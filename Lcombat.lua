@@ -2243,10 +2243,10 @@ function CastSorcery(name)
 			mobHits("MSS!",false,"SPL")
 		end
 		
-	elseif name=="Ice Sword" then
+	elseif name=="Ice Spear" then
 		local isHit=EvadeCalc("mob",64)
 		if isHit>0 then
-			local Damage=DamageCalc("mob",(math.random(15,20)/10),48,2)
+			local Damage=DamageCalc("mob",(math.random(15,20)/10),48,4)
 			if (Damage)<=0 then
 				mobHits("BLK!",false,"SPL")
 			else

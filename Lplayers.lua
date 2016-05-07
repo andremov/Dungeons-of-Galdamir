@@ -104,7 +104,7 @@ function CreatePlayers(name)
 		{"Poison Blade","Inflicts poison.",false,16,19},
 		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,26,37},
 		{"Healing","Heals for 20% of maximum Hit Points.",false,58,4},
-		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,46,51},
+		{"Ice Spear","Hits for twice damage and reduces enemy's dexterity.",false,51,46},
 	}
 	--Secondary Stats
 	player.portcd=0
