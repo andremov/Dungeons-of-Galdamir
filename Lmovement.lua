@@ -18,8 +18,8 @@ local mup
 local mdown
 local mleft
 local inter
-local espaciox=80
-local espacioy=80
+local scale=1.1
+local espacio=80*scale
 local yinicial=display.contentHeight/2
 local xinicial=display.contentWidth/2
 local Toggle=math.random(3,6)
@@ -56,7 +56,6 @@ function ShowArrows(value)
 			Toggle=math.random(3,6)
 			mob.DoTurns()
 		else
-			Visibility()
 			Ports=coll.PortCheck()
 			Shop=coll.ShopCheck()
 			CanMoveDown=true
@@ -126,7 +125,9 @@ function ShowArrows(value)
 					if (mobs[i].loc==p1.loc-(math.sqrt(size))) then
 						mup=display.newImageRect("interact1.png",80,80)
 						mup.x=xinicial
-						mup.y=yinicial-espacioy
+						mup.y=yinicial-espacio
+						mup.xScale=scale
+						mup.yScale=mup.xScale
 						mup:toFront()		
 						mup:addEventListener( "touch",attackup)
 						CanMoveUp=false
@@ -139,7 +140,9 @@ function ShowArrows(value)
 					if (mobs[i].loc==p1.loc+(math.sqrt(size))) then
 						mdown=display.newImageRect("interact1.png",80,80)
 						mdown.x=xinicial
-						mdown.y=yinicial+espacioy
+						mdown.y=yinicial+espacio
+						mdown.xScale=scale
+						mdown.yScale=mdown.xScale
 						mdown:toFront()		
 						mdown:addEventListener( "touch",attackdown)
 						CanMoveDown=false
@@ -151,8 +154,10 @@ function ShowArrows(value)
 				if (mobs[i]) then
 					if (mobs[i].loc==p1.loc-1) then
 						mleft=display.newImageRect("interact1.png",80,80)
-						mleft.x=xinicial-espaciox
+						mleft.x=xinicial-espacio
 						mleft.y=yinicial
+						mleft.xScale=scale
+						mleft.yScale=mleft.xScale
 						mleft:toFront()		
 						mleft:addEventListener( "touch",attackleft)
 						CanMoveLeft=false
@@ -164,8 +169,10 @@ function ShowArrows(value)
 				if (mobs[i]) then
 					if (mobs[i].loc==p1.loc+1) then
 						mright=display.newImageRect("interact1.png",80,80)
-						mright.x=xinicial+espaciox
+						mright.x=xinicial+espacio
 						mright.y=yinicial
+						mright.xScale=scale
+						mright.yScale=mright.xScale
 						mright:toFront()		
 						mright:addEventListener( "touch",attackright)
 						CanMoveRight=false
@@ -180,6 +187,8 @@ function ShowArrows(value)
 				inter=display.newImageRect("interact5.png",80,80)
 				inter.x=xinicial
 				inter.y=yinicial
+				inter.xScale=scale
+				inter.yScale=inter.xScale
 				inter:toFront()
 				inter:addEventListener( "touch",ShopInteract)
 			end
@@ -189,18 +198,24 @@ function ShowArrows(value)
 					inter=display.newImageRect("interact3.png",80,80)
 					inter.x=xinicial
 					inter.y=yinicial
+					inter.xScale=scale
+					inter.yScale=inter.xScale
 					inter:toFront()
 					inter:addEventListener( "touch",PortInteract)
 				elseif Ports=="OP" and p1.portcd==0 then
 					inter=display.newImageRect("interact4.png",80,80)
 					inter.x=xinicial
 					inter.y=yinicial
+					inter.xScale=scale
+					inter.yScale=inter.xScale
 					inter:toFront()
 					inter:addEventListener( "touch",PortInteract)
 				elseif Ports=="RP" then
 					inter=display.newImageRect("interact1.png",80,80)
 					inter.x=xinicial
 					inter.y=yinicial
+					inter.xScale=scale
+					inter.yScale=inter.xScale
 					inter:toFront()
 					inter:addEventListener( "touch",PortInteract)
 				end
@@ -214,12 +229,16 @@ function ShowArrows(value)
 						inter=display.newImageRect("interact2.png",80,80)
 						inter.x=xinicial
 						inter.y=yinicial
+						inter.xScale=scale
+						inter.yScale=inter.xScale
 						inter:toFront()
 						inter:addEventListener( "touch",GoinUp)
 					else
 						inter=display.newImageRect("interact2.png",80,80)
 						inter.x=xinicial
 						inter.y=yinicial
+						inter.xScale=scale
+						inter.yScale=inter.xScale
 						inter:toFront()
 						inter:addEventListener( "touch",GoinDown)
 					end
@@ -231,12 +250,16 @@ function ShowArrows(value)
 					inter=display.newImageRect("interact2.png",80,80)
 					inter.x=xinicial
 					inter.y=yinicial
+					inter.xScale=scale
+					inter.yScale=inter.xScale
 					inter:toFront()
 					inter:addEventListener( "touch",GoinDown)
 				else
 					inter=display.newImageRect("interact2.png",80,80)
 					inter.x=xinicial
 					inter.y=yinicial
+					inter.xScale=scale
+					inter.yScale=inter.xScale
 					inter:toFront()
 					inter:addEventListener( "touch",GoinUp)
 				end
@@ -245,7 +268,9 @@ function ShowArrows(value)
 			if CanMoveUp==true then
 				mup=display.newImageRect("moveu.png",80,80)
 				mup.x=xinicial
-				mup.y=yinicial-espaciox
+				mup.y=yinicial-espacio
+				mup.xScale=scale
+				mup.yScale=mup.xScale
 				mup:toFront()
 				mup:addEventListener( "touch",moveplayerup)
 			end
@@ -253,23 +278,29 @@ function ShowArrows(value)
 			if CanMoveDown==true then
 				mdown=display.newImageRect("moved.png",80,80)
 				mdown.x=xinicial
-				mdown.y=yinicial+espacioy
+				mdown.y=yinicial+espacio
+				mdown.xScale=scale
+				mdown.yScale=mdown.xScale
 				mdown:toFront()
 				mdown:addEventListener( "touch",moveplayerdown)
 			end
 			
 			if CanMoveLeft==true then
 				mleft=display.newImageRect("movel.png",80,80)
-				mleft.x=xinicial-espaciox
+				mleft.x=xinicial-espacio
 				mleft.y=yinicial
+				mleft.xScale=scale
+				mleft.yScale=mleft.xScale
 				mleft:toFront()
 				mleft:addEventListener( "touch",moveplayerleft)
 			end
 			
 			if CanMoveRight==true then
 				mright=display.newImageRect("mover.png",80,80)
-				mright.x=xinicial+espaciox
+				mright.x=xinicial+espacio
 				mright.y=yinicial
+				mright.xScale=scale
+				mright.yScale=mright.xScale
 				mright:toFront()
 				mright:addEventListener( "touch",moveplayerright)
 			end
@@ -278,30 +309,45 @@ function ShowArrows(value)
 end
 
 function Visibility()
-	if (Tiles) then
-		for l=table.maxn(Tiles),1,-1 do
-			Tiles[l]=nil
-		end
-		Tiles=nil
-	end
-	Tiles={}
+	local Tiles={}
+	local Seen={}
+	Tiles[#Tiles+1]=true
+	
 	p1=p.GetPlayer()
 	boundary=b.GetData(1)
-	size=b.GetData(0)
-	size=math.sqrt(size)
+	mbounds=b.GetData(2)
+	msize=b.GetData(0)
+	size=math.sqrt(msize)
 	
-	b.Show(p1.loc)
-	for c=1,5 do
+	--Player's Place
+	Seen[(p1.loc)]=1
+	
+	--Surrounding tiles
+	for x=1,3,2 do
+		for y=1,3,2 do
+			if boundary[p1.loc+(x-2)+((y-2)*size)]==0 then
+				--Player can't walk here
+				Seen[(p1.loc+(x-2)+((y-2)*size))]=1
+			elseif boundary[p1.loc+((y-2)*size)]==1 and boundary[p1.loc+(x-2)]==1 then
+				--Player can walk, check near walls
+				Seen[(p1.loc+(x-2)+((y-2)*size))]=1
+			end
+		end
+	end
+	
+	--Tiles to the left
+	for c=1,4 do
 		if math.floor((p1.loc)/size)==math.floor((p1.loc-c)/size) then
-			if boundary[(p1.loc-c)]==1 then
-				if c==1 or Tiles[#Tiles]~=false then
-					Tiles[#Tiles+1]=true
-					b.Show(p1.loc-c)
-				else
+			if boundary[(p1.loc-c)]==1 and Tiles[#Tiles]~=false then
+				if mbounds[(p1.loc-c)]==0 then
+					Seen[(p1.loc-c)]=1
 					Tiles[#Tiles+1]=false
+				else
+					Seen[(p1.loc-c)]=1
+					Tiles[#Tiles+1]=true
 				end
 			elseif Tiles[#Tiles]==true and boundary[(p1.loc-c)]==0 then
-				b.Show(p1.loc-c)
+					Seen[(p1.loc-c)]=1
 				Tiles[#Tiles+1]=false
 			else
 				Tiles[#Tiles+1]=false
@@ -313,21 +359,22 @@ function Visibility()
 		for l=table.maxn(Tiles),1,-1 do
 			Tiles[l]=nil
 		end
-		Tiles=nil
+		Tiles[#Tiles+1]=true
 	end
-	Tiles={}
-	
-	for c=1,5 do
-		if math.floor((p1.loc)/size)==math.floor((p1.loc+c)/size) then
-			if boundary[(p1.loc+c)]==1 then
-				if c==1 or Tiles[#Tiles]~=false then
-					Tiles[#Tiles+1]=true
-					b.Show(p1.loc+c)
-				else
+
+	--Tiles to the right
+	for c=1,4 do
+		if math.floor((p1.loc)/size)==math.floor((p1.loc+c-1)/size) then
+			if boundary[(p1.loc+c)]==1 and Tiles[#Tiles]~=false then
+				if mbounds[(p1.loc+c)]==0 then
+					Seen[(p1.loc+c)]=1
 					Tiles[#Tiles+1]=false
+				else
+					Seen[(p1.loc+c)]=1
+					Tiles[#Tiles+1]=true
 				end
 			elseif Tiles[#Tiles]==true and boundary[(p1.loc+c)]==0 then
-				b.Show(p1.loc+c)
+				Seen[(p1.loc+c)]=1
 				Tiles[#Tiles+1]=false
 			else
 				Tiles[#Tiles+1]=false
@@ -339,21 +386,22 @@ function Visibility()
 		for l=table.maxn(Tiles),1,-1 do
 			Tiles[l]=nil
 		end
-		Tiles=nil
+		Tiles[#Tiles+1]=true
 	end
-	Tiles={}
-	
+
+	--Tiles upwards
 	for r=1,6 do
 		if ((p1.loc)%size)==((p1.loc-(r*size))%size) then
-			if boundary[(p1.loc-(r*size))]==1 then
-				if r==1 or Tiles[#Tiles]~=false then
-					Tiles[#Tiles+1]=true
-					b.Show(p1.loc-(r*size))
-				else
+			if boundary[(p1.loc-(r*size))]==1 and Tiles[#Tiles]~=false then
+				if mbounds[(p1.loc-(r*size))]==0 then
+					Seen[(p1.loc-(r*size))]=1
 					Tiles[#Tiles+1]=false
+				else
+					Seen[(p1.loc-(r*size))]=1
+					Tiles[#Tiles+1]=true
 				end
 			elseif Tiles[#Tiles]==true and boundary[(p1.loc-(r*size))]==0 then
-				b.Show(p1.loc-(r*size))
+				Seen[(p1.loc-(r*size))]=1
 				Tiles[#Tiles+1]=false
 			else
 				Tiles[#Tiles+1]=false
@@ -365,21 +413,22 @@ function Visibility()
 		for l=table.maxn(Tiles),1,-1 do
 			Tiles[l]=nil
 		end
-		Tiles=nil
+		Tiles[#Tiles+1]=true
 	end
-	Tiles={}
 	
+	--Tiles downwards
 	for r=1,6 do
 		if ((p1.loc)%size)==((p1.loc+(r*size))%size) then
-			if boundary[(p1.loc+(r*size))]==1 then
-				if r==1 or Tiles[#Tiles]~=false then
-					Tiles[#Tiles+1]=true
-					b.Show(p1.loc+(r*size))
-				else
+			if boundary[(p1.loc+(r*size))]==1 and Tiles[#Tiles]~=false then
+				if mbounds[(p1.loc+(r*size))]==0 then
+					Seen[(p1.loc+(r*size))]=1
 					Tiles[#Tiles+1]=false
+				else
+					Seen[(p1.loc+(r*size))]=1
+					Tiles[#Tiles+1]=true
 				end
 			elseif Tiles[#Tiles]==true and boundary[(p1.loc+(r*size))]==0 then
-				b.Show(p1.loc+(r*size))
+				Seen[(p1.loc+(r*size))]=1
 				Tiles[#Tiles+1]=false
 			else
 				Tiles[#Tiles+1]=false
@@ -387,124 +436,18 @@ function Visibility()
 		end
 	end
 	
-	for x=1,5 do
-		for y=1,5 do--[[
-			if (math.floor(p1.loc%size))==2 and x==1 then
-			elseif (math.floor(p1.loc%size))==size-1 and x==5 then
-			elseif (math.floor(p1.loc/size))==1 and y==1 then
-			elseif (math.floor(p1.loc/size))==size-1 and y==5 then
-			else]]
-				if x==1 and y==1 then
-					if boundary[p1.loc+((x+1)-3)+((y-3)*size)]==1 and 
-						boundary[p1.loc+(x-3)+(((y+1)-3)*size)]==1 and 
-						boundary[p1.loc+((x+1)-3)+(((y+1)-3)*size)]==1 and 
-						boundary[p1.loc+((x+2)-3)+(((y+1)-3)*size)]==1 and 
-						boundary[p1.loc+((x+1)-3)+(((y+2)-3)*size)]==1 then
-							b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==5 and y==1 then
-					if boundary[p1.loc+((x-1)-3)+((y-3)*size)]==1 and 
-						boundary[p1.loc+(x-3)+(((y+1)-3)*size)]==1 and 
-						boundary[p1.loc+((x-1)-3)+(((y+1)-3)*size)]==1 and 
-						boundary[p1.loc+((x-2)-3)+(((y+1)-3)*size)]==1 and 
-						boundary[p1.loc+((x-1)-3)+(((y+2)-3)*size)]==1 then
-							b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==1 and y==5 then
-					if boundary[p1.loc+((x+1)-3)+((y-3)*size)]==1 and 
-						boundary[p1.loc+(x-3)+(((y-1)-3)*size)]==1 and 
-						boundary[p1.loc+((x+1)-3)+(((y-1)-3)*size)]==1 and 
-						boundary[p1.loc+((x+2)-3)+(((y-1)-3)*size)]==1 and 
-						boundary[p1.loc+((x+1)-3)+(((y-2)-3)*size)]==1 then
-							b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==5 and y==5 then
-					if boundary[p1.loc+((x-1)-3)+((y-3)*size)]==1 and 
-						boundary[p1.loc+(x-3)+(((y-1)-3)*size)]==1 and 
-						boundary[p1.loc+((x-1)-3)+(((y-1)-3)*size)]==1 and 
-						boundary[p1.loc+((x-2)-3)+(((y-1)-3)*size)]==1 and 
-						boundary[p1.loc+((x-1)-3)+(((y-2)-3)*size)]==1 then
-							b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==2 and y==2 then
-					if boundary[p1.loc+((x+1)-3)+((y-3)*size)]==1 or boundary[p1.loc+(x-3)+(((y+1)-3)*size)]==1 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					elseif boundary[p1.loc+(x-3)+((y-3)*size)]==0 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==2 and y==4 then
-					if boundary[p1.loc+((x+1)-3)+((y-3)*size)]==1 or boundary[p1.loc+(x-3)+(((y-1)-3)*size)]==1 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					elseif boundary[p1.loc+(x-3)+((y-3)*size)]==0 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==4 and y==2 then
-					if boundary[p1.loc+((x-1)-3)+((y-3)*size)]==1 or boundary[p1.loc+(x-3)+(((y+1)-3)*size)]==1 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					elseif boundary[p1.loc+(x-3)+((y-3)*size)]==0 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==4 and y==4 then
-					if boundary[p1.loc+((x-1)-3)+((y-3)*size)]==1 or boundary[p1.loc+(x-3)+(((y-1)-3)*size)]==1 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					elseif boundary[p1.loc+(x-3)+((y-3)*size)]==0 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==1 and y==2 then
-					if boundary[p1.loc+((x+1)-3)+((y-3)*size)]==1 and boundary[p1.loc+((x+1)-3)+(((y+1)-3)*size)]==1 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==1 and y==4 then
-					if boundary[p1.loc+((x+1)-3)+((y-3)*size)]==1 and boundary[p1.loc+((x+1)-3)+(((y-1)-3)*size)]==1 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==2 and y==1 then
-					if boundary[p1.loc+((x+1)-3)+(((y+1)-3)*size)]==1 and boundary[p1.loc+(x-3)+(((y+1)-3)*size)]==1 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==2 and y==5 then
-					if boundary[p1.loc+((x+1)-3)+(((y-1)-3)*size)]==1 and boundary[p1.loc+(x-3)+(((y-1)-3)*size)]==1 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==4 and y==1 then
-					if boundary[p1.loc+((x-1)-3)+(((y+1)-3)*size)]==1 and boundary[p1.loc+(x-3)+(((y+1)-3)*size)]==1 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==4 and y==5 then
-					if boundary[p1.loc+((x-1)-3)+(((y-1)-3)*size)]==1 and boundary[p1.loc+(x-3)+(((y-1)-3)*size)]==1 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==5 and y==2 then
-					if boundary[p1.loc+((x-1)-3)+((y-3)*size)]==1 and boundary[p1.loc+((x-1)-3)+(((y+1)-3)*size)]==1 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==5 and y==4 then
-					if boundary[p1.loc+((x-1)-3)+((y-3)*size)]==1 and boundary[p1.loc+((x-1)-3)+(((y-1)-3)*size)]==1 then
-						b.Show(p1.loc+(x-3)+((y-3)*size))
-					end
-				elseif x==3 and y==2 then
-					b.Show(p1.loc+(x-3)+((y-3)*size))
-				elseif x==3 and y==4 then
-					b.Show(p1.loc+(x-3)+((y-3)*size))
-				elseif x==2 and y==3 then
-					b.Show(p1.loc+(x-3)+((y-3)*size))
-				elseif x==4 and y==3 then
-					b.Show(p1.loc+(x-3)+((y-3)*size))
-				end
-	--		end
-		end
-	end
+	b.Show(Seen)
 end
 
 function PortInteract( event )
-	if event.phase~="ended" then
+	if event.phase=="ended" then
 		ShowArrows("clean")
 		coll.Port()
 	end
 end
 
 function ShopInteract( event )
-	if event.phase~="ended" then
+	if event.phase=="ended" then
 		ShowArrows("clean")
 		function closure1()
 			sho.DisplayShop(p1.loc)
@@ -514,79 +457,79 @@ function ShopInteract( event )
 end
 
 function GoinDown( event )
-	if event.phase~="ended" then
+	if event.phase=="ended" then
 		WD.FloorPort(false)
 	end
 end
 
 function GoinUp( event )
-	if event.phase~="ended" then
+	if event.phase=="ended" then
 		WD.Win()
 	end
 end
 
 function moveplayerup( event )
-	if event.phase~="ended" then
+	if event.phase=="ended" then
 		map=b.GetData(3)
 		P1=p.GetPlayer()
-		map.y=map.y+80
+		map.y=map.y+espacio
 		p.MovePlayer(-math.sqrt(size))
 		if Slowed==true then
-			Toggle=Toggle-2
+			Toggle=Toggle-3
 		else
 			Toggle=Toggle-1
 		end
-		ShowArrows()
+		Visibility()
 	end
 end
 
 function moveplayerdown( event )
-	if event.phase~="ended" then
+	if event.phase=="ended" then
 		map=b.GetData(3)
 		P1=p.GetPlayer()
-		map.y=map.y-80
+		map.y=map.y-espacio
 		p.MovePlayer(math.sqrt(size))
 		if Slowed==true then
-			Toggle=Toggle-2
+			Toggle=Toggle-3
 		else
 			Toggle=Toggle-1
 		end
-		ShowArrows()
+		Visibility()
 	end
 end	
 
 function moveplayerleft( event )
-	if event.phase~="ended" then
+	if event.phase=="ended" then
 		map=b.GetData(3)
 		P1=p.GetPlayer()
-		map.x=map.x+80
+		map.x=map.x+espacio
 		p.MovePlayer(-1)
 		if Slowed==true then
-			Toggle=Toggle-2
+			Toggle=Toggle-3
 		else
 			Toggle=Toggle-1
 		end
-		ShowArrows()
+		Visibility()
 	end
 end	
 
 function moveplayerright( event )
-	if event.phase~="ended" then
+	if event.phase=="ended" then
 		map=b.GetData(3)
 		P1=p.GetPlayer()
-		map.x=map.x-80
+		map.x=map.x-espacio
 		p.MovePlayer(1)
 		if Slowed==true then
-			Toggle=Toggle-2
+			Toggle=Toggle-3
 		else
 			Toggle=Toggle-1
 		end
-		ShowArrows()
+		Visibility()
 	end
 end
 
 function attackup( event )
-	if event.phase~="ended" then
+	if event.phase=="ended" then
 		ShowArrows("clean")
 		--
 		for i=1, table.maxn(mobs) do
@@ -603,7 +546,7 @@ function attackup( event )
 end
 
 function attackdown( event )
-	if event.phase~="ended" then
+	if event.phase=="ended" then
 		ShowArrows("clean")
 		--
 		for i=1, table.maxn(mobs) do
@@ -620,7 +563,7 @@ function attackdown( event )
 end	
 
 function attackleft( event )
-	if event.phase~="ended" then
+	if event.phase=="ended" then
 		ShowArrows("clean")
 		--
 		for i=1, table.maxn(mobs) do
@@ -637,7 +580,7 @@ function attackleft( event )
 end	
 
 function attackright( event )
-	if event.phase~="ended" then
+	if event.phase=="ended" then
 		ShowArrows("clean")
 		--
 		for i=1, table.maxn(mobs) do

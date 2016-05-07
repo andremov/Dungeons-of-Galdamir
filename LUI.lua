@@ -146,7 +146,7 @@ function MovePause(val)
 	if (pwg) then
 		if pwg.x==0 and val~=true then
 			window.loc=0
-			m.ShowArrows()
+			m.Visibility()
 		elseif pwg.x==-350 and val~=true then
 			window.loc=1
 		else

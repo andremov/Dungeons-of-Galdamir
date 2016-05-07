@@ -16,7 +16,6 @@ local ui=require("Lui")
 local q=require("Lquest")
 local inv=require("Lwindow")
 local itm=require("Litems")
-local physics = require "physics"
 local WD=require("Lprogress")
 local m=require("Lmovement")
 local sav=require("Lsaving")
@@ -28,8 +27,6 @@ local DoLoad=false
 function Startup(val)
 	if val~=false then
 	--	print "Game loading..."
-		physics.start()
-		physics.setGravity(0,30)
 		DoStuff=true
 	elseif val==false then
 		DoStuff=false
@@ -115,7 +112,7 @@ function Continue()
 			audio.Play(10)
 		end
 		if DoStuff==false then
-			m.ShowArrows()
+			m.Visibility()
 		end
 		return false
 	end

@@ -549,7 +549,7 @@ function ToggleExit()
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=30,
 			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
+			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = DoExit}
 		AcceptBtn:setReferencePoint( display.CenterReferencePoint )
@@ -562,7 +562,7 @@ function ToggleExit()
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=30,
 			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
+			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = ToggleExit}
 		BackBtn:setReferencePoint( display.CenterReferencePoint )
@@ -699,7 +699,7 @@ function DeathMenu(cause)
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=30,
 			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
+			overFile="cbutton-over.png",
 			width=290, height=80,
 			onRelease = onToMenuBtnRelease
 		}
@@ -930,7 +930,7 @@ function UseMenu(id,slot)
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=30,
 			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
+			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = UseMenu}
 		backbtn:setReferencePoint( display.CenterReferencePoint )
@@ -943,7 +943,7 @@ function UseMenu(id,slot)
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=30,
 			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
+			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = DroppedIt}
 		dropbtn:setReferencePoint( display.CenterReferencePoint )
@@ -961,7 +961,7 @@ function UseMenu(id,slot)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = UsedIt
 			}
@@ -987,7 +987,7 @@ function UseMenu(id,slot)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = EquippedIt
 			}
@@ -1059,7 +1059,7 @@ function UseMenu(id,slot)
 					labelColor = { default={255,255,255}, over={0,0,0} },
 					fontSize=30,
 					defaultFile="cbutton.png",
-					overFile="cbutton2.png",
+					overFile="cbutton-over.png",
 					width=200, height=55,
 					onRelease = UsedIt
 				}
@@ -1073,7 +1073,7 @@ function UseMenu(id,slot)
 					labelColor = { default={255,255,255}, over={0,0,0} },
 					fontSize=30,
 					defaultFile="cbutton.png",
-					overFile="cbutton2.png",
+					overFile="cbutton-over.png",
 					width=200, height=55,
 					onRelease = UsedIt
 				}
@@ -1101,7 +1101,7 @@ function UseMenu(id,slot)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = LearnedIt
 			}
@@ -1129,7 +1129,7 @@ function UseMenu(id,slot)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = StatBoost
 			}

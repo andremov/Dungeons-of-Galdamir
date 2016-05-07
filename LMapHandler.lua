@@ -26,9 +26,9 @@ local CurSize
 local CurTile
 local Testing=false
 
-function GetCMap()
+function GetCMap(value)
 	Round=WD.Circle()
-	if Testing==false then
+	if Testing==false and value~=-1 then
 		if SizeID==1 then
 			currentmap=mapsS[1]
 			return currentmap
@@ -42,6 +42,9 @@ function GetCMap()
 			currentmap=mapsH[1]
 			return currentmap
 		end
+	elseif value==-1 then
+		currentmap=tutorial[1]
+		return currentmap
 	elseif Testing==true then
 		currentmap=testin[1]
 		return currentmap
@@ -73,11 +76,6 @@ function GetTiles()
 end
 
 function MapSizeMenu()
-
-	local background = display.newImageRect( "bkgs/bkgsize.png", display.contentWidth, display.contentHeight )
-	background:setReferencePoint( display.TopLeftReferencePoint )
-	background.x, background.y = 0, 0
-	opt:insert(background)
 	
 	function onBackRelease()
 		for i=opt.numChildren,1,-1 do
@@ -129,129 +127,135 @@ function MapSizeMenu()
 	
 	local SmallBtn = widget.newButton{
 		label="Small Map",
-		labelColor = { default={0,0,0}, over={255,255,255} },
+		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
-		defaultFile="button1.png",
-		overFile="button1-over.png",
-		width=308, height=80,
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
 		onRelease = SmallMap
 	}
 	SmallBtn:setReferencePoint( display.CenterReferencePoint )
 	SmallBtn.x = display.contentWidth*0.5-160
-	SmallBtn.y = display.contentHeight*0.31
+	SmallBtn.y = display.contentHeight*0.3
 	opt:insert(SmallBtn)
 	
 	local MedBtn = widget.newButton{
 		label="Medium Map",
-		labelColor = { default={0,0,0}, over={255,255,255} },
+		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
-		defaultFile="button1.png",
-		overFile="button1-over.png",
-		width=308, height=80,
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
 		onRelease = MedMap
 	}
 	MedBtn:setReferencePoint( display.CenterReferencePoint )
 	MedBtn.x = SmallBtn.x
-	MedBtn.y = SmallBtn.y+90
+	MedBtn.y = SmallBtn.y+100
 	opt:insert(MedBtn)
 	
 	local LargeBtn = widget.newButton{
 		label="Large Map",
-		labelColor = { default={0,0,0}, over={255,255,255} },
+		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
-		defaultFile="button1.png",
-		overFile="button1-over.png",
-		width=308, height=80,
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
 		onRelease = LargeMap
 	}
 	LargeBtn:setReferencePoint( display.CenterReferencePoint )
 	LargeBtn.x = SmallBtn.x
-	LargeBtn.y = MedBtn.y+90
+	LargeBtn.y = MedBtn.y+100
 	opt:insert(LargeBtn)
 	
 	local HCBtn = widget.newButton{
 		label="Hardcore Map",
-		labelColor = { default={0,0,0}, over={255,255,255} },
+		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
-		defaultFile="button1.png",
-		overFile="button1-over.png",
-		width=308, height=80,
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
 		onRelease = HCMap
 	}
 	HCBtn:setReferencePoint( display.CenterReferencePoint )
 	HCBtn.x = SmallBtn.x
-	HCBtn.y = LargeBtn.y+90
+	HCBtn.y = LargeBtn.y+100
 	opt:insert(HCBtn)
 	
 	local DefaultTS = widget.newButton{
 		label="Default Tileset",
-		labelColor = { default={0,0,0}, over={255,255,255} },
+		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
-		defaultFile="button1.png",
-		overFile="button1-over.png",
-		width=308, height=80,
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
 		onRelease = DefaultTSet
 	}
 	DefaultTS:setReferencePoint( display.CenterReferencePoint )
 	DefaultTS.x = display.contentWidth*0.5+160
-	DefaultTS.y = display.contentHeight*0.31
+	DefaultTS.y = display.contentHeight*0.3
 	opt:insert(DefaultTS)
 	
 	local NotebookTS = widget.newButton{
 		label="Notebook Tileset",
-		labelColor = { default={0,0,0}, over={255,255,255} },
+		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
-		defaultFile="button1.png",
-		overFile="button1-over.png",
-		width=308, height=80,
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
 		onRelease = NotebookTSet
 	}
 	NotebookTS:setReferencePoint( display.CenterReferencePoint )
 	NotebookTS.x = DefaultTS.x
-	NotebookTS.y = DefaultTS.y+90
+	NotebookTS.y = DefaultTS.y+100
 	opt:insert(NotebookTS)
 	
 	local RealTS = widget.newButton{
 		label="Realistic Tileset",
-		labelColor = { default={0,0,0}, over={255,255,255} },
+		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
-		defaultFile="button1.png",
-		overFile="button1-over.png",
-		width=308, height=80,
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
 		onRelease = RealTSet
 	}
 	RealTS:setReferencePoint( display.CenterReferencePoint )
 	RealTS.x = NotebookTS.x
-	RealTS.y = NotebookTS.y+90
+	RealTS.y = NotebookTS.y+100
 	opt:insert(RealTS)
 	
 	local BWTS = widget.newButton{
 		label="Black & White Tileset",
-		labelColor = { default={0,0,0}, over={255,255,255} },
+		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
-		defaultFile="button1.png",
-		overFile="button1-over.png",
-		width=308, height=80,
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
 		onRelease = BWTSet
 	}
 	BWTS:setReferencePoint( display.CenterReferencePoint )
 	BWTS.x = RealTS.x
-	BWTS.y = RealTS.y+90
+	BWTS.y = RealTS.y+100
 	opt:insert(BWTS)
 	
-	local Back = widget.newButton{
+	title=display.newText("Map Customization",0,0,"MoolBoran",100)
+	title.x = display.contentWidth*0.5
+	title.y = 100
+	title:setTextColor(125,250,125)
+	opt:insert(title)
+	
+	local BackBtn = widget.newButton{
 		label="Back",
-		labelColor = { default={0,0,0}, over={255,255,255} },
+		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
-		defaultFile="button1.png",
-		overFile="button1-over.png",
-		width=308, height=80,
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
 		onRelease = onBackRelease
 	}
-	Back:setReferencePoint( display.CenterReferencePoint )
-	Back.x = display.contentWidth*0.5
-	Back.y = display.contentHeight-120
-	opt:insert(Back)
+	BackBtn:setReferencePoint( display.CenterReferencePoint )
+	BackBtn.x = display.contentWidth*0.5
+	BackBtn.y = display.contentHeight-100
+	opt:insert(BackBtn)
 	
 	if SizeID==1 then
 		CurSize = display.newText( ("Current Map Size: Small"), 0, 0, "MoolBoran", 75 )

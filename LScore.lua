@@ -6,15 +6,13 @@
 module(..., package.seeall)
 local widget = require "widget"
 local audio = require("Laudio")
-local menu = require("Lmenu")
+local o = require("Loptions")
 local v = require("Lversion")
 local ghs=display.newGroup()
 local Score
 local GVersion
 local OKVers={
-		"BETA 1.9.0",
-		"BETA 1.9.1",
-		"BETA 1.9.2",
+		"GAMMA 1.0.0",
 	}
 local Default={
 		"Brownie S.",10000,
@@ -49,16 +47,12 @@ function onBackBtn()
 		local child = ghs[i]
 		child.parent:remove( child )
 	end
-	menu.ShowMenu()
-	menu.ReadySetGo()
+	o.DisplayOptions()
 end
 
 function Scoring(round,p1,size)
 	Score=(
-		(size/5)
-	)
-	Score=(
-		Score*(round-1)
+		(round-1)
 	)
 	Score=(
 		Score+1
@@ -67,10 +61,10 @@ function Scoring(round,p1,size)
 		p1.gp/Score
 	)
 	Score=(
-		Score^(round)
+		Score^((size/10)-1)
 	)
 	Score=(
-		math.floor((Score*p1.lvl)*((p1.stats[1]+p1.stats[2]+p1.stats[3]+p1.stats[4]+p1.stats[5]+p1.stats[6])/6))
+		math.floor(Score*((p1.stats[1]+p1.stats[2]+p1.stats[3]+p1.stats[4]+p1.stats[5]+p1.stats[6])/6))
 	)
 	isHigh(Score,p1.name)
 	return Score
@@ -78,6 +72,7 @@ end
 
 function isHigh(val,name)
 	if val~=nil then
+		CheckScore()
 		Sve={}
 		local path = system.pathForFile(  "DoGScores.sco", system.DocumentsDirectory )
 		for line in io.lines( path ) do
@@ -120,23 +115,24 @@ end
 function HighScores()
 	--Displays high scores
 	
-	local background = display.newImageRect( "bkgs/score.png", display.contentWidth, display.contentHeight )
-	background:setReferencePoint( display.TopLeftReferencePoint )
-	background.x, background.y = 0, 0
-	ghs:insert(background)
+	title=display.newText("High Scores",0,0,"MoolBoran",100)
+	title.x = display.contentWidth*0.5
+	title.y = 100
+	title:setTextColor(125,250,125)
+	ghs:insert(title)
 	
 	BackBtn = widget.newButton{
 		label="Back",
-		labelColor = { default={0,0,0}, over={255,255,255} },
+		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
-		defaultFile="button1.png",
-		overFile="button1-over.png",
-		width=308, height=80,
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
 		onRelease = onBackBtn
 	}
 	BackBtn:setReferencePoint( display.CenterReferencePoint )
 	BackBtn.x = display.contentWidth*0.5
-	BackBtn.y = display.contentHeight-70
+	BackBtn.y = display.contentHeight-100
 	ghs:insert(BackBtn)
 	
 	Sve={}
@@ -144,18 +140,29 @@ function HighScores()
 	local path = system.pathForFile(  "DoGScores.sco", system.DocumentsDirectory )
 	for line in io.lines( path ) do
 		n = tonumber(line)
-		
 		if n == nil then
 			Sve[#Sve+1]=line
 		else
 			Sve[#Sve+1]=n
 		end
 	end
+	Nums={}
+	for n=1,10 do
+		Nums[#Nums+1] = display.newText( (n.."."),50,145+(72*#Nums),"MoolBoran", 75 )
+		Nums[#Nums]:setTextColor(250,250,125)
+		ghs:insert(Nums[#Nums])
+	end
+	
+	Lines={}
+	for l=1,10 do
+		Lines[#Lines+1] = display.newText( ("___________________________"),135,145+(72*#Lines),"MoolBoran", 75 )
+		Lines[#Lines]:setTextColor(125,125,125)
+		ghs:insert(Lines[#Lines])
+	end
 	
 	Text={}
-	
-	for l=2,21,2 do
-		Text[#Text+1] = display.newText( ( (Sve[l].." - "..Sve[l+1]) ) ,140,145+(72*#Text),"MoolBoran", 75 )
+	for t=2,21,2 do
+		Text[#Text+1] = display.newText( ( (Sve[t].." - "..Sve[t+1]) ) ,140,145+(72*#Text),"MoolBoran", 75 )
 		ghs:insert(Text[#Text])
 	end
 end

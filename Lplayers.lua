@@ -23,6 +23,7 @@ local Map
 local check=119
 local player
 local Cheat=false
+local scale=1.1
 local StrongForce
 local transp
 local transp2
@@ -49,6 +50,8 @@ function CreatePlayers(name)
 	player=display.newImageRect( "chars/"..char.."/"..class.."/char.png", 76 ,76)
 	player.x, player.y = display.contentWidth/2, display.contentHeight/2
 	player:setStrokeColor(50, 50, 255)
+	player.xScale=scale
+	player.yScale=player.xScale
 	player.strokeWidth = 4
 	--Leveling
 	if name==nil or name=="" or name==" " then

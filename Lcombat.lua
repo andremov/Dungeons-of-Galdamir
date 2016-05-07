@@ -262,7 +262,7 @@ function ShowActions()
 	
 	if not(MagicBtn)then
 		MagicBtn= widget.newButton{
-			label="Sorcery",
+			label="Spellbook",
 			labelColor = { default={0,0,0}, over={255,255,255} },
 			fontSize=35,
 			defaultFile="combataction.png",
@@ -283,7 +283,7 @@ function ShowActions()
 	
 	if not(ItemBtn)then
 		ItemBtn= widget.newButton{
-			label="Item",
+			label="Inventory",
 			labelColor = { default={0,0,0}, over={255,255,255} },
 			fontSize=35,
 			defaultFile="combataction.png",
@@ -1194,29 +1194,25 @@ function PlayerAttacks(atktype)
 			local Damage=DamageCalc("mob",(math.random(15,20)/10),force,atkstat)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,false)
-				UpdateStats()
 			else
 				enemy.HP=enemy.HP-Damage
 				MobSprite(3)
-				UpdateStats()
 				Hits((Damage),true,true,false)
 			end
 		else
 			local Damage=DamageCalc("mob",1,force,atkstat)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,false)
-				UpdateStats()
 			else
 				enemy.HP=enemy.HP-Damage
 				MobSprite(3)
-				UpdateStats()
 				Hits((Damage),false,true,false)
 			end
 		end
 	else
 		Hits("MSS!",false,true,false)
-		UpdateStats()
 	end
+	UpdateStats()
 end
 
 function EndTurn()
@@ -1295,7 +1291,7 @@ function EndCombat(outcome)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=290, height=80,
 				onRelease = AcceptOutcome
 			}
@@ -1395,7 +1391,7 @@ function EndCombat(outcome)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=290, height=80,
 				onRelease = AcceptOutcome
 			}
@@ -1422,28 +1418,28 @@ function AcceptOutcome()
 			hits[i]=nil
 		end
 	end
-	mov.ShowArrows()
+	mov.Visibility()
 end
 
 function Hits(damage,crit,target,special)
 	P1=players.GetPlayer()
 	if special==true then
-		hits[#hits+1]=display.newText( ("+"..damage), 0, 0, "Game Over", 120 )
+		hits[#hits+1]=display.newText( ("+"..damage), 0, 0, "MoolBoran", 50 )
 		hits[#hits]:setTextColor( 0, 150, 0)
 	elseif special=="BRN" then
-		hits[#hits+1]=display.newText( (damage), 0, 0, "Game Over", 120 )
+		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 50 )
 		hits[#hits]:setTextColor( 200, 0, 0)
 	elseif special=="PSN" then
-		hits[#hits+1]=display.newText( (damage), 0, 0, "Game Over", 120 )
+		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 50 )
 		hits[#hits]:setTextColor( 150, 0, 150)
 	elseif special=="SPL" then
-		hits[#hits+1]=display.newText( (damage), 0, 0, "Game Over", 120 )
+		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 50 )
 		hits[#hits]:setTextColor(20,20,200)
 	elseif crit==true then
-		hits[#hits+1]=display.newText( (damage.."!"), 0, 0, "Game Over", 120 )
+		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 70 )
 		hits[#hits]:setTextColor( 150, 0, 0)
 	elseif crit==false then
-		hits[#hits+1]=display.newText( (damage), 0, 0, "Game Over", 100 )
+		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 50 )
 		hits[#hits]:setTextColor( 0, 0, 0)
 	end
 	physics.addBody(hits[#hits], "dynamic", { friction=0.5,} )
@@ -1475,7 +1471,6 @@ function ShowBag(action)
 		for i=1,table.maxn(p1.inv) do
 			if (p1.inv[i])~=nil and p1.inv[i][1]<=8 then
 				local itmnme=item.ReturnInfo(p1.inv[i][1],0)
-				print ("Player has "..p1.inv[i][2].." of "..itmnme..".")
 				
 				items2[#items2+1]=display.newRect(0,0,65,65)
 				items2[#items2]:setFillColor(50,50,50)
@@ -1564,8 +1559,8 @@ end
 
 function UseItem(id,slot)
 	inv=false
-	display.remove(closeInvBtn)
-	closeInvBtn=nil
+	display.remove(BackBtn)
+	BackBtn=nil
 	for i=table.maxn(items),1,-1 do
 		display.remove(items[i])
 		items[i]=nil

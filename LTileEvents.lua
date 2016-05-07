@@ -63,18 +63,16 @@ function onChestCollision()
 	local bounds=builder.GetData(2)
 	local Chests=builder.GetData(5)
 	local Round=WD.Circle()
-	for i=1, table.maxn(Chests) do
-		if (Chests[i]) then
-			if ((i)==(P1.loc)) then
-				bounds[i]=1
-				display.remove(Chests[i])
-				Chests[i]=nil
-				gold.CallCoins(Round)
-				audio.Play(1)
-				builder.ModMap(i)
-				Dropped=item.ItemDrop()
-				return Dropped
-			end
+	for i in pairs(Chests) do
+		if ((i)==(P1.loc)) then
+			bounds[i]=1
+			display.remove(Chests[i])
+			Chests[i]=nil
+			gold.CallCoins(Round)
+			audio.Play(1)
+			builder.ModMap(i)
+			Dropped=item.ItemDrop()
+			return Dropped
 		end
 	end
 end
@@ -85,61 +83,59 @@ function onRockCollision()
 	local P1=player.GetPlayer()
 	local Rocks=builder.GetData(6)
 	local bounds=builder.GetData(2)
-	for i=1, table.maxn(Rocks) do
-		if (Rocks[i]) then
-			if ((i)==(P1.loc)) and bounds[i]~=1 then
-				bounds[i]=1
-				builder.ModMap(i)
-				local level=builder.GetData(3)
-				Rocks[i]:play()
-				audio.Play(13)
-				--Small
-				local somuchdebris=math.random(10,15)
-				for i=1, somuchdebris do
-					debris[#debris+1]=display.newImage((debrimages[(math.random(1,3))]), 13, 13)
-					debris[#debris].xScale=1.3
-					debris[#debris].yScale=1.3
+	for i in pairs(Rocks) do
+		if ((i)==(P1.loc)) and bounds[i]~=1 then
+			bounds[i]=1
+			builder.ModMap(i)
+			local level=builder.GetData(3)
+			Rocks[i]:play()
+			audio.Play(13)
+			--Small
+			local somuchdebris=math.random(10,15)
+			for i=1, somuchdebris do
+				debris[#debris+1]=display.newImage((debrimages[(math.random(1,3))]), 13, 13)
+				debris[#debris].xScale=1.3
+				debris[#debris].yScale=1.3
+				debris[#debris].x=(P1.x+(math.random(-5,5)))
+				debris[#debris].y=(P1.y+(math.random(-50,-10)))
+				physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=7.0} )
+				debris[#debris]:setLinearVelocity((math.random(-300,300)),-300)
+				debris[#debris]:toFront()
+			end
+			--Medium
+			local somuchdebris=math.random(1,5)
+			for i=1, somuchdebris do
+				debris[#debris+1]=display.newImage((debrimages[(math.random(4,5))]), 28, 40)
+				debris[#debris].x=(P1.x+(math.random(-5,5)))
+				debris[#debris].y=(P1.y+(math.random(-50,-10)))
+				physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=20.0} )
+				debris[#debris]:setLinearVelocity((math.random(-200,200)),-200)
+				debris[#debris]:toFront()
+			end
+			--Large
+			local somuchdebris=math.random(1,10)
+			if somuchdebris>=9 then
+				debris[#debris+1]=display.newImage((debrimages[6]), 52, 72)
+				debris[#debris].x=(P1.x+(math.random(-5,5)))
+				debris[#debris].y=(P1.y+(math.random(-50,-10)))
+				physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=36.0} )
+				debris[#debris]:setLinearVelocity((math.random(-100,100)),-100)
+				debris[#debris]:toFront()
+			end
+			--Gold
+			local somuchdebris=math.random(1,100)
+			if somuchdebris>=80 then
+				local goldgaincount=0
+				for i=1,(math.ceil((somuchdebris-79)/2)) do
+					debris[#debris+1]=display.newImage((debrimages[(math.random(7,9))]), 13, 13)
 					debris[#debris].x=(P1.x+(math.random(-5,5)))
 					debris[#debris].y=(P1.y+(math.random(-50,-10)))
 					physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=7.0} )
-					debris[#debris]:setLinearVelocity((math.random(-300,300)),-300)
-					debris[#debris]:toFront()
-				end
-				--Medium
-				local somuchdebris=math.random(1,5)
-				for i=1, somuchdebris do
-					debris[#debris+1]=display.newImage((debrimages[(math.random(4,5))]), 28, 40)
-					debris[#debris].x=(P1.x+(math.random(-5,5)))
-					debris[#debris].y=(P1.y+(math.random(-50,-10)))
-					physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=20.0} )
-					debris[#debris]:setLinearVelocity((math.random(-200,200)),-200)
-					debris[#debris]:toFront()
-				end
-				--Large
-				local somuchdebris=math.random(1,10)
-				if somuchdebris>=9 then
-					debris[#debris+1]=display.newImage((debrimages[6]), 52, 72)
-					debris[#debris].x=(P1.x+(math.random(-5,5)))
-					debris[#debris].y=(P1.y+(math.random(-50,-10)))
-					physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=36.0} )
 					debris[#debris]:setLinearVelocity((math.random(-100,100)),-100)
 					debris[#debris]:toFront()
+					goldgaincount=goldgaincount+(math.random(1,3))
 				end
-				--Gold
-				local somuchdebris=math.random(1,100)
-				if somuchdebris>=80 then
-					local goldgaincount=0
-					for i=1,(math.ceil((somuchdebris-79)/2)) do
-						debris[#debris+1]=display.newImage((debrimages[(math.random(7,9))]), 13, 13)
-						debris[#debris].x=(P1.x+(math.random(-5,5)))
-						debris[#debris].y=(P1.y+(math.random(-50,-10)))
-						physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=7.0} )
-						debris[#debris]:setLinearVelocity((math.random(-100,100)),-100)
-						debris[#debris]:toFront()
-						goldgaincount=goldgaincount+(math.random(1,3))
-					end
-					gold.CallAddCoins(goldgaincount)
-				end
+				gold.CallAddCoins(goldgaincount)
 			end
 		end
 	end
@@ -170,7 +166,7 @@ function onKeyCollision()
 					child.parent:remove( child )
 				end
 				gum=nil
-				mov.ShowArrows()
+				mov.Visibility()
 			end
 			
 			local lolname=display.newText( ("Key Get!") ,0,0,"MoolBoran",90)
@@ -189,7 +185,7 @@ function onKeyCollision()
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = Backbtn}
 			backbtn:setReferencePoint( display.CenterReferencePoint )
@@ -208,13 +204,11 @@ function onLavaCollision()
 	local isPaused=ui.Paused()
 	if inCombat==true or isPaused==true then
 	else
-		for i=1, table.maxn(LavaBlocks) do
-			if (LavaBlocks[i]) then
-				if ((i)==(P1.loc)) and (P1.HP~=0)then
-					local damage=(math.floor(P1.MaxHP*0.02))
-					player.ReduceHP(damage,"Lava")
-					timer.performWithDelay(100,onLavaCollision)
-				end
+		for i in pairs(LavaBlocks) do
+			if ((i)==(P1.loc)) and (P1.HP~=0)then
+				local damage=(math.floor(P1.MaxHP*0.02))
+				player.ReduceHP(damage,"Lava")
+				timer.performWithDelay(100,onLavaCollision)
 			end
 		end
 	end
@@ -224,11 +218,9 @@ function onWaterCollision()
 	local P1=player.GetPlayer()
 	local WaterBlocks=builder.GetData(9)
 	local isWet=false
-	for i=1, table.maxn(WaterBlocks) do
-		if (WaterBlocks[i]) then
-			if ((i)==(P1.loc)) and (P1.HP~=0)then
-				isWet=true
-			end
+	for i in pairs(WaterBlocks) do
+		if ((i)==(P1.loc)) and (P1.HP~=0)then
+			isWet=true
 		end
 	end
 	return isWet
@@ -374,7 +366,7 @@ function Port()
 				map.y=map.y+ychange
 				P1.loc=BP.loc
 				P1.portcd=12
-				timer.performWithDelay(10,mov.ShowArrows)
+				timer.performWithDelay(100,mov.Visibility)
 			end
 			audio.Play(11)
 			function Closure()
@@ -395,7 +387,7 @@ function Port()
 				map.y=map.y+ychange
 				P1.loc=OP.loc
 				P1.portcd=12
-				timer.performWithDelay(10,mov.ShowArrows)
+				timer.performWithDelay(100,mov.Visibility)
 			end
 			audio.Play(11)
 			function Closure()
@@ -410,8 +402,8 @@ end
 function ShopCheck()
 	local ShopGroup=builder.GetData(7)
 	local P1=players.GetPlayer()
-	for i=1, table.maxn(ShopGroup) do
-		if (ShopGroup[i]) and ((i)==(P1.loc)) then
+	for i in pairs(ShopGroup) do
+		if ((i)==(P1.loc)) then
 			return true
 		end
 	end

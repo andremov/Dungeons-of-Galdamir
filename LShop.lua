@@ -54,7 +54,7 @@ function DisplayShop(id)
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
 		defaultFile="cbutton.png",
-		overFile="cbutton2.png",
+		overFile="cbutton-over.png",
 		width=303, height=52,
 		onRelease = CloseShop
 	}
@@ -307,7 +307,7 @@ function CloseShop()
 	gbm=nil
 	gp.ShowGCounter()
 	
-	mov.ShowArrows()
+	mov.Visibility()
 end
 
 function BuyItem(id,name,prc)

@@ -86,7 +86,7 @@ function ItemDrop(boost)
 					local child = gum[i]
 					child.parent:remove( child )
 				end
-				mov.ShowArrows()
+				mov.Visibility()
 			end
 			
 			local lolname=display.newText( ("Item Get!") ,0,0,"MoolBoran",90)
@@ -105,7 +105,7 @@ function ItemDrop(boost)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = Backbtn}
 			backbtn:setReferencePoint( display.CenterReferencePoint )
@@ -130,7 +130,7 @@ function ItemDrop(boost)
 					local child = gum[i]
 					child.parent:remove( child )
 				end
-				mov.ShowArrows()
+				mov.Visibility()
 			end
 			
 			function Bagbtn()
@@ -158,7 +158,7 @@ function ItemDrop(boost)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = Backbtn}
 			backbtn:setReferencePoint( display.CenterReferencePoint )
@@ -171,7 +171,7 @@ function ItemDrop(boost)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = Bagbtn}
 			bagbtn:setReferencePoint( display.CenterReferencePoint )
