@@ -4,8 +4,8 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local healthsheet = graphics.newImageSheet( "healthtwinkle.png", { width=7, height=18, numFrames=14 } )
-local manasheet = graphics.newImageSheet( "manatwinkle.png", { width=7, height=18, numFrames=14 } )
+local healthsheet = graphics.newImageSheet( "twinkle1.png", { width=7, height=18, numFrames=14 } )
+local manasheet = graphics.newImageSheet( "twinkle2.png", { width=7, height=18, numFrames=14 } )
 local tpsheet = graphics.newImageSheet( "portsprite.png", { width=80, height=80, numFrames=16 } )
 local debrimages={"debrissmall1.png", "debrissmall2.png", "debrissmall3.png", "debrismed1.png", "debrismed2.png", "debrislarge1.png","golddebrissmall1.png", "golddebrissmall2.png", "golddebrissmall3.png"}
 local rockbreaksheet

@@ -4,10 +4,10 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local heartfsheet = graphics.newImageSheet( "heartsprite.png", { width=17, height=17, numFrames=16 } )
+local heartfsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height=25, numFrames=16 } )
 local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 } )
-local heartnsheet = graphics.newImageSheet( "heartemptysprite.png", { width=17, height=17, numFrames=16 } )
-local heartssheet = graphics.newImageSheet( "heartsilversprite.png", { width=17, height=17, numFrames=16 } )
+local heartnsheet = graphics.newImageSheet( "heartemptysprite.png", { width=25, height=25, numFrames=16 } )
+local heartssheet = graphics.newImageSheet( "heartsilversprite.png", { width=25, height=25, numFrames=16 } )
 local xpsheet = graphics.newImageSheet( "xpbar.png", { width=392, height=40, numFrames=50 } )
 local b=require("LMapBuilder")
 local gold=require("LGold")
@@ -69,18 +69,20 @@ function CreatePlayers(name)
 	--Extras
 	player.gp=0
 	player.eqp={  }
-	player.inv={ {1,10}}
+	player.inv={ {1,10} }
 	--Stats
 	player.statnames=	{"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity",	"Intellect"}
 	player.eqs=			{0,			0,			0,			0,			0,				0}
 	player.nat=			{2,			2,			2,			2,			2,				2}
+	player.bon=			{0,			0,			0,			0,			0,				0}
+	player.bst=			{0,			0,			0,			0,			0,				0}
 	player.stats={
-		(player.nat[1]+player.eqs[1]),
-		(player.nat[2]+player.eqs[2]),
-		(player.nat[3]+player.eqs[3]),
-		(player.nat[4]+player.eqs[4]),
-		(player.nat[5]+player.eqs[5]),
-		(player.nat[6]+player.eqs[6]),
+		(player.nat[1]+player.eqs[1]+player.bon[1]+player.bst[1]),
+		(player.nat[2]+player.eqs[2]+player.bon[2]+player.bst[2]),
+		(player.nat[3]+player.eqs[3]+player.bon[3]+player.bst[3]),
+		(player.nat[4]+player.eqs[4]+player.bon[4]+player.bst[4]),
+		(player.nat[5]+player.eqs[5]+player.bon[5]+player.bst[5]),
+		(player.nat[6]+player.eqs[6]+player.bon[6]+player.bst[6]),
 	}
 	player.pnts=5
 	--Spells
@@ -309,29 +311,29 @@ function AddMP(amount)
 end
 
 function StatCheck()
-	player.stats={
-		(player.nat[1]+player.eqs[1]),
-		(player.nat[2]+player.eqs[2]),
-		(player.nat[3]+player.eqs[3]),
-		(player.nat[4]+player.eqs[4]),
-		(player.nat[5]+player.eqs[5]),
-		(player.nat[6]+player.eqs[6]),
-	}
 	if player.class==0 then
-		player.stats[6]=player.stats[6]+math.floor(player.stats[3]/6)
-		player.stats[1]=player.stats[1]+math.floor(player.stats[3]/6)
+		player.bon[6]=math.floor(player.nat[3]/6)
+		player.bon[1]=math.floor(player.nat[3]/6)
 	elseif player.class==1 then
-		player.stats[5]=player.stats[5]+math.floor(player.stats[2]/3)
+		player.bon[5]=math.floor(player.nat[2]/3)
 	elseif player.class==2 then
-		player.stats[2]=player.stats[2]+math.floor(player.stats[5]/6)
-		player.stats[4]=player.stats[4]+math.floor(player.stats[5]/6)
+		player.bon[2]=math.floor(player.nat[5]/6)
+		player.bon[4]=math.floor(player.nat[5]/6)
 	elseif player.class==3 then
-		player.stats[3]=player.stats[3]+math.floor(player.stats[1]/3)
+		player.bon[3]=math.floor(player.nat[1]/3)
 	elseif player.class==4 then
-		player.stats[5]=player.stats[5]+math.floor(player.stats[4]/3)
+		player.bon[5]=math.floor(player.nat[4]/3)
 	elseif player.class==5 then
-		player.stats[3]=player.stats[3]+math.floor(player.stats[6]/3)
+		player.bon[3]=math.floor(player.nat[6]/3)
 	end
+	player.stats={
+		(player.nat[1]+player.eqs[1]+player.bon[1]+player.bst[1]),
+		(player.nat[2]+player.eqs[2]+player.bon[2]+player.bst[2]),
+		(player.nat[3]+player.eqs[3]+player.bon[3]+player.bst[3]),
+		(player.nat[4]+player.eqs[4]+player.bon[4]+player.bst[4]),
+		(player.nat[5]+player.eqs[5]+player.bon[5]+player.bst[5]),
+		(player.nat[6]+player.eqs[6]+player.bon[6]+player.bst[6]),
+	}
 	player.SPD=(1.00-(player.stats[5]/100))
 	player.MaxHP=(100*player.lvl)+(player.stats[1]*10)
 	player.MaxMP=(player.lvl*15)+(player.stats[6]*10)
@@ -366,7 +368,7 @@ function Statless()
 end
 
 function StatBoost(stat)
-	player.nat[stat]=player.nat[stat]+1
+	player.bst[stat]=player.bst[stat]+1
 	StatCheck()
 end
 

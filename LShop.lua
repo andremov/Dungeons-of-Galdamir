@@ -8,6 +8,8 @@ local HPot2sheet = graphics.newImageSheet( "items/HealthPotion2.png", { width=64
 local HPot3sheet = graphics.newImageSheet( "items/HealthPotion3.png", { width=64, height=64, numFrames=16 })
 local MPot2sheet = graphics.newImageSheet( "items/ManaPotion2.png", { width=64, height=64, numFrames=16 })
 local MPot3sheet = graphics.newImageSheet( "items/ManaPotion3.png", { width=64, height=64, numFrames=16 })
+local EPot2sheet = graphics.newImageSheet( "items/EnergyPotion2.png", { width=64, height=64, numFrames=16 })
+local EPot3sheet = graphics.newImageSheet( "items/EnergyPotion3.png", { width=64, height=64, numFrames=16 })
 local widget = require "widget"
 local ui=require("LUI")
 local b=require("LMapBuilder")
@@ -86,6 +88,12 @@ function DisplayShop(id)
 				item[s]:play()
 			elseif curShop.item[s][1]==8 then
 				item[s]=display.newSprite( MPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
+				item[s]:play()
+			elseif curShop.item[s][1]==10 then
+				item[s]=display.newSprite( EPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
+				item[s]:play()
+			elseif curShop.item[s][1]==11 then
+				item[s]=display.newSprite( EPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
 				item[s]:play()
 			else
 				item[s]=display.newImageRect( "items/"..curShop.item[s][2]..".png" ,64,64)

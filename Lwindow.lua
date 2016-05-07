@@ -8,10 +8,12 @@ local HPot2sheet = graphics.newImageSheet( "items/HealthPotion2.png", { width=64
 local HPot3sheet = graphics.newImageSheet( "items/HealthPotion3.png", { width=64, height=64, numFrames=16 })
 local MPot2sheet = graphics.newImageSheet( "items/ManaPotion2.png", { width=64, height=64, numFrames=16 })
 local MPot3sheet = graphics.newImageSheet( "items/ManaPotion3.png", { width=64, height=64, numFrames=16 })
+local EPot2sheet = graphics.newImageSheet( "items/EnergyPotion2.png", { width=64, height=64, numFrames=16 })
+local EPot3sheet = graphics.newImageSheet( "items/EnergyPotion3.png", { width=64, height=64, numFrames=16 })
 local widget = require "widget"
 local audio=require("LAudio")
 local g=require("LGold")
-local c=require("lcombat")
+local c=require("Lcombat")
 local mov=require("Lmovement")
 local p=require("Lplayers")
 local WD=require("LProgress")
@@ -90,6 +92,12 @@ function ToggleBag()
 				elseif p1.inv[i][1]==8 then
 					items[#items+1]=display.newSprite( MPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
 					items[#items]:play()
+				elseif curShop.item[s][1]==10 then
+					item[s]=display.newSprite( EPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
+					item[s]:play()
+				elseif curShop.item[s][1]==11 then
+					item[s]=display.newSprite( EPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
+					item[s]:play()
 				else
 					items[#items+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
 				end
@@ -276,7 +284,7 @@ function ToggleInfo()
 				(
 					p1.nat[s]
 				),
-				info[7].x+220,420+(45*(s-1)),native.systemFont,40
+				info[#info-s].x+220,420+(45*(s-1)),native.systemFont,40
 			)
 			ginf:insert(info[#info])
 		end
@@ -286,7 +294,18 @@ function ToggleInfo()
 				(
 				"+"..p1.eqs[s]
 				),
-				info[13].x+120,420+(45*(s-1)),native.systemFont,40
+				info[#info-s].x+120,420+(45*(s-1)),native.systemFont,40
+			)
+			info[#info]:setTextColor(50,200,50)
+			ginf:insert(info[#info])
+		end
+		
+		for s=1,6 do
+			info[#info+1]=display.newText(
+				(
+				"+"..p1.bon[s]+p1.bst[s]
+				),
+				info[#info-s].x+120,420+(45*(s-1)),native.systemFont,40
 			)
 			info[#info]:setTextColor(50,200,50)
 			ginf:insert(info[#info])
@@ -297,7 +316,7 @@ function ToggleInfo()
 				(
 					"= "..p1.stats[s]
 				),
-				info[19].x+50,420+(45*(s-1)),native.systemFont,40
+				info[#info-s].x+50,420+(45*(s-1)),native.systemFont,40
 			)
 			ginf:insert(info[#info])
 		end
@@ -541,10 +560,9 @@ function UseMenu(id,slot)
 				child.parent:remove( child )
 			end
 			gum=nil
-			if amount==1 then
+			p1.inv[slot][2]=p1.inv[slot][2]-1
+			if p1.inv[slot][2]==0 then
 				table.remove( p1.inv, slot )
-			elseif amount~=1 then
-				p1.inv[slot][2]=p1.inv[slot][2]-1
 			end
 			if itemstats[3]==0 then
 				if itemstats[4]<0 then
@@ -578,7 +596,7 @@ function UseMenu(id,slot)
 				child.parent:remove( child )
 			end
 			gum=nil
-			table.remove( inv, slot )
+			table.remove( p1.inv, slot )
 			ToggleBag()
 			ToggleBag()
 		end
@@ -592,10 +610,9 @@ function UseMenu(id,slot)
 				child.parent:remove( child )
 			end
 			gum=nil
-			if amount==1 then
-				table.remove( inv, slot )
-			elseif amount~=1 then
-				p1.inv[slot][2]=p1.inv[slot][2]-1
+			p1.inv[slot][2]=p1.inv[slot][2]-1
+			if p1.inv[slot][2]==0 then
+				table.remove( p1.inv, slot )
 			end
 			ToggleBag()
 			ToggleBag()
@@ -842,14 +859,14 @@ function UseMenu(id,slot)
 			end
 			
 			if statchange[6]>0 then
-				intbonus=display.newText( ("INT +"..statchange[5]) ,0,0,"Game Over",85)
+				intbonus=display.newText( ("INT +"..statchange[6]) ,0,0,"Game Over",85)
 				intbonus:setTextColor( 60, 180, 60)
 				intbonus.x=statchangex+(statchangexs*5)
 				intbonus.y=statchangey
 				gum:insert(intbonus)
 				eqpstatchnge=true
 			elseif statchange[6]<0 then
-				intbonus=display.newText( ("INT "..statchange[5]) ,0,0,"Game Over",85)
+				intbonus=display.newText( ("INT "..statchange[6]) ,0,0,"Game Over",85)
 				intbonus:setTextColor( 180, 60, 60)
 				intbonus.x=statchangex+(statchangexs*5)
 				intbonus.y=statchangey

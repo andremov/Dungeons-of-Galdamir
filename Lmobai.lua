@@ -46,6 +46,10 @@ function DoTurns()
 	
 	for i=1, table.maxn( mobs ) do
 		if (mobs[i]) then
+			if not(mobs[i].loc) then
+				display.remove(mobs[i])
+				mobs[i]=nil
+			else
 			col[i]=(math.floor(mobs[i].loc%(math.sqrt(size))))
 			row[i]=(math.floor(mobs[i].loc/(math.sqrt(size))))+1
 			p1=p.GetPlayer()
@@ -91,6 +95,10 @@ function DoTurns()
 			--Other Mob Collision Checks
 			for  g=1, table.maxn( mobs ) do
 				if (mobs[g]) then
+					if not (mobs[g].loc) then
+						display.remove(mobs[g])
+						mobs[g]=nil
+					else
 					if mobs[i].loc==(mobs[g].loc+(math.sqrt(size))) then
 						CanGoUp=false
 					end
@@ -105,6 +113,7 @@ function DoTurns()
 					
 					if mobs[i].loc==(mobs[g].loc-1) then
 						CanGoRight=false
+					end
 					end
 				end
 			end
@@ -183,6 +192,7 @@ function DoTurns()
 				end
 				timer.performWithDelay(100,closure)
 				DidSomething=true
+			end
 			end
 		end
 	end

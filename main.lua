@@ -53,7 +53,7 @@ local loadtxt
 	loadtxt.y = load1.y
 	Loading2:insert( loadtxt )
 	
-	logo=display.newImageRect("SymbolW.png",200,240)
+	logo=display.newImageRect("SymbolW.png",240,390)
 	logo.x=display.contentWidth/2
 	logo.y=display.contentHeight/2
 	logo.xScale=1

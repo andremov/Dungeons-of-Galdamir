@@ -180,7 +180,6 @@ function onTutBtnRelease()
 end
 
 function onOptnBtnRelease()
-	
 	if canGo==true then
 		for i=group.numChildren,1,-1 do
 			local child = group[i]
@@ -192,7 +191,6 @@ function onOptnBtnRelease()
 end
 
 function onScreBtnRelease()
-	
 	if canGo==true then
 		for i=group.numChildren,1,-1 do
 			local child = group[i]
@@ -319,21 +317,19 @@ function ShowMenu()
 	VDisplay.x=sign.x
 	VDisplay.y=sign.y-25
 	
-	logo=display.newImageRect("Symbol.png",200,240)
-	logo.xScale=0.75
-	logo.yScale=0.75
+	logo=display.newImageRect("Symbol.png",160,260)
 	logo.x=80
-	logo.y=display.contentHeight-100
+	logo.y=display.contentHeight-130
 	
 	ad1=display.newImageRect("ad1.png",57,57)
 	ad1.x=logo.x+160
 	ad1.y=logo.y+30
-	ad1.xScale=1.5
+	ad1.xScale=2.0
 	ad1.yScale=ad1.xScale
 	ad1:addEventListener("tap",openAd1)
 	
 	ad2=display.newImageRect("ad2.png",57,57)
-	ad2.x=ad1.x+120
+	ad2.x=ad1.x+(70*ad1.xScale)
 	ad2.y=ad1.y
 	ad2.xScale=ad1.xScale
 	ad2.yScale=ad1.xScale

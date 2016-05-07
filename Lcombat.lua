@@ -9,7 +9,7 @@ local player2 = graphics.newImageSheet( "player/1.png", { width=24, height=33, n
 local player3 = graphics.newImageSheet( "player/2.png", { width=30, height=49, numFrames=25 } )
 local player4 = graphics.newImageSheet( "player/3.png", { width=33, height=53, numFrames=35 } )
 local player5 = graphics.newImageSheet( "player/4.png", { width=32, height=32, numFrames=80 } )
-local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=17, height=17, numFrames=16 } )
+local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height=25, numFrames=16 } )
 local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 } )
 local statussheet = graphics.newImageSheet( "status.png", { width=88, height=40, numFrames=6 } )
 local dexatt2 = graphics.newImageSheet( "enemy/dexatt2.png",{ width=32, height=33, numFrames=24 })
@@ -114,19 +114,19 @@ function DisplayCombat()
 	bkg.y = 146
 	gcm:insert(bkg)
 	
-	window1=display.newImage("window.png",171,43)
-	window1.x=190
-	window1.y=yCoord-120
-	window1.xScale=2.25
-	window1.yScale=window1.xScale
-	gcm:insert(window1)
-	
 	window2=display.newImage("window2.png",171,43)
-	window2.x=display.contentWidth-window1.x
-	window2.y=window1.y
-	window2.xScale=window1.xScale
+	window2.x=display.contentWidth-190
+	window2.y=yCoord-120
+	window2.xScale=2.25
 	window2.yScale=window2.xScale
 	gcm:insert(window2)
+	
+	window1=display.newImage("window.png",171,65)
+	window1.x=190
+	window1.y=window2.y+24
+	window1.xScale=window2.xScale
+	window1.yScale=window1.xScale
+	gcm:insert(window1)
 
 	
 	gcm:toFront()	
@@ -358,24 +358,6 @@ function MobsTurn()
 			Hits((Poison),false,true,"PSN")
 			UpdateStats()
 		end
-	end
-	if p1.HP<=0 then
-		if p1.HP<0 then
-			p1.HP=0
-		end
-		function closure1()
-			EndCombat("Loss")
-		end
-		timer.performWithDelay(200,closure1)
-	elseif enemy.HP<=0 then
-		if enemy.HP<0 then
-			enemy.HP=0
-		end
-		function closure2()
-			EndCombat("Win")
-		end
-		timer.performWithDelay(200,closure2)
-	else
 	end
 end
 
@@ -1018,15 +1000,6 @@ function PlayerAttacks()
 		Hits("MSS!",false,true,false)
 		UpdateStats()
 	end
-	if enemy.HP<=0 then
-		if enemy.HP<0 then
-			enemy.HP=0
-		end
-		function closure()
-			EndCombat("Win")
-		end
-		timer.performWithDelay(200,closure)
-	end
 end
 
 function EndTurn()
@@ -1052,6 +1025,16 @@ function EndTurn()
 		end
 		MobSprite()
 		P1Sprite()
+	elseif p1.HP<=0 then
+		function closure1()
+			EndCombat("Loss")
+		end
+		timer.performWithDelay(200,closure1)
+	elseif enemy.HP<=0 then
+		function closure2()
+			EndCombat("Win")
+		end
+		timer.performWithDelay(200,closure2)
 	end
 end
 
@@ -1466,32 +1449,12 @@ function CastSorcery(name)
 		Hits((Damage),true,true,"SPL")
 		enemy.HP=enemy.HP-Damage
 		MobSprite(3)
-		if enemy.HP<=0 then
-			if enemy.HP<0 then
-				enemy.HP=0
-			end
-			function closure()
-				EndCombat("Win")
-			end
-			timer.performWithDelay(200,closure)
-		end
-		UpdateStats()
 		
 	elseif name=="Healing" then
 	
 		local p1=players.GetPlayer()
 		players.AddHP(math.floor(p1.MaxHP*.2))
 		Hits((math.floor(p1.MaxHP*.2)),false,false,true)
-		if enemy.HP<=0 then
-			if enemy.HP<0 then
-				enemy.HP=0
-			end
-			function closure()
-				EndCombat("Win")
-			end
-			timer.performWithDelay(200,closure)
-		end
-		UpdateStats()
 		
 	elseif name=="Fire Sword" then
 	
@@ -1500,7 +1463,6 @@ function CastSorcery(name)
 			local Damage=MagicCalc((math.random(15,20)/10),22)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,"SPL")
-				UpdateStats()
 			else
 				enemy.status="BRN"
 				Hits(("Burn!"),false,true,"SPL")
@@ -1512,22 +1474,10 @@ function CastSorcery(name)
 					BurnLimit=20
 				end
 				Hits((Damage),true,true,"SPL")
-				UpdateStats()
 			end
 		else
 			Hits("MSS!",false,true,"SPL")
-			UpdateStats()
 		end
-		if enemy.HP<=0 then
-			if enemy.HP<0 then
-				enemy.HP=0
-			end
-			function closure()
-				EndCombat("Win")
-			end
-			timer.performWithDelay(200,closure)
-		end
-		UpdateStats()
 		
 	elseif name=="Fireball" then
 	
@@ -1537,7 +1487,6 @@ function CastSorcery(name)
 				local Damage=MagicCalc((math.random(15,20)/10),22)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
-					UpdateStats()
 				else
 					enemy.status="BRN"
 					Hits(("Burn!"),false,true,"SPL")
@@ -1549,13 +1498,11 @@ function CastSorcery(name)
 						BurnLimit=15
 					end
 					Hits((Damage),true,true,"SPL")
-					UpdateStats()
 				end
 			else
 				local Damage=MagicCalc(1,22)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
-					UpdateStats()
 				else
 					enemy.status="BRN"
 					Hits(("Burn!"),false,true,"SPL")
@@ -1567,23 +1514,11 @@ function CastSorcery(name)
 						BurnLimit=15
 					end
 					Hits((Damage),false,true,"SPL")
-					UpdateStats()
 				end
 			end
 		else
 			Hits("MSS!",false,true,"SPL")
-			UpdateStats()
 		end
-		if enemy.HP<=0 then
-			if enemy.HP<0 then
-				enemy.HP=0
-			end
-			function closure()
-				EndCombat("Win")
-			end
-			timer.performWithDelay(200,closure)
-		end
-		UpdateStats()
 		
 	elseif name=="Ice Sword" then
 	
@@ -1592,43 +1527,20 @@ function CastSorcery(name)
 			local Damage=MagicCalc((math.random(15,20)/10),22)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,"SPL")
-				UpdateStats()
 			else
 				enemy.stats[5]=enemy.stats[5]-(math.floor(enemy.stats[5]*.2))
 				Hits(("Slowed!"),false,true,"SPL")
 				enemy.HP=enemy.HP-Damage
 				MobSprite(3)
 				Hits((Damage),true,true,"SPL")
-				UpdateStats()
 			end
 		else
 			Hits("MSS!",false,true,"SPL")
-			UpdateStats()
 		end
-		if enemy.HP<=0 then
-			if enemy.HP<0 then
-				enemy.HP=0
-			end
-			function closure()
-				EndCombat("Win")
-			end
-			timer.performWithDelay(200,closure)
-		end
-		UpdateStats()
 		
 	elseif name=="Slow" then
 		enemy.stats[5]=enemy.stats[5]-(math.floor(enemy.stats[5]*.2))
 		Hits(("Slowed!"),false,true,"SPL")
-		if enemy.HP<=0 then
-			if enemy.HP<0 then
-				enemy.HP=0
-			end
-			function closure()
-				EndCombat("Win")
-			end
-			timer.performWithDelay(200,closure)
-		end
-		UpdateStats()
 		
 	elseif name=="Poison Blade" then
 	
@@ -1638,7 +1550,6 @@ function CastSorcery(name)
 				local Damage=MagicCalc((math.random(15,20)/10),22)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
-					UpdateStats()
 				else
 					enemy.status="PSN"
 					Hits(("Poison!"),false,true,"SPL")
@@ -1646,13 +1557,11 @@ function CastSorcery(name)
 					MobSprite(3)
 					statusdisplay:setFrame(5)
 					Hits((Damage),true,true,"SPL")
-					UpdateStats()
 				end
 			else
 				local Damage=MagicCalc(1,22)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
-					UpdateStats()
 				else
 					enemy.status="PSN"
 					Hits(("Poison!"),false,true,"SPL")
@@ -1660,24 +1569,13 @@ function CastSorcery(name)
 					MobSprite(3)
 					statusdisplay:setFrame(5)
 					Hits((Damage),false,true,"SPL")
-					UpdateStats()
 				end
 			end
 		else
 			Hits("MSS!",false,true,"SPL")
-			UpdateStats()
 		end
-		if enemy.HP<=0 then
-			if enemy.HP<0 then
-				enemy.HP=0
-			end
-			function closure()
-				EndCombat("Win")
-			end
-			timer.performWithDelay(200,closure)
-		end
-		UpdateStats()
 	end
+	UpdateStats()
 end
 
 function NoMansLand()
