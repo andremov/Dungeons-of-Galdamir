@@ -803,14 +803,14 @@ function Up()
 		else
 			Toggle=Toggle-1
 		end
+		Visibility()
 		if P1.EP>=energycost then
 			P1.EP=P1.EP-energycost
 		else
 			local deficit=energycost-P1.EP
-			p.ReduceHP(math.floor(deficit/2),"Energy")
+			p.ReduceHP(math.ceil(deficit/2),"Energy")
 			P1.EP=0
 		end
-		Visibility()
 	end
 end
 
@@ -843,14 +843,14 @@ function Down()
 		else
 			Toggle=Toggle-1
 		end
+		Visibility()
 		if P1.EP>=energycost then
 			P1.EP=P1.EP-energycost
 		else
 			local deficit=energycost-P1.EP
-			p.ReduceHP(math.floor(deficit/2),"Energy")
+			p.ReduceHP(math.ceil(deficit/2),"Energy")
 			P1.EP=0
 		end
-		Visibility()
 	end
 end
 
@@ -883,14 +883,14 @@ function Left()
 		else
 			Toggle=Toggle-1
 		end
+		Visibility()
 		if P1.EP>=energycost then
 			P1.EP=P1.EP-energycost
 		else
 			local deficit=energycost-P1.EP
-			p.ReduceHP(math.floor(deficit/2),"Energy")
+			p.ReduceHP(math.ceil(deficit/2),"Energy")
 			P1.EP=0
 		end
-		Visibility()
 	end
 end
 
@@ -923,13 +923,13 @@ function Right()
 		else
 			Toggle=Toggle-1
 		end
+		Visibility()
 		if P1.EP>=energycost then
 			P1.EP=P1.EP-energycost
 		else
 			local deficit=energycost-P1.EP
-			p.ReduceHP(math.floor(deficit/2),"Energy")
+			p.ReduceHP(math.ceil(deficit/2),"Energy")
 			P1.EP=0
 		end
-		Visibility()
 	end
 end

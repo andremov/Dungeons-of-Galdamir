@@ -224,7 +224,7 @@ function MapSizeMenu()
 	NotebookTS.x = DefaultTS.x
 	NotebookTS.y = DefaultTS.y+100
 	opt:insert(NotebookTS)
-	
+	--[[
 	local RealTS = widget.newButton{
 		label="Realistic Tileset",
 		labelColor = { default={255,255,255}, over={0,0,0} },
@@ -252,7 +252,7 @@ function MapSizeMenu()
 	BWTS.x = RealTS.x
 	BWTS.y = RealTS.y+100
 	opt:insert(BWTS)
-	
+	--]]
 	title=display.newText("Map Customization",0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100

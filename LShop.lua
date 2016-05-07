@@ -204,7 +204,7 @@ function SellMenu()
 	PageTxt.y = (display.contentCenterY)+160
 	gsm:insert(PageTxt)
 	
-	if page~=1 then
+	if page>1 then
 		PrevBtn= widget.newButton{
 			defaultFile="arrow.png",
 			overFile="arrow2.png",

@@ -4,7 +4,6 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local gearsheet = graphics.newImageSheet( "gearsprite.png", { width=50, height=50, numFrames=30 })
 local widget = require "widget"
 local menu=require("Lmenu")
 local a=require("Laudio")
@@ -33,30 +32,6 @@ function DisplayOptions()
 	title.y = 100
 	title:setTextColor(125,250,125)
 	optionz:insert(title)
-	
-	gear=display.newSprite( gearsheet, { name="gear", start=1, count=30, time=3000,}  )
-	gear.x=display.contentWidth
-	gear.y=display.contentHeight
-	gear.xScale=4.0
-	gear.yScale=4.0
-	gear:play()
-	optionz:insert(gear)
-	
-	gear2=display.newSprite( gearsheet, { name="gear2", start=1, count=30, time=4000,}  )
-	gear2.x=0
-	gear2.y=0
-	gear2.xScale=6.0
-	gear2.yScale=6.0
-	gear2:play()
-	optionz:insert(gear2)
-	
-	gear3=display.newSprite( gearsheet, { name="gear3", start=1, count=30, time=3500,}  )
-	gear3.x=0
-	gear3.y=display.contentHeight
-	gear3.xScale=5.0
-	gear3.yScale=5.0
-	gear3:play()
-	optionz:insert(gear3)
 	
 	BackBtn = widget.newButton{
 		label="Back",

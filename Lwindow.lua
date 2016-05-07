@@ -65,17 +65,16 @@ local DeathMessages={
 		"Portal dismemberment.",
 		"I think your leg is over there.",
 		"Your blood didn't teleport...",
-		"Next time, keep your arms and legs in the portal at all times.",
+		"Stay inside the portal at all times.",
 		"Not your best teleport.",
 		"Did you find the secret cow level?",
 	},
 	-- Energy
 	{
 		"Falling unconscious in a dungeon.",
-		"\"Don't mind the energy\", they said, \"It won't kill you.'\", they said.",
 		"Should've kept some energy drinks handy.",
 		"So is having energy a priority to you now?",
-		"Should've gotten a good night's sleep before adventuring.",
+		"Should've gotten a good night's sleep.",
 	},
 }
 
@@ -538,7 +537,7 @@ function StatChange()
 end
 
 function StatInfo()
-	local baseX=30
+	local baseX=50
 	local baseY=90
 	local SpacingX=300
 	local SpacingY=50
@@ -630,7 +629,7 @@ function StatInfo()
 		(
 			"Statistics:"
 		),
-		10,350,"MoolBoran",70
+		baseX-20,350,"MoolBoran",70
 	)
 	ginf:insert(info[#info])
 	
@@ -639,7 +638,7 @@ function StatInfo()
 			(
 				p1.statnames[s]
 			),
-			30,420+(45*(s-1)),"MoolBoran",60
+			baseX,420+(45*(s-1)),"MoolBoran",60
 		)
 		ginf:insert(info[#info])
 	end
@@ -648,7 +647,7 @@ function StatInfo()
 		(
 			"Stat Points: "..p1.pnts
 		),
-		30,690,"MoolBoran",60
+		baseX,690,"MoolBoran",60
 	)
 	ginf:insert(info[#info])
 	
@@ -709,15 +708,6 @@ function StatInfo()
 			info[#info]:setTextColor(200,50,50)
 		else
 		end
-		ginf:insert(info[#info])
-	end
-	
-	if p1.name=="Magus" then
-		info[#info+1]=display.newImageRect("player/magus.png",120,120)
-		info[#info].x=display.contentWidth-120
-		info[#info].y=150
-		info[#info].xScale=1.5
-		info[#info].yScale=info[#info].xScale
 		ginf:insert(info[#info])
 	end
 	

@@ -48,7 +48,7 @@ function CreateQuest()
 			gqm:insert(QWindow)
 			
 			QTitle=display.newText("Current Quest:",display.contentWidth-380,-5,"MoolBoran",40)
-			QTitle:setTextColor( 0, 0, 0)
+			QTitle:setTextColor( 255, 255, 255)
 			gqm:insert(QTitle)
 			
 			QuestType=math.random(1,3)
@@ -66,7 +66,7 @@ function CreateQuest()
 					CurKills=0
 					NumKills=math.random(1,math.floor(mobcount/mobPerc))
 					QText=display.newText(("Defeat "..NumKills.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+8,"MoolBoran",40)
-					QText:setTextColor( 0, 0, 0)
+					QText:setTextColor( 255, 255, 255)
 					gqm:insert(QText)
 					if NumKills==0 then
 	--					print "Quest Error. Wiping quest..."
@@ -84,7 +84,7 @@ function CreateQuest()
 				NumItem=math.ceil(ItemName/2)
 				
 				QText=display.newText((ItemNames[ItemName].."s: ("..CurItem.."/"..NumItem..")"),display.contentWidth-380,QTitle.y+8,"MoolBoran",40)
-				QText:setTextColor( 0, 0, 0)
+				QText:setTextColor( 255, 255, 255)
 				gqm:insert(QText)
 			end
 			if QuestType==3 then
@@ -105,7 +105,7 @@ function CreateQuest()
 					MobLvl=(math.random(1,zonas)+(zonas*(round-1)))
 					
 					QText=display.newText(("Defeat "..NumKills.." level "..MobLvl.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+8,"MoolBoran",40)
-					QText:setTextColor( 0, 0, 0)
+					QText:setTextColor( 255, 255, 255)
 					gqm:insert(QText)
 					if NumKills==0 then
 	--					print "Quest Error. Wiping quest..."

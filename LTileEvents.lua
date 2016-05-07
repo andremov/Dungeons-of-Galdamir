@@ -9,7 +9,6 @@ local manasheet = graphics.newImageSheet( "twinkle2.png", { width=7, height=18, 
 local energysheet = graphics.newImageSheet( "twinkle3.png", { width=7, height=18, numFrames=14 } )
 local tpsheet = graphics.newImageSheet( "portsprite.png", { width=80, height=80, numFrames=16 } )
 local debrimages={"debrissmall1.png", "debrissmall2.png", "debrissmall3.png", "debrismed1.png", "debrismed2.png", "debrislarge1.png","golddebrissmall1.png", "golddebrissmall2.png", "golddebrissmall3.png"}
-local rockbreaksheet
 local physics = require "physics"
 local players=require("Lplayers")
 local handler=require("Lmaphandler")
@@ -81,8 +80,6 @@ function onChestCollision()
 end
 
 function onRockCollision()
-	local TSet=handler.GetTiles()
-	rockbreaksheet = graphics.newImageSheet( "tiles/"..TSet.."/break.png", { width=80, height=80, numFrames=14 } )
 	local P1=player.GetPlayer()
 	local Rocks=builder.GetData(6)
 	local bounds=builder.GetData(2)
@@ -90,7 +87,8 @@ function onRockCollision()
 		if ((l)==(P1.loc)) and bounds[l]~=1 then
 			bounds[l]=1
 			builder.ModMap(l)
-			Rocks[P1.room][l]:play()
+			display.remove(Rocks[P1.room][l])
+			Rocks[P1.room][l]=nil
 			audio.Play(13)
 			--Small
 			local somuchdebris=math.random(10,15)
@@ -400,6 +398,7 @@ function PortCheck()
 			P1.portcd=0
 		end
 	end
+	P1.portcd=0
 	return info
 end
 
@@ -435,24 +434,27 @@ function Port()
 					local deficit=manacost-P1.MP
 					players.ReduceHP(deficit*2,"Portal")
 					P1.MP=0
-					local chosentile=math.random(1,msize)
-					if boundary[chosentile]==1 then
-						local xchange=walls[chosentile].x-RP.x
-						local ychange=walls[chosentile].y-RP.y
-						map.x=map.x+xchange
-						map.y=map.y+ychange
-						P1.loc=chosentile
-						P1.portcd=12
-						timer.performWithDelay(100,mov.Visibility)
-					else
-						local xchange=OP.x-RP.x
-						local ychange=OP.y-RP.y
-						map.x=map.x+xchange
-						map.y=map.y+ychange
-						P1.loc=RP.loc
-						P1.room=RP.room
-						P1.portcd=12
-						timer.performWithDelay(100,mov.Visibility)
+					if P1.HP>0 then
+					--	local chosentile=math.random(1,msize)
+						local chosentile=1
+						if boundary[chosentile]==1 then
+							local xchange=walls[chosentile].x-RP.x
+							local ychange=RP.y-(walls[chosentile].y)
+							map.x=map.x+xchange
+							map.y=map.y+ychange
+							P1.loc=chosentile
+							P1.portcd=12
+							timer.performWithDelay(100,mov.Visibility)
+						else
+							local xchange=OP.x-RP.x
+							local ychange=OP.y-RP.y
+							map.x=map.x+xchange
+							map.y=map.y+ychange
+							P1.loc=RP.loc
+							P1.room=RP.room
+							P1.portcd=12
+							timer.performWithDelay(100,mov.Visibility)
+						end
 					end
 				end
 			end
@@ -482,25 +484,28 @@ function Port()
 					local deficit=manacost-P1.MP
 					players.ReduceHP(deficit*2,"Portal")
 					P1.MP=0
-					local chosentile=math.random(1,msize)
-					if boundary[chosentile]==1 then
-						local xchange=walls[chosentile].x-OP.x
-						local ychange=walls[chosentile].y-OP.y
-						map.x=map.x+xchange
-						map.y=map.y+ychange
-						P1.loc=chosentile
-						P1.portcd=12
-						timer.performWithDelay(100,mov.Visibility)
-					else
-						local map=builder.GetData(3)
-						local xchange=RP.x-OP.x
-						local ychange=RP.y-OP.y
-						map.x=map.x+xchange
-						map.y=map.y+ychange
-						P1.loc=OP.loc
-						P1.room=OP.room
-						P1.portcd=12
-						timer.performWithDelay(100,mov.Visibility)
+					if P1.HP>0 then
+					--	local chosentile=math.random(1,msize)
+						local chosentile=1
+						if boundary[chosentile]==1 then
+							local xchange=walls[chosentile].x-OP.x
+							local ychange=OP.y-walls[chosentile].y
+							map.x=map.x+xchange
+							map.y=map.y+ychange
+							P1.loc=chosentile
+							P1.portcd=12
+							timer.performWithDelay(100,mov.Visibility)
+						else
+							local map=builder.GetData(3)
+							local xchange=RP.x-OP.x
+							local ychange=RP.y-OP.y
+							map.x=map.x+xchange
+							map.y=map.y+ychange
+							P1.loc=OP.loc
+							P1.room=OP.room
+							P1.portcd=12
+							timer.performWithDelay(100,mov.Visibility)
+						end
 					end
 				end
 			end
@@ -533,24 +538,27 @@ function Port()
 					local deficit=manacost-P1.MP
 					players.ReduceHP(deficit*2,"Portal")
 					P1.MP=0
-					local chosentile=math.random(1,msize)
-					if boundary[chosentile]==1 then
-						local xchange=walls[chosentile].x-DP.x
-						local ychange=walls[chosentile].y-DP.y
-						map.x=map.x+xchange
-						map.y=map.y+ychange
-						P1.loc=chosentile
-						P1.portcd=12
-						timer.performWithDelay(100,mov.Visibility)
-					else
-						local xchange=BP.x-DP.x
-						local ychange=BP.y-DP.y
-						map.x=map.x+xchange
-						map.y=map.y+ychange
-						P1.loc=DP.loc
-						P1.room=DP.room
-						P1.portcd=12
-						timer.performWithDelay(100,mov.Visibility)
+					if P1.HP>0 then
+					--	local chosentile=math.random(1,msize)
+						local chosentile=1
+						if boundary[chosentile]==1 then
+							local xchange=walls[chosentile].x-DP.x
+							local ychange=DP.y-walls[chosentile].y
+							map.x=map.x+xchange
+							map.y=map.y+ychange
+							P1.loc=chosentile
+							P1.portcd=12
+							timer.performWithDelay(100,mov.Visibility)
+						else
+							local xchange=BP.x-DP.x
+							local ychange=BP.y-DP.y
+							map.x=map.x+xchange
+							map.y=map.y+ychange
+							P1.loc=DP.loc
+							P1.room=DP.room
+							P1.portcd=12
+							timer.performWithDelay(100,mov.Visibility)
+						end
 					end
 				end
 			end
@@ -580,25 +588,28 @@ function Port()
 					local deficit=manacost-P1.MP
 					players.ReduceHP(deficit*2,"Portal")
 					P1.MP=0
-					local chosentile=math.random(1,msize)
-					if boundary[chosentile]==1 then
-						local xchange=walls[chosentile].x-BP.x
-						local ychange=walls[chosentile].y-BP.y
-						map.x=map.x+xchange
-						map.y=map.y+ychange
-						P1.loc=chosentile
-						P1.portcd=12
-						timer.performWithDelay(100,mov.Visibility)
-					else
-						local map=builder.GetData(3)
-						local xchange=DP.x-BP.x
-						local ychange=DP.y-BP.y
-						map.x=map.x+xchange
-						map.y=map.y+ychange
-						P1.loc=BP.loc
-						P1.room=BP.room
-						P1.portcd=12
-						timer.performWithDelay(100,mov.Visibility)
+					if P1.HP>0 then
+					--	local chosentile=math.random(1,msize)
+						local chosentile=1
+						if boundary[chosentile]==1 then
+							local xchange=walls[chosentile].x-BP.x
+							local ychange=BP.y-walls[chosentile].y
+							map.x=map.x+xchange
+							map.y=map.y+ychange
+							P1.loc=chosentile
+							P1.portcd=12
+							timer.performWithDelay(100,mov.Visibility)
+						else
+							local map=builder.GetData(3)
+							local xchange=DP.x-BP.x
+							local ychange=DP.y-BP.y
+							map.x=map.x+xchange
+							map.y=map.y+ychange
+							P1.loc=BP.loc
+							P1.room=BP.room
+							P1.portcd=12
+							timer.performWithDelay(100,mov.Visibility)
+						end
 					end
 				end
 			end
