@@ -693,7 +693,7 @@ function DisplayMap()
 	end
 	
 	if count~=mapsize then
-		timer.performWithDelay(50,DisplayMap)
+		timer.performWithDelay(5,DisplayMap)
 	else
 		ui.UI()
 		Level:insert( dmobs )
@@ -892,7 +892,7 @@ function Pathfinding()
 	steps={}
 	curpos=math.sqrt(mapsize)+2
 	posmoves={}
-	deadends={}
+	closed={}
 	target=mapsize-(math.sqrt(mapsize)+1)
 	
 	while curpos~=true and curpos~=false do
@@ -918,9 +918,9 @@ function Pathfinding()
 					end
 				end
 			end
-			for d=1,table.maxn(deadends)do
+			for d=1,table.maxn(closed)do
 				for p=table.maxn(posmoves),1,-1 do
-					if posmoves[p]==deadends[d] then
+					if posmoves[p]==closed[d] then
 						table.remove(posmoves,p)
 					end
 				end
@@ -932,7 +932,7 @@ function Pathfinding()
 					table.remove(posmoves,p)
 				end
 			elseif (steps[#steps]) then
-				deadends[#deadends+1]=curpos
+				closed[#closed+1]=curpos
 				curpos=steps[#steps]
 				table.remove(steps,table.maxn(steps))
 				for p=table.maxn(posmoves),1,-1 do

@@ -50,7 +50,7 @@ function GoldDisplay()
 	if not (GCDisplay) then
 		transp=0
 		GCDisplay = display.newText( (GoldCount), 0, 0, "Game Over", 100 )
-		GCDisplay:setTextColor( 255, 255, 0,transp)
+		GCDisplay:setTextColor( 255, 255, 0, transp)
 		GCDisplay.y = Displayy+10
 		GCDisplay.x = Displayx+20
 	end
@@ -67,7 +67,7 @@ function GoldDisplay()
 		else
 			transp=transp-(255/100)
 		end
-		GCDisplay:setTextColor( 255, 255, 0,transp)
+		GCDisplay:setTextColor( 255, 255, 0, transp)
 		CDisplay:setFillColor( transp, transp, transp, transp)
 	else
 		if GoldCount<P1.gp then
@@ -76,7 +76,7 @@ function GoldDisplay()
 			GoldCount=GoldCount-1
 		end
 		transp=255
-		GCDisplay:setTextColor( 255, 255, 0,transp)
+		GCDisplay:setTextColor( 255, 255, 0, transp)
 		CDisplay:setFillColor( transp, transp, transp, transp)
 	end
 end

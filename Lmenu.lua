@@ -430,15 +430,16 @@ function Keyboard()
 	kbrd=display.newGroup()
 	UpdateName()
 	
-	local title=display.newText(("Character Name"),0,0,native.systemFont,75)
-	title.x=display.contentWidth/2
-	title.y=100
-	kbrd:insert(title)
+	
+	bkg=display.newImageRect("bkgs/bkgname.png", 768, 1024)
+	bkg.x,bkg.y = display.contentCenterX, display.contentCenterY
+	kbrd:insert( bkg )
 	
 	for i=1,table.maxn(letters)/2 do
 		keys[i]=display.newText( (letters[i]) ,0,0,native.systemFont,75)
+		keys[i]:setTextColor( 0, 0, 0)
 		keys[i].x=80+(75*((i-1)%9))
-		keys[i].y=((display.contentHeight/2)-50)+(80*math.floor((i-1)/9))
+		keys[i].y=((display.contentHeight/2)-140)+(80*math.floor((i-1)/9))
 		kbrd:insert( keys[i] )
 		
 		function Input()
@@ -451,8 +452,9 @@ function Keyboard()
 	
 	for i=table.maxn(letters)/2+1,table.maxn(letters) do
 		keys2[i]=display.newText( (letters[i]) ,0,0,native.systemFont,75)
+		keys2[i]:setTextColor( 0, 0, 0)
 		keys2[i].x=80+(75*((i-1-table.maxn(letters)/2)%9))
-		keys2[i].y=((display.contentHeight/2)+220)+(80*math.floor((i-1-table.maxn(letters)/2)/9))
+		keys2[i].y=((display.contentHeight/2)+140)+(80*math.floor((i-1-table.maxn(letters)/2)/9))
 		kbrd:insert( keys2[i] )
 		
 		function Input()
@@ -474,7 +476,7 @@ function Keyboard()
 	}
 	keys[#keys]:setReferencePoint( display.CenterReferencePoint )
 	keys[#keys].x = 80+(75*((table.maxn(letters)/2)%9))
-	keys[#keys].y = ((display.contentHeight/2)-50)+(80*math.floor((table.maxn(letters)/2)/9))
+	keys[#keys].y = ((display.contentHeight/2)-140)+(80*math.floor((table.maxn(letters)/2)/9))
 	kbrd:insert( keys[#keys] )
 	
 	keys2[#keys2+1] = widget.newButton{
@@ -485,20 +487,44 @@ function Keyboard()
 	}
 	keys2[#keys2]:setReferencePoint( display.CenterReferencePoint )
 	keys2[#keys2].x = 80+(75*((table.maxn(letters)+1)%9))
-	keys2[#keys2].y = ((display.contentHeight/2)+130)+(85*math.floor((table.maxn(letters)-18)/9))
+	keys2[#keys2].y = ((display.contentHeight/2)+40)+(85*math.floor((table.maxn(letters)-18)/9))
 	kbrd:insert( keys2[#keys2] )
+	
+	keys2[#keys2+1] = widget.newButton{
+		label="Back",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		fontSize=30,
+		defaultFile="cbutton.png",
+		overFile="cbutton2.png",
+		width=252, height=55,
+		onRelease = Back2Menu
+	}
+	keys2[#keys2]:setReferencePoint( display.CenterReferencePoint )
+	keys2[#keys2].x = display.contentCenterX
+	keys2[#keys2].y = display.contentHeight-40
+	kbrd:insert( keys2[#keys2] )
+end
+
+function Back2Menu()
+	DelKeyboard()
+	ShowMenu()
+	canGo=true
+	namedis=nil
+	curname=nil
 end
 
 function UpdateName()
 	if not(namedis) then
 		namedis=display.newText((""),0,0,native.systemFont,80)
+		namedis:setTextColor( 0, 0, 0)
 		namedis.x=display.contentWidth/2
-		namedis.y=300
+		namedis.y=250
 		kbrd:insert( namedis )
 	end
 	if (curname) then
 		namedis.text=curname
 	end
+	namedis:toFront()
 end
 
 function LetterChange(let)

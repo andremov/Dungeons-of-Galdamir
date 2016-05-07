@@ -190,9 +190,10 @@ function ToggleInfo()
 		ginf=display.newGroup()
 		info={}
 		
-		bkg=display.newImageRect("pausebkg.png", 768, 800)
+		bkg=display.newImageRect("bkgs/pausebkg.png", 768, 800)
 		bkg.x,bkg.y = display.contentWidth/2, 400
 		ginf:insert( bkg )
+		
 		if p1.name=="Error" or p1.name=="error" or p1.name=="ERROR" then
 			info[1]=display.newText(
 				(
@@ -330,6 +331,19 @@ function ToggleInfo()
 			end
 		end
 		ginf:toFront()
+		
+		local ExitBtn=widget.newButton{
+			label="Menu",
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			fontSize=30,
+			defaultFile="cbutton.png",
+			overFile="cbutton2.png",
+			width=252, height=55,
+			onRelease = onToMenuBtnRelease}
+		ExitBtn:setReferencePoint( display.CenterReferencePoint )
+		ExitBtn.x = display.contentWidth-150
+		ExitBtn.y = 740
+		ginf:insert(ExitBtn)
 		
 	elseif isOpn==true and (ginf) then
 		isOpn=false
@@ -1030,7 +1044,12 @@ end
 
 function onToMenuBtnRelease()
 	audio.Play(12)
+	if (gdm) then
 	DeathMenu()
+	end
+	if (ginf) then
+		ToggleInfo()
+	end
 	WD.SrsBsns()
 end
 

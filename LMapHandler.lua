@@ -148,6 +148,16 @@ function MapSizeMenu()
 		opt:insert(CurTile)
 	end
 	
+	function BWTSet()
+		audio.Play(12)
+		SetTile(3)
+		display.remove(CurTile)
+		CurTile = display.newText( ("Current Tileset: BW"), 0, 0, "Game Over", 110 )
+		CurTile.x=display.contentWidth*0.5
+		CurTile.y= display.contentHeight*0.31+400
+		opt:insert(CurTile)
+	end
+	
 	local SmallBtn = widget.newButton{
 	label="Small Map",
 	labelColor = { default={0,0,0}, over={255,255,255} },
@@ -231,6 +241,20 @@ function MapSizeMenu()
 	NotebookTS.x = DefaultTS.x
 	NotebookTS.y = DefaultTS.y+90
 	opt:insert(NotebookTS)
+	
+	local BWTS = widget.newButton{
+	label="Black & White Tileset",
+	labelColor = { default={0,0,0}, over={255,255,255} },
+	fontSize=30,
+	defaultFile="button.png",
+	overFile="button-over.png",
+	width=308, height=80,
+	onRelease = BWTSet
+	}
+	BWTS:setReferencePoint( display.CenterReferencePoint )
+	BWTS.x = NotebookTS.x
+	BWTS.y = NotebookTS.y+90
+	opt:insert(BWTS)
 	
 	local Back = widget.newButton{
 	label="Back",

@@ -40,7 +40,10 @@ local S={
 	"27MB of Pure Gold!",
 	"Over 100 items!",
 	"Rings!",
-	}
+	"Unused Equipment!",
+	"Sorcery!",
+	"Mana!",
+}
 
 function GetSplash()
 	local chooser=math.random(1,table.maxn(S))
@@ -48,5 +51,4 @@ function GetSplash()
 	Splashtxt = display.newEmbossedText((Splash),20,170,native.systemFont, 50 )
 	Splashtxt:setTextColor( 255, 255, 0)
 	return Splashtxt
-	
 end

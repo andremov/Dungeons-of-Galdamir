@@ -81,7 +81,7 @@ function Attacked(victim)
 		inCombat=true
 		enemy=victim
 		DisplayCombat()
-		MobsTurn()
+	--	MobsTurn()
 	end
 end
 
@@ -91,6 +91,7 @@ function DisplayCombat()
 	mov.ShowArrows("clean")
 	HitGroup=display.newGroup()
 	Runtime:removeEventListener("enterFrame", gp.GoldDisplay)
+	Runtime:removeEventListener("enterFrame", players.ShowStats)
 	Runtime:addEventListener("enterFrame", NoMansLand)
 	
 	local bkgdark=display.newImageRect("bkgs/bkg_level.png",768,1024)
@@ -855,6 +856,7 @@ function EndCombat(outcome)
 		
 		outcomed=true
 		Runtime:addEventListener("enterFrame", gp.GoldDisplay)
+		Runtime:addEventListener("enterFrame", players.ShowStats)
 		--------------------------------------------
 		if outcome=="Loss" then
 		--------------------------------------------
