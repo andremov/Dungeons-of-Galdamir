@@ -222,7 +222,7 @@ function MobSpawn()
 		end
 		
 		if CanSpawn==true and SpawnCD==0 then
-			LifeOverDeath(MS.loc,MS.room)
+	--		LifeOverDeath(MS.loc,MS.room)
 			SpawnCD=math.random(10,15)
 		end
 		

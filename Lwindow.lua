@@ -907,7 +907,7 @@ function DeathMenu(cause)
 		
 		Runtime:removeEventListener("enterFrame", g.GoldDisplay)
 		b.WipeMap()
-		mov.ShowArrows("clean")
+		mov.CleanArrows()
 		a.Stopbkg()
 		s.WipeSave()
 		

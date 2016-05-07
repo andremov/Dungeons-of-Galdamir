@@ -28,14 +28,14 @@ local BoughtTxt
 local atShop=false
 local page
 
-function DisplayShop(id)
+function DisplayShop(id,room)
 	atShop=true
 	gsm=display.newGroup()
 	gbm=display.newGroup()
 	swg=display.newGroup()
 	gp.ShowGCounter()
 	Shops=b.GetData(7)
-	curShop=Shops[id]
+	curShop=Shops[room][id]
 	ShopID=id
 	page=1
 	

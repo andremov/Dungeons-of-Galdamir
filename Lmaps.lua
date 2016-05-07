@@ -15,7 +15,7 @@ local test={}
 2-left opening
 3-right opening
 4-lower opening
-a-						b-boundary
+a-start					b-boundary
 c-						d-break/wall
 e-						f-
 g-						h-healpad
@@ -28,7 +28,7 @@ r-random				s-shop
 t-						u-mobspawner
 v-						w-water
 x-walkable				y-
-z-start/finish	
+z-finish	
 
 H = 10x10
 S = 20x20
@@ -48,12 +48,25 @@ tut1={
 	"b","x","x","x","w","x","x","o","z","b",
 	"b","b","b","b","b","b","b","b","b","b",
 	}
-
+	
 test1={
 	"b","b","b","b","1","1","b","b","b","b",
-	"b","z","x","o","x","x","x","q","u","b",
-	"b","x","m","o","x","x","x","l","q","b",
-	"b","o","o","o","x","x","x","x","x","b",
+	"b","a","x","x","x","b","x","x","x","b",
+	"b","x","x","x","x","o","x","x","x","b",
+	"b","x","x","x","x","o","x","x","x","b",
+	"2","x","x","x","x","o","x","x","x","3",
+	"2","x","x","x","x","o","x","x","x","3",
+	"b","x","x","x","x","o","x","x","x","b",
+	"b","x","x","x","x","o","x","x","x","b",
+	"b","x","x","x","x","o","x","x","z","b",
+	"b","b","b","b","4","4","b","b","b","b",
+	}
+--[[
+test1={
+	"b","b","b","b","1","1","b","b","b","b",
+	"b","a","x","x","x","x","x","q","u","b",
+	"b","x","m","x","x","x","x","l","q","b",
+	"b","x","x","x","x","x","x","x","x","b",
 	"2","x","x","x","h","j","x","x","x","3",
 	"2","x","x","x","i","s","x","x","x","3",
 	"b","x","x","x","x","x","x","x","x","b",
@@ -61,7 +74,7 @@ test1={
 	"b","x","x","x","x","x","x","x","z","b",
 	"b","b","b","b","4","4","b","b","b","b",
 	}
-
+--]]
 map1H={
 	"b","b","b","b","1","1","b","b","b","b",
 	"b","z","r","r","r","r","r","r","r","b",

@@ -66,7 +66,7 @@ function onChestCollision()
 	for r in pairs(Chests) do
 		for l in pairs(Chests[r]) do
 			if (l==P1.loc) and (r==P1.room) then
-				bounds[r][l]=1
+				bounds[l]=1
 				display.remove(Chests[r][l])
 				Chests[r][l]=nil
 				gold.CallCoins(Round)
@@ -85,59 +85,60 @@ function onRockCollision()
 	local P1=player.GetPlayer()
 	local Rocks=builder.GetData(6)
 	local bounds=builder.GetData(2)
-	for i in pairs(Rocks) do
-		if ((i)==(P1.loc)) and bounds[i]~=1 then
-			bounds[i]=1
-			builder.ModMap(i)
-			local level=builder.GetData(3)
-			Rocks[i]:play()
-			audio.Play(13)
-			--Small
-			local somuchdebris=math.random(10,15)
-			for i=1, somuchdebris do
-				debris[#debris+1]=display.newImage((debrimages[(math.random(1,3))]), 13, 13)
-				debris[#debris].xScale=1.3
-				debris[#debris].yScale=1.3
-				debris[#debris].x=(P1.x+(math.random(-5,5)))
-				debris[#debris].y=(P1.y+(math.random(-50,-10)))
-				physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=7.0} )
-				debris[#debris]:setLinearVelocity((math.random(-300,300)),-300)
-				debris[#debris]:toFront()
-			end
-			--Medium
-			local somuchdebris=math.random(1,5)
-			for i=1, somuchdebris do
-				debris[#debris+1]=display.newImage((debrimages[(math.random(4,5))]), 28, 40)
-				debris[#debris].x=(P1.x+(math.random(-5,5)))
-				debris[#debris].y=(P1.y+(math.random(-50,-10)))
-				physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=20.0} )
-				debris[#debris]:setLinearVelocity((math.random(-200,200)),-200)
-				debris[#debris]:toFront()
-			end
-			--Large
-			local somuchdebris=math.random(1,10)
-			if somuchdebris>=9 then
-				debris[#debris+1]=display.newImage((debrimages[6]), 52, 72)
-				debris[#debris].x=(P1.x+(math.random(-5,5)))
-				debris[#debris].y=(P1.y+(math.random(-50,-10)))
-				physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=36.0} )
-				debris[#debris]:setLinearVelocity((math.random(-100,100)),-100)
-				debris[#debris]:toFront()
-			end
-			--Gold
-			local somuchdebris=math.random(1,100)
-			if somuchdebris>=80 then
-				local goldgaincount=0
-				for i=1,(math.ceil((somuchdebris-79)/2)) do
-					debris[#debris+1]=display.newImage((debrimages[(math.random(7,9))]), 13, 13)
+	for r in pairs(Rocks) do
+		for l in pairs(Rocks[r]) do
+			if ((l)==(P1.loc)) and ((r)==(P1.room)) and bounds[l]~=1 then
+				bounds[l]=1
+				builder.ModMap(l)
+				Rocks[r][l]:play()
+				audio.Play(13)
+				--Small
+				local somuchdebris=math.random(10,15)
+				for i=1, somuchdebris do
+					debris[#debris+1]=display.newImage((debrimages[(math.random(1,3))]), 13, 13)
+					debris[#debris].xScale=1.3
+					debris[#debris].yScale=1.3
 					debris[#debris].x=(P1.x+(math.random(-5,5)))
 					debris[#debris].y=(P1.y+(math.random(-50,-10)))
 					physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=7.0} )
+					debris[#debris]:setLinearVelocity((math.random(-300,300)),-300)
+					debris[#debris]:toFront()
+				end
+				--Medium
+				local somuchdebris=math.random(1,5)
+				for i=1, somuchdebris do
+					debris[#debris+1]=display.newImage((debrimages[(math.random(4,5))]), 28, 40)
+					debris[#debris].x=(P1.x+(math.random(-5,5)))
+					debris[#debris].y=(P1.y+(math.random(-50,-10)))
+					physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=20.0} )
+					debris[#debris]:setLinearVelocity((math.random(-200,200)),-200)
+					debris[#debris]:toFront()
+				end
+				--Large
+				local somuchdebris=math.random(1,10)
+				if somuchdebris>=9 then
+					debris[#debris+1]=display.newImage((debrimages[6]), 52, 72)
+					debris[#debris].x=(P1.x+(math.random(-5,5)))
+					debris[#debris].y=(P1.y+(math.random(-50,-10)))
+					physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=36.0} )
 					debris[#debris]:setLinearVelocity((math.random(-100,100)),-100)
 					debris[#debris]:toFront()
-					goldgaincount=goldgaincount+(math.random(1,3))
 				end
-				gold.CallAddCoins(goldgaincount)
+				--Gold
+				local somuchdebris=math.random(1,100)
+				if somuchdebris>=80 then
+					local goldgaincount=0
+					for i=1,(math.ceil((somuchdebris-79)/2)) do
+						debris[#debris+1]=display.newImage((debrimages[(math.random(7,9))]), 13, 13)
+						debris[#debris].x=(P1.x+(math.random(-5,5)))
+						debris[#debris].y=(P1.y+(math.random(-50,-10)))
+						physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=7.0} )
+						debris[#debris]:setLinearVelocity((math.random(-100,100)),-100)
+						debris[#debris]:toFront()
+						goldgaincount=goldgaincount+(math.random(1,3))
+					end
+					gold.CallAddCoins(goldgaincount)
+				end
 			end
 		end
 	end
@@ -147,7 +148,7 @@ function onKeyCollision()
 	local P1=player.GetPlayer()
 	local Key=builder.TheGates("key")
 	if (Key) then
-		if ((Key.loc)==(P1.loc)) then
+		if (Key.loc==P1.loc) and ((Key.room)==(P1.room)) then
 	--		print "Got Key!"
 			audio.Play(2)
 			builder.ModMap(Key.loc)
@@ -204,14 +205,25 @@ function onLavaCollision()
 	local LavaBlocks=builder.GetData(4)
 	local inCombat=c.InTrouble()
 	local isPaused=ui.Paused()
+	local isLava=false
 	if inCombat==true or isPaused==true then
 	else
-		for i in pairs(LavaBlocks) do
-			if ((i)==(P1.loc)) and (P1.HP~=0)then
-				local damage=(math.floor(P1.MaxHP*0.02))
-				player.ReduceHP(damage,"Lava")
-				timer.performWithDelay(200,onLavaCollision)
+		for r in pairs(LavaBlocks) do
+			for l in pairs(LavaBlocks[r]) do
+				if ((l)==(P1.loc)) and ((r)==(P1.room)) and (P1.HP~=0)then
+					isLava=true
+				end
 			end
+		end
+	end
+	if isLava==true then
+		local damage=(math.floor(P1.MaxHP*0.02))
+		player.ReduceHP(damage,"Lava")
+		lavatimer=timer.performWithDelay(200,onLavaCollision)
+	else
+		if (lavatimer) then
+			local stahp=timer.pause(lavatimer)
+			lavatimer=nil
 		end
 	end
 end
@@ -220,9 +232,11 @@ function onWaterCollision()
 	local P1=player.GetPlayer()
 	local WaterBlocks=builder.GetData(9)
 	local isWet=false
-	for i in pairs(WaterBlocks) do
-		if ((i)==(P1.loc)) and (P1.HP~=0)then
-			isWet=true
+	for r in pairs(WaterBlocks) do
+		for l in pairs(WaterBlocks[r]) do
+			if ((l)==(P1.loc)) and ((r)==(P1.room)) and (P1.HP~=0)then
+				isWet=true
+			end
 		end
 	end
 	return isWet
@@ -234,8 +248,8 @@ function LayOnHands()
 	local inCombat=c.InTrouble()
 	local isPaused=ui.Paused()
 	if inCombat==true or isPaused==true then
-	else
-		if (Heal==P1.loc) then
+	elseif (Heal) then
+		if (Heal.loc==P1.loc) and (Heal.room==P1.room) then
 			if P1.HP<P1.MaxHP then
 				twinkles[#twinkles+1]=display.newSprite( healthsheet, { name="twinkle", start=1, count=14, time=1000, loopCount=1 }  )
 				twinkles[#twinkles].x=P1.x+(math.random(-30,30))
@@ -262,8 +276,8 @@ function LayOnFeet()
 	local inCombat=c.InTrouble()
 	local isPaused=ui.Paused()
 	if inCombat==true or isPaused==true then
-	else
-		if (Energy==P1.loc) then
+	elseif (Energy) then
+		if (Energy.loc==P1.loc) and (Energy.room==P1.room) then
 			if P1.EP<P1.MaxEP then
 				twinkles[#twinkles+1]=display.newSprite( energysheet, { name="twinkle", start=1, count=14, time=1000, loopCount=1 }  )
 				twinkles[#twinkles].x=P1.x+(math.random(-30,30))
@@ -290,8 +304,8 @@ function LayOnHead()
 	local inCombat=c.InTrouble()
 	local isPaused=ui.Paused()
 	if inCombat==true or isPaused==true then
-	else
-		if (Mana==P1.loc) then
+	elseif (Mana) then
+		if (Mana.loc==P1.loc) and (Mana.room==P1.room) then
 			if P1.MP<P1.MaxMP then
 				twinkles[#twinkles+1]=display.newSprite( manasheet, { name="twinkle", start=1, count=14, time=1000, loopCount=1 }  )
 				twinkles[#twinkles].x=P1.x+(math.random(-30,30))
@@ -315,22 +329,19 @@ end
 function PortCheck()
 	local OP=builder.GetPortal(false)
 	local BP=builder.GetPortal(true)
-	local RP=builder.GetRedP()
 	local P1=players.GetPlayer()
 	if (OP) and (BP) then
-		if (P1) and (OP.loc==P1.loc) and P1.portcd==0 then
+		if (P1) and (OP.loc==P1.loc) and (OP.room==P1.room) and P1.portcd==0 then
 			return "OP"
-		elseif (P1) and (BP.loc==P1.loc) and P1.portcd==0 then
+		elseif (P1) and (BP.loc==P1.loc) and (BP.room==P1.room) and P1.portcd==0 then
 			return "BP"
-		elseif (P1) and (BP.loc~=P1.loc) and (OP.loc~=P1.loc) then
+		elseif (P1) then
 			P1.portcd=P1.portcd-1
 			if P1.portcd<=0 then
 				P1.portcd=0
 			end
 			return false
 		end
-	elseif (P1) and (RP) and (RP.loc==P1.loc) then
-		return "RP"
 	else
 		P1.portcd=P1.portcd-1
 		if P1.portcd<=0 then
@@ -343,18 +354,8 @@ end
 function Port()
 	local OP=builder.GetPortal(false)
 	local BP=builder.GetPortal(true)
-	local RP=builder.GetRedP()
 	local P1=players.GetPlayer()
-	if (RP) then
-		if (RP.loc==P1.loc) then
-			audio.Play(11)
-			function Closure()
-				mov.ShowArrows("clean")
-			end
-			timer.performWithDelay(10,Closure)
-			timer.performWithDelay(300,WD.Lrn2WinNub)
-		end
-	elseif (OP) and (BP) then
+	if (OP) and (BP) then
 		if (P1) and (OP.loc==P1.loc) and P1.portcd==0 then
 			function OrangePort()
 				twinkles[#twinkles+1]=display.newSprite( tpsheet, { name="twinkle", start=1, count=16, time=300, loopCount=1 }  )
@@ -372,7 +373,7 @@ function Port()
 			end
 			audio.Play(11)
 			function Closure()
-				mov.ShowArrows("clean")
+				mov.CleanArrows()
 			end
 			timer.performWithDelay(10,Closure)
 			timer.performWithDelay(300,OrangePort)
@@ -393,7 +394,7 @@ function Port()
 			end
 			audio.Play(11)
 			function Closure()
-				mov.ShowArrows("clean")
+				mov.CleanArrows()
 			end
 			timer.performWithDelay(10,Closure)
 			timer.performWithDelay(300,BluePort)
@@ -404,9 +405,11 @@ end
 function ShopCheck()
 	local ShopGroup=builder.GetData(7)
 	local P1=players.GetPlayer()
-	for i in pairs(ShopGroup) do
-		if ((i)==(P1.loc)) then
-			return true
+	for r in pairs(ShopGroup) do
+		for l in pairs(ShopGroup[r]) do
+			if ((l)==(P1.loc)) and ((r)==(P1.room)) then
+				return true
+			end
 		end
 	end
 end

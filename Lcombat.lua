@@ -110,7 +110,7 @@ function DisplayCombat()
 	Runtime:removeEventListener("enterFrame", gp.GoldDisplay)
 	Runtime:addEventListener("enterFrame", NoMansLand)
 	HitGroup=display.newGroup()
-	mov.ShowArrows("clean")
+	mov.CleanArrows()
 	gcm=display.newGroup()
 	hits={}
 	

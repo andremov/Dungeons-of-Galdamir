@@ -142,10 +142,6 @@ function GetPlayer()
 	return player
 end
 
-function MovePlayer(dist)
-	player.loc=player.loc+dist
-end
-
 function ShowStats()
 	check=check+1
 	if check==120 then

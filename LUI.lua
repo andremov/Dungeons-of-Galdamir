@@ -138,7 +138,7 @@ function Pause(mute)
 		elseif isPaused==false then
 			isPaused=true
 	--		print "!3"
-			m.ShowArrows("clean")
+			m.CleanArrows()
 			gold.ShowGCounter()
 			players.LetsYodaIt()
 	--		print "Game paused."

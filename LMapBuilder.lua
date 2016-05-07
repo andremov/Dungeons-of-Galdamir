@@ -28,8 +28,8 @@ local watersheet
 local lavasheet
 -- General Map Values
 local Destructibles
-local LavaBlocks
 local WaterBlocks
+local LavaBlocks
 local boundary
 local mbounds
 local loadtxt
@@ -45,17 +45,23 @@ local side
 local fog
 -- Extra Tiles
 local OrangePortal
+local entranceroom
+local entranceloc
+local finishroom
 local BluePortal
 local EnergyPad
+local finishpos
 local SmallKey
+local exitroom
 local Spawner
 local HealPad
 local ManaPad
-local finish
+local exitloc
 local mobs
 -- Extra Tiles other values
 local keytriescount
 local KeySpawned
+local ShopCount
 local dmobs
 local BP
 local OP
@@ -63,7 +69,6 @@ local HP
 local MP
 local EP
 local MS
-local ShopCount
 -- Constants
 local TileIDsNum=true
 local Peaceful=true
@@ -96,7 +101,9 @@ function Essentials()
 	dmobs=display.newGroup()
 	Destructibles={}
 	WaterBlocks={}
+	finishroom={}
 	LavaBlocks={}
+	finishpos={}
 	boundary={}
 	mbounds={}
 	hidden={}
@@ -120,13 +127,13 @@ function Essentials()
 	curroom=1
 	roomid=1
 	layout={
-		1,0,0,0,0,
-		0,0,0,0,0,
+		1,1,0,0,0,
+		1,1,0,0,0,
 		0,0,0,0,0,
 		0,0,0,0,0,
 		0,0,0,0,0,
 	}
-	for i=2,rooms do
+	for i=3,rooms do
 		local posrooms={}
 		for r=1,table.maxn(layout)do
 			if layout[r]==1 then
@@ -171,11 +178,11 @@ function Essentials()
 	end]]
 	Tiles()
 	bkg=ui.Background()
-	print (layout[1].." "..layout[2].." "..layout[3].." "..layout[4].." "..layout[5])
-	print (layout[6].." "..layout[7].." "..layout[8].." "..layout[9].." "..layout[10])
-	print (layout[11].." "..layout[12].." "..layout[13].." "..layout[14].." "..layout[15])
-	print (layout[16].." "..layout[17].." "..layout[18].." "..layout[19].." "..layout[20])
-	print (layout[21].." "..layout[22].." "..layout[23].." "..layout[24].." "..layout[25])
+	--print (layout[1].." "..layout[2].." "..layout[3].." "..layout[4].." "..layout[5])
+	--print (layout[6].." "..layout[7].." "..layout[8].." "..layout[9].." "..layout[10])
+	--print (layout[11].." "..layout[12].." "..layout[13].." "..layout[14].." "..layout[15])
+	--print (layout[16].." "..layout[17].." "..layout[18].." "..layout[19].." "..layout[20])
+	--print (layout[21].." "..layout[22].." "..layout[23].." "..layout[24].." "..layout[25])
 end
 
 function BuildMap()
@@ -212,16 +219,25 @@ function BuildMap()
 			curroom=curroom+1
 			timer.performWithDelay(0.2,BuildMap)
 		else
+			local froll=math.random(1,table.maxn(finishpos))
+			exitloc=finishpos[froll]
+			exitroom=finishroom[froll]
+			for t=1,table.maxn(finishpos) do
+				if exitroom==finishroom[t] and exitloc==finishpos[t] then
+				else
+					room[finishroom[t]][finishpos[t]]="x"
+				end
+			end
 			loadtxt.text=("Testing Map...")
 			loadtxt:toFront()
-			local CanBeDone=Pathfinding()
+			local CanBeDone=Pathfinding(entranceloc,exitloc,exitroom)
 			if CanBeDone==false then
-		--		print "Map failed."
+				print "Map failed."
 				loadtxt.text=("Map Failed.\n   Retrying...")
 				loadtxt:toFront()
 				timer.performWithDelay(500,Rebuild)
 			else
-		--		print "Map passed."
+				print "Map passed."
 				count=0
 				curroom=1
 				DisplayMap()
@@ -326,12 +342,13 @@ end
 function Extras()
 --	print "Adding Sprinkles to Map..."
 	for r=1,25 do
+		xinicial=math.floor((r-1)%5)*(math.sqrt(mapsize)*espacio)
+		yinicial=math.floor((r-1)/5)*(math.sqrt(mapsize)*espacio)
 		if layout[r]==1 then
 			local map=handler.GetCMap()
 			mapsize=table.maxn( map )
 			for i=1, mapsize do
 				if i~=(math.sqrt(mapsize)+2) and room[r][i]=="x" then
-				
 					if mbounds[r][i]==1 and KeySpawned==false then
 						local isKey=math.random(1,500)
 						if isKey>=490 then
@@ -341,6 +358,7 @@ function Extras()
 							SmallKey.y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacio)
 							SmallKey.isVisible=false
 							SmallKey.loc=(i)
+							SmallKey.room=(r)
 							room[r][i]="k"
 							SmallKey.xScale=scale
 							SmallKey.yScale=SmallKey.xScale
@@ -361,8 +379,6 @@ function Extras()
 							Chests[r][i].xScale=scale
 							Chests[r][i].yScale=Chests[r][i].xScale
 							Level:insert( Chests[r][i] )
-							print (r)
-							print (i)
 						end
 					end
 					
@@ -387,18 +403,23 @@ function Extras()
 				end
 			end
 		end
-	end		
+	end
+	
 	if KeySpawned==false then
-		mbounds[finish]=1
-		boundary[finish]=1
+		mbounds[exitroom][exitloc]=1
+		boundary[exitroom][exitloc]=1
 	else
-		mbounds[finish]=0
-		boundary[finish]=0
-		Gate=walls[finish]
+		xinicial=math.floor((exitroom-1)%5)*(math.sqrt(mapsize)*espacio)
+		yinicial=math.floor((exitroom-1)/5)*(math.sqrt(mapsize)*espacio)
+		mbounds[exitroom][exitloc]=0
+		boundary[exitroom][exitloc]=0
+		Gate=walls[exitroom][exitloc]
 		Gate=display.newImageRect( "tiles/"..TSet.."/jail.png", 80, 80)
-		Gate.x=xinicial+((((finish-1)%math.sqrt(mapsize)))*espacio)
-		Gate.y=yinicial+(math.floor((finish-1)/math.sqrt(mapsize))*espacio)
+		Gate.x=xinicial+((((exitloc-1)%math.sqrt(mapsize)))*espacio)
+		Gate.y=yinicial+(math.floor((exitloc-1)/math.sqrt(mapsize))*espacio)
 		Gate.isVisible=false
+		Gate.loc=exitloc
+		Gate.room=exitroom
 		Gate.xScale=scale
 		Gate.yScale=Gate.xScale
 		Level:insert( Gate )
@@ -608,10 +629,56 @@ function BuildTile()
 			room[curroom][count]="x"
 		end
 		
+		local CurRound=WD.Circle()
+		
+		if(map[count]=="a")then
+			if CurRound%2==0 then
+				mbounds[curroom][count]=0
+				boundary[curroom][count]=1
+				room[curroom][count]="z"
+				finishpos[#finishpos+1]=(count)
+				finishroom[#finishroom+1]=(curroom)
+			else
+				if curroom==1 then
+					mbounds[curroom][count]=0
+					boundary[curroom][count]=1
+					room[curroom][count]="a"
+					entranceloc=(count)
+					entranceroom=(curroom)
+				else
+					mbounds[curroom][count]=1
+					boundary[curroom][count]=1
+					room[curroom][count]="x"
+				end
+			end
+		end
+		
 		if(map[count]=="z")then
-			mbounds[curroom][count]=0
+			if CurRound%2==0 then
+				if curroom==1 then
+					mbounds[curroom][count]=0
+					boundary[curroom][count]=1
+					room[curroom][count]="a"
+					entranceloc=(count)
+					entranceroom=(curroom)
+				else
+					mbounds[curroom][count]=1
+					boundary[curroom][count]=1
+					room[curroom][count]="x"
+				end
+			else
+				mbounds[curroom][count]=0
+				boundary[curroom][count]=1
+				room[curroom][count]="z"
+				finishpos[#finishpos+1]=(count)
+				finishroom[#finishroom+1]=(curroom)
+			end
+		end
+		
+		if count==16 and curroom~=1 then
+			mbounds[curroom][count]=1
 			boundary[curroom][count]=1
-			room[curroom][count]="z"
+			room[curroom][count]="x"
 		end
 		
 	elseif count~=mapsize+1 then
@@ -707,9 +774,18 @@ function BuildTile()
 			boundary[curroom][count]=1
 		end
 		
+		if(room[curroom][count]=="a")then
+			mbounds[curroom][count]=0
+			boundary[curroom][count]=1
+			entranceloc=(count)
+			entranceroom=(curroom)
+		end
+		
 		if(room[curroom][count]=="z")then
 			mbounds[curroom][count]=0
 			boundary[curroom][count]=1
+			exitloc=count
+			exitroom=curroom
 		end
 		
 	end
@@ -718,15 +794,14 @@ function BuildTile()
 end
 
 function RandomizeTile()
-	local map=handler.GetCMap()
-	mapsize=table.maxn( map )
-	
 	if count==1 then
 	--	print "Starting Map Randomization..."
 	end
+	local map=handler.GetCMap()
+	mapsize=table.maxn( map )
 	
 	if count~=mapsize+1 and not(room[curroom][count]) then
-		if (map[curroom][count]=="r") then
+		if (map[count]=="r") then
 			if i~=(math.sqrt(mapsize)+2) then
 				local TileRoll=math.random(1, 100)
 			
@@ -1179,10 +1254,19 @@ function DisplayTile()
 			Level:insert( walls[curroom][count] )
 		end	
 		
-		if(room[curroom][count]=="z")then
+		if(room[curroom][count]=="a")then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/stairup.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
+		end
+		
+		if(room[curroom][count]=="z")and(curroom==exitroom)and(count==exitloc)then
 			local curround=WD.Circle()
-			if didStair==false then
-				walls[curroom][count]=walls[curroom][count]
+		--	if didStair==false then
 				walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/stairup.png", 80, 80)
 				walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 				walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
@@ -1190,23 +1274,15 @@ function DisplayTile()
 				walls[curroom][count].xScale=scale
 				walls[curroom][count].yScale=walls[curroom][count].xScale
 				Level:insert( walls[curroom][count] )
-				didStair=true
-				if curround%2==0  then
-					finish=(count)
-				end
-			elseif didStair==true then
-				walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/stairdown.png", 80, 80)
-				walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-				walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-				walls[curroom][count].isVisible=false
-				walls[curroom][count].xScale=scale
-				walls[curroom][count].yScale=walls[curroom][count].xScale
-				Level:insert( walls[curroom][count] )
-				didStair=false
-				if curround%2~=0  then
-					finish=(count)
-				end
-			end
+		--	elseif didStair==true then
+		--		walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/stairdown.png", 80, 80)
+		--		walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+		--		walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+		--		walls[curroom][count].isVisible=false
+		--		walls[curroom][count].xScale=scale
+		--		walls[curroom][count].yScale=walls[curroom][count].xScale
+		--		Level:insert( walls[curroom][count] )
+		--	end
 		end
 		
 		fog[curroom][count]=display.newImageRect( "tiles/"..TSet.."/fog.png", 80, 80)
@@ -1229,7 +1305,7 @@ function DisplayTile()
 			end
 			
 			num[curroom][count]=display.newText( (curroom.."\n   "..NZone.."-"..count),0,0,"MoolBoran",40 )
-			num[curroom][count]:setTextColor(70,255,70)
+			num[curroom][count]:setTextColor(0,0,0)
 			num[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			num[curroom][count].y=yinicial+10+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			Level:insert( num[curroom][count] )
@@ -1293,89 +1369,58 @@ function Tiles()
 end
 
 function Show(IDs)
-	local p1=p.GetPlayer()
-	roomid=p1.room
-	for i in pairs(hidden) do
-		hidden[roomid][i]=nil
-		fog[roomid][i].isVisible=true
-		fog[roomid][i]:toFront()
-		for m in pairs(mobs)do
-			if (mobs[m].loc==i) and mobs[m].room==roomid then
-				mobs[m].isVisible=false
+	for r in pairs(hidden) do
+		for t in pairs(hidden[r]) do
+			hidden[r][t]=nil
+			fog[r][t].isVisible=true
+			fog[r][t]:toFront()
+			for m in pairs(mobs)do
+				if (mobs[m].loc==t) and mobs[m].room==r then
+					mobs[m].isVisible=false
+				end
 			end
-		end
-		if (LavaBlocks[roomid][i]) then
-			LavaBlocks[roomid][i]:pause()
-		end
-		if (WaterBlocks[roomid][i]) then
-			WaterBlocks[roomid][i]:pause()
-		end
-		if (OrangePortal==true) and (OP.loc==i) and (OP.room==roomid) then
-			OP:pause()
-		end
-		if (BluePortal==true) and (BP.loc==i) and (BP.room==roomid) then
-			BP:pause()
-		end
-		if (Spawner==true) and (MS.loc==i) and (MS.room==roomid) then
-			MS:pause()
-		end
-		if (ManaPad==true) and (MP.loc==i) and (MP.room==roomid) then
-			MP:pause()
-		end
-		if (HealPad==true) and (HP.loc==i) and (HP.room==roomid) then
-			HP:pause()
-		end
-		if (EnergyPad==true) and (EP.loc==i) and (EP.room==roomid) then
-			EP:pause()
+			if (LavaBlocks[r][t]) then
+				LavaBlocks[r][t]:pause()
+			end
+			if (WaterBlocks[r][t]) then
+				WaterBlocks[r][t]:pause()
+			end
+			if (OrangePortal==true) and (OP.loc==t) and (OP.room==r) then
+				OP:pause()
+			end
+			if (BluePortal==true) and (BP.loc==t) and (BP.room==r) then
+				BP:pause()
+			end
+			if (Spawner==true) and (MS.loc==t) and (MS.room==r) then
+				MS:pause()
+			end
+			if (ManaPad==true) and (MP.loc==t) and (MP.room==r) then
+				MP:pause()
+			end
+			if (HealPad==true) and (HP.loc==t) and (HP.room==r) then
+				HP:pause()
+			end
+			if (EnergyPad==true) and (EP.loc==t) and (EP.room==r) then
+				EP:pause()
+			end
 		end
 	end
 	for i in pairs(IDs) do
-		if (fog[roomid][i]) then
-			fog[roomid][i].isVisible=false
-			hidden[roomid][i]=true
+	--print (IDs[i]..": "..i)
+		if (fog[IDs[i]][i]) then
+			fog[IDs[i]][i].isVisible=false
+			hidden[IDs[i]][i]=true
 		end
-		if (walls[roomid][i]) then
-			walls[roomid][i].isVisible=true
+		if (walls[IDs[i]][i]) then
+			walls[IDs[i]][i].isVisible=true
 		end
-		if (Destructibles[roomid][i]) then
-			Destructibles[roomid][i].isVisible=true
+		if (Destructibles[IDs[i]][i]) then
+			Destructibles[IDs[i]][i].isVisible=true
 		end
-		if (Shops[roomid][i]) then
-			Shops[roomid][i].isVisible=true
+		if (Shops[IDs[i]][i]) then
+			Shops[IDs[i]][i].isVisible=true
 		end
-		if (LavaBlocks[roomid][i]) then
-			LavaBlocks[roomid][i].isVisible=true
-			LavaBlocks[roomid][i]:play()
-		end
-		if (WaterBlocks[roomid][i]) then
-			WaterBlocks[roomid][i].isVisible=true
-			WaterBlocks[roomid][i]:play()
-		end
-		if (OrangePortal==true) and (OP.loc==i) and (BP.room==roomid) then
-			OP.isVisible=true
-			OP:play()
-		end
-		if (BluePortal==true) and (BP.loc==i) and (BP.room==roomid) then
-			BP.isVisible=true
-			BP:play()
-		end
-		if (Spawner==true) and (MS.loc==i) and (MS.room==roomid) then
-			MS.isVisible=true
-			MS:play()
-		end
-		if (ManaPad==true) and (MP.loc==i) and (MP.room==roomid) then
-			MP.isVisible=true
-			MP:play()
-		end
-		if (HealPad==true) and (HP.loc==i) and (HP.room==roomid) then
-			HP.isVisible=true
-			HP:play()
-		end
-		if (EnergyPad==true) and (EP.loc==i) and (EP.room==roomid) then
-			EP.isVisible=true
-			EP:play()
-		end
-		if (KeySpawned==true) and (SmallKey) and (SmallKey.loc==i) and (SmallKey.room==roomid) then
+		if (KeySpawned==true) and (SmallKey) and (SmallKey.loc==i) and (SmallKey.room==IDs[i]) then
 			SmallKey.isVisible=true
 		end
 		for m=1,table.maxn(mobs)do
@@ -1383,14 +1428,47 @@ function Show(IDs)
 				mobs[m].isVisible=true
 			end
 		end
-		if (Chests[roomid][i]) then
-			Chests[roomid][i].isVisible=true
+		if (Chests[IDs[i]][i]) then
+			Chests[IDs[i]][i].isVisible=true
+		else
 		end
-		if (finish==i) and (Gate) then
+		if (Gate) and Gate.room==IDs[i] and Gate.loc==i then
 			Gate.isVisible=true
 		end
-		if (num[roomid][i]) then
-			num[roomid][i]:toFront()
+		if (LavaBlocks[IDs[i]][i]) then
+			LavaBlocks[IDs[i]][i].isVisible=true
+			LavaBlocks[IDs[i]][i]:play()
+		end
+		if (WaterBlocks[IDs[i]][i]) then
+			WaterBlocks[IDs[i]][i].isVisible=true
+			WaterBlocks[IDs[i]][i]:play()
+		end
+		if (OrangePortal==true) and (OP.loc==i) and (BP.room==IDs[i]) then
+			OP.isVisible=true
+			OP:play()
+		end
+		if (BluePortal==true) and (BP.loc==i) and (BP.room==IDs[i]) then
+			BP.isVisible=true
+			BP:play()
+		end
+		if (Spawner==true) and (MS.loc==i) and (MS.room==IDs[i]) then
+			MS.isVisible=true
+			MS:play()
+		end
+		if (ManaPad==true) and (MP.loc==i) and (MP.room==IDs[i]) then
+			MP.isVisible=true
+			MP:play()
+		end
+		if (HealPad==true) and (HP.loc==i) and (HP.room==IDs[i]) then
+			HP.isVisible=true
+			HP:play()
+		end
+		if (EnergyPad==true) and (EP.loc==i) and (EP.room==IDs[i]) then
+			EP.isVisible=true
+			EP:play()
+		end
+		if (num[IDs[i]][i]) then
+			num[IDs[i]][i]:toFront()
 		end
 	end
 	local canArr=wdow.OpenWindow()
@@ -1434,42 +1512,81 @@ function WipeMap()
 	bkg:toBack()
 end
 
-function Pathfinding(start,finish)
-	tiles={}
-	done={}
+function Pathfinding(start,finish,finishroom)
+	local flroom=1
+	local tiles={}
+	local done={}
+	local postiles={}
+	local isDone=false
+	local foundIt={}
+	print ("Processing room "..flroom.."...")
+	tiles[flroom]={}
+	done[flroom]={}
+	sentIt={
+		true,false,false,false,false,
+		false,false,false,false,false,
+		false,false,false,false,false,
+		false,false,false,false,false,
+		false,false,false,false,false
+	}
+	finishIt={false,false,false,false}
 	if (start) and type(start)=="number" then
-		tiles[start]=1
-		done[start]=false
+		tiles[flroom][start]=1
+		done[flroom][start]=false
 	else
-		tiles[math.sqrt(mapsize)+2]=1
-		done[math.sqrt(mapsize)+2]=false
+		tiles[flroom][math.sqrt(mapsize)+2]=1
+		done[flroom][math.sqrt(mapsize)+2]=false
 	end
 	if (finish) and type(finish)=="number" then
 		target=finish
 	else
 		target=mapsize-(math.sqrt(mapsize)+1)
 	end
-	postiles={}
-	isDone=false
+	if (finishroom) and type(finishroom)=="number" then
+		targetroom=finishroom
+		if (layout[targetroom-5]) and layout[targetroom-5]==1 then
+			finishIt[1]=false
+		else
+			finishIt[1]=true
+		end
+		if (layout[targetroom-1]) and layout[targetroom-1]==1 then
+			finishIt[2]=false
+		else
+			finishIt[2]=true
+		end
+		if (layout[targetroom+1]) and layout[targetroom+1]==1 then
+			finishIt[3]=false
+		else
+			finishIt[3]=true
+		end
+		if (layout[targetroom+5]) and layout[targetroom+5]==1 then
+			finishIt[4]=false
+		else
+			finishIt[4]=true
+		end
+	else
+		targetroom=1
+		finishIt={true,true,false,false}
+	end
 	while isDone==false do
-		for i in pairs(tiles) do
-			if done[i]==false then
+		for i in pairs(tiles[flroom]) do
+			if done[flroom][i]==false then
 				local col=math.floor((i-1)%math.sqrt(mapsize))
 				local row=math.floor((i-1)/math.sqrt(mapsize))
-				if boundary[1][i+math.sqrt(mapsize)]==1 then
+				if boundary[flroom][i+math.sqrt(mapsize)]==1 then
 					postiles[#postiles+1]=i+math.sqrt(mapsize)
 				end
-				if boundary[1][i+1]==1 then
+				if boundary[flroom][i+1]==1 then
 					postiles[#postiles+1]=i+1
 				end
-				if boundary[1][i-math.sqrt(mapsize)]==1 then
+				if boundary[flroom][i-math.sqrt(mapsize)]==1 then
 					postiles[#postiles+1]=i-math.sqrt(mapsize)
 				end
-				if boundary[1][i-1]==1 then
+				if boundary[flroom][i-1]==1 then
 					postiles[#postiles+1]=i-1
 				end
 				--Overwrite check
-				for s in pairs(tiles) do
+				for s in pairs(tiles[flroom]) do
 					for p=table.maxn(postiles),1,-1 do
 						if postiles[p]==s then
 							table.remove(postiles,p)
@@ -1478,40 +1595,71 @@ function Pathfinding(start,finish)
 				end
 				if (table.maxn(postiles)~=0) then
 					for i=1,table.maxn(postiles) do
-						tiles[postiles[i]]=1
-						done[postiles[i]]=false
+						tiles[flroom][postiles[i]]=1
+						done[flroom][postiles[i]]=false
+						if map[postiles[i]]=="1" and sentIt[flroom-5]==false then
+							sentIt[flroom-5]=true
+							foundIt[2]=ExtraFinding(flroom,flroom-5)
+						elseif flroom-5==targetroom and finishIt[4]==false then
+							finishIt[4]=true
+							foundIt[2]=ExtraFinding(flroom,flroom-5)
+						end
+						if map[postiles[i]]=="2" and sentIt[flroom-1]==false then
+							sentIt[flroom-1]=true
+							foundIt[3]=ExtraFinding(flroom,flroom-1)
+						elseif flroom-1==targetroom and finishIt[3]==false then
+							finishIt[3]=true
+							foundIt[3]=ExtraFinding(flroom,flroom-1)
+						end
+						if map[postiles[i]]=="3" and sentIt[flroom+1]==false then
+							sentIt[flroom+1]=true
+							foundIt[4]=ExtraFinding(flroom,flroom+1)
+						elseif flroom+1==targetroom and finishIt[2]==false then
+							finishIt[2]=true
+							foundIt[4]=ExtraFinding(flroom,flroom+1)
+						end
+						if map[postiles[i]]=="4" and sentIt[flroom+5]==false then
+							sentIt[flroom+5]=true
+							foundIt[5]=	ExtraFinding(flroom,flroom+5)
+						elseif flroom+5==targetroom and finishIt[1]==false then
+							finishIt[1]=true
+							foundIt[5]=	ExtraFinding(flroom,flroom+5)
+						end
 					end
 					for p=table.maxn(postiles),1,-1 do
 						table.remove(postiles,p)
 					end
 				else
-					done[i]=true
+					done[flroom][i]=true
 				end
 			end
 			isDone=true
-			for i in pairs(done) do
-				if done[i]~=true then
+			for i in pairs(done[flroom]) do
+				if done[flroom][i]~=true then
 					isDone=false
 				end
 			end
 		end
 	end
+	print ("Processed room "..flroom.."...")
 	local canDo=false
-	for t in pairs(tiles) do
-		if target==t then
-			canDo=true
+	if targetroom==flroom then
+		for t in pairs(tiles[flroom]) do
+			if target==t then
+				foundIt[1]=true
+			end
 		end
 	end
-	if canDo==false then
+	if foundIt[1]==false then
 		if BPLoc and OPLoc then
 			local isBP=false
 			local isOP=false
-			for t in pairs(tiles) do
+			for t in pairs(tiles[flroom]) do
 				if BPLoc==t then
 					isBP=true
 				end
 			end
-			for t in pairs(tiles) do
+			for t in pairs(tiles[flroom]) do
 				if OPLoc==t then
 					isOP=true
 				end
@@ -1526,68 +1674,164 @@ function Pathfinding(start,finish)
 			else
 				portDo=false
 			end
-			canDo=portDo
+			foundIt[1]=portDo
 		end
 	end
+	for i=1,table.maxn(foundIt)do
+		if foundIt[i]==true then
+			canDo=true
+		end
+	end
+	print (canDo)
 	return canDo
-	--[[
-		steps={}
-		curpos=math.sqrt(mapsize)+2
-		posmoves={}
-		closed={}
-		
-		while curpos~=true and curpos~=false do
-			if curpos==target then
-				curpos=true
-			else
-				if boundary[curpos+math.sqrt(mapsize)]==1 then
-					posmoves[#posmoves+1]=curpos+math.sqrt(mapsize)
+end
+
+function ExtraFinding(fromroom,toroom)
+	local tiles={}
+	local done={}
+	local flroom=toroom
+	local dif=toroom-fromroom
+	local postiles={}
+	local foundIt={}
+	local isDone=false
+	print ("Processing room "..flroom.."...")
+	tiles[flroom]={}
+	done[flroom]={}
+	if dif==1 then
+		local size=math.sqrt(mapsize)
+		tiles[flroom][((size/2)*size)+1]=1
+		done[flroom][((size/2)*size)+1]=false
+	elseif dif==5 then
+		local size=math.sqrt(mapsize)
+		tiles[flroom][size/2]=1
+		done[flroom][size/2]=false
+	elseif dif==-1 then
+		local size=math.sqrt(mapsize)
+		tiles[flroom][((size/2)*size)]=1
+		done[flroom][((size/2)*size)]=false
+	elseif dif==-5 then
+		local size=math.sqrt(mapsize)
+		tiles[flroom][(size/2)+((size-1)*size)]=1
+		done[flroom][(size/2)+((size-1)*size)]=false
+	end
+	while isDone==false do
+		for i in pairs(tiles[flroom]) do
+			if done[flroom][i]==false then
+				local col=math.floor((i-1)%math.sqrt(mapsize))
+				local row=math.floor((i-1)/math.sqrt(mapsize))
+				if boundary[flroom][i+math.sqrt(mapsize)]==1 then
+					postiles[#postiles+1]=i+math.sqrt(mapsize)
 				end
-				if boundary[curpos+1]==1 then
-					posmoves[#posmoves+1]=curpos+1
+				if boundary[flroom][i+1]==1 then
+					postiles[#postiles+1]=i+1
 				end
-				if boundary[curpos-math.sqrt(mapsize)]==1 then
-					posmoves[#posmoves+1]=curpos-math.sqrt(mapsize)
+				if boundary[flroom][i-math.sqrt(mapsize)]==1 then
+					postiles[#postiles+1]=i-math.sqrt(mapsize)
 				end
-				if boundary[curpos-1]==1 then
-					posmoves[#posmoves+1]=curpos-1
+				if boundary[flroom][i-1]==1 then
+					postiles[#postiles+1]=i-1
 				end
-				for s=1,table.maxn(steps)do
-					for p=table.maxn(posmoves),1,-1 do
-						if posmoves[p]==steps[s] then
-							table.remove(posmoves,p)
+				--Overwrite check
+				for s in pairs(tiles[flroom]) do
+					for p=table.maxn(postiles),1,-1 do
+						if postiles[p]==s then
+							table.remove(postiles,p)
 						end
 					end
 				end
-				for d=1,table.maxn(closed)do
-					for p=table.maxn(posmoves),1,-1 do
-						if posmoves[p]==closed[d] then
-							table.remove(posmoves,p)
+				if (table.maxn(postiles)~=0) then
+					for i=1,table.maxn(postiles) do
+						tiles[flroom][postiles[i]]=1
+						done[flroom][postiles[i]]=false
+						if map[postiles[i]]=="1" and sentIt[flroom-5]==false then
+							sentIt[flroom-5]=true
+							foundIt[2]=ExtraFinding(flroom,flroom-5)
+						elseif flroom-5==targetroom and finishIt[4]==false then
+							finishIt[4]=true
+							foundIt[2]=ExtraFinding(flroom,flroom-5)
+						end
+						if map[postiles[i]]=="2" and sentIt[flroom-1]==false then
+							sentIt[flroom-1]=true
+							foundIt[3]=ExtraFinding(flroom,flroom-1)
+						elseif flroom-1==targetroom and finishIt[3]==false then
+							finishIt[3]=true
+							foundIt[3]=ExtraFinding(flroom,flroom-1)
+						end
+						if map[postiles[i]]=="3" and sentIt[flroom+1]==false then
+							sentIt[flroom+1]=true
+							foundIt[4]=ExtraFinding(flroom,flroom+1)
+						elseif flroom+1==targetroom and finishIt[2]==false then
+							finishIt[2]=true
+							foundIt[4]=ExtraFinding(flroom,flroom+1)
+						end
+						if map[postiles[i]]=="4" and sentIt[flroom+5]==false then
+							sentIt[flroom+5]=true
+							foundIt[5]=	ExtraFinding(flroom,flroom+5)
+						elseif flroom+5==targetroom and finishIt[1]==false then
+							finishIt[1]=true
+							foundIt[5]=	ExtraFinding(flroom,flroom+5)
 						end
 					end
-				end
-				if (posmoves[1]) then
-					steps[#steps+1]=curpos
-					curpos=posmoves[1]
-					for p=table.maxn(posmoves),1,-1 do
-						table.remove(posmoves,p)
-					end
-				elseif (steps[#steps]) then
-					closed[#closed+1]=curpos
-					curpos=steps[#steps]
-					table.remove(steps,table.maxn(steps))
-					for p=table.maxn(posmoves),1,-1 do
-						table.remove(posmoves,p)
+					for p=table.maxn(postiles),1,-1 do
+						table.remove(postiles,p)
 					end
 				else
-					curpos=false
+					done[flroom][i]=true
+				end
+			end
+			isDone=true
+			for i in pairs(done[flroom]) do
+				if done[flroom][i]~=true then
+					isDone=false
 				end
 			end
 		end
-		return curpos
-	--]]
+	end
+	print ("Processed room "..flroom.."...")
+	local canDo=false
+	if targetroom==flroom then
+		for t in pairs(tiles[flroom]) do
+			if target==t then
+				foundIt[1]=true
+			end
+		end
+	end
+	if foundIt[1]==false then
+		if BPLoc and OPLoc then
+			local isBP=false
+			local isOP=false
+			for t in pairs(tiles[flroom]) do
+				if BPLoc==t then
+					isBP=true
+				end
+			end
+			for t in pairs(tiles[flroom]) do
+				if OPLoc==t then
+					isOP=true
+				end
+			end
+			local portDo=false
+			if isOP==true and isBP==true then
+				portDo=false
+			elseif isOP==true and isBP==false then
+				portDo=Pathfinding(BPLoc)
+			elseif isOP==false and isBP==true then
+				portDo=Pathfinding(OPLoc)
+			else
+				portDo=false
+			end
+			foundIt[1]=portDo
+		end
+	end
+	for i=1,table.maxn(foundIt)do
+		if foundIt[i]==true then
+			canDo=true
+		end
+	end
+	print (canDo)
+	return canDo
 end
-	
+
 function TheGates(action)
 	if action=="key" then
 		return SmallKey
@@ -1597,63 +1841,68 @@ function TheGates(action)
 			SmallKey=nil
 		end
 		display.remove(Gate)
-		mbounds[finish]=1
-		boundary[finish]=1
+		mbounds[exitroom][exitloc]=1
+		boundary[exitroom][exitloc]=1
 	end
 end
 
 function GetPad(int)
 	if int==1 and HealPad==true and (HP) then
-		return HP.loc
+		return HP
 	elseif int==2 and ManaPad==true and (MP) then
-		return MP.loc
+		return MP
 	elseif int==3 and EnergyPad==true and (EP) then
-		return EP.loc
+		return EP
 	else
 		return nil
 	end
 end
 
-function GetData(val)
+function GetData(val,val2)
 	local p1=p.GetPlayer()
 	roomid=p1.room
 	if val==0 then
 		return mapsize
 	elseif val==1 then
-		return boundary[roomid]
+		if val2==0 then
+			return boundary
+		else
+			return boundary[roomid]
+		end
 	elseif val==2 then
-		return mbounds[roomid]
+		if val2==0 then
+			return mbounds
+		else
+			return mbounds[roomid]
+		end
 	elseif val==3 then
 		return Level
 	elseif val==4 then
-		return LavaBlocks[roomid]
+		return LavaBlocks
 	elseif val==5 then
-		return Chests[roomid]
+		return Chests
 	elseif val==6 then
-		return Destructibles[roomid]
+		return Destructibles
 	elseif val==7 then
-		return Shops[roomid]
+		return Shops
 	elseif val==8 then
 		return room[roomid]
 	elseif val==9 then
-		return WaterBlocks[roomid]
+		return WaterBlocks
 	elseif val==10 then
 		return fog[roomid]
+	elseif val==11 then
+		return exitloc,exitroom
+	elseif val==12 then
+		return entranceloc,entranceroom
 	else
 		return walls[roomid]
 	end
 end
 
 function GetFinish()
-	return finish
-end
-
-function GetRedP()
-	if RedPortal==true then
-		return RP
-	else
-		return nil
-	end
+	print "OH SHIT"
+	--return exitloc
 end
 
 function GetMSpawner()
