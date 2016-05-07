@@ -354,6 +354,13 @@ function CleanArrows()
 	display.remove(mleft)
 	display.remove(mright)
 	display.remove(inter)
+	--
+	if (mtext) then
+		display.remove(mtext)
+		mtext=nil
+		display.remove(mwindow)
+		mwindow=nil
+	end
 end
 
 function CleanWindow()
@@ -754,9 +761,9 @@ end
 function YouNoSpawn( event )
 	if event.phase=="ended" then
 		local Round=WD.Circle()
-		CleanArrows()
 		mob.DelayMobs()
 		g.CallCoins(Round)
+		Visibility()
 	end
 end
 

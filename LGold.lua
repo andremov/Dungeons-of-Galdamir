@@ -160,11 +160,7 @@ end
 function CallCoins(value)
 	DaCoins=(math.random(2,5)*(math.ceil(value/2)))
 	CallAddCoins(DaCoins)
-	if DaCoins>10 then
-		timer.performWithDelay(1, Coins, 5)
-	else
-		timer.performWithDelay(1, Coins, (DaCoins))
-	end
+	timer.performWithDelay(1, Coins, math.random(2,3))
 end
 
 function CleanCounter()

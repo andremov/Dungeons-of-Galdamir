@@ -223,7 +223,7 @@ function MobSpawn()
 			else
 				MS.cd=MS.cd-1
 			end
-			SpawnCD=math.random(10,15)
+			SpawnCD=math.random(5,10)
 		end
 		
 	end
@@ -393,6 +393,6 @@ end
 function DelayMobs()
 	local MS=builder.GetMSpawner()
 	if (MS) and (MS.cd==0) then
-		MS.cd=math.random(5,10)
+		MS.cd=math.random(1,3)
 	end
 end

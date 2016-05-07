@@ -46,7 +46,7 @@ local ui=require("Lui")
 local SBookDisplayed
 local statusdisplay
 local timersprite
-local AutoAttack
+local Automatic
 local Spellbook
 local SorceryUI
 local inCombat
@@ -65,7 +65,11 @@ local gcm
 local gom
 
 function InTrouble()
-	return inCombat
+	if inCombat==true or outcomed==true then
+		return true
+	else
+		return false
+	end
 end
 
 function Essentials()
@@ -76,7 +80,7 @@ function Essentials()
 	outcomed=false
 	yinvicial=180
 	xinvicial=75
-	AutoAttack=0
+	Automatic=0
 	espaciox=64
 	espacioy=64
 	Sorcery={}
@@ -177,16 +181,6 @@ function CreateMobStats()
 	local zonas=math.ceil((math.sqrt(size))/10)
 	local round=WD.Circle()
 	
-	if not (enemy.bonus) then
-		enemy.bonus={}
-		for i=1,5 do
-			if enemy.class==i then
-				enemy.bonus[i]=2
-			else
-				enemy.bonus[i]=1
-			end
-		end
-	end
 	if not (enemy.lvl) then
 		if round%2==0 then
 			for z=1, zonas do
@@ -219,16 +213,16 @@ function CreateMobStats()
 	end
 	if not (enemy.stats) then
 		enemy.stats={}
-		for s=1,5 do
-			enemy.stats[s]=1+enemy.bonus[s]
+		for s=1,6 do
+			enemy.stats[s]=2
 		end
 		enemy.status=false
 		enemy.pnts=(4.5*enemy.lvl)
 		enemy.pnts=math.floor(enemy.pnts+1)
 		for i=1,enemy.pnts do
-			enemy.min=math.min(enemy.stats[1],enemy.stats[2],enemy.stats[3],enemy.stats[4],enemy.stats[5])
+			enemy.min=math.min(enemy.stats[1],enemy.stats[2],enemy.stats[3],enemy.stats[4],enemy.stats[5],enemy.stats[6])
 			local astats={}
-			for i=1,5 do
+			for i=1,6 do
 				if enemy.stats[i]>enemy.min+5 then
 					astats[i]=0
 				else
@@ -236,7 +230,7 @@ function CreateMobStats()
 				end
 			end
 			function DoneIt()
-				local statroll=math.random(1,5)
+				local statroll=math.random(1,6)
 				if astats[statroll]==1 then
 					enemy.stats[statroll]=enemy.stats[statroll]+1
 				else
@@ -246,13 +240,13 @@ function CreateMobStats()
 			DoneIt()
 		end
 	end
-	enemy.max=math.max(enemy.stats[1],enemy.stats[2],enemy.stats[3],enemy.stats[4],enemy.stats[5])
-	for i=1,5 do
+	enemy.max=math.max(enemy.stats[1],enemy.stats[2],enemy.stats[3],enemy.stats[4],enemy.stats[5],enemy.stats[6])
+	for i=1,6 do
 		if enemy.stats[i]==enemy.max then
 			enemy.class=i
 		end
 	end
-	enemy.classnames={"Gladiator","Berserker","Gladiator","Wizard","Berserker"}
+	enemy.classnames={"Gladiator","Berserker","Gladiator","Wizard","Berserker","Wizard"}
 	enemy.classname=enemy.classnames[enemy.class]
 	MobSprite(1)
 	enemy.MaxHP=(10*enemy.lvl)+(enemy.stats[1]*(15+math.random(1,7)))
@@ -280,12 +274,20 @@ function HideActions()
 		display.remove(RecoverBtn)
 	end
 	
+	if (AutoRecoverBtn) then
+		display.remove(AutoRecoverBtn)
+	end
+	
 	if (GuardBtn) then
 		display.remove(GuardBtn)
 	end
 	
 	if (BackBtn) then
 		display.remove(BackBtn)
+	end
+	
+	if (AutoRunBtn) then
+		display.remove(AutoRunBtn)
 	end
 	
 	AttackBtn=display.newImageRect("combataction3.png",342,86)
@@ -325,18 +327,20 @@ function ShowActions()
 	ptimer=nil
 	local ep=timer.pause(etimer)
 	
-	if isDefend==true then
-		P1Sprite()
-		p1.stats[3]=p1.stats[3]/1.5
-		isDefend=false
-	end
-	if isRecover==true then
-		P1Sprite()
-		p1.stats[3]=p1.stats[3]/0.75
-		isRecover=false
-	end
+	if Automatic==0 then
 	
-	if AutoAttack==0 then
+		if isDefend==true then
+			P1Sprite()
+			p1.stats[3]=p1.stats[3]/1.5
+			isDefend=false
+		end
+		
+		if isRecover==true then
+			P1Sprite()
+			p1.stats[3]=p1.stats[3]/0.75
+			isRecover=false
+		end
+	
 		if (AttackBtn) then
 			display.remove(AttackBtn)
 			AttackBtn=nil
@@ -361,10 +365,20 @@ function ShowActions()
 			display.remove(RecoverBtn)
 			RecoverBtn=nil
 		end
+	
+		if (AutoRecoverBtn) then
+			display.remove(AutoRecoverBtn)
+			AutoRecoverBtn=nil
+		end
 		
 		if (BackBtn) then
 			display.remove(BackBtn)
 			BackBtn=nil
+		end
+		
+		if (AutoRunBtn) then
+			display.remove(AutoRunBtn)
+			AutoRunBtn=nil
 		end
 		
 		if not(AttackBtn)then
@@ -464,6 +478,29 @@ function ShowActions()
 			gcm:insert( RecoverBtn )
 		end
 		
+		function toAutoRecover()
+			HideActions()
+			TurnOnAuto(3)
+			Recover()
+		end
+		
+		if not(AutoRecoverBtn)then
+			AutoRecoverBtn= widget.newButton{
+				label="Auto-Recover",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="extracombataction.png",
+				overFile="extracombataction2.png",
+				width=342, height=86,
+				onRelease = toAutoRecover}
+			AutoRecoverBtn:setReferencePoint( display.CenterReferencePoint )
+			AutoRecoverBtn.x = RecoverBtn.x
+			AutoRecoverBtn.y = RecoverBtn.y+68
+			AutoRecoverBtn.xScale = 0.75
+			AutoRecoverBtn.yScale = 0.75
+			gcm:insert( AutoRecoverBtn )
+		end
+		
 		function toRun()
 			HideActions()
 			
@@ -484,8 +521,35 @@ function ShowActions()
 			BackBtn.y = RecoverBtn.y
 			gcm:insert( BackBtn )
 		end
-	else
-		PlayerAttacks(AutoAttack-1)
+		
+		function toAutoRun()
+			HideActions()
+			TurnOnAuto(4)
+			RunAttempt()
+		end
+		
+		if not(AutoRunBtn)then
+			AutoRunBtn= widget.newButton{
+				label="Auto-Retreat",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="extracombataction.png",
+				overFile="extracombataction2.png",
+				width=342, height=86,
+				onRelease = toAutoRun}
+			AutoRunBtn:setReferencePoint( display.CenterReferencePoint )
+			AutoRunBtn.x = BackBtn.x
+			AutoRunBtn.y = BackBtn.y+68
+			AutoRunBtn.xScale = 0.75
+			AutoRunBtn.yScale = 0.75
+			gcm:insert( AutoRunBtn )
+		end
+	elseif Automatic==1 or Automatic==2 then
+		PlayerAttacks(Automatic-1)
+	elseif Automatic==3 then
+		Recover()
+	elseif Automatic==4 then
+		RunAttempt()
 	end
 	timersprite:toFront()
 end
@@ -583,7 +647,7 @@ function MobSprite(value)
 				esprite.yScale=esprite.xScale
 				esprite:play()
 				gcm:insert(esprite)
-			elseif (enemy.class)==(4) then
+			elseif (enemy.class)==(4) or (enemy.class)==(6) then
 				--MGC
 				eseqs={
 					{name="walk", start=1, count=4, time=1000},
@@ -799,9 +863,19 @@ function AttackType()
 		RecoverBtn=nil
 	end
 	
+	if (AutoRecoverBtn) then
+		display.remove(AutoRecoverBtn)
+		AutoRecoverBtn=nil
+	end
+	
 	if (BackBtn) then
 		display.remove(BackBtn)
 		BackBtn=nil
+	end
+	
+	if (AutoRunBtn) then
+		display.remove(AutoRunBtn)
+		AutoRunBtn=nil
 	end
 	
 	function AttackMe()
@@ -861,7 +935,7 @@ function AttackType()
 		gcm:insert( MagicBtn )
 	end
 	
-	function AutoAttackMe()
+	function AutomaticMe()
 		HideActions()
 		TurnOnAuto(1)
 		PlayerAttacks(0)
@@ -869,20 +943,20 @@ function AttackType()
 	
 	if not(GuardBtn)then
 		GuardBtn= widget.newButton{
-			label="Auto Melee Attack",
+			label="Auto-Melee Attack",
 			labelColor = { default={0,0,0}, over={255,255,255} },
 			fontSize=35,
 			defaultFile="combataction.png",
 			overFile="combataction2.png",
 			width=342, height=86,
-			onRelease = AutoAttackMe}
+			onRelease = AutomaticMe}
 		GuardBtn:setReferencePoint( display.CenterReferencePoint )
 		GuardBtn.x = AttackBtn.x
 		GuardBtn.y = timersprite.y+44
 		gcm:insert( GuardBtn )
 	end
 	
-	function AutoAttackMa()
+	function AutomaticMa()
 		HideActions()
 		TurnOnAuto(2)
 		PlayerAttacks(1)
@@ -890,13 +964,13 @@ function AttackType()
 	
 	if not(ItemBtn)then
 		ItemBtn= widget.newButton{
-			label="Auto Magic Attack",
+			label="Auto-Magic Attack",
 			labelColor = { default={0,0,0}, over={255,255,255} },
 			fontSize=35,
 			defaultFile="combataction.png",
 			overFile="combataction2.png",
 			width=342, height=86,
-			onRelease = AutoAttackMa}
+			onRelease = AutomaticMa}
 		ItemBtn:setReferencePoint( display.CenterReferencePoint )
 		ItemBtn.x = MagicBtn.x
 		ItemBtn.y = timersprite.y+44
@@ -928,7 +1002,7 @@ end
 
 function TurnOnAuto(auto)
 	NoAutoBtn= widget.newButton{
-		label="Turn Off Auto Attack",
+		label="Manual Actions",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=35,
 		defaultFile="combataction.png",
@@ -939,13 +1013,13 @@ function TurnOnAuto(auto)
 	NoAutoBtn.x = display.contentCenterX
 	NoAutoBtn.y = display.contentHeight-50
 	gcm:insert( NoAutoBtn )
-	AutoAttack=auto
+	Automatic=auto
 end
 
 function TurnOffAuto()
 	display.remove(NoAutoBtn)
 	NoAutoBtn=nil
-	AutoAttack=0
+	Automatic=0
 end
 
 function Guard()
@@ -977,6 +1051,9 @@ function Recover()
 	P1Sprite(3)
 	p1.stats[3]=p1.stats[3]*0.75
 	isRecover=true
+	if Automatic==3 and p1.MP==p1.MaxMP and p1.EP==p1.MaxEP  then
+		TurnOffAuto()
+	end
 	UpdateStats()
 end
 
@@ -1118,9 +1195,9 @@ function UpdateStats(Secret)
 		gcm:insert(LvlDisplay)
 		
 		if enemy.lvl-p1.lvl>=3 then
-			LvlDisplay:setTextColor( 50, 255, 50)
-		elseif enemy.lvl-p1.lvl<=-3 then
 			LvlDisplay:setTextColor( 255, 50, 50)
+		elseif enemy.lvl-p1.lvl<=-3 then
+			LvlDisplay:setTextColor( 50, 255, 50)
 		else
 			LvlDisplay:setTextColor( 255, 255, 50)
 		end
@@ -1383,8 +1460,15 @@ function RunAttempt()
 	ShowSorcery(true)
 	local RunChance=EvadeCalc("mob",48)
 	local MaxChance=MaxCalc()
-	if RunChance>0 or MaxChance==0 then
+	if RunChance>0 then
 		EndCombat("Ran")
+	elseif MaxChance==0 then
+		local roll=math.random(1,10)
+		if roll>8 then
+			EndCombat("Ran")
+		else
+			EndTurn()
+		end
 	else
 		EndTurn()
 	end
@@ -1493,6 +1577,9 @@ function EndTurn()
 			UpdateStats(true)
 		end
 		
+		if Automatic==3 and p1.MP==p1.MaxMP and p1.EP==p1.MaxEP  then
+			TurnOffAuto()
+		end
 		MobSprite()
 		if isDefend~=true and isRecover~=true then
 			P1Sprite()
@@ -1511,16 +1598,20 @@ function EndTurn()
 end
 
 function EndCombat(outcome)
-	m.FindMe(6)
+	Runtime:removeEventListener("enterFrame", ManageHits)
 	inCombat=false
 	for i=gcm.numChildren,1,-1 do
 		display.remove(gcm[i])
 		gcm[i]=nil
 	end
 	gcm=nil
+	for i=table.maxn(hits),1,-1 do
+		display.remove(hits[i])
+		hits[i]=nil
+	end
+	hits=nil
 	Created=nil
-	AutoAttack=0
-	players.CalmDownCowboy(true)
+	Automatic=0
 	
 	if outcomed==false then
 		
@@ -1657,19 +1748,12 @@ function EndCombat(outcome)
 end
 
 function AcceptOutcome()
-	Runtime:removeEventListener("enterFrame", ManageHits)
-	
+	m.FindMe(6)
 	outcomed=false
-	Automatic=false
+	players.CalmDownCowboy(true)
 	for i=gom.numChildren,1,-1 do
 		local child = gom[i]
 		child.parent:remove( child )
-	end
-	for i = 1, table.maxn(hits) do
-		if (hits[i]) then
-			display.remove(hits[i])
-			hits[i]=nil
-		end
 	end
 	mov.Visibility()
 end
@@ -1742,7 +1826,7 @@ function mobHits(amount,crit,special)
 	hits[hpos].isFixedRotation = true
 	hits[hpos].x=LifeSymbol.x
 	hits[hpos].y=LifeSymbol.y+5
-	hits[hpos]:setLinearVelocity(-30,0)
+	hits[hpos]:setLinearVelocity(-45,0)
 end
 
 function hpHits(amount,crit,special)
@@ -1804,7 +1888,7 @@ function hpHits(amount,crit,special)
 	hits[hpos].isFixedRotation = true
 	hits[hpos].x=LifeSymbol2.x
 	hits[hpos].y=LifeSymbol2.y+5
-	hits[hpos]:setLinearVelocity(30,0)
+	hits[hpos]:setLinearVelocity(45,0)
 end
 
 function epHits(amount)
@@ -1832,7 +1916,7 @@ function epHits(amount)
 	hits[hpos].isFixedRotation = true
 	hits[hpos].x=EnergySymbol2.x
 	hits[hpos].y=EnergySymbol2.y+5
-	hits[hpos]:setLinearVelocity(30,0)
+	hits[hpos]:setLinearVelocity(45,0)
 end
 
 function mpHits(amount)
@@ -1860,7 +1944,7 @@ function mpHits(amount)
 	hits[hpos].isFixedRotation = true
 	hits[hpos].x=ManaSymbol2.x
 	hits[hpos].y=ManaSymbol2.y+5
-	hits[hpos]:setLinearVelocity(30,0)
+	hits[hpos]:setLinearVelocity(45,0)
 end
 
 function GetHits()
@@ -1990,14 +2074,23 @@ function UseItem(id,slot)
 			players.ReduceHP((itemstats[4]*-1),"Poison")
 			hpHits(-itemstats[4],false,false)
 		elseif itemstats[4]>0 then
-			players.AddHP(itemstats[4])
+			p1.HP=p1.HP+(itemstats[4])
+			if p1.HP>p1.MaxHP then
+				p1.HP=p1.MaxHp
+			end
 			hpHits(itemstats[4],false,true)
 		end
 	elseif itemstats[3]==1 then
-		players.AddMP(itemstats[4])
+		p1.MP=p1.MP+(itemstats[4])
+		if p1.MP>p1.MaxMP then
+			p1.MP=p1.MaxMP
+		end
 		mpHits(itemstats[4])
 	elseif itemstats[3]==2 then
-		players.AddEP(itemstats[4])
+		p1.EP=p1.EP+(itemstats[4])
+		if p1.EP>p1.MaxEP then
+			p1.EP=p1.MaxEP
+		end
 		epHits(itemstats[4])
 	end
 	UpdateStats()
@@ -2175,7 +2268,7 @@ function CastSorcery(name)
 			if (Damage)<=0 then
 				mobHits("BLK!",false,"SPL")
 			else
-				enemy.stats[5]=math.ceil(enemy.stats[5]*.2)
+				enemy.stats[5]=(enemy.stats[5]*.2)
 				mobHits(("Frozen!"),false,"SPL")
 				enemy.status="FRZ"
 				statusdisplay:setFrame(2)
@@ -2192,7 +2285,7 @@ function CastSorcery(name)
 		end
 		
 	elseif name=="Slow" then
-		enemy.stats[5]=math.ceil(enemy.stats[5]*.2)
+		enemy.stats[5]=(enemy.stats[5]*.2)
 		mobHits(("Frozen!"),false,"SPL")
 		enemy.status="FRZ"
 		statusdisplay:setFrame(2)

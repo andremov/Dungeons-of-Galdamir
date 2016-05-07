@@ -1004,7 +1004,6 @@ function AddItem(id,stacks,amount)
 end
 
 function UseMenu(id,slot)
-
 	if isUse==false then
 	
 		function UsedIt()

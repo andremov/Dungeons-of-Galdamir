@@ -35,6 +35,7 @@ function DisplayShop(id,room)
 	gbm=display.newGroup()
 	swg=display.newGroup()
 	gp.ShowGCounter()
+	p.LetsYodaIt()
 	Shops=b.GetData(7)
 	curShop=Shops[room][id]
 	ShopID=id
@@ -309,7 +310,7 @@ function CloseShop()
 	end
 	gbm=nil
 	gp.ShowGCounter()
-	
+	p.LetsYodaIt()
 	mov.Visibility()
 end
 

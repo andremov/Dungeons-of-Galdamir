@@ -1122,7 +1122,8 @@ function DisplayTile()
 			walls[curroom][count].yScale=walls[curroom][count].xScale
 			Level:insert( walls[curroom][count] )
 			
-			MS=display.newSprite( spawnersheet, { name="mobspawner", start=1, count=20, time=1750 }  )
+			MS=display.newSprite( spawnersheet, mseqs  )
+			MS:setSequence("on")
 			MS.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			MS.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			MS.isVisible=false
@@ -1520,6 +1521,10 @@ function Tiles()
 		"tiles/"..TSet.."/spawner.png", 
 		{ width=80, height=80, numFrames=30 }
 	)
+	mseqs={
+		{name="on", start=1, count=20, time=1750},
+		{name="off", start=21, count=10, loopCount=1, time=900},
+	}
 	
 	lavasheet = graphics.newImageSheet( 
 		"tiles/"..TSet.."/lava.png", 
@@ -1557,6 +1562,11 @@ function Show(IDs)
 				BP:pause()
 			end
 			if (Spawner==true) and (MS.loc==t) and (MS.room==r) then
+				if MS.cd==0 and MS.sequence~="on" then
+					MS:setSequence( "on" )
+				elseif MS.cd~=0 and MS.sequence~="off" then
+					MS:setSequence( "off" )
+				end
 				MS:pause()
 			end
 			if (ManaPad==true) and (MP.loc==t) and (MP.room==r) then
@@ -1626,6 +1636,11 @@ function Show(IDs)
 				BP:play()
 			end
 			if (Spawner==true) and (MS.loc==t) and (MS.room==r) then
+				if MS.cd==0 and MS.sequence~="on" then
+					MS:setSequence( "on" )
+				elseif MS.cd~=0 and MS.sequence~="off" then
+					MS:setSequence( "off" )
+				end
 				MS.isVisible=true
 				MS:play()
 			end
