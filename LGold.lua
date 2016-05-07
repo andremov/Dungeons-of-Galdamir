@@ -81,6 +81,7 @@ function GoldDisplay()
 		GWindow.y=GCDisplay.y+5
 		
 		GCDisplay:toFront()
+		CDisplay:toFront()
 		GCDisplay:setTextColor( 255, 255, 50, transp)
 		CDisplay:setFillColor( transp, transp, transp, transp)
 	else
@@ -97,6 +98,7 @@ function GoldDisplay()
 		GWindow.y=GCDisplay.y+5
 		
 		GCDisplay:toFront()
+		CDisplay:toFront()
 		GCDisplay:setTextColor( 255, 255, 50, transp)
 		CDisplay:setFillColor( transp, transp, transp, transp)
 	end
@@ -170,5 +172,7 @@ function CleanCounter()
 	CDisplay=nil
 	display.remove(GCDisplay)
 	GCDisplay=nil
+	display.remove(GWindow)
+	GWindow=nil
 end
 

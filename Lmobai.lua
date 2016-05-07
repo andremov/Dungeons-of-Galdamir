@@ -27,10 +27,15 @@ local col
 local row
 local SpawnCD=5
 local DidSomething
+local scale=1.2
+local espacio=80*scale
+local xinicial=display.contentCenterX-(espacio)
+local yinicial=display.contentCenterY-(espacio)
 
 function DoTurns()
 	DidSomething=false
 	map=builder.GetData()
+	fog=builder.GetData(10)
 	boundary=builder.GetData(2)
 	size=builder.GetData(0)
 	p1=p.GetPlayer()
@@ -38,19 +43,17 @@ function DoTurns()
 	row={}
 	pos=p1.loc
 	
-	for i=1, table.maxn( mobs ) do
-		if (mobs[i]) then
-			CanMove[i]=true
-		end
+	for i in pairs( mobs ) do
+		CanMove[i]=true
 	end
 	
-	for i=1, table.maxn( mobs ) do
-		if (mobs[i]) then
-			if not(mobs[i].loc) then
-			--	display.remove(mobs[i])
-			--	mobs[i]=nil
-				print (i.." is a problem.")
-			else
+	for i in pairs( mobs ) do
+		if not(mobs[i].loc) then
+		--	display.remove(mobs[i])
+		--	mobs[i]=nil
+			print (i.." is a problem.")
+		else
+		--	print ("TURN: "..mobs[i].loc)
 			col[i]=(math.floor(mobs[i].loc%(math.sqrt(size))))
 			row[i]=(math.floor(mobs[i].loc/(math.sqrt(size))))+1
 			p1=p.GetPlayer()
@@ -94,13 +97,12 @@ function DoTurns()
 			end
 			
 			--Other Mob Collision Checks
-			for  g=1, table.maxn( mobs ) do
-				if (mobs[g]) then
-					if not (mobs[g].loc) then
-					--	display.remove(mobs[g])
-					--	mobs[g]=nil
-						print (g.." is a problem.")
-					else
+			for  g in pairs( mobs ) do
+				if not (mobs[g].loc) then
+				--	display.remove(mobs[g])
+				--	mobs[g]=nil
+					print (g.." is a problem.")
+				else
 					if mobs[i].loc==(mobs[g].loc+(math.sqrt(size))) then
 						CanGoUp=false
 					end
@@ -115,7 +117,6 @@ function DoTurns()
 					
 					if mobs[i].loc==(mobs[g].loc-1) then
 						CanGoRight=false
-					end
 					end
 				end
 			end
@@ -195,12 +196,11 @@ function DoTurns()
 				timer.performWithDelay(100,closure)
 				DidSomething=true
 			end
-			end
 		end
 	end
 	MobSpawn()
 	if DidSomething==false then
-		timer.performWithDelay(20,mov.ShowArrows)
+		timer.performWithDelay(20,mov.Visibility)
 	end
 end
 
@@ -214,11 +214,9 @@ function MobSpawn()
 	if (MS) then
 		CanSpawn=true
 		
-		for i=1, table.maxn( mobs ) do
-			if (mobs[i]) and mobs[i].live==1 then
-				if mobs[i].loc==MS.loc then
-					CanSpawn=false
-				end
+		for i in pairs( mobs ) do
+			if mobs[i].loc==MS.loc then
+				CanSpawn=false
 			end
 		end
 		p1=p.GetPlayer()
@@ -228,7 +226,7 @@ function MobSpawn()
 		
 		if CanSpawn==true and SpawnCD==0 then
 			LifeOverDeath(MS.loc)
-			SpawnCD=5
+			SpawnCD=math.random(10,15)
 		end
 		
 	end
@@ -246,7 +244,7 @@ function MobDied(data)
 	if mobs==nil then
 		mobs=builder.GetMobGroup(false)
 	end
-	for i=1, table.maxn(mobs) do
+	for i in pairs(mobs) do
 		if data==mobs[i] then
 			display.remove(mobs[i])
 			mobs[i]=nil
@@ -257,14 +255,20 @@ end
 function LifeOverDeath(id)
 	local TSet=handler.GetTiles()
 	local level=builder.GetData(3)
-	mobs[#mobs+1]=display.newImageRect( "tiles/"..TSet.."/mob.png",80,80)
-	mobs[#mobs].x=304+((((id-1)%math.sqrt(size)))*80)
-	mobs[#mobs].y=432+(math.floor((id-1)/math.sqrt(size))*80)
-	mobs[#mobs].loc=(id)
-	if map[mobs[#mobs].loc].isVisible==false then
-		mobs[#mobs].isVisible=false
+	local zergOff=false
+	for m=1,size do
+		if not(mobs[m]) and zergOff==false then
+			mobs[m]=display.newImageRect( "tiles/"..TSet.."/mob.png",80,80)
+			mobs[m].x=xinicial+((((id-1)%math.sqrt(size)))*espacio)
+			mobs[m].y=yinicial+(math.floor((id-1)/math.sqrt(size))*espacio)
+			mobs[m].loc=(id)
+			mobs[m].xScale=scale
+			mobs[m].yScale=mobs[m].xScale
+			mobs[m].isVisible=false
+			level:insert(mobs[m])
+			zergOff=true
+		end
 	end
-	level:insert(mobs[#mobs])
 end
 
 function Decision(i)	
@@ -289,13 +293,15 @@ end
 function MoveLeft(i)
 	if CanMove[i]==true then
 		CanMove[i]=false
-		mobs[i].x=mobs[i].x-80
+		mobs[i].x=mobs[i].x-espacio
 		mobs[i].loc=(mobs[i].loc-1)
-		if (map[mobs[i].loc])and(map[mobs[i].loc].isVisible) then
-			if map[mobs[i].loc].isVisible==false then
+		if (map[mobs[i].loc])and(map[mobs[i].loc].isVisible)and(fog[mobs[i].loc].isVisible)then
+			if map[mobs[i].loc].isVisible==false or fog[mobs[i].loc].isVisible==true then
 				mobs[i].isVisible=false
-			elseif map[mobs[i].loc].isVisible==true then
+			elseif map[mobs[i].loc].isVisible==true and fog[mobs[i].loc].isVisible==false then
 				mobs[i].isVisible=true
+			else
+				mobs[i].isVisible=false
 			end
 		else
 			mobs[i].isVisible=false
@@ -306,13 +312,15 @@ end
 function MoveUp(i)
 	if CanMove[i]==true then
 		CanMove[i]=false
-		mobs[i].y=mobs[i].y-80
+		mobs[i].y=mobs[i].y-espacio
 		mobs[i].loc=(mobs[i].loc-(math.sqrt(size)))
-		if (map[mobs[i].loc])and(map[mobs[i].loc].isVisible) then
-			if map[mobs[i].loc].isVisible==false then
+		if (map[mobs[i].loc])and(map[mobs[i].loc].isVisible)and(fog[mobs[i].loc].isVisible)then
+			if map[mobs[i].loc].isVisible==false or fog[mobs[i].loc].isVisible==true then
 				mobs[i].isVisible=false
-			elseif map[mobs[i].loc].isVisible==true then
+			elseif map[mobs[i].loc].isVisible==true and fog[mobs[i].loc].isVisible==false then
 				mobs[i].isVisible=true
+			else
+				mobs[i].isVisible=false
 			end
 		else
 			mobs[i].isVisible=false
@@ -323,13 +331,15 @@ end
 function MoveDown(i)
 	if CanMove[i]==true then
 		CanMove[i]=false
-		mobs[i].y=mobs[i].y+80
+		mobs[i].y=mobs[i].y+espacio
 		mobs[i].loc=(mobs[i].loc+(math.sqrt(size)))
-		if (map[mobs[i].loc])and(map[mobs[i].loc].isVisible) then
-			if map[mobs[i].loc].isVisible==false then
+		if (map[mobs[i].loc])and(map[mobs[i].loc].isVisible)and(fog[mobs[i].loc].isVisible)then
+			if map[mobs[i].loc].isVisible==false or fog[mobs[i].loc].isVisible==true then
 				mobs[i].isVisible=false
-			elseif map[mobs[i].loc].isVisible==true then
+			elseif map[mobs[i].loc].isVisible==true and fog[mobs[i].loc].isVisible==false then
 				mobs[i].isVisible=true
+			else
+				mobs[i].isVisible=false
 			end
 		else
 			mobs[i].isVisible=false
@@ -340,13 +350,15 @@ end
 function MoveRight(i)
 	if CanMove[i]==true then
 		CanMove[i]=false
-		mobs[i].x=mobs[i].x+80
+		mobs[i].x=mobs[i].x+espacio
 		mobs[i].loc=(mobs[i].loc+1)
-		if (map[mobs[i].loc])and(map[mobs[i].loc].isVisible) then
-			if map[mobs[i].loc].isVisible==false then
+		if (map[mobs[i].loc])and(map[mobs[i].loc].isVisible)and(fog[mobs[i].loc].isVisible)then
+			if map[mobs[i].loc].isVisible==false or fog[mobs[i].loc].isVisible==true then
 				mobs[i].isVisible=false
-			elseif map[mobs[i].loc].isVisible==true then
+			elseif map[mobs[i].loc].isVisible==true and fog[mobs[i].loc].isVisible==false then
 				mobs[i].isVisible=true
+			else
+				mobs[i].isVisible=false
 			end
 		else
 			mobs[i].isVisible=false

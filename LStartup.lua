@@ -16,8 +16,8 @@ local ui=require("Lui")
 local q=require("Lquest")
 local inv=require("Lwindow")
 local itm=require("Litems")
-local physics = require "physics"
 local WD=require("Lprogress")
+local s=require("Lsplashes")
 local m=require("Lmovement")
 local sav=require("Lsaving")
 local Round
@@ -28,52 +28,43 @@ local DoLoad=false
 function Startup(val)
 	if val~=false then
 	--	print "Game loading..."
-		physics.start()
-		physics.setGravity(0,30)
 		DoStuff=true
 	elseif val==false then
 		DoStuff=false
 	end
 	Loading=display.newGroup()
 	
-	local loadbkg = display.newImage("bkgs/bkg_leveldark.png", true)
+	loadbkg = display.newImage("bkgs/bkg_leveldark.png", true)
 	loadbkg.x = display.contentWidth/2
 	loadbkg.y = display.contentHeight/2
 	Loading:insert( loadbkg )
 	
-	local load1 = display.newSprite( loadsheet, { name="load", start=1, count=8, time=600,}  )
+	load1 = display.newSprite( loadsheet, { name="load", start=1, count=8, time=600,}  )
 	load1.x = display.contentWidth-50
 	load1.y = display.contentHeight-50
 	load1:play()
 	Loading:insert( load1 )
 	
-	local load2 = display.newSprite( loadsheet, { name="load", start=1, count=8, time=600,}  )
+	load2 = display.newSprite( loadsheet, { name="load", start=1, count=8, time=600,}  )
 	load2.x = load1.x-55
 	load2.y = load1.y
 	load2:play()
 	Loading:insert( load2 )
 	
-	local load3 = display.newSprite( loadsheet, { name="load", start=1, count=8, time=600,}  )
+	load3 = display.newSprite( loadsheet, { name="load", start=1, count=8, time=600,}  )
 	load3.x = load2.x+30
 	load3.y = load2.y-50
 	load3:play()
 	Loading:insert( load3 )
 	
-	local loadtxt = display.newText("Loading...", 0,0,"Game Over",100)
+	loadtxt = display.newText("Loading...", 0,0,"Game Over",100)
 	loadtxt.x = load2.x-150
 	loadtxt.y = load1.y
 	Loading:insert( loadtxt )
 	
-	function ShowContinue()
-		loadbkg:addEventListener( "touch", Continue )
-		Loading:remove( loadtxt )
+	Tip=s.GetTip()
+	Loading:insert( Tip )
 	
-		contxt = display.newText("Tap to continue...", 0,0,"Game Over",100)
-		contxt.x = load2.x-200
-		contxt.y = load1.y
-		Loading:insert( contxt )
-	
-	end
 	if DoStuff==true then
 		if val==true then
 			function WrapIt()
@@ -90,13 +81,36 @@ function Startup(val)
 	end
 end
 
-	
-function Continue()
+function ShowContinue()
+	ui.UI(false)
 	if DoLoad==true then
 		DoLoad=false
 		timer.performWithDelay(100, (sav.Load) )
 		return true
 	else
+		Runtime:addEventListener( "touch", Continue )
+		
+		display.remove( loadtxt )
+		loadtxt=nil
+		display.remove( load1 )
+		load1=nil
+		display.remove( load2 )
+		load2=nil
+		display.remove( load3 )
+		load3=nil
+		
+		contxt = display.newText("Tap to continue", 0,0,"MoolBoran",60)
+		contxt:setTextColor(70,255,70)
+		contxt.x = display.contentCenterX
+		contxt.y = display.contentHeight*.75
+		Loading:insert( contxt )
+		return false
+	end
+end
+	
+function Continue( event )
+	if event.phase=="ended" then
+		Runtime:removeEventListener( "touch", Continue )
 		if DoStuff==true then
 			Runtime:addEventListener("enterFrame", gp.GoldDisplay)
 		end
@@ -107,7 +121,7 @@ function Continue()
 			end
 		end
 		Loading=nil
-		ui.UI()
+		ui.UI(true)
 		if DoStuff==true then
 			ui.Pause(true)
 			inv.ToggleInfo()
@@ -115,9 +129,8 @@ function Continue()
 			audio.Play(10)
 		end
 		if DoStuff==false then
-			m.ShowArrows()
+			m.Visibility()
 		end
-		return false
 	end
 end
 	

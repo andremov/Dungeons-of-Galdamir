@@ -9,7 +9,7 @@ local Music
 local Stawp
 local soundboard
 local bkgMus=true
-
+local Loaded
 
 function LoadSounds()
 	if not (soundboard)then
@@ -33,29 +33,33 @@ function LoadSounds()
 			soundboard[15] = audio.loadSound	("sounds/rock3.mp3")
 			soundboard[16] = audio.loadSound	("sounds/rock4.mp3")
 			soundboard[17] = audio.loadSound	("sounds/rock5.mp3")
+			Loaded=true
 		else
+			Loaded=false
 			print ("\n".."There goes the sound.")
 		end
 	end
 end
 
 function Play(id)
-	local check=audio.isChannelPlaying(id)
-	if check==false and (soundboard[1]) then
-		if id==10 and Stawp==false and bkgMus==true then
-			audio.setVolume( 0.1*Music, { channel=id  })
-			bkgmusic=audio.play( soundboard[id], {channel=id, onComplete=RepeatBkg} )
-			if Music==0.0 then
-				audio.pause(bkgmusic)
+	if Loaded==true then
+		local check=audio.isChannelPlaying(id)
+		if check==false then
+			if id==10 and Stawp==false and bkgMus==true then
+				audio.setVolume( 0.5*Music, { channel=id  })
+				bkgmusic=audio.play( soundboard[id], {channel=id, onComplete=RepeatBkg} )
+				if Music==0.0 then
+					audio.pause(bkgmusic)
+				end
+			elseif Sound~=0.0 then
+				if id==13 then
+					id=id+(math.random(0,4))
+				end
+				if id==15 or id==16 then
+					audio.setVolume( 0.4*Sound, { channel=id  })
+				end
+				audio.play( soundboard[id], {channel=id} )
 			end
-		elseif Sound~=0.0 then
-			if id==13 then
-				id=id+(math.random(0,4))
-			end
-			if id==15 or id==16 then
-				audio.setVolume( 0.4*Sound, { channel=id  })
-			end
-			audio.play( soundboard[id], {channel=id} )
 		end
 	end
 end

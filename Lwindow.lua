@@ -160,6 +160,10 @@ function ToggleBag()
 				end
 				curreqp[#curreqp].x = xeqpicial+ (((plcmnt-1)%9)*((espaciox*curreqp[#curreqp].xScale)+4))
 				curreqp[#curreqp].y = yeqpicial
+				function Argh()
+					CheckMenu(p1.eqp[i][1])
+				end
+				curreqp[#curreqp]:addEventListener("tap",Argh)
 				ginv:insert( curreqp[#curreqp] )
 			end
 		end
@@ -217,235 +221,32 @@ function ToggleInfo()
 		isOpn=true
 		ginf=display.newGroup()
 		info={}
+		pli={}
+		mini={}
 		
 		bkg=display.newImageRect("bkgs/pausebkg.png", 768, 800)
 		bkg.x,bkg.y = display.contentWidth/2, 400
-		ginf:insert( bkg )
 		
-		if p1.name=="Error" then
-			info[1]=display.newText(
-				(
-					"I AM ERROR."
-				),
-				10,10,"MoolBoran",80
-			)
-			ginf:insert(info[1])
-		else
-			info[1]=display.newText(
-				(
-					p1.name
-				),
-				10,10,"MoolBoran",80
-			)
-			ginf:insert(info[1])
-		end
-		local baseX=30
-		local baseY=90
-		local SpacingX=300
-		local SpacingY=50
-		
-		info[#info+1]=display.newText(
-			(
-				"HP: "..p1.HP.."/"..p1.MaxHP
-			),
-			baseX,baseY,"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		info[#info+1]=display.newText(
-			(
-				"MP: "..p1.MP.."/"..p1.MaxMP
-			),
-			baseX+SpacingX,baseY,"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		info[#info+1]=display.newText(
-			(
-				"EP: "..p1.EP.."/"..p1.MaxEP
-			),
-			baseX,baseY+SpacingY,"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		info[#info+1]=display.newText(
-			(
-				"Gold: "..p1.gp
-			),
-			baseX+SpacingX,baseY+SpacingY,"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		info[#info+1]=display.newText(
-			(
-				"Level: "..p1.lvl
-			),
-			baseX,baseY+(SpacingY*2),"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		info[#info+1]=display.newText(
-			(
-				"XP: "..p1.XP.."/"..p1.MaxXP
-			),
-			baseX+SpacingX,baseY+(SpacingY*2),"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		local flr=WD.Circle()
-		info[#info+1]=display.newText(
-			(
-				"Floor: "..flr
-			),
-			baseX,baseY+(SpacingY*3),"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		info[#info+1]=display.newText(
-			(
-				"Class: "..p1.clsnames[p1.class+1]
-			),
-			baseX+SpacingX,baseY+(SpacingY*3),"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		
-		info[#info+1]=display.newText(
-			(
-				"Statistics:"
-			),
-			10,350,"MoolBoran",70
-		)
-		ginf:insert(info[#info])
-		
-		for s=1,6 do
-			info[#info+1]=display.newText(
-				(
-					p1.statnames[s]
-				),
-				30,420+(45*(s-1)),"MoolBoran",60
-			)
-			ginf:insert(info[#info])
-		end
-		
-		info[#info+1]=display.newText(
-			(
-				"Stat Points: "..p1.pnts
-			),
-			30,690,"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		for s=1,6 do
-			info[#info+1]=display.newText(
-				(
-					p1.nat[s]
-				),
-				info[#info-s].x+220,420+(45*(s-1)),"MoolBoran",60
-			)
-			ginf:insert(info[#info])
-		end
-		
-		for s=1,6 do
-			info[#info+1]=display.newText(
-				(
-				"+"..p1.eqs[s]
-				),
-				info[#info-s].x+100,420+(45*(s-1)),"MoolBoran",60
-			)
-			if p1.eqs[s]>0 then
-				info[#info]:setTextColor(50,200,50)
-			elseif p1.eqs[s]<0 then
-				info[#info]:setTextColor(200,50,50)
-			else
-				info[#info]:setTextColor(150,150,150)
-			end
-			ginf:insert(info[#info])
-		end
-		
-		for s=1,6 do
-			info[#info+1]=display.newText(
-				(
-				"+"..p1.bon[s]+p1.bst[s]
-				),
-				info[#info-s].x+60,420+(45*(s-1)),"MoolBoran",60
-			)
-			if p1.bon[s]>0 then
-				info[#info]:setTextColor(50,200,50)
-			elseif p1.bon[s]<0 then
-				info[#info]:setTextColor(200,50,50)
-			else
-				info[#info]:setTextColor(150,150,150)
-			end
-			ginf:insert(info[#info])
-		end
-		
-		for s=1,6 do
-			info[#info+1]=display.newText(
-				(
-					"= "..p1.stats[s]
-				),
-				info[#info-s].x+50,420+(45*(s-1)),"MoolBoran",60
-			)
-			if p1.stats[s]>p1.nat[s] then
-				info[#info]:setTextColor(50,200,50)
-			elseif p1.stats[s]<p1.nat[s] then
-				info[#info]:setTextColor(200,50,50)
-			else
-			end
-			ginf:insert(info[#info])
-		end
-		
-		if p1.name=="Magus" then
-			info[#info+1]=display.newImageRect("player/magus.png",120,120)
-			info[#info].x=display.contentWidth-120
-			info[#info].y=150
-			info[#info].xScale=1.5
-			info[#info].yScale=info[#info].xScale
-			ginf:insert(info[#info])
-		end
-		
-		if p1.pnts~=0 then
-			pli={}
-			mini={}
-			for n=1,6 do
-				--
-				if (p1.nat[n]+1)<(p1.lvl*12) then
-					pli[n]=widget.newButton{
-						defaultFile="+.png",
-						overFile="+2.png",
-						width=20, height=20,
-						onRelease = More,
-					}
-					pli[n].xScale,pli[n].yScale=2.0,2.0
-					pli[n].x = info[17+n].x+45
-					pli[n].y = 445+((n-1)*45)
-					ginf:insert(pli[n])
-				end
-				--
-				if p1.nat[n]-1~=0 then
-					mini[n]=widget.newButton{
-						defaultFile="-.png",
-						overFile="-2.png",
-						width=20, height=20,
-						onRelease = Less,
-					}
-					mini[n].xScale,mini[n].yScale=2.0,2.0
-					mini[n].x = info[17+n].x-75
-					mini[n].y = 445+((n-1)*45)
-					ginf:insert(mini[n])
-				end
-			end
-		end
-		ginf:toFront()
-		
+		StatInfo()
 	elseif isOpn==true and (ginf) then
+		display.remove(bkg)
+		bkg=nil
 		isOpn=false
 		for i=table.maxn(info),1,-1 do
 			display.remove(info[i])
 			info[i]=nil
 		end
 		info=nil
+		for i=table.maxn(pli),1,-1 do
+			display.remove(pli[i])
+			pli[i]=nil
+		end
+		pli=nil
+		for i=table.maxn(mini),1,-1 do
+			display.remove(mini[i])
+			mini[i]=nil
+		end
+		mini=nil
 		for i=ginf.numChildren,1,-1 do
 			display.remove(ginf[i])
 			ginf[i]=nil
@@ -458,23 +259,27 @@ function ToggleSound()
 	if isOpn==false then
 		isOpn=true
 		swg=display.newGroup()
-		
+	
 		window=display.newImageRect("usemenu.png",768,308)
 		window.x=display.contentCenterX
 		window.y=display.contentCenterY
 		swg:insert(window)
-		
+	
 		scroll=display.newImageRect("scroll.png",600,50)
 		scroll.x=display.contentCenterX
 		scroll.y=display.contentCenterY-40
+		scroll.xScale=1.15
+		scroll.yScale=scroll.xScale
 		scroll:addEventListener("touch",MusicScroll)
 		swg:insert(scroll)
 		
 		local m=a.muse()
 		m=m*10
 		scrollind=display.newImageRect("scrollind.png",15,50)
-		scrollind.x=display.contentCenterX-290+( m*58 )
+		scrollind.x=display.contentCenterX-(290*scroll.xScale)+( m*(290*scroll.xScale)/5 )
 		scrollind.y=scroll.y
+		scrollind.xScale=1.45
+		scrollind.yScale=scrollind.xScale
 		swg:insert(scrollind)
 		
 		musicind=display.newText( ("Music Volume: "..(m*10).."%"),0,0,"MoolBoran",50 )
@@ -483,16 +288,20 @@ function ToggleSound()
 		swg:insert(musicind)
 		
 		scroll2=display.newImageRect("scroll.png",600,50)
-		scroll2.x=display.contentCenterX
-		scroll2.y=scroll.y+80
+		scroll2.x=scroll.x
+		scroll2.y=scroll.y+100
+		scroll2.xScale=scroll.xScale
+		scroll2.yScale=scroll.xScale
 		scroll2:addEventListener("touch",SoundScroll)
 		swg:insert(scroll2)
 		
 		local s=a.sfx()
 		s=s*10
 		scrollind2=display.newImageRect("scrollind.png",15,50)
-		scrollind2.x=display.contentCenterX-290+( s*58 )
+		scrollind2.x=display.contentCenterX-(290*scroll.xScale)+( s*(290*scroll.xScale)/5 )
 		scrollind2.y=scroll2.y
+		scrollind2.xScale=scrollind.xScale
+		scrollind2.yScale=scrollind.xScale
 		swg:insert(scrollind2)
 		
 		soundind=display.newText( ("Sound Volume: "..(s*10).."%"),0,0,"MoolBoran",50 )
@@ -541,7 +350,7 @@ function ToggleExit()
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=30,
 			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
+			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = DoExit}
 		AcceptBtn:setReferencePoint( display.CenterReferencePoint )
@@ -554,7 +363,7 @@ function ToggleExit()
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=30,
 			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
+			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = ToggleExit}
 		BackBtn:setReferencePoint( display.CenterReferencePoint )
@@ -574,6 +383,349 @@ function ToggleExit()
 	end
 end
 
+function StatChange()
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+				p1.statnames[s]
+			),
+			0,0,"MoolBoran",60
+		)
+		info[#info].x=(display.contentWidth/4)+((display.contentWidth/2)*math.floor((s-1)%2))
+		info[#info].y=110+(220*math.floor((s-1)/2))
+		ginf:insert(info[#info])
+	end
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+				p1.nat[s]
+			),
+			0,0,"MoolBoran",60
+		)
+		info[#info].x=info[#info-6].x
+		info[#info].y=info[#info-6].y+80
+		ginf:insert(info[#info])
+	end
+	for s=1,6 do
+		if p1.pnts[s]>0 and p1.nat[s]<p1.lvl*10 then
+			pli[#pli+1]= widget.newButton{
+				label="+",
+				labelColor = { default={255,255,255}, over={0,0,0} },
+				fontSize=40,
+				defaultFile="sbutton.png",
+				overFile="sbutton-over.png",
+				width=90, height=90,
+				onRelease = More
+			}
+			pli[#pli]:setReferencePoint( display.CenterReferencePoint )
+			pli[#pli].x = info[6+s].x+90
+			pli[#pli].y = info[6+s].y-10
+			ginf:insert(pli[#pli])
+		end
+	end
+	for s=1,6 do
+		if p1.nat[s]>1 then
+			mini[#mini+1]= widget.newButton{
+				label="-",
+				labelColor = { default={255,255,255}, over={0,0,0} },
+				fontSize=40,
+				defaultFile="sbutton.png",
+				overFile="sbutton-over.png",
+				width=90, height=90,
+				onRelease = Less
+			}
+			mini[#mini]:setReferencePoint( display.CenterReferencePoint )
+			mini[#mini].x = info[6+s].x-90
+			mini[#mini].y = info[6+s].y-10
+			ginf:insert(mini[#mini])
+		end
+	end
+	
+	swapInfoBtn= widget.newButton{
+		defaultFile="sbutton.png",
+		overFile="sbutton-over.png",
+		width=90, height=90,
+		onRelease = SwapInfo}
+	swapInfoBtn:setReferencePoint( display.CenterReferencePoint )
+	swapInfoBtn.x = display.contentWidth-60
+	swapInfoBtn.y = display.contentHeight-300
+	swapInfoBtn.state=true
+	ginf:insert( swapInfoBtn )
+	
+	swapInfoImg=display.newImageRect("plusminusinfo.png",70,70)
+	swapInfoImg.x=swapInfoBtn.x
+	swapInfoImg.y=swapInfoBtn.y
+	swapInfoImg.xScale=0.7
+	swapInfoImg.yScale=swapInfoImg.xScale
+	ginf:insert(swapInfoImg)
+	
+	info[#info+1]=display.newText(
+		(
+			"Stat Management"
+		),
+		display.contentCenterX/2,10,"MoolBoran",80
+	)
+	info[#info]:setTextColor(125,250,125)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"Stat Points: "..p1.pnts
+		),
+		0,700,"MoolBoran",60
+	)
+	info[#info].x=display.contentCenterX
+	ginf:insert(info[#info])
+	if p1.pnts==0 then
+		info[#info]:setTextColor(180,180,180)
+	end
+end
+
+function StatInfo()
+	local baseX=30
+	local baseY=90
+	local SpacingX=300
+	local SpacingY=50
+	if p1.name=="Error" then
+		info[1]=display.newText(
+			(
+				"I AM ERROR."
+			),
+			display.contentCenterX/2,10,"MoolBoran",80
+		)
+		ginf:insert(info[1])
+	else
+		info[1]=display.newText(
+			(
+				p1.name
+			),
+			display.contentCenterX/2,10,"MoolBoran",80
+		)
+		ginf:insert(info[1])
+	end
+	
+	info[#info+1]=display.newText(
+		(
+			"HP: "..p1.HP.."/"..p1.MaxHP
+		),
+		baseX,baseY,"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"MP: "..p1.MP.."/"..p1.MaxMP
+		),
+		baseX+SpacingX,baseY,"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"EP: "..p1.EP.."/"..p1.MaxEP
+		),
+		baseX,baseY+SpacingY,"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"Gold: "..p1.gp
+		),
+		baseX+SpacingX,baseY+SpacingY,"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"Level: "..p1.lvl
+		),
+		baseX,baseY+(SpacingY*2),"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"XP: "..p1.XP.."/"..p1.MaxXP
+		),
+		baseX+SpacingX,baseY+(SpacingY*2),"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	local flr=WD.Circle()
+	info[#info+1]=display.newText(
+		(
+			"Floor: "..flr
+		),
+		baseX,baseY+(SpacingY*3),"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"Class: "..p1.clsnames[p1.class+1]
+		),
+		baseX+SpacingX,baseY+(SpacingY*3),"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	
+	info[#info+1]=display.newText(
+		(
+			"Statistics:"
+		),
+		10,350,"MoolBoran",70
+	)
+	ginf:insert(info[#info])
+	
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+				p1.statnames[s]
+			),
+			30,420+(45*(s-1)),"MoolBoran",60
+		)
+		ginf:insert(info[#info])
+	end
+	
+	info[#info+1]=display.newText(
+		(
+			"Stat Points: "..p1.pnts
+		),
+		30,690,"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+				p1.nat[s]
+			),
+			info[#info-s].x+160,420+(45*(s-1)),"MoolBoran",60
+		)
+		ginf:insert(info[#info])
+	end
+	
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+			"+"..p1.eqs[s]
+			),
+			info[#info-s].x+60,420+(45*(s-1)),"MoolBoran",60
+		)
+		if p1.eqs[s]>0 then
+			info[#info]:setTextColor(50,200,50)
+		elseif p1.eqs[s]<0 then
+			info[#info]:setTextColor(200,50,50)
+		else
+			info[#info]:setTextColor(150,150,150)
+		end
+		ginf:insert(info[#info])
+	end
+	
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+			"+"..p1.bon[s]+p1.bst[s]
+			),
+			info[#info-s].x+60,420+(45*(s-1)),"MoolBoran",60
+		)
+		if p1.bon[s]>0 then
+			info[#info]:setTextColor(50,200,50)
+		elseif p1.bon[s]<0 then
+			info[#info]:setTextColor(200,50,50)
+		else
+			info[#info]:setTextColor(150,150,150)
+		end
+		ginf:insert(info[#info])
+	end
+	
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+				"= "..p1.stats[s]
+			),
+			info[#info-s].x+50,420+(45*(s-1)),"MoolBoran",60
+		)
+		if p1.stats[s]>p1.nat[s] then
+			info[#info]:setTextColor(50,200,50)
+		elseif p1.stats[s]<p1.nat[s] then
+			info[#info]:setTextColor(200,50,50)
+		else
+		end
+		ginf:insert(info[#info])
+	end
+	
+	if p1.name=="Magus" then
+		info[#info+1]=display.newImageRect("player/magus.png",120,120)
+		info[#info].x=display.contentWidth-120
+		info[#info].y=150
+		info[#info].xScale=1.5
+		info[#info].yScale=info[#info].xScale
+		ginf:insert(info[#info])
+	end
+	
+	swapInfoBtn= widget.newButton{
+		defaultFile="sbutton.png",
+		overFile="sbutton-over.png",
+		width=90, height=90,
+		onRelease = SwapInfo}
+	swapInfoBtn:setReferencePoint( display.CenterReferencePoint )
+	swapInfoBtn.x = display.contentWidth-60
+	swapInfoBtn.y = display.contentHeight-300
+	swapInfoBtn.state=false
+	ginf:insert( swapInfoBtn )
+	
+	swapInfoImg=display.newImageRect("plusminus.png",70,70)
+	swapInfoImg.x=swapInfoBtn.x
+	swapInfoImg.y=swapInfoBtn.y
+	swapInfoImg.xScale=0.7
+	swapInfoImg.yScale=swapInfoImg.xScale
+	ginf:insert(swapInfoImg)
+	
+	ginf:toFront()
+end
+
+function SwapInfo()
+	if swapInfoBtn.state==false then
+		for i=table.maxn(info),1,-1 do
+			display.remove(info[i])
+			info[i]=nil
+		end
+		for i=table.maxn(mini),1,-1 do
+			display.remove(mini[i])
+			mini[i]=nil
+		end
+		for i=table.maxn(pli),1,-1 do
+			display.remove(pli[i])
+			pli[i]=nil
+		end
+		for i=ginf.numChildren,1,-1 do
+			display.remove(ginf[i])
+			ginf[i]=nil
+		end
+		StatChange()
+	else
+		for i=table.maxn(info),1,-1 do
+			display.remove(info[i])
+			info[i]=nil
+		end
+		for i=table.maxn(mini),1,-1 do
+			display.remove(mini[i])
+			mini[i]=nil
+		end
+		for i=table.maxn(pli),1,-1 do
+			display.remove(pli[i])
+			pli[i]=nil
+		end
+		for i=ginf.numChildren,1,-1 do
+			display.remove(ginf[i])
+			ginf[i]=nil
+		end
+		StatInfo()
+	end
+end
+
 function DoExit()
 	for i=gexui.numChildren,1,-1 do
 		display.remove(gexui[i])
@@ -581,23 +733,24 @@ function DoExit()
 	end
 	gexui=nil
 	isOpn=false
+	ui.Pause(true)
 	WD.SrsBsns()
 end
 
 function MusicScroll( event )
-	if event.x>display.contentCenterX+290 then
-		scrollind.x=display.contentCenterX+290
+	if event.x>display.contentCenterX+(290*scroll.xScale) then
+		scrollind.x=display.contentCenterX+(290*scroll.xScale)
 		a.MusicVol(1.0)
 		musicind.text=("Music Volume: "..(1.0*100).."%")
-	elseif event.x<display.contentCenterX-290 then
-		scrollind.x=display.contentCenterX-290
+	elseif event.x<display.contentCenterX-(290*scroll.xScale) then
+		scrollind.x=display.contentCenterX-(290*scroll.xScale)
 		a.MusicVol(0.0)
 		musicind.text=("Music Volume: "..(0.0*100).."%")
 	else
-		for s=1,10 do
-			local x=display.contentCenterX-290+( (s-1)*58 )
-			if event.x>x-29 and event.x<x+29 then
-				scrollind.x=display.contentCenterX-290+( (s-1)*58 )
+		for s=1,11 do
+			local x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*58 )
+			if event.x>x-(290*scroll.xScale)/10 and event.x<x+(290*scroll.xScale)/10 then
+				scrollind.x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*(290*scroll.xScale)/5 )
 				a.MusicVol((s-1)/10)
 				musicind.text=("Music Volume: "..((s-1)*10).."%")
 			end
@@ -606,19 +759,19 @@ function MusicScroll( event )
 end
 
 function SoundScroll( event )
-	if event.x>display.contentCenterX+290 then
-		scrollind2.x=display.contentCenterX+290
+	if event.x>display.contentCenterX+(290*scroll.xScale) then
+		scrollind2.x=display.contentCenterX+(290*scroll.xScale)
 		a.SoundVol(1.0)
 		soundind.text=("Sound Volume: "..(1.0*100).."%")
-	elseif event.x<display.contentCenterX-290 then
-		scrollind2.x=display.contentCenterX-290
+	elseif event.x<display.contentCenterX-(290*scroll.xScale) then
+		scrollind2.x=display.contentCenterX-(290*scroll.xScale)
 		a.SoundVol(0.0)
 		soundind.text=("Sound Volume: "..(0.0*100).."%")
 	else
-		for s=1,10 do
-			local x=display.contentCenterX-290+( (s-1)*58 )
-			if event.x>x-29 and event.x<x+29 then
-				scrollind2.x=display.contentCenterX-290+( (s-1)*58 )
+		for s=1,11 do
+			local x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*58 )
+			if event.x>x-(290*scroll.xScale)/10 and event.x<x+(290*scroll.xScale)/10 then
+				scrollind2.x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*(290*scroll.xScale)/5 )
 				a.SoundVol((s-1)/10)
 				soundind.text=("Sound Volume: "..((s-1)*10).."%")
 			end
@@ -630,28 +783,28 @@ function More( event )
 	local statnum
 	for i=1,6 do
 		if (pli[i]) then
-			if event.y+21>pli[i].y and event.y-21<pli[i].y then
+			if event.y+50>pli[i].y and event.y-50<pli[i].y and event.x+50>pli[i].x and event.x-50<pli[i].x then
 				statnum=i
 			end
 		end
 	end
 	p.Natural(statnum,1)
-	ToggleInfo()
-	ToggleInfo()
+	SwapInfo()
+	SwapInfo()
 end
 
 function Less( event )
 	local statnum
 	for i=1,6 do
 		if (mini[i]) then
-			if event.y+21>mini[i].y and event.y-21<mini[i].y then
+			if event.y+50>mini[i].y and event.y-50<mini[i].y and event.x+50>mini[i].x and event.x-50<mini[i].x then
 				statnum=i
 			end
 		end
 	end
 	p.Natural(statnum,-1)
-	ToggleInfo()
-	ToggleInfo()
+	SwapInfo()
+	SwapInfo()
 end
 
 function DeathMenu(cause)
@@ -690,7 +843,7 @@ function DeathMenu(cause)
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=30,
 			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
+			overFile="cbutton-over.png",
 			width=290, height=80,
 			onRelease = onToMenuBtnRelease
 		}
@@ -701,7 +854,7 @@ function DeathMenu(cause)
 		Round=WD.Circle()
 		p1=p.GetPlayer()
 		size=b.GetData(0)
-		scre=sc.Scoring( Round , p1 , (math.sqrt(size)) )
+		scre,hs=sc.Scoring( Round , p1 , (math.sqrt(size)) )
 		Round=tostring(Round)
 		GCount=tostring(p1.gp)
 		GInfoTxt=display.newGroup()
@@ -729,10 +882,24 @@ function DeathMenu(cause)
 		InfoTxt5.y=InfoTxt1.y
 		GInfoTxt:insert( InfoTxt5 )
 		
-		InfoTxt6=display.newText(("Score: "..scre),0,0,"MoolBoran", 60 )
-		InfoTxt6.x=display.contentCenterX
-		InfoTxt6.y=display.contentCenterY+20
-		GInfoTxt:insert( InfoTxt6 )
+		if hs==true then
+			InfoTxt6=display.newText(("New high score:"),0,0,"MoolBoran", 60 )
+			InfoTxt6:setTextColor(70, 255, 70)
+			InfoTxt6.x=display.contentCenterX
+			InfoTxt6.y=display.contentCenterY-20
+			GInfoTxt:insert( InfoTxt6 )
+		else
+			InfoTxt6=display.newText(("Score:"),0,0,"MoolBoran", 60 )
+			InfoTxt6:setTextColor(70, 255, 70)
+			InfoTxt6.x=display.contentCenterX
+			InfoTxt6.y=display.contentCenterY-20
+			GInfoTxt:insert( InfoTxt6 )
+		end
+		
+		InfoTxt7=display.newText((scre),0,0,"MoolBoran", 60 )
+		InfoTxt7.x=display.contentCenterX
+		InfoTxt7.y=display.contentCenterY+40
+		GInfoTxt:insert( InfoTxt7 )
 		
 		gdm:insert( Dthtxt )
 		gdm:insert( GInfoTxt )
@@ -811,10 +978,18 @@ function UseMenu(id,slot)
 					p.AddHP(itemstats[4])
 				end
 				ToggleBag()
+				ToggleBag()
 			elseif itemstats[3]==1 then
 				p.AddMP(itemstats[4])
 				ToggleBag()
+				ToggleBag()
+			elseif itemstats[3]==2 then
+				p.AddEP(itemstats[4])
+				ToggleBag()
+				ToggleBag()
 			else
+				ToggleBag()
+				ui.Pause(true)
 				if itemstats[4]==0 then
 					WD.FloorPort(false)
 				elseif itemstats[4]==1 then
@@ -823,7 +998,6 @@ function UseMenu(id,slot)
 					s.Save()
 				end
 			end
-			ToggleBag()
 		end
 		
 		function LearnedIt()
@@ -915,13 +1089,18 @@ function UseMenu(id,slot)
 				items[i]:removeEventListener("tap",Gah)
 			end
 		end
+		for i=1,table.maxn(curreqp) do
+			if curreqp[i] then
+				curreqp[i]:removeEventListener("tap",Argh)
+			end
+		end
 		
 		local backbtn= widget.newButton{
 			label="Back",
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=30,
 			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
+			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = UseMenu}
 		backbtn:setReferencePoint( display.CenterReferencePoint )
@@ -934,7 +1113,7 @@ function UseMenu(id,slot)
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=30,
 			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
+			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = DroppedIt}
 		dropbtn:setReferencePoint( display.CenterReferencePoint )
@@ -946,13 +1125,18 @@ function UseMenu(id,slot)
 			item.ReturnInfo(id,4)
 		}
 		
+		local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
+		lolname.x=display.contentWidth/2
+		lolname.y=(display.contentHeight/2)-120
+		gum:insert( lolname )
+		
 		if itemstats[1]==0 then
 			local usebtn= widget.newButton{
 				label="Use",
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = UsedIt
 			}
@@ -960,11 +1144,6 @@ function UseMenu(id,slot)
 			usebtn.x = (display.contentWidth/4)-50
 			usebtn.y = (display.contentHeight/2)+30
 			gum:insert( usebtn )
-			
-			local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
-			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-120
-			gum:insert( lolname )
 			
 			local descrip=display.newText( (itemstats[5]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
@@ -978,7 +1157,7 @@ function UseMenu(id,slot)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = EquippedIt
 			}
@@ -986,11 +1165,6 @@ function UseMenu(id,slot)
 			equipbtn.x = (display.contentWidth/4)-50
 			equipbtn.y = (display.contentHeight/2)+30
 			gum:insert( equipbtn )
-			
-			local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
-			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-120
-			gum:insert( lolname )
 			
 			local itmfound=false
 			local equipstats
@@ -1050,7 +1224,7 @@ function UseMenu(id,slot)
 					labelColor = { default={255,255,255}, over={0,0,0} },
 					fontSize=30,
 					defaultFile="cbutton.png",
-					overFile="cbutton2.png",
+					overFile="cbutton-over.png",
 					width=200, height=55,
 					onRelease = UsedIt
 				}
@@ -1064,7 +1238,7 @@ function UseMenu(id,slot)
 					labelColor = { default={255,255,255}, over={0,0,0} },
 					fontSize=30,
 					defaultFile="cbutton.png",
-					overFile="cbutton2.png",
+					overFile="cbutton-over.png",
 					width=200, height=55,
 					onRelease = UsedIt
 				}
@@ -1073,11 +1247,6 @@ function UseMenu(id,slot)
 				usebtn.y = (display.contentHeight/2)+30
 				gum:insert( usebtn )
 			end
-			
-			local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
-			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-120
-			gum:insert( lolname )
 			
 			local descrip=display.newText( (itemstats[3]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
@@ -1092,7 +1261,7 @@ function UseMenu(id,slot)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = LearnedIt
 			}
@@ -1100,11 +1269,6 @@ function UseMenu(id,slot)
 			learnbtn.x = (display.contentWidth/4)-50
 			learnbtn.y = (display.contentHeight/2)+30
 			gum:insert( learnbtn )
-			
-			local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
-			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-120
-			gum:insert( lolname )
 			
 			local descrip=display.newText( (itemstats[4]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
@@ -1120,7 +1284,7 @@ function UseMenu(id,slot)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = StatBoost
 			}
@@ -1128,11 +1292,6 @@ function UseMenu(id,slot)
 			boostbtn.x = (display.contentWidth/4)-50
 			boostbtn.y = (display.contentHeight/2)+30
 			gum:insert( boostbtn )
-			
-			local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
-			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-120
-			gum:insert( lolname )
 			
 			local descrip=display.newText( (itemstats[4]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
@@ -1142,6 +1301,87 @@ function UseMenu(id,slot)
 			
 		end
 		
+	elseif isUse==true then
+		SpecialUClose()
+		ToggleBag()
+		ToggleBag()
+	end
+end
+
+function CheckMenu(id)
+
+	if isUse==false then
+		gum=display.newGroup()
+		gum:toFront()
+		isUse=true
+		
+	--	print ("Player wants to use item "..id..", in slot "..slot..".")
+		window=display.newImageRect("usemenu.png", 768, 308)
+		window.x,window.y = display.contentWidth/2, 450
+		gum:insert( window )
+		
+		for i=1,table.maxn(items) do
+			if items[i] then
+				items[i]:removeEventListener("tap",Gah)
+			end
+		end
+		for i=1,table.maxn(curreqp) do
+			if curreqp[i] then
+				curreqp[i]:removeEventListener("tap",Argh)
+			end
+		end
+		
+		local backbtn= widget.newButton{
+			label="Back",
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			fontSize=30,
+			defaultFile="cbutton.png",
+			overFile="cbutton-over.png",
+			width=200, height=55,
+			onRelease = CheckMenu}
+		backbtn:setReferencePoint( display.CenterReferencePoint )
+		backbtn.x = (display.contentWidth/2)
+		backbtn.y = (display.contentHeight/2)+30
+		gum:insert( backbtn )
+		
+		itemstats={
+			item.ReturnInfo(id,4)
+		}
+		
+		local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
+		lolname.x=display.contentWidth/2
+		lolname.y=(display.contentHeight/2)-120
+		gum:insert( lolname )
+		
+		if itemstats[1]==1 then
+			
+			statchange={
+				itemstats[4],
+				itemstats[5],
+				itemstats[6],
+				itemstats[7],
+				itemstats[8],
+				itemstats[9]
+			}
+			stattxts={}
+			
+			local stats={"STA","ATT","DEF","MGC","DEX","INT"}
+			for c=1,6 do
+				if statchange[c]>0 then
+					stattxts[c]=display.newText( (stats[c].." +"..statchange[c]),0,0,"MoolBoran",60)
+					stattxts[c]:setTextColor( 60, 180, 60)
+					stattxts[c].x=statchangex+(statchangexs*((c-1)%3))
+					stattxts[c].y=statchangey+(50*math.floor((c-1)/3))
+					gum:insert( stattxts[c] )
+				elseif statchange[c]<0 then
+					stattxts[c]=display.newText( (stats[c].." "..statchange[c]) ,0,0,"MoolBoran",60)
+					stattxts[c]:setTextColor( 180, 60, 60)
+					stattxts[c].x=statchangex+(statchangexs*((c-1)%3))
+					stattxts[c].y=statchangey+(50*math.floor((c-1)/3))
+					gum:insert( stattxts[c] )
+				end
+			end
+		end
 	elseif isUse==true then
 		SpecialUClose()
 		ToggleBag()

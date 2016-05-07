@@ -86,7 +86,7 @@ function ItemDrop(boost)
 					local child = gum[i]
 					child.parent:remove( child )
 				end
-				mov.ShowArrows()
+				mov.Visibility()
 			end
 			
 			local lolname=display.newText( ("Item Get!") ,0,0,"MoolBoran",90)
@@ -105,7 +105,7 @@ function ItemDrop(boost)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = Backbtn}
 			backbtn:setReferencePoint( display.CenterReferencePoint )
@@ -130,7 +130,7 @@ function ItemDrop(boost)
 					local child = gum[i]
 					child.parent:remove( child )
 				end
-				mov.ShowArrows()
+				mov.Visibility()
 			end
 			
 			function Bagbtn()
@@ -158,7 +158,7 @@ function ItemDrop(boost)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = Backbtn}
 			backbtn:setReferencePoint( display.CenterReferencePoint )
@@ -171,7 +171,7 @@ function ItemDrop(boost)
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
 				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
+				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = Bagbtn}
 			bagbtn:setReferencePoint( display.CenterReferencePoint )
@@ -181,8 +181,8 @@ function ItemDrop(boost)
 			
 			local skrlrl=math.random(1,10)
 			if skrlrl>8 then
-				lolname2.text=(asdname.." + "..itemlist[26][1])
-				inv.AddItem(26,itemlist[26][2])
+				lolname2.text=(asdname.." + "..itemlist[29][1])
+				inv.AddItem(29,itemlist[29][2])
 			end
 			
 			return true
@@ -294,17 +294,20 @@ end
 function Essentials()
 	gum=display.newGroup()
 	items={
-		{"HealthPotionI",		0,50,		"Heals for 50 Hit Points."},
-		{"HealthPotionII",		0,100,		"Heals for 100 Hit Points."},
-		{"HealthPotionIII",		0,200,		"Heals for 200 Hit Points."},
+		{"HealthPotionI",		0,25,		"Heals for 25 Hit Points."},
+		{"HealthPotionII",		0,50,		"Heals for 50 Hit Points."},
+		{"HealthPotionIII",		0,100,		"Heals for 100 Hit Points."},
 		{"PurpleElixir",		0,-20,		"The label is teared off."},	
 		{"GreenPotion",			0,-100,		"Smells funny."},
-		{"ManaPotionI",			1,30,		"Recovers 30 Mana."},
-		{"ManaPotionII",		1,60,		"Recovers 60 Mana."},
-		{"ManaPotionIII",		1,120,		"Recovers 120 Mana."},
-		{"EnergyPotionI",		2,30,		"Recovers 30 Energy."},
-		{"EnergyPotionII",		2,60,		"Recovers 60 Energy."},
-		{"EnergyPotionIII",		2,120,		"Recovers 120 Energy."},
+		{"ManaPotionI",			1,15,		"Recovers 15 Mana."},
+		{"ManaPotionII",		1,30,		"Recovers 30 Mana."},
+		{"ManaPotionIII",		1,60,		"Recovers 60 Mana."},
+		{"EnergyPotionI",		2,15,		"Recovers 15 Energy."},
+		{"EnergyPotionII",		2,30,		"Recovers 30 Energy."},
+		{"EnergyPotionIII",		2,60,		"Recovers 60 Energy."},
+		{"HealthSalve",			0,200,		"Heals for 200 Hit Points."},
+		{"ManaSalve",			1,120,		"Recovers 120 Mana."},
+		{"EnergySalve",			2,120,		"Recovers 120 Energy."},
 	}
 	scrolls={
 		{"ScrollOfCleave",		"Cleave",		"Teaches the \"Cleave\" sorcery."},
@@ -2081,17 +2084,20 @@ function Essentials()
 		{"GreenClearRing",6,0,0,0,0,0,7},
 	}
 	itemlist={
-		{"HealthPotionI",true,1,5},
-		{"HealthPotionII",true,3,15},
-		{"HealthPotionIII",true,5,30},
+		{"HealthPotionI",true,1,10},
+		{"HealthPotionII",true,5,17},
+		{"HealthPotionIII",true,10,40},
 		{"PurpleElixir",true,1,nil},
 		{"GreenPotion",true,5,nil},
 		{"ManaPotionI",true,1,10},
 		{"ManaPotionII",true,6,25},
-		{"ManaPotionIII",true,13,40},
+		{"ManaPotionIII",true,12,40},
 		{"EnergyPotionI",true,1,15},
-		{"EnergyPotionII",true,9,37},
-		{"EnergyPotionIII",true,19,60},
+		{"EnergyPotionII",true,7,37},
+		{"EnergyPotionIII",true,13,60},
+		{"HealthSalve",true,15,78},
+		{"ManaSalve",true,16,95},
+		{"EnergySalve",true,17,115},
 		--
 		{"ScrollOfCleave",false,3,100},
 		{"ScrollOfFireSword",false,10,100},

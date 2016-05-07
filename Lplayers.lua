@@ -16,6 +16,7 @@ local c=require("Lchars")
 local a=require("Laudio")
 local i=require("Litems")
 local w=require("Lwindow")
+local ui=require("Lui")
 local su=require("Lstartup")
 local yCoord=856
 local xCoord=70
@@ -23,6 +24,8 @@ local Map
 local check=119
 local player
 local Cheat=false
+local scale=1.2
+local StrongForce
 local transp
 local transp2
 local transp3
@@ -31,6 +34,7 @@ local names={
 		"Orphan",
 		"Smith",
 		"Slave",
+		"Hctib",
 	}
 	
 function CreatePlayers(name)
@@ -48,6 +52,8 @@ function CreatePlayers(name)
 	player=display.newImageRect( "chars/"..char.."/"..class.."/char.png", 76 ,76)
 	player.x, player.y = display.contentWidth/2, display.contentHeight/2
 	player:setStrokeColor(50, 50, 255)
+	player.xScale=scale
+	player.yScale=player.xScale
 	player.strokeWidth = 4
 	--Leveling
 	if name==nil or name=="" or name==" " then
@@ -72,7 +78,6 @@ function CreatePlayers(name)
 	--Stats
 	player.statnames=	{"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity",	"Intellect"}
 	player.eqs=			{0,			0,			0,			0,			0,				0}
---	player.nat=			{20,		20,			20,			20,			20,				20}
 	player.nat=			{2,			2,			2,			2,			2,				2}
 	player.bon=			{0,			0,			0,			0,			0,				0}
 	player.bst=			{0,			0,			0,			0,			0,				0}
@@ -84,24 +89,25 @@ function CreatePlayers(name)
 		(player.nat[5]+player.eqs[5]+player.bon[5]+player.bst[5]),
 		(player.nat[6]+player.eqs[6]+player.bon[6]+player.bst[6]),
 	}
-	player.pnts=5
+	player.pnts=7
 	--Spells
 	player.spells={
-		{"Fireball","Cast a firey ball of death and burn the enemy.",true,10,5},
-		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,5,20},
-		{"Slow","Reduces enemy's dexterity.",false,50,5},
-		{"Poison Blade","Inflicts poison.",false,15,20},
-		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,30,40},
-		{"Healing","Heals for 20% of maximum Hit Points.",false,60,5},
-		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,50,50},
+		{"Gouge","Place a deep wound on the enemy target.",true,9,13},
+		{"Fireball","Cast a firey ball of death and burn the enemy.",true,16,7},
+		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,5,13},
+		{"Slow","Reduces enemy's dexterity.",false,28,5},
+		{"Poison Blade","Inflicts poison.",false,16,19},
+		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,26,37},
+		{"Healing","Heals for 20% of maximum Hit Points.",false,58,4},
+		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,46,51},
 	}
 	--Secondary Stats
 	player.portcd=0
-	player.MaxHP=(100*player.lvl)+(player.stats[1]*10)
+	player.MaxHP=(10*player.lvl)+(player.stats[1]*20)
+	player.MaxMP=(5*player.lvl)+(player.stats[6]*10)
+	player.MaxEP=(5*player.lvl)+(player.stats[6]*10)
 	player.HP=player.MaxHP
-	player.MaxMP=( (player.lvl*15)+(player.stats[6]*10) )
 	player.MP=player.MaxMP
-	player.MaxEP=( (player.lvl*15)+(player.stats[6]*10) )
 	player.EP=player.MaxEP
 	player.SPD=(1.00-(player.stats[5]/100))
 	--
@@ -173,7 +179,7 @@ function ShowStats()
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
 	end
 	
-	if ((player.HP.."/"..player.MaxHP))~=LifeDisplay.text then
+	if ((player.HP.."/"..player.MaxHP))~=LifeDisplay.text or StrongForce==true then
 		transp=255
 		LifeDisplay.text=((player.HP.."/"..player.MaxHP))
 		
@@ -186,7 +192,7 @@ function ShowStats()
 		LifeDisplay:toFront()
 		LifeDisplay:setTextColor( 255, 255, 255,transp)
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
-	elseif ((player.HP.."/"..player.MaxHP))==LifeDisplay.text and transp~=0 and player.HP==player.MaxHP then
+	elseif ((player.HP.."/"..player.MaxHP))==LifeDisplay.text and transp~=0 and player.HP==player.MaxHP and StrongForce~=true then
 		transp=transp-(255/50)
 		if transp<20 then
 			transp=0
@@ -233,7 +239,7 @@ function ShowStats()
 		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
 	end
 	
-	if ((player.MP.."/"..player.MaxMP))~=ManaDisplay.text then
+	if ((player.MP.."/"..player.MaxMP))~=ManaDisplay.text or StrongForce==true then
 		transp3=255
 		ManaDisplay.text=((player.MP.."/"..player.MaxMP))
 		
@@ -246,7 +252,7 @@ function ShowStats()
 		ManaDisplay:toFront()
 		ManaDisplay:setTextColor( 255, 255, 255,transp3)
 		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
-	elseif ((player.MP.."/"..player.MaxMP))==ManaDisplay.text and transp3~=0 and player.MP==player.MaxMP then
+	elseif ((player.MP.."/"..player.MaxMP))==ManaDisplay.text and transp3~=0 and player.MP==player.MaxMP and StrongForce~=true then
 		transp3=transp3-(255/50)
 		if transp3<20 then
 			transp3=0
@@ -282,7 +288,7 @@ function ShowStats()
 		EnergySymbol:setFillColor(transp5,transp5,transp5,transp5)
 	end
 	
-	if ((player.EP.."/"..player.MaxEP))~=EnergyDisplay.text then
+	if ((player.EP.."/"..player.MaxEP))~=EnergyDisplay.text or StrongForce==true then
 		transp5=255
 		EnergyDisplay.text=((player.EP.."/"..player.MaxEP))
 		
@@ -295,7 +301,7 @@ function ShowStats()
 		EnergyDisplay:toFront()
 		EnergyDisplay:setTextColor( 255, 255, 255,transp5)
 		EnergySymbol:setFillColor(transp5,transp5,transp5,transp5)
-	elseif ((player.EP.."/"..player.MaxEP))==EnergyDisplay.text and transp5~=0 and player.EP==player.MaxEP then
+	elseif ((player.EP.."/"..player.MaxEP))==EnergyDisplay.text and transp5~=0 and player.EP==player.MaxEP and StrongForce~=true then
 		transp5=transp5-(255/50)
 		if transp5<20 then
 			transp5=0
@@ -326,21 +332,46 @@ function ShowStats()
 		transp4=0
 		StatSymbol=display.newImageRect("unspent.png",240,80)
 		StatSymbol.x = display.contentWidth-130
-		StatSymbol.y = display.contentHeight-250
+		StatSymbol.y = display.contentHeight-150
 		StatSymbol:toFront()
 		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
 		su.FrontNCenter()
 	end
 	
-	if player.pnts~=0 then
-		transp4=255
-		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
-	elseif player.pnts==0 and transp4~=0 then
+	if StrongForce==true then
+		StatSymbol:removeEventListener("touch",openStats)
 		transp4=transp4-(255/50)
 		if transp4<20 then
 			transp4=0
 		end
 		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
+	elseif player.pnts~=0 then
+		StatSymbol:removeEventListener("touch",openStats)
+		transp4=255
+		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
+		StatSymbol:addEventListener("touch",openStats)
+	elseif player.pnts==0 and transp4~=0 then
+		StatSymbol:removeEventListener("touch",openStats)
+		transp4=transp4-(255/50)
+		if transp4<20 then
+			transp4=0
+		end
+		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
+	end
+end
+
+function openStats( event )
+	if event.phase=="ended" then
+		ui.Pause(true)
+		w.ToggleInfo()
+	end
+end
+
+function LetsYodaIt()
+	if StrongForce~=true then
+		StrongForce=true
+	else
+		StrongForce=false
 	end
 end
 
@@ -409,9 +440,9 @@ function StatCheck()
 		(player.nat[6]+player.eqs[6]+player.bon[6]+player.bst[6]),
 	}
 	player.SPD=(1.00-(player.stats[5]/100))
-	player.MaxHP=(100*player.lvl)+(player.stats[1]*10)
-	player.MaxMP=(player.lvl*15)+(player.stats[6]*10)
-	player.MaxEP=(player.lvl*15)+(player.stats[6]*10)
+	player.MaxHP=(10*player.lvl)+(player.stats[1]*20)
+	player.MaxMP=(5*player.lvl)+(player.stats[6]*10)
+	player.MaxEP=(5*player.lvl)+(player.stats[6]*10)
 	if player.HP>player.MaxHP then
 		player.HP=player.MaxHP
 	end
@@ -430,19 +461,29 @@ end
 function Statless()
 	player=nil
 	display.remove(LifeDisplay)
+	display.remove(LifeWindow)
 	display.remove(LifeSymbol)
 	display.remove(ManaDisplay)
+	display.remove(ManaWindow)
 	display.remove(ManaSymbol)
+	display.remove(EnergyDisplay)
+	display.remove(EnergyWindow)
+	display.remove(EnergySymbol)
 	display.remove(XPSymbol)
 	display.remove(XPDisplay)
 	display.remove(StatSymbol)
 	LifeDisplay=nil
+	LifeWindow=nil
 	LifeSymbol=nil
 	ManaDisplay=nil
+	ManaWindow=nil
 	ManaSymbol=nil
+	EnergyDisplay=nil
+	EnergyWindow=nil
+	EnergySymbol=nil
+	XPSymbol=nil
 	XPDisplay=nil
 	StatSymbol=nil
-	XPSymbol=nil
 end
 
 function StatBoost(stat)
@@ -622,13 +663,14 @@ function FinishLoading()
 	player.inv={}
 	player.eqp={}
 	player.spells={
-		{"Fireball","Cast a firey ball of death and burn the enemy.",true,10,5},
-		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,5,20},
-		{"Slow","Reduces enemy's dexterity.",false,50,5},
-		{"Poison Blade","Inflicts poison.",false,15,20},
-		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,30,40},
-		{"Healing","Heals for 20% of maximum Hit Points.",false,60,5},
-		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,50,50},
+		{"Gouge","Place a deep wound on the enemy target.",true,9,13},
+		{"Fireball","Cast a firey ball of death and burn the enemy.",true,16,7},
+		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,5,13},
+		{"Slow","Reduces enemy's dexterity.",false,28,5},
+		{"Poison Blade","Inflicts poison.",false,16,19},
+		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,26,37},
+		{"Healing","Heals for 20% of maximum Hit Points.",false,58,4},
+		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,46,51},
 	}
 	if (player) then
 		check=119

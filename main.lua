@@ -9,6 +9,7 @@ local loadsheet = graphics.newImageSheet( "spriteload.png", { width=50, height=5
 local startup=require("Lstartup")
 local menu = require("Lmenu")
 local widget = require "widget"
+local physics = require "physics"
 local bin = require("Lgarbage")
 local v=require("Lversion")
 local GVersion=v.HowDoIVersion(false)
@@ -20,6 +21,8 @@ local loadtxt
 	print ("Version: "..GVersion)
 	
 	function Go()
+		physics.start()
+		physics.setGravity(0,30)
 		menu.ShowMenu()
 	--	startup.Startup()
 	--	bin.Font()

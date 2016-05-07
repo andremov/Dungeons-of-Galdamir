@@ -17,14 +17,17 @@ local Sve
 local SplStrt
 local SplEnd
 local InvStrt
+local saveSlot
 local EqpStrt
 local OKVers={
-		"BETA 1.9.0",
+		"GAMMA 1.0.0",
+		"GAMMA 1.0.1",
+		"GAMMA 1.0.2",
 	}
 
 function Load()
 	Sve={}
-	local path = system.pathForFile(  "DoGSave.sav", system.DocumentsDirectory )
+	local path = system.pathForFile(  "DoGSave"..saveSlot..".sav", system.DocumentsDirectory )
 	for line in io.lines( path ) do
 		n = tonumber(line)
 		if n == nil then
@@ -103,42 +106,54 @@ function Load()
 	--	print "Save loaded successfully."
 		LoadMap()
 		b.Rebuild(false)
+		su.ShowContinue()
 	else
 	--	print "Save incompatible. Deleting..."
 		WipeSave()
 	end
 end
 
-function CheckSave()
-	local path = system.pathForFile(  "DoGSave.sav", system.DocumentsDirectory )
+function CheckSave(slot)
+	local path = system.pathForFile(  "DoGSave"..slot..".sav", system.DocumentsDirectory )
 	local fh, errStr = io.open( path, "r" )
 	local okSave=false
 	if (fh) then
 		local contents = fh:read( "*a" )
 	--	print( "Contents \n" .. contents )
 		if (contents) and contents~="" and contents~=" " then
-			local savever=string.sub(contents,1,10)
+			Sve={}
+			for line in io.lines( path ) do
+				n = tonumber(line)
+				if n == nil then
+					Sve[#Sve+1]=line
+				else
+					Sve[#Sve+1]=n
+				end
+			end
 			for i=1,table.maxn(OKVers) do
-				if savever==OKVers[i] then
+				if Sve[1]==OKVers[i] then
 					okSave=true
 				end
 			end
 			if okSave==true then
-				return true
+				return Sve[27]
 			else
-				WipeSave()
+				WipeSave(slot)
 				return false
 			end
 		else
+			WipeSave(slot)
 			return false
 		end
 	else
+		WipeSave(slot)
+		
 		return false
 	end
 end
 
 function Save()
-	local path = system.pathForFile(  "DoGSave.sav", system.DocumentsDirectory )
+	local path = system.pathForFile(  "DoGSave"..saveSlot..".sav", system.DocumentsDirectory )
 	local fh, errStr = io.open( path, "w+" )
 	
 	local GVer=v.HowDoIVersion()
@@ -194,20 +209,32 @@ function Save()
 	SaveMap()
 end
 
-function WipeSave()
-	local path = system.pathForFile(  "DoGSave.sav", system.DocumentsDirectory )
-	local fh, errStr = io.open( path, "w+" )
-	fh:write("")
-	io.close( fh )
-	
-	local path = system.pathForFile(  "DoGMapSave.sav", system.DocumentsDirectory )
-	local fh, errStr = io.open( path, "w+" )
-	fh:write("")
-	io.close( fh )
+function WipeSave(slot)
+	if not(slot)then
+		local path = system.pathForFile(  "DoGSave"..saveSlot..".sav", system.DocumentsDirectory )
+		local fh, errStr = io.open( path, "w+" )
+		fh:write("")
+		io.close( fh )
+		
+		local path = system.pathForFile(  "DoGMapSave"..saveSlot..".sav", system.DocumentsDirectory )
+		local fh, errStr = io.open( path, "w+" )
+		fh:write("")
+		io.close( fh )
+	else
+		local path = system.pathForFile(  "DoGSave"..slot..".sav", system.DocumentsDirectory )
+		local fh, errStr = io.open( path, "w+" )
+		fh:write("")
+		io.close( fh )
+		
+		local path = system.pathForFile(  "DoGMapSave"..slot..".sav", system.DocumentsDirectory )
+		local fh, errStr = io.open( path, "w+" )
+		fh:write("")
+		io.close( fh )
+	end
 end
 
 function SaveMap()
-	local path = system.pathForFile(  "DoGMapSave.sav", system.DocumentsDirectory )
+	local path = system.pathForFile(  "DoGMapSave"..saveSlot..".sav", system.DocumentsDirectory )
 	local fh, errStr = io.open( path, "w+" )
 	
 	local map=b.GetData(8)
@@ -224,11 +251,15 @@ end
 
 function LoadMap()
 	Map={}
-	local path = system.pathForFile(  "DoGMapSave.sav", system.DocumentsDirectory )
+	local path = system.pathForFile(  "DoGMapSave"..saveSlot..".sav", system.DocumentsDirectory )
 	for line in io.lines( path ) do
 		Map[#Map+1]=line
 	end
 	
 	b.ReceiveMap(Map)
 --	print "Map loaded successfully."
+end
+
+function setSlot(data)
+	saveSlot=data
 end

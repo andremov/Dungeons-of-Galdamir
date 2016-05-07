@@ -78,7 +78,7 @@ end
 function FloorPort(up)
 	if up==true then
 		local P1=players.GetPlayer()
-		local size=builder.GetLevel(0)
+		local size=builder.GetData(0)
 		Round=Round+1
 		
 		FloorSign()
@@ -88,13 +88,10 @@ function FloorPort(up)
 		if Round>HighCard then
 			HighCard=Round
 			local gpgain=Round*((math.sqrt(size)/5)*2)
-			if gpgain>(10*math.sqrt(size)) then
-				gpgain=(10*math.sqrt(size))
+			if gpgain>(5*math.sqrt(size)) then
+				gpgain=(5*math.sqrt(size))
 			end
 			gp.CallAddCoins(gpgain)
-		end
-		if Round%(math.ceil(5/(math.sqrt(size)/5)))==0 then
-			shp.DisplayShop()
 		end
 		su.Startup(false)
 		builder.Rebuild(false)
@@ -127,8 +124,8 @@ function Win()
 	if Round>HighCard then
 		HighCard=Round
 		local gpgain=Round*((math.sqrt(size)/5)*2)
-		if gpgain>(10*math.sqrt(size)) then
-			gpgain=(10*math.sqrt(size))
+		if gpgain>(5*math.sqrt(size)) then
+			gpgain=(5*math.sqrt(size))
 		end
 		gp.CallAddCoins(gpgain)
 	end
@@ -139,6 +136,7 @@ end
 
 function Lrn2WinNub()
 	local P1=players.GetPlayer()
+	local size=builder.GetData(0)
 	Round=Round+1
 
 	FloorSign()
@@ -149,13 +147,13 @@ function Lrn2WinNub()
 	if Round>HighCard then
 		HighCard=Round
 		local gpgain=Round*((math.sqrt(size)/5)*2)
-		if gpgain>(10*math.sqrt(size)) then
-			gpgain=(10*math.sqrt(size))
+		if gpgain>(5*math.sqrt(size)) then
+			gpgain=(5*math.sqrt(size))
 		end
 		gp.CallAddCoins(gpgain)
 	end
 	su.Startup(false)
-	builder.Rebuild(true)
+	builder.Rebuild(false)
 	sav.Save()
 end
 

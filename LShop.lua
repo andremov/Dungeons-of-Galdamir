@@ -54,7 +54,7 @@ function DisplayShop(id)
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
 		defaultFile="cbutton.png",
-		overFile="cbutton2.png",
+		overFile="cbutton-over.png",
 		width=303, height=52,
 		onRelease = CloseShop
 	}
@@ -117,7 +117,7 @@ function BuyMenu()
 			item[s].sq.y = item[s].y
 			item[s].sq:setFillColor(0,0,0,0)
 			function itemGet()
-				BuyItem(curShop.item[s][1],curShop.item[s][2],curShop.item[s][3])
+				ItemInfo(s)
 			end
 			item[s].sq:addEventListener("tap",itemGet)
 			gbm:insert(item[s])
@@ -307,16 +307,18 @@ function CloseShop()
 	gbm=nil
 	gp.ShowGCounter()
 	
-	mov.ShowArrows()
+	mov.Visibility()
 end
 
 function BuyItem(id,name,prc)
 	local stacks=it.ReturnInfo(id,3)
 	local Full=inv.InvFull()
 	local p1=p.GetPlayer()
-	if Full==true then
-	elseif (p1.gp-prc)<0 then
+	if Full==true or prc>p1.gp then
 	else
+		print (id)
+		print (stacks)
+		print (prc)
 		a.Play(1)
 		inv.AddItem(id,stacks,1)
 		gp.CallAddCoins(-prc)
@@ -328,7 +330,186 @@ function BuyItem(id,name,prc)
 		SellMenu()
 	end
 end
+
+function ItemInfo(slot)
+	if (slot) and type(slot)=="number" then
+		local p1=p.GetPlayer()
+		local statchangexs=200
+		local statchangey=(display.contentCenterY)-70
+		local statchangex=(display.contentCenterX)-statchangexs
+		
+		gum=display.newGroup()
+		gum:toFront()
+		isUse=true
 	
+		function Buy()
+			ItemInfo()
+			BuyItem(curShop.item[slot][1],curShop.item[slot][2],curShop.item[slot][3])
+			for i=gbm.numChildren,1,-1 do
+				display.remove(gbm[i])
+				gbm[i]=nil
+			end
+			BuyMenu()
+		end
+		
+		window=display.newImageRect("usemenu.png", 768, 308)
+		window.x,window.y = display.contentWidth/2, 450
+		gum:insert( window )
+		
+		for i=1,table.maxn(item) do
+			if item[i] then
+				item[i].sq:removeEventListener("tap",itemGet)
+			end
+		end
+		for i=1,table.maxn(pitems) do
+			if pitems[i] then
+				pitems[i].sq:addEventListener("tap",itemGive)
+			end
+		end
+		
+		if curShop.item[slot][3]>p1.gp then
+			local usebtn= widget.newButton{
+				label="Buy",
+				labelColor = { default={255,255,255}, over={0,0,0} },
+				fontSize=30,
+				defaultFile="nbutton.png",
+				overFile="nbutton-over.png",
+				width=200, height=55,
+			}
+			usebtn:setReferencePoint( display.CenterReferencePoint )
+			usebtn.x = (display.contentWidth/2)-120
+			usebtn.y = (display.contentHeight/2)+30
+			gum:insert( usebtn )
+		else
+			local usebtn= widget.newButton{
+				label="Buy",
+				labelColor = { default={255,255,255}, over={0,0,0} },
+				fontSize=30,
+				defaultFile="cbutton.png",
+				overFile="cbutton-over.png",
+				width=200, height=55,
+				onRelease = Buy
+			}
+			usebtn:setReferencePoint( display.CenterReferencePoint )
+			usebtn.x = (display.contentWidth/2)-120
+			usebtn.y = (display.contentHeight/2)+30
+			gum:insert( usebtn )
+		end
+		
+		local backbtn= widget.newButton{
+			label="Back",
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			fontSize=30,
+			defaultFile="cbutton.png",
+			overFile="cbutton-over.png",
+			width=200, height=55,
+			onRelease = ItemInfo}
+		backbtn:setReferencePoint( display.CenterReferencePoint )
+		backbtn.x = (display.contentWidth/2)+120
+		backbtn.y = (display.contentHeight/2)+30
+		gum:insert( backbtn )
+		
+		itemstats={
+			it.ReturnInfo(curShop.item[slot][1],4)
+		}
+		
+		local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
+		lolname.x=display.contentWidth/2
+		lolname.y=(display.contentHeight/2)-120
+		gum:insert( lolname )
+		
+		if itemstats[1]==0 then			
+			local descrip=display.newText( (itemstats[5]) ,0,0,"MoolBoran",55)
+			descrip.y=(display.contentHeight/2)-50
+			descrip.x=display.contentWidth/2
+			descrip:setTextColor( 180, 180, 180)
+			gum:insert( descrip )
+		end	
+		if itemstats[1]==1 then
+			local itmfound=false
+			local equipstats
+			for i=1,table.maxn(p1.eqp) do
+				if p1.eqp[i][2]==itemstats[3] then
+					equipstats={item.ReturnInfo(p1.eqp[i][1],4)}
+					itmfound=true
+				end
+			end
+			
+			if itmfound==false then
+				equipstats={0,0,0,0,0,0,0,0,0}
+			end
+			
+			statchange={
+				itemstats[4]-equipstats[4],
+				itemstats[5]-equipstats[5],
+				itemstats[6]-equipstats[6],
+				itemstats[7]-equipstats[7],
+				itemstats[8]-equipstats[8],
+				itemstats[9]-equipstats[9]
+			}
+			stattxts={}
+			
+			local eqpstatchnge=false
+			local stats={"STA","ATT","DEF","MGC","DEX","INT"}
+			for c=1,6 do
+				if statchange[c]>0 then
+					stattxts[c]=display.newText( (stats[c].." +"..statchange[c]),0,0,"MoolBoran",60)
+					stattxts[c]:setTextColor( 60, 180, 60)
+					stattxts[c].x=statchangex+(statchangexs*((c-1)%3))
+					stattxts[c].y=statchangey+(50*math.floor((c-1)/3))
+					gum:insert( stattxts[c] )
+					eqpstatchnge=true
+				elseif statchange[c]<0 then
+					stattxts[c]=display.newText( (stats[c].." "..statchange[c]) ,0,0,"MoolBoran",60)
+					stattxts[c]:setTextColor( 180, 60, 60)
+					stattxts[c].x=statchangex+(statchangexs*((c-1)%3))
+					stattxts[c].y=statchangey+(50*math.floor((c-1)/3))
+					gum:insert( stattxts[c] )
+					eqpstatchnge=true
+				end
+			end
+			
+			if eqpstatchnge==false then
+				stattxts[1]=display.newText( ("No change.") ,0,0,"MoolBoran",55)
+				stattxts[1]:setTextColor( 180, 180, 180)
+				stattxts[1].y=(display.contentHeight/2)-50
+				stattxts[1].x=display.contentWidth/2
+				gum:insert( stattxts[1] )
+			end
+		end
+		if itemstats[1]==2 then
+			local descrip=display.newText( (itemstats[3]) ,0,0,"MoolBoran",55)
+			descrip.y=(display.contentHeight/2)-50
+			descrip.x=display.contentWidth/2
+			descrip:setTextColor( 180, 180, 180)
+			gum:insert( descrip )
+		end
+		if itemstats[1]==3 then
+			local descrip=display.newText( (itemstats[4]) ,0,0,"MoolBoran",55)
+			descrip.y=(display.contentHeight/2)-50
+			descrip.x=display.contentWidth/2
+			descrip:setTextColor( 180, 180, 180)
+			gum:insert( descrip )
+		end
+		if itemstats[1]==4 then
+			local descrip=display.newText( (itemstats[4]) ,0,0,"MoolBoran",55)
+			descrip.y=(display.contentHeight/2)-50
+			descrip.x=display.contentWidth/2
+			descrip:setTextColor( 180, 180, 180)
+			gum:insert( descrip )
+		end
+		
+	else
+		isUse=false
+		statchange={}
+		for i=gum.numChildren,1,-1 do
+			local child = gum[i]
+			child.parent:remove( child )
+		end
+		gum=nil
+	end
+end
+
 function AtTheMall()
 	return atShop
 end
