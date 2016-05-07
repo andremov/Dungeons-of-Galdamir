@@ -64,6 +64,7 @@ local EP
 local MS
 local ShopCount
 -- Constants
+local TileIDsNum=false
 local Peaceful=false
 local didStair
 local xinicial
@@ -321,7 +322,7 @@ function BuildTile()
 	end
 	
 	if count~=mapsize+1 and not(map2[count]) then
-		
+	
 		if(map[count]=="b")then
 			boundary[count]=0
 			mbounds[count]=0
@@ -437,12 +438,6 @@ function BuildTile()
 			map2[count]="q"
 		end	
 		
-		if(map[count]=="r")then
-			boundary[count]=1
-			mbounds[count]=1
-			map2[count]="r"
-		end	
-		
 		if(map[count]=="s")and(ShopCount~=(mapsize/10)*(mapsize/10))then
 			boundary[count]=1
 			mbounds[count]=1
@@ -549,11 +544,6 @@ function BuildTile()
 		if(map2[count]=="q")then
 			boundary[count]=1
 			mbounds[count]=0
-		end	
-		
-		if(map2[count]=="r")then
-			boundary[count]=1
-			mbounds[count]=1
 		end
 		
 		if(map2[count]=="s")then
@@ -626,10 +616,10 @@ function RandomizeTile()
 					elseif EnergyPad==false and (port==204) then
 						map2[count]="i"
 						EnergyPad=true
-					elseif (port==205) and (ShopCount~=(mapsize/10)*(mapsize/10)) then
+					elseif (port==205) and (ShopCount~=((math.sqrt(mapsize))/10)*((math.sqrt(mapsize))/10)) then
 						local TimeIsMoney=true
 						for i=1,mapsize do
-							if Shops[i] then
+							if map2[i]=="s" then
 								local SZoneX=math.floor(i%(math.sqrt(mapsize)))
 								local SZoneY=math.floor(i/(math.sqrt(mapsize)))+1
 								local SZone=1
@@ -651,14 +641,9 @@ function RandomizeTile()
 								if CZone==SZone then
 									TimeIsMoney=false
 								end
-								if (CZoneX-4)<SZoneX and (CZoneX+4)>SZoneX then
-									TimeIsMoney=false
-								end
-								if (CZoneY-4)<SZoneY and (CZoneY+4)>SZoneY then
-									TimeIsMoney=false
-								end
 							end
 						end
+						
 						if TimeIsMoney==true then
 							map2[count]="s"
 							ShopCount=ShopCount+1
@@ -756,6 +741,9 @@ function DisplayTile()
 	else
 		loadtxt.text=("Displaying Map...\n".."             "..math.floor((count/mapsize)*100).."%")
 		loadtxt:toFront()
+	end
+	if TileIDsNum==true then
+		num={}
 	end
 	
 	if count~=mapsize+1 then
@@ -1046,7 +1034,24 @@ function DisplayTile()
 				end
 			end
 		end
-
+		
+		if TileIDsNum==true then
+			local NZoneX=math.floor(count%(math.sqrt(mapsize)))
+			local NZoneY=math.floor(count/(math.sqrt(mapsize)))+1
+			local NZone=1
+			if( NZoneX>(math.sqrt(mapsize))/2 )then
+				NZone=NZone+1
+			end
+			if( NZoneY>(math.sqrt(mapsize))/2 )then
+				NZone=NZone+2
+			end
+			
+			num[count]=display.newText( (NZone.."-"..count),0,0,"MoolBoran",40 )
+			num[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			num[count].y=yinicial+10+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			Level:insert( num[count] )
+		end
+		
 	end
 end
 

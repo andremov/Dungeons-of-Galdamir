@@ -286,7 +286,7 @@ function Visibility()
 	end
 	Tiles={}
 	p1=p.GetPlayer()
-	boundary=b.GetData(2)
+	boundary=b.GetData(1)
 	size=b.GetData(0)
 	size=math.sqrt(size)
 	

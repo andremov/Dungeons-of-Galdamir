@@ -430,19 +430,29 @@ end
 function Statless()
 	player=nil
 	display.remove(LifeDisplay)
+	display.remove(LifeWindow)
 	display.remove(LifeSymbol)
 	display.remove(ManaDisplay)
+	display.remove(ManaWindow)
 	display.remove(ManaSymbol)
+	display.remove(EnergyDisplay)
+	display.remove(EnergyWindow)
+	display.remove(EnergySymbol)
 	display.remove(XPSymbol)
 	display.remove(XPDisplay)
 	display.remove(StatSymbol)
 	LifeDisplay=nil
+	LifeWindow=nil
 	LifeSymbol=nil
 	ManaDisplay=nil
+	ManaWindow=nil
 	ManaSymbol=nil
+	EnergyDisplay=nil
+	EnergyWindow=nil
+	EnergySymbol=nil
+	XPSymbol=nil
 	XPDisplay=nil
 	StatSymbol=nil
-	XPSymbol=nil
 end
 
 function StatBoost(stat)

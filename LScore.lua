@@ -153,7 +153,7 @@ function HighScores()
 	Text={}
 	
 	for l=2,21,2 do
-		Text[#Text+1] = display.newText( ( (Sve[l].." - "..Sve[l+1]) ) ,140,150+(71*#Text),"MoolBoran", 75 )
+		Text[#Text+1] = display.newText( ( (Sve[l].." - "..Sve[l+1]) ) ,140,145+(72*#Text),"MoolBoran", 75 )
 		ghs:insert(Text[#Text])
 	end
 end

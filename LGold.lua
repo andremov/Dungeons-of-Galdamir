@@ -170,5 +170,7 @@ function CleanCounter()
 	CDisplay=nil
 	display.remove(GCDisplay)
 	GCDisplay=nil
+	display.remove(GWindow)
+	GWindow=nil
 end
 

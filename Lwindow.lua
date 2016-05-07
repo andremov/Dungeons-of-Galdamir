@@ -11,13 +11,8 @@ local MPot3sheet = graphics.newImageSheet( "items/ManaPotion3.png", { width=64, 
 local EPot2sheet = graphics.newImageSheet( "items/EnergyPotion2.png", { width=64, height=64, numFrames=16 })
 local EPot3sheet = graphics.newImageSheet( "items/EnergyPotion3.png", { width=64, height=64, numFrames=16 })
 local widget = require "widget"
-<<<<<<< HEAD
-local audio=require("LAudio")
-local g=require("LGold")
-=======
 local a=require("Laudio")
 local g=require("Lgold")
->>>>>>> B1.9.0
 local c=require("Lcombat")
 local mov=require("Lmovement")
 local p=require("Lplayers")
