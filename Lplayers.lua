@@ -62,11 +62,7 @@ function CreatePlayers(name)
 	player.lvl=1
 	player.MaxXP=50
 	player.XP=0
-<<<<<<< HEAD
-	player.clsnames={"Knight","Warrior","Thief","Viking","Mage","Scholar"}
-=======
 	player.clsnames={"Knight","Warrior","Thief","Viking","Sorceror","Scholar"}
->>>>>>> B1.8.2
 	player.char=char
 	player.class=class
 	player.life=0
@@ -523,11 +519,7 @@ function LoadPlayer(cls,chr,stam,atk,dfnc,mgk,dxtrty,intlct,pnts,lv,xpnts,hitp,m
 	
 	player.stats={}
 	
-<<<<<<< HEAD
-	player.clsnames={"Knight","Warrior","Thief","Viking","Mage","Scholar"}
-=======
 	player.clsnames={"Knight","Warrior","Thief","Viking","Sorceror","Scholar"}
->>>>>>> B1.8.2
 	player.char=char
 	player.class=class
 	player.inv={}

@@ -11,7 +11,7 @@ local MPot3sheet = graphics.newImageSheet( "items/ManaPotion3.png", { width=64, 
 local widget = require "widget"
 local audio=require("LAudio")
 local g=require("LGold")
-local c=require("lcombat")
+local c=require("Lcombat")
 local mov=require("Lmovement")
 local p=require("Lplayers")
 local WD=require("LProgress")
