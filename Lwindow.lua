@@ -4,12 +4,6 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local HPot2sheet = graphics.newImageSheet( "items/HealthPotion2.png", { width=64, height=64, numFrames=16 })
-local HPot3sheet = graphics.newImageSheet( "items/HealthPotion3.png", { width=64, height=64, numFrames=16 })
-local MPot2sheet = graphics.newImageSheet( "items/ManaPotion2.png", { width=64, height=64, numFrames=16 })
-local MPot3sheet = graphics.newImageSheet( "items/ManaPotion3.png", { width=64, height=64, numFrames=16 })
-local EPot2sheet = graphics.newImageSheet( "items/EnergyPotion2.png", { width=64, height=64, numFrames=16 })
-local EPot3sheet = graphics.newImageSheet( "items/EnergyPotion3.png", { width=64, height=64, numFrames=16 })
 local widget = require "widget"
 local a=require("Laudio")
 local g=require("Lgold")
@@ -98,22 +92,22 @@ end
 function CloseErrthang()
 	if not (gdm) then
 		if (gum) then
-			UseMenu()
+			UseMenu(false)
 		end
 		if (swg) then
-			ToggleSound()
+			ToggleSound(false)
 		end
 		if (ginf) then
-			ToggleInfo()
+			ToggleInfo(false)
 		end
 		if (ginv) then
-			ToggleBag()
+			ToggleBag(false)
 		end
 		if (gexui) then
-			ToggleExit()
+			ToggleExit(false)
 		end
 		if (gbk) then
-			ToggleSpells()
+			ToggleSpells(false)
 		end
 		return true
 	else
@@ -121,8 +115,11 @@ function CloseErrthang()
 	end
 end
 
-function ToggleBag()
+function ToggleBag(sound)
 	if isOpn==false then
+		if sound~=false then
+			a.Play(3)
+		end
 		ginv=display.newGroup()
 		items={}
 		curreqp={}
@@ -139,27 +136,8 @@ function ToggleBag()
 			if (p1.inv[i])~=nil then
 				local itmnme=item.ReturnInfo(p1.inv[i][1],0)
 	--			print ("Player has "..p1.inv[i][2].." of "..itmnme..".")
-				if p1.inv[i][1]==2 then
-					items[#items+1]=display.newSprite( HPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==3 then
-					items[#items+1]=display.newSprite( HPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==7 then
-					items[#items+1]=display.newSprite( MPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==8 then
-					items[#items+1]=display.newSprite( MPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==10 then
-					item[i]=display.newSprite( EPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					item[i]:play()
-				elseif p1.inv[i][1]==11 then
-					item[i]=display.newSprite( EPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					item[i]:play()
-				else
-					items[#items+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
-				end
+	
+				items[#items+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
 				items[#items].xScale=scale
 				items[#items].yScale=scale
 				items[#items].x = xinvicial+ (((#items-1)%9)*(espacio+(3*1.28)))
@@ -224,6 +202,9 @@ function ToggleBag()
 	--		print "Player has nothing equipped."
 		end
 	elseif isOpn==true and (ginv) then
+		if sound~=false then
+			a.Play(4)
+		end
 		
 		if isUse==false then
 			for i=table.maxn(items),1,-1 do
@@ -265,8 +246,11 @@ function ToggleBag()
 	end
 end
 
-function ToggleInfo()
+function ToggleInfo(sound)
 	if isOpn==false then
+		if sound~=false then
+			a.Play(3)
+		end
 		isOpn=true
 		ginf=display.newGroup()
 		info={}
@@ -278,6 +262,9 @@ function ToggleInfo()
 		
 		StatInfo()
 	elseif isOpn==true and (ginf) then
+		if sound~=false then
+			a.Play(4)
+		end
 		display.remove(bkg)
 		bkg=nil
 		isOpn=false
@@ -304,8 +291,11 @@ function ToggleInfo()
 	end
 end
 
-function ToggleSound()
+function ToggleSound(sound)
 	if isOpn==false then
+		if sound~=false then
+			a.Play(3)
+		end
 		isOpn=true
 		swg=display.newGroup()
 	
@@ -359,6 +349,9 @@ function ToggleSound()
 		swg:insert(soundind)
 
 	elseif isOpn==true and (swg) then
+		if sound~=false then
+			a.Play(4)
+		end
 		isOpn=false
 		for i=swg.numChildren,1,-1 do
 			display.remove(swg[i])
@@ -368,8 +361,11 @@ function ToggleSound()
 	end
 end
 
-function ToggleExit()
+function ToggleExit(sound)
 	if isOpn==false then
+		if sound~=false then
+			a.Play(3)
+		end
 		m.FindMe(9)
 		isOpn=true
 		gexui=display.newGroup()
@@ -424,6 +420,9 @@ function ToggleExit()
 		gexui:toFront()
 		
 	elseif isOpn==true and (gexui) then
+		if sound~=false then
+			a.Play(4)
+		end
 		m.FindMe(6)
 		isOpn=false
 		for i=gexui.numChildren,1,-1 do
@@ -434,8 +433,11 @@ function ToggleExit()
 	end
 end
 
-function ToggleSpells()
+function ToggleSpells(sound)
 	if isOpn==false then
+		if sound~=false then
+			a.Play(3)
+		end
 		isOpn=true
 		gbk=display.newGroup()
 		spellicons={}
@@ -479,6 +481,9 @@ function ToggleSpells()
 		end
 		
 	elseif isOpn==true and (gbk) then
+		if sound~=false then
+			a.Play(4)
+		end
 		isOpn=false
 		for i=table.maxn(spellicons),1,-1 do
 			display.remove(spellicons[i])
@@ -860,7 +865,10 @@ function StatInfo()
 	ginf:toFront()
 end
 
-function SwapInfo()
+function SwapInfo(sound)
+	if sound~=false then
+		a.Play(4)
+	end
 	if swapInfoBtn.state==false then
 		for i=table.maxn(info),1,-1 do
 			display.remove(info[i])
@@ -956,7 +964,7 @@ function More( event )
 		end
 	end
 	p.Natural(statnum,1)
-	SwapInfo()
+	SwapInfo(false)
 	SwapInfo()
 end
 
@@ -970,7 +978,7 @@ function Less( event )
 		end
 	end
 	p.Natural(statnum,-1)
-	SwapInfo()
+	SwapInfo(false)
 	SwapInfo()
 end
 
@@ -1081,7 +1089,7 @@ function DeathMenu(cause)
 		Runtime:removeEventListener("enterFrame", g.GoldDisplay)
 		b.WipeMap()
 		mov.CleanArrows()
-		a.Stopbkg()
+		a.changeMusic(0)
 		s.WipeSave()
 		
 	elseif isOpn==true then
@@ -1131,6 +1139,9 @@ end
 
 function UseMenu(id,slot)
 	if isUse==false then
+		if id~=false then
+			a.Play(3)
+		end
 	
 		function UsedIt()
 			isUse=false
@@ -1205,7 +1216,7 @@ function UseMenu(id,slot)
 		end
 		
 		function EquippedIt()
-			
+			a.Play(8)
 			for i=1,table.maxn(p1.eqp) do
 				if (p1.eqp[i]) and (p1.eqp[i][1]) and (p1.eqp[i][2]) and (p1.eqp[i][2]==itemstats[3]) then
 					p1.inv[#p1.inv+1]={}
@@ -1474,9 +1485,12 @@ function UseMenu(id,slot)
 		end
 		
 	elseif isUse==true then
+		if id~=false then
+			a.Play(4)
+		end
 		SpecialUClose()
-		ToggleBag()
-		ToggleBag()
+		ToggleBag(false)
+		ToggleBag(false)
 	end
 end
 

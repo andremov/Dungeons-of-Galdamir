@@ -136,6 +136,7 @@ function DisplayOptions()
 end
 
 function onScreBtnRelease()
+	a.Play(12)
 	for i=optionz.numChildren,1,-1 do
 		local child = optionz[i]
 		child.parent:remove( child )
@@ -144,6 +145,7 @@ function onScreBtnRelease()
 end
 
 function onBackRelease()
+	a.Play(12)
 	for i=optionz.numChildren,1,-1 do
 		local child = optionz[i]
 		child.parent:remove( child )
@@ -153,6 +155,7 @@ function onBackRelease()
 end
 	
 function FunSize()
+	a.Play(12)
 	map.MapSizeMenu()
 	for i=optionz.numChildren,1,-1 do
 		local child = optionz[i]
@@ -161,6 +164,7 @@ function FunSize()
 end
 
 function onCharRelease()
+	a.Play(12)
 	for i=optionz.numChildren,1,-1 do
 		local child = optionz[i]
 		child.parent:remove( child )

@@ -103,7 +103,7 @@ function CreatePlayers(name)
 		{"Slow","Reduces enemy's dexterity.",false,28,5},
 		{"Poison Blade","Inflicts poison.",false,16,19},
 		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,26,37},
-		{"Healing","Heals for 20% of maximum Hit Points.",false,58,4},
+		{"Healing","Heals for 20% of your maximum Hit Points.",false,58,4},
 		{"Ice Spear","Hits for twice damage and reduces enemy's dexterity.",false,51,46},
 	}
 	--Secondary Stats
@@ -353,7 +353,7 @@ end
 function openStats( event )
 	if event.phase=="ended" and DisplayCan==true then
 		ui.Pause()
-		w.ToggleInfo()
+		w.ToggleInfo(false)
 	end
 end
 
@@ -385,7 +385,7 @@ function AddHP(amount)
 		if player.HP > player.MaxHP then
 			player.HP = player.MaxHP
 		end
-		a.Play(7)
+		a.Play(5)
 	end
 end
 
@@ -395,7 +395,7 @@ function AddMP(amount)
 		if player.MP > player.MaxMP then
 			player.MP = player.MaxMP
 		end
-		a.Play(7)
+		a.Play(5)
 	end
 end
 
@@ -405,7 +405,7 @@ function AddEP(amount)
 		if player.EP > player.MaxEP then
 			player.EP = player.MaxEP
 		end
-		a.Play(7)
+		a.Play(5)
 	end
 end
 
@@ -529,6 +529,7 @@ function LvlUp()
 end
 
 function LvlFanfare()
+	a.Play(9)
 	if not (LvlWindow) then
 		transp10=255
 		LvlWindow=display.newImageRect("fanfarelevelup.png",330,142)

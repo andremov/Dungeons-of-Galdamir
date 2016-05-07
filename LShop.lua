@@ -4,12 +4,6 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local HPot2sheet = graphics.newImageSheet( "items/HealthPotion2.png", { width=64, height=64, numFrames=16 })
-local HPot3sheet = graphics.newImageSheet( "items/HealthPotion3.png", { width=64, height=64, numFrames=16 })
-local MPot2sheet = graphics.newImageSheet( "items/ManaPotion2.png", { width=64, height=64, numFrames=16 })
-local MPot3sheet = graphics.newImageSheet( "items/ManaPotion3.png", { width=64, height=64, numFrames=16 })
-local EPot2sheet = graphics.newImageSheet( "items/EnergyPotion2.png", { width=64, height=64, numFrames=16 })
-local EPot3sheet = graphics.newImageSheet( "items/EnergyPotion3.png", { width=64, height=64, numFrames=16 })
 local widget = require "widget"
 local ui=require("Lui")
 local b=require("Lmapbuilder")
@@ -30,9 +24,8 @@ local atShop=false
 local page
 
 function DisplayShop(id,room)
+	a.Play(3)
 	atShop=true
-	gsm=display.newGroup()
-	gbm=display.newGroup()
 	swg=display.newGroup()
 	gp.ShowGCounter()
 	p.LetsYodaIt()
@@ -86,115 +79,101 @@ function DisplayShop(id,room)
 end
 
 function BuyMenu()
+	if (gbm) then
+		for i=gbm.numChildren,1,-1 do
+			display.remove(gbm[i])
+			gbm[i]=nil
+		end
+		gbm=nil
+	end
+	gbm=display.newGroup()
+	item={}
+	itemw={}
 	for s=1,4 do
-		item={}
 		if (curShop.item[s][1]) then
-			if curShop.item[s][1]==2 then
-				item[s]=display.newSprite( HPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-				item[s]:play()
-			elseif curShop.item[s][1]==3 then
-				item[s]=display.newSprite( HPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-				item[s]:play()
-			elseif curShop.item[s][1]==7 then
-				item[s]=display.newSprite( MPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-				item[s]:play()
-			elseif curShop.item[s][1]==8 then
-				item[s]=display.newSprite( MPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-				item[s]:play()
-			elseif curShop.item[s][1]==10 then
-				item[s]=display.newSprite( EPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-				item[s]:play()
-			elseif curShop.item[s][1]==11 then
-				item[s]=display.newSprite( EPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-				item[s]:play()
-			else
-				item[s]=display.newImageRect( "items/"..curShop.item[s][2]..".png" ,64,64)
-			end
+			item[s]=display.newImageRect( "items/"..curShop.item[s][2]..".png" ,64,64)
 			item[s].x = display.contentCenterX+60
 			item[s].y = 280+((s-1)*100)
 			item[s].txt=display.newText( (curShop.item[s][2]) ,item[s].x+50,item[s].y-40,"MoolBoran",50)
 			item[s].prc=display.newText( ("Buy for "..curShop.item[s][3].." gold.") ,item[s].x+50,item[s].y,"MoolBoran",40)
 			item[s].prc:setTextColor( 255, 255, 0)
-			item[s].sq=display.newRect(0,0,350,80)
-			item[s].sq.x = item[s].x+135
-			item[s].sq.y = item[s].y
-			item[s].sq:setFillColor(0,0,0,0)
+			itemw[s]=display.newRect(0,0,350,80)
+			itemw[s].x = item[s].x+135
+			itemw[s].y = item[s].y
+			itemw[s]:setFillColor(0,0,0,0)
 			function itemGet()
 				ItemInfo(s)
 			end
-			item[s].sq:addEventListener("tap",itemGet)
+			itemw[s]:addEventListener("tap",itemGet)
 			gbm:insert(item[s])
 			gbm:insert(item[s].txt)
 			gbm:insert(item[s].prc)
-			gbm:insert(item[s].sq)
+			gbm:insert(itemw[s])
 		end
 	end
+	
 	gbm:toFront()
 end
 
 function SellMenu()
 	local p1=p.GetPlayer()
-	pitems={}
+	if (gsm) then
+		for i=gsm.numChildren,1,-1 do
+			display.remove(gsm[i])
+			gsm[i]=nil
+		end
+		gsm=nil
+	end
+	gsm=display.newGroup()
+	pinv={}
+	pitem={}
+	pitemw={}
 	for m=1,5 do
 		if (p1.inv[m+((page-1)*5)]) then
-			pitems[m]={}
-			pitems[m][1]=p1.inv[m+((page-1)*5)][1]
-			pitems[m][2]=p1.inv[m+((page-1)*5)][2]
-			pitems[m][3],pitems[m][4]=it.ShopStock(1,pitems[m][1])
-			if pitems[m][4]~=nil then
-				pitems[m][4]=math.ceil(pitems[m][4]/2)
+			pinv[m]={}
+			pinv[m][1]=p1.inv[m+((page-1)*5)][1]
+			pinv[m][2]=p1.inv[m+((page-1)*5)][2]
+			pinv[m][3],pinv[m][4]=it.ShopStock(1,pinv[m][1])
+			if pinv[m][4]~=nil then
+				pinv[m][4]=math.ceil(pinv[m][4]/2)
 			end
 		end
 	end
 	for s=1,5 do
-		if (pitems[s]) then
-			if pitems[s][1]==2 then
-				pitems[s].img=display.newSprite( HPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-				pitems[s].img:play()
-			elseif pitems[s][1]==3 then
-				pitems[s].img=display.newSprite( HPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-				pitems[s].img:play()
-			elseif pitems[s][1]==7 then
-				pitems[s].img=display.newSprite( MPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-				pitems[s].img:play()
-			elseif pitems[s][1]==8 then
-				pitems[s].img=display.newSprite( MPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-				pitems[s].img:play()
-			else
-				pitems[s].img=display.newImageRect( "items/"..pitems[s][3]..".png" ,64,64)
-			end
-			pitems[s].img.x = 60
-			pitems[s].img.y = 280+((s-1)*80)
-			pitems[s].txt=display.newText( (pitems[s][3]) ,pitems[s].img.x+50,pitems[s].img.y-40,"MoolBoran",50)
-			if pitems[s][2]~=1 then
-				if pitems[s][2]>9 then
-					pitems[s].num=display.newText( (pitems[s][2]) ,pitems[s].img.x+5,pitems[s].img.y-5,"Game Over",80)
-				elseif p1.inv[s][2]<=9 then
-					pitems[s].num=display.newText( (pitems[s][2]) ,pitems[s].img.x+15,pitems[s].img.y-5,"Game Over",80)
+		if (pinv[s]) then
+			pitem[s]=display.newImageRect( "items/"..pinv[s][3]..".png" ,64,64)
+			pitem[s].x = 60
+			pitem[s].y = 280+((s-1)*80)
+			pitem[s].txt=display.newText( (pinv[s][3]) ,pitem[s].x+50,pitem[s].y-40,"MoolBoran",50)
+			if pinv[s][2]~=1 then
+				if pinv[s][2]>9 then
+					pitem[s].num=display.newText( (pinv[s][2]) ,pitem[s].x+5,pitem[s].y-5,"Game Over",80)
+				elseif pinv[s][2]<=9 then
+					pitem[s].num=display.newText( (pinv[s][2]) ,pitem[s].x+15,pitem[s].y-5,"Game Over",80)
 				end
 			end
-			if pitems[s][4]~=nil then
-				pitems[s].prc=display.newText( ("Sell for "..pitems[s][4].." gold.") ,pitems[s].img.x+50,pitems[s].img.y,"MoolBoran",40)
-				pitems[s].prc:setTextColor( 255, 255, 0)
+			if pinv[s][4]~=nil then
+				pitem[s].prc=display.newText( ("Sell for "..pinv[s][4].." gold.") ,pitem[s].x+50,pitem[s].y,"MoolBoran",40)
+				pitem[s].prc:setTextColor( 255, 255, 0)
 			end
-			pitems[s].sq=display.newRect(0,0,350,80)
-			pitems[s].sq.x = pitems[s].img.x+135
-			pitems[s].sq.y = pitems[s].img.y
-			pitems[s].sq:setFillColor(0,0,0,0)
+			pitemw[s]=display.newRect(0,0,350,80)
+			pitemw[s].x = pitem[s].x+135
+			pitemw[s].y = pitem[s].y
+			pitemw[s]:setFillColor(0,0,0,0)
 			function itemGive()
-				SellItem(pitems[s][1],pitems[s][3],pitems[s][4],(s+(5*(page-1))))
+				SellItem(pinv[s][4],(s+(5*(page-1))))
 			end
-			if pitems[s][4]~=nil then
-				pitems[s].sq:addEventListener("tap",itemGive)
+			if pinv[s][4]~=nil then
+				pitemw[s]:addEventListener("tap",itemGive)
 			end
-			gsm:insert(pitems[s].img)
-			gsm:insert(pitems[s].txt)
-			if (pitems[s].prc) then
-				gsm:insert(pitems[s].prc)
-				gsm:insert(pitems[s].sq)
+			gsm:insert(pitem[s])
+			gsm:insert(pitem[s].txt)
+			gsm:insert(pitemw[s])
+			if (pitem[s].prc) then
+				gsm:insert(pitem[s].prc)
 			end
-			if (pitems[s].num) then
-				gsm:insert( pitems[s].num )
+			if (pitem[s].num) then
+				gsm:insert( pitem[s].num )
 			end
 		end
 	end
@@ -233,87 +212,61 @@ function SellMenu()
 	gsm:toFront()
 end
 
-function SellItem(id,name,prc,slot)
+function SellItem(prc,slot)
 	if isUse==false then
 		local p1=p.GetPlayer()
 		a.Play(1)
 		
 		if p1.inv[slot][2]==1 then
 			table.remove( p1.inv, slot )
-			for i=gsm.numChildren,1,-1 do
-				display.remove(gsm[i])
-				gsm[i]=nil
-			end
-			if page>math.ceil(table.maxn(p1.inv)/5) then
-				page=page-1
-			end
-			SellMenu()
 		else
 			p1.inv[slot][2]=p1.inv[slot][2]-1
-			for i=gsm.numChildren,1,-1 do
-				display.remove(gsm[i])
-				gsm[i]=nil
-			end
-			if page>math.ceil(table.maxn(p1.inv)/5) then
-				page=page-1
-			end
-			SellMenu()
 		end
-		
-		if (BoughtTxt) then
-			display.remove(BoughtTxt)
-			BoughtTxt=nil
+		if page>math.ceil(table.maxn(p1.inv)/5) then
+			page=page-1
 		end
-		
-		--[[
-		BoughtTxt=display.newText(("You sold a "..name.."."),0,0,"Game Over",70)
-		BoughtTxt:setTextColor( 255, 255, 0)
-		BoughtTxt.x=display.contentCenterX
-		BoughtTxt.y=750]]
+		SellMenu()
 		
 		gp.CallAddCoins(prc)
 	end
 end
 
 function NextPage()
-	for i=gsm.numChildren,1,-1 do
-		display.remove(gsm[i])
-		gsm[i]=nil
-	end
 	page=page+1
 	SellMenu()
 end
 
 function PrevPage()
-	for i=gsm.numChildren,1,-1 do
-		display.remove(gsm[i])
-		gsm[i]=nil
-	end
 	page=page-1
 	SellMenu()
 end
 
 function CloseShop()
+	a.Play(4)
 	menu.FindMe(6)
 	if isUse==true then
 		ItemInfo()
 	end
 	atShop=false
-	for i=gsm.numChildren,1,-1 do
-		display.remove(gsm[i])
-		gsm[i]=nil
+	if (gsm) then
+		for i=gsm.numChildren,1,-1 do
+			display.remove(gsm[i])
+			gsm[i]=nil
+		end
+		gsm=nil
 	end
-	gsm=nil
+	if (gbm) then
+		for i=gbm.numChildren,1,-1 do
+			display.remove(gbm[i])
+			gbm[i]=nil
+		end
+		gbm=nil
+	end
 	for i=swg.numChildren,1,-1 do
 		display.remove(swg[i])
 		swg[i]=nil
 	end
 	swg=nil
-	for i=gbm.numChildren,1,-1 do
-		display.remove(gbm[i])
-		gbm[i]=nil
-	end
-	gbm=nil
 	gp.ShowGCounter()
 	p.LetsYodaIt()
 	mov.Visibility()
@@ -328,17 +281,11 @@ function BuyItem(id,name,prc)
 		a.Play(1)
 		inv.AddItem(id,stacks,1)
 		gp.CallAddCoins(-prc)
-		
-		for i=gsm.numChildren,1,-1 do
-			display.remove(gsm[i])
-			gsm[i]=nil
-		end
-		SellMenu()
 	end
 end
 
 function ItemInfo(slot)
-	if (slot) and type(slot)=="number" and isUse==false then
+	if (slot) and type(slot)=="number"  then
 		local p1=p.GetPlayer()
 		local statchangexs=200
 		local statchangey=(display.contentCenterY)-70
@@ -351,6 +298,16 @@ function ItemInfo(slot)
 		function Buy()
 			ItemInfo()
 			BuyItem(curShop.item[slot][1],curShop.item[slot][2],curShop.item[slot][3])
+		end
+		
+		for s in pairs(pitemw) do
+			display.remove(pitemw[s])
+			pitemw[s]=nil
+		end
+		
+		for s in pairs(itemw) do
+			display.remove(itemw[s])
+			itemw[s]=nil
 		end
 		
 		window=display.newImageRect("usemenu.png", 768, 308)
@@ -490,13 +447,15 @@ function ItemInfo(slot)
 		end
 		
 	elseif isUse==true then
-		isUse=false
 		statchange={}
+		timer.performWithDelay(100,SellMenu)
+		timer.performWithDelay(100,BuyMenu)
 		for i=gum.numChildren,1,-1 do
 			local child = gum[i]
 			child.parent:remove( child )
 		end
 		gum=nil
+		isUse=false
 	end
 end
 

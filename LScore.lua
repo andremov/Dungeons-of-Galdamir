@@ -16,6 +16,7 @@ local OKVers={
 		"GAMMA 1.0.1",
 		"GAMMA 1.0.2",
 		"GAMMA 1.1.0",
+		"GAMMA 1.2.0",
 	}
 local Default={
 		"Brownie S.",10000,
@@ -31,6 +32,7 @@ local Default={
 	}
 	
 function onBackBtn()
+	audio.Play(12)
 	
 	if (Text) then
 		for i=table.maxn(Text),1,-1 do

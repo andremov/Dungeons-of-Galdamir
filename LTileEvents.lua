@@ -88,7 +88,7 @@ function onRockCollision()
 			builder.ModMap(l)
 			display.remove(Rocks[P1.room][l])
 			Rocks[P1.room][l]=nil
-			audio.Play(13)
+			audio.Play(7)
 			--Small
 			local somuchdebris=math.random(10,15)
 			for i=1, somuchdebris do
@@ -456,7 +456,7 @@ function Port()
 					end
 				end
 			end
-			audio.Play(11)
+			audio.Play(6)
 			function Closure()
 				mov.CleanArrows()
 			end
@@ -507,7 +507,7 @@ function Port()
 					end
 				end
 			end
-			audio.Play(11)
+			audio.Play(6)
 			function Closure()
 				mov.CleanArrows()
 			end
@@ -560,7 +560,7 @@ function Port()
 					end
 				end
 			end
-			audio.Play(11)
+			audio.Play(6)
 			function Closure()
 				mov.CleanArrows()
 			end
@@ -611,7 +611,7 @@ function Port()
 					end
 				end
 			end
-			audio.Play(11)
+			audio.Play(6)
 			function Closure()
 				mov.CleanArrows()
 			end

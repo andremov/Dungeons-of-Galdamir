@@ -9,6 +9,7 @@ local p=require("Lplayers")
 local WD=require("Lprogress")
 local ui=require("Lui")
 local coll=require("Ltileevents")
+local a=require("Laudio")
 local mob=require("Lmobai")
 local c=require("Lcombat")
 local sho=require("Lshop")
@@ -787,6 +788,7 @@ function Up()
 			end
 		end
 	elseif CanMoveUp==true then
+		a.Step()
 		map=b.GetData(3)
 		P1=p.GetPlayer()
 		map.y=map.y+espacio
@@ -827,6 +829,7 @@ function Down()
 			end
 		end
 	elseif CanMoveDown==true then
+		a.Step()
 		map=b.GetData(3)
 		P1=p.GetPlayer()
 		map.y=map.y-espacio
@@ -867,6 +870,7 @@ function Left()
 			end
 		end
 	elseif CanMoveLeft==true then
+		a.Step()
 		map=b.GetData(3)
 		P1=p.GetPlayer()
 		map.x=map.x+espacio
@@ -907,6 +911,7 @@ function Right()
 			end
 		end
 	elseif CanMoveRight==true then
+		a.Step()
 		map=b.GetData(3)
 		P1=p.GetPlayer()
 		map.x=map.x-espacio

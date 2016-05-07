@@ -125,8 +125,7 @@ function Continue( event )
 				inv.ToggleInfo()
 			end
 			players.CalmDownCowboy(true)
-			audio.Play(3)
-			audio.Play(10)
+			audio.changeMusic(2)
 			menu.FindMe(6)
 		elseif DoStuff==false then
 			m.Visibility()

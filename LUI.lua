@@ -145,7 +145,7 @@ function Pause(mute)
 			isPaused=false
 		--	print "Game resumed."
 			if mute~=true then
-				audio.Play(5)
+				audio.Play(3)
 			end
 		elseif isPaused==false then
 			isPaused=true
@@ -155,7 +155,7 @@ function Pause(mute)
 			players.LetsYodaIt()
 		--	print "Game paused."
 			if mute~=true then
-				audio.Play(6)
+				audio.Play(4)
 			end
 		end
 	elseif busy==true then
@@ -200,31 +200,31 @@ function MovePause(val)
 end
 
 function OpenBag( event )
-	if event.phase=="ended" then
+	if event.phase=="ended" and isPaused==true then
 		inv.ToggleBag()
 	end
 end
 
 function OpenExit( event )
-	if event.phase=="ended" then
+	if event.phase=="ended" and isPaused==true then
 		inv.ToggleExit()
 	end
 end
 
 function OpenSnd( event )
-	if event.phase=="ended" then
+	if event.phase=="ended" and isPaused==true then
 		inv.ToggleSound()
 	end
 end
 
 function OpenInfo( event )
-	if event.phase=="ended" then
+	if event.phase=="ended" and isPaused==true then
 		inv.ToggleInfo()
 	end
 end
 
 function OpenBook( event )
-	if event.phase=="ended" then
+	if event.phase=="ended" and isPaused==true then
 		inv.ToggleSpells()
 	end
 end

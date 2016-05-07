@@ -66,11 +66,10 @@ end
 function Essentials()
 	inCombat=false
 	outcomed=false
-	yinvicial=180
-	xinvicial=75
+	yinvicial=display.contentHeight-180
+	xinvicial=display.contentCenterX-((48*3)+4+2)
 	Automatic=0
-	espaciox=64
-	espacioy=64
+	espacio=64
 	book=false
 	inv=false
 end
@@ -109,6 +108,7 @@ function DisplayCombat()
 	Runtime:addEventListener("enterFrame", ManageHits)
 	mov.CleanArrows()
 	players.CalmDownCowboy(false)
+	audio.changeMusic(3)
 	gcm=display.newGroup()
 	hits={}
 	m.FindMe(7)
@@ -246,6 +246,10 @@ end
 
 function HideActions()
 	
+	if Automatic==true then
+		Automatic=0
+	end
+	
 	if (AttackBtn) then
 		display.remove(AttackBtn)
 	end
@@ -266,8 +270,8 @@ function HideActions()
 		display.remove(AutoRecoverBtn)
 	end
 	
-	if (GuardBtn) then
-		display.remove(GuardBtn)
+	if (SpellBtn) then
+		display.remove(SpellBtn)
 	end
 	
 	if (BackBtn) then
@@ -276,6 +280,18 @@ function HideActions()
 	
 	if (AutoRunBtn) then
 		display.remove(AutoRunBtn)
+	end
+	
+	if (AutoTxt) then
+		display.remove(AutoTxt)
+	end
+	
+	if (AutoTxt2) then
+		display.remove(AutoTxt2)
+	end
+	
+	if (AutoWin) then
+		display.remove(AutoWin)
 	end
 	
 	AttackBtn=display.newImageRect("combataction3.png",342,86)
@@ -293,10 +309,10 @@ function HideActions()
 	ItemBtn.y = timersprite.y+44
 	gcm:insert( ItemBtn )
 	
-	GuardBtn=display.newImageRect("combataction3.png",342,86)
-	GuardBtn.x = AttackBtn.x
-	GuardBtn.y = ItemBtn.y
-	gcm:insert( GuardBtn )
+	SpellBtn=display.newImageRect("combataction3.png",342,86)
+	SpellBtn.x = AttackBtn.x
+	SpellBtn.y = ItemBtn.y
+	gcm:insert( SpellBtn )
 	
 	RecoverBtn=display.newImageRect("combataction3.png",342,86)
 	RecoverBtn.x = AttackBtn.x
@@ -308,12 +324,42 @@ function HideActions()
 	BackBtn.y = RecoverBtn.y
 	gcm:insert( BackBtn )
 	
+	AutoWin=display.newRect(0,0,400,60)
+	AutoWin:setFillColor(0,0,0,0)
+	AutoWin.x=display.contentCenterX
+	AutoWin.y=RecoverBtn.y+88
+	gcm:insert( AutoWin )
+	AutoWin:addEventListener("tap",AutoToggle)
+	
+	AutoTxt=display.newText("Automatic Actions:",0,0,"MoolBoran",55)
+	AutoTxt.x=display.contentCenterX-40
+	AutoTxt.y=AutoWin.y+10
+	gcm:insert( AutoTxt )
+	
+	if Automatic~=0 then
+		AutoTxt2=display.newText("On",0,0,"MoolBoran",55)
+		AutoTxt2:setTextColor(70,255,70)
+		AutoTxt2.x=AutoTxt.x+190
+		AutoTxt2.y=AutoTxt.y
+		gcm:insert( AutoTxt2 )
+	else
+		AutoTxt2=display.newText("Off",0,0,"MoolBoran",55)
+		AutoTxt2:setTextColor(255,70,70)
+		AutoTxt2.x=AutoTxt.x+190
+		AutoTxt2.y=AutoTxt.y
+		gcm:insert( AutoTxt2 )
+	end
+	
 	timersprite:toFront()
 end
 
 function ShowActions()
 	ptimer=nil
 	local ep=timer.pause(etimer)
+	
+	if Automatic==true then
+		Automatic=0
+	end
 	
 	if Automatic==0 then
 	
@@ -344,19 +390,14 @@ function ShowActions()
 			ItemBtn=nil
 		end
 		
-		if (GuardBtn) then
-			display.remove(GuardBtn)
-			GuardBtn=nil
+		if (SpellBtn) then
+			display.remove(SpellBtn)
+			SpellBtn=nil
 		end
 		
 		if (RecoverBtn) then
 			display.remove(RecoverBtn)
 			RecoverBtn=nil
-		end
-	
-		if (AutoRecoverBtn) then
-			display.remove(AutoRecoverBtn)
-			AutoRecoverBtn=nil
 		end
 		
 		if (BackBtn) then
@@ -364,41 +405,57 @@ function ShowActions()
 			BackBtn=nil
 		end
 		
-		if (AutoRunBtn) then
-			display.remove(AutoRunBtn)
-			AutoRunBtn=nil
+		if (AutoTxt) then
+			display.remove(AutoTxt)
+			AutoTxt=nil
+		end
+		
+		if (AutoTxt2) then
+			display.remove(AutoTxt2)
+			AutoTxt2=nil
+		end
+		
+		if (AutoWin) then
+			display.remove(AutoWin)
+			AutoWin=nil
+		end
+	
+		function AttackMe()
+			SetAuto(1)
+			HideActions()
+			PlayerAttacks(0)
 		end
 		
 		if not(AttackBtn)then
 			AttackBtn= widget.newButton{
-				label="Attack",
+				label="Melee Attack",
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				fontSize=35,
 				defaultFile="combataction.png",
 				overFile="combataction2.png",
 				width=342, height=86,
-				onRelease = AttackType}
+				onRelease = AttackMe}
 			AttackBtn:setReferencePoint( display.CenterReferencePoint )
 			AttackBtn.x = timersprite.x-172
 			AttackBtn.y = timersprite.y-44
 			gcm:insert( AttackBtn )
 		end
 		
-		function toSorcery()	
+		function AttackMa()
+			SetAuto(2)
 			HideActions()
-			
-			ShowSorcery()
+			PlayerAttacks(1)
 		end
-		
+	
 		if not(MagicBtn)then
 			MagicBtn= widget.newButton{
-				label="Spellbook",
+				label="Magic Attack",
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				fontSize=35,
 				defaultFile="combataction.png",
 				overFile="combataction2.png",
 				width=342, height=86,
-				onRelease = toSorcery}
+				onRelease = AttackMa}
 			MagicBtn:setReferencePoint( display.CenterReferencePoint )
 			MagicBtn.x = timersprite.x+172
 			MagicBtn.y = AttackBtn.y
@@ -426,30 +483,30 @@ function ShowActions()
 			gcm:insert( ItemBtn )
 		end
 		
-		function toDefend()
+		function toSorcery()	
 			HideActions()
 			
-			Guard()
+			ShowSorcery()
 		end
 		
-		if not(GuardBtn)then
-			GuardBtn= widget.newButton{
-				label="Guard",
+		if not(SpellBtn)then
+			SpellBtn= widget.newButton{
+				label="Spellbook",
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				fontSize=35,
 				defaultFile="combataction.png",
 				overFile="combataction2.png",
 				width=342, height=86,
-				onRelease = toDefend}
-			GuardBtn:setReferencePoint( display.CenterReferencePoint )
-			GuardBtn.x = AttackBtn.x
-			GuardBtn.y = ItemBtn.y
-			gcm:insert( GuardBtn )
+				onRelease = toSorcery}
+			SpellBtn:setReferencePoint( display.CenterReferencePoint )
+			SpellBtn.x = AttackBtn.x
+			SpellBtn.y = ItemBtn.y
+			gcm:insert( SpellBtn )
 		end
 		
 		function toRecover()
+			SetAuto(3)
 			HideActions()
-			
 			Recover()
 		end
 		
@@ -468,32 +525,9 @@ function ShowActions()
 			gcm:insert( RecoverBtn )
 		end
 		
-		function toAutoRecover()
-			HideActions()
-			TurnOnAuto(3)
-			Recover()
-		end
-		
-		if not(AutoRecoverBtn)then
-			AutoRecoverBtn= widget.newButton{
-				label="Auto-Recover",
-				labelColor = { default={0,0,0}, over={255,255,255} },
-				fontSize=35,
-				defaultFile="extracombataction.png",
-				overFile="extracombataction2.png",
-				width=342, height=86,
-				onRelease = toAutoRecover}
-			AutoRecoverBtn:setReferencePoint( display.CenterReferencePoint )
-			AutoRecoverBtn.x = RecoverBtn.x
-			AutoRecoverBtn.y = RecoverBtn.y+68
-			AutoRecoverBtn.xScale = 0.75
-			AutoRecoverBtn.yScale = 0.75
-			gcm:insert( AutoRecoverBtn )
-		end
-		
 		function toRun()
+			SetAuto(4)
 			HideActions()
-			
 			RunAttempt()
 		end
 		
@@ -512,27 +546,35 @@ function ShowActions()
 			gcm:insert( BackBtn )
 		end
 		
-		function toAutoRun()
-			HideActions()
-			TurnOnAuto(4)
-			RunAttempt()
+		if not(AutoWin)then
+			AutoWin=display.newRect(0,0,400,60)
+			AutoWin:setFillColor(0,0,0,0)
+			AutoWin.x=display.contentCenterX
+			AutoWin.y=RecoverBtn.y+88
+			gcm:insert( AutoWin )
+			AutoWin:addEventListener("tap",AutoToggle)
 		end
 		
-		if not(AutoRunBtn)then
-			AutoRunBtn= widget.newButton{
-				label="Auto-Retreat",
-				labelColor = { default={0,0,0}, over={255,255,255} },
-				fontSize=35,
-				defaultFile="extracombataction.png",
-				overFile="extracombataction2.png",
-				width=342, height=86,
-				onRelease = toAutoRun}
-			AutoRunBtn:setReferencePoint( display.CenterReferencePoint )
-			AutoRunBtn.x = BackBtn.x
-			AutoRunBtn.y = BackBtn.y+68
-			AutoRunBtn.xScale = 0.75
-			AutoRunBtn.yScale = 0.75
-			gcm:insert( AutoRunBtn )
+		if not(AutoTxt)then
+			AutoTxt=display.newText("Automatic Actions:",0,0,"MoolBoran",55)
+			AutoTxt.x=display.contentCenterX-40
+			AutoTxt.y=AutoWin.y+10
+			gcm:insert( AutoTxt )
+		end
+		if not(AutoTxt2)then
+			if Automatic~=0 then
+				AutoTxt2=display.newText("On",0,0,"MoolBoran",55)
+				AutoTxt2:setTextColor(70,255,70)
+				AutoTxt2.x=AutoTxt.x+190
+				AutoTxt2.y=AutoTxt.y
+				gcm:insert( AutoTxt2 )
+			else
+				AutoTxt2=display.newText("Off",0,0,"MoolBoran",55)
+				AutoTxt2:setTextColor(255,70,70)
+				AutoTxt2.x=AutoTxt.x+190
+				AutoTxt2.y=AutoTxt.y
+				gcm:insert( AutoTxt2 )
+			end
 		end
 	elseif Automatic==1 or Automatic==2 then
 		PlayerAttacks(Automatic-1)
@@ -792,6 +834,7 @@ function P1Sprite(value)
 			psprite:play()
 		end
 		if (value)==(4) then--Set to Casting
+			audio.Play(11)
 			psprite:setSequence( "cast" )
 			psprite:play()
 		end
@@ -808,199 +851,22 @@ function P1Sprite(value)
 	end
 end
 
-function AttackType()
-	
-	
-	if (AttackBtn) then
-		display.remove(AttackBtn)
-		AttackBtn=nil
+function AutoToggle()
+	if Automatic~=0 then
+		AutoTxt2.text=("Off")
+		AutoTxt2:setTextColor(255,70,70)
+		Automatic=0
+	else
+		AutoTxt2.text=("On")
+		AutoTxt2:setTextColor(70,255,70)
+		Automatic=true
 	end
-	
-	if (MagicBtn) then
-		display.remove(MagicBtn)
-		MagicBtn=nil
-	end
-	
-	if (ItemBtn) then
-		display.remove(ItemBtn)
-		ItemBtn=nil
-	end
-	
-	if (GuardBtn) then
-		display.remove(GuardBtn)
-		GuardBtn=nil
-	end
-	
-	if (RecoverBtn) then
-		display.remove(RecoverBtn)
-		RecoverBtn=nil
-	end
-	
-	if (AutoRecoverBtn) then
-		display.remove(AutoRecoverBtn)
-		AutoRecoverBtn=nil
-	end
-	
-	if (BackBtn) then
-		display.remove(BackBtn)
-		BackBtn=nil
-	end
-	
-	if (AutoRunBtn) then
-		display.remove(AutoRunBtn)
-		AutoRunBtn=nil
-	end
-	
-	function AttackMe()
-		HideActions()
-		
-		PlayerAttacks(0)
-	end
-	
-	if not(AttackBtn)then
-		AttackBtn= widget.newButton{
-			label="Melee Attack",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = AttackMe}
-		AttackBtn:setReferencePoint( display.CenterReferencePoint )
-		AttackBtn.x = timersprite.x-172
-		AttackBtn.y = timersprite.y-44
-		gcm:insert( AttackBtn )
-	end
-	
-	function AttackMa()
-		HideActions()
-		
-		PlayerAttacks(1)
-	end
-	
-	if not(MagicBtn)then
-		MagicBtn= widget.newButton{
-			label="Magic Attack",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = AttackMa}
-		MagicBtn:setReferencePoint( display.CenterReferencePoint )
-		MagicBtn.x = timersprite.x+172
-		MagicBtn.y = AttackBtn.y
-		gcm:insert( MagicBtn )
-	end
-	
-	if not(MagicBtn)then
-		MagicBtn= widget.newButton{
-			label="Magic Attack",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = AttackMa}
-		MagicBtn:setReferencePoint( display.CenterReferencePoint )
-		MagicBtn.x = timersprite.x+172
-		MagicBtn.y = AttackBtn.y
-		gcm:insert( MagicBtn )
-	end
-	
-	function AutomaticMe()
-		HideActions()
-		TurnOnAuto(1)
-		PlayerAttacks(0)
-	end
-	
-	if not(GuardBtn)then
-		GuardBtn= widget.newButton{
-			label="Auto-Melee Attack",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = AutomaticMe}
-		GuardBtn:setReferencePoint( display.CenterReferencePoint )
-		GuardBtn.x = AttackBtn.x
-		GuardBtn.y = timersprite.y+44
-		gcm:insert( GuardBtn )
-	end
-	
-	function AutomaticMa()
-		HideActions()
-		TurnOnAuto(2)
-		PlayerAttacks(1)
-	end
-	
-	if not(ItemBtn)then
-		ItemBtn= widget.newButton{
-			label="Auto-Magic Attack",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = AutomaticMa}
-		ItemBtn:setReferencePoint( display.CenterReferencePoint )
-		ItemBtn.x = MagicBtn.x
-		ItemBtn.y = timersprite.y+44
-		gcm:insert( ItemBtn )
-	end
-	
-	RecoverBtn=display.newImageRect("combataction3.png",342,86)
-	RecoverBtn.x = AttackBtn.x
-	RecoverBtn.y = ItemBtn.y+88
-	gcm:insert( RecoverBtn )
-	
-	if not(BackBtn)then
-		BackBtn=widget.newButton{
-			label="Close",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=30,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = ShowActions}
-		BackBtn:setReferencePoint( display.CenterReferencePoint )
-		BackBtn.x = MagicBtn.x
-		BackBtn.y = RecoverBtn.y
-		gcm:insert( BackBtn )
-	end
-	
-	timersprite:toFront()
 end
 
-function TurnOnAuto(auto)
-	NoAutoBtn= widget.newButton{
-		label="Manual Actions",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=35,
-		defaultFile="combataction.png",
-		overFile="combataction2.png",
-		width=342, height=86,
-		onRelease = TurnOffAuto}
-	NoAutoBtn:setReferencePoint( display.CenterReferencePoint )
-	NoAutoBtn.x = display.contentCenterX
-	NoAutoBtn.y = display.contentHeight-50
-	gcm:insert( NoAutoBtn )
-	Automatic=auto
-end
-
-function TurnOffAuto()
-	display.remove(NoAutoBtn)
-	NoAutoBtn=nil
-	Automatic=0
-end
-
-function Guard()
-	
-	P1Sprite(3)
-	p1.stats[3]=p1.stats[3]*1.5
-	isDefend=true
-	UpdateStats()
+function SetAuto(auto)
+	if Automatic==true then
+		Automatic=auto
+	end
 end
 
 function Recover()
@@ -1025,7 +891,7 @@ function Recover()
 	p1.stats[3]=p1.stats[3]*0.75
 	isRecover=true
 	if Automatic==3 and p1.MP==p1.MaxMP and p1.EP==p1.MaxEP  then
-		TurnOffAuto()
+		AutoToggle()
 	end
 	UpdateStats()
 end
@@ -1038,6 +904,7 @@ function MobsTurn()
 	
 	local isHit=EvadeCalc("p1",16)
 	if isHit>=(p1.stats[5]/6)*2 then
+		audio.Play(13)
 		local Damage
 		if isHit>=(p1.stats[5]/3)*5 then
 			if enemy.stats[2]>enemy.stats[4]then
@@ -1067,6 +934,7 @@ function MobsTurn()
 			end
 		end
 	else
+		audio.Play(10)
 		hpHits("MSS!",false,false)
 	end
 	MobStatuses()
@@ -1485,6 +1353,7 @@ function PlayerAttacks(atktype)
 		end
 	end
 	local isHit=EvadeCalc("mob",16)
+		audio.Play(13)
 		if isHit>0 then
 			if isHit>1 then
 			local Damage=DamageCalc("mob",(math.random(15,20)/10),force,atkstat)
@@ -1506,6 +1375,7 @@ function PlayerAttacks(atktype)
 			end
 		end
 	else
+		audio.Play(10)
 		mobHits("MSS!",false,false)
 	end
 	UpdateStats()
@@ -1551,10 +1421,10 @@ function EndTurn()
 		end
 		
 		if Automatic==3 and p1.MP==p1.MaxMP and p1.EP==p1.MaxEP  then
-			TurnOffAuto()
+			AutoToggle()
 		end
 		MobSprite()
-		if isDefend~=true and isRecover~=true then
+		if isRecover~=true then
 			P1Sprite()
 		end
 	elseif p1.HP<=0 then
@@ -1571,6 +1441,7 @@ function EndTurn()
 end
 
 function EndCombat(outcome)
+	audio.changeMusic(1)
 	Runtime:removeEventListener("enterFrame", ManageHits)
 	inCombat=false
 	for i=gcm.numChildren,1,-1 do
@@ -1593,6 +1464,10 @@ function EndCombat(outcome)
 		Runtime:addEventListener("enterFrame", players.ShowStats)
 		--------------------------------------------
 		if outcome=="Loss" then
+			for i=gom.numChildren,1,-1 do
+				local child = gom[i]
+				child.parent:remove( child )
+			end
 		--------------------------------------------
 		elseif (outcome)=="Win" then
 			q.UpdateQuest("mob",enemy.lvl)
@@ -1928,52 +1803,53 @@ function ShowBag()
 	if inv==false then
 		inv=true
 		
+		if (AutoTxt) then
+			display.remove(AutoTxt)
+		end
+		
+		if (AutoTxt2) then
+			display.remove(AutoTxt2)
+		end
+		
+		if (AutoWin) then
+			display.remove(AutoWin)
+		end
+		
 		ginv=display.newGroup()
 		items={}
 		items2={}
 		for i=1,table.maxn(p1.inv) do
-			if (p1.inv[i])~=nil and p1.inv[i][1]<=14 then
+			if (p1.inv[i])~=nil and p1.inv[i][1]<=17 then
 				local itmnme=item.ReturnInfo(p1.inv[i][1],0)
 				
 				function Gah()
 					UseItem(p1.inv[i][1],i)
 				end
-				items2[#items2+1]=display.newImageRect("itemframe.png",50,50)
-				items2[#items2].xScale=1.25*1.3
-				items2[#items2].yScale=1.25*1.3
-				items2[#items2].x = xinvicial+ (((#items2-1)%8)*((espaciox*items2[#items2].xScale)+4))
-				items2[#items2].y = display.contentHeight-yinvicial
+				items2[#items2+1]=display.newImageRect("itemframe.png",64,64)
+				items2[#items2].xScale=1.5
+				items2[#items2].yScale=items2[#items2].xScale
+				items2[#items2].x = xinvicial+(((#items2-1)%4)*((espacio*items2[#items2].xScale)+4))
+				items2[#items2].y = yinvicial+(((espacio*items2[#items2].xScale)+4)*(math.floor((#items2-1)/4)))
 				items2[#items2]:addEventListener("tap",Gah)
 				ginv:insert( items2[#items2] )
 				
-				if p1.inv[i][1]==2 then
-					items[#items+1]=display.newSprite( HPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==3 then
-					items[#items+1]=display.newSprite( HPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==7 then
-					items[#items+1]=display.newSprite( MPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==8 then
-					items[#items+1]=display.newSprite( MPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				else
-					items[#items+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
-				end
-				items[#items].xScale=1.25
-				items[#items].yScale=1.25
+				items[#items+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
+				items[#items].xScale=items2[#items2].xScale
+				items[#items].yScale=items[#items].xScale
 				items[#items].x = items2[#items2].x
 				items[#items].y = items2[#items2].y
 				ginv:insert( items[#items] )
 				
+				items2[#items2]:toFront()
 				if p1.inv[i][2]~=1 then
 					if p1.inv[i][2]>9 then
 						items[#items].num=display.newText( (p1.inv[i][2]) ,items[#items].x+5,items[#items].y-5,"Game Over",80)
 						ginv:insert( items[#items].num )
+						items[#items].num:toFront()
 					elseif p1.inv[i][2]<=9 then
 						items[#items].num=display.newText( (p1.inv[i][2]) ,items[#items].x+15,items[#items].y-5,"Game Over",80)
 						ginv:insert( items[#items].num )
+						items[#items].num:toFront()
 					end
 				end
 			end
@@ -2074,6 +1950,18 @@ function ShowSorcery()
 	if book==false then
 		book=true
 		
+		if (AutoTxt) then
+			display.remove(AutoTxt)
+		end
+		
+		if (AutoTxt2) then
+			display.remove(AutoTxt2)
+		end
+		
+		if (AutoWin) then
+			display.remove(AutoWin)
+		end
+		
 		gspl=display.newGroup()
 		spells={}
 		spellframes={}
@@ -2082,15 +1970,17 @@ function ShowSorcery()
 				function Hoo()
 					CastSorcery(p1.spells[i][1])
 				end
-				spellframes[#spellframes+1]=display.newImageRect("itemframe.png",50,50)
-				spellframes[#spellframes].xScale=1.25*1.3
-				spellframes[#spellframes].yScale=1.25*1.3
-				spellframes[#spellframes].x = xinvicial+ (((#spellframes-1)%8)*((espaciox*spellframes[#spellframes].xScale)+4))
-				spellframes[#spellframes].y = display.contentHeight-yinvicial
+				spellframes[#spellframes+1]=display.newImageRect("itemframe.png",64,64)
+				spellframes[#spellframes].xScale=1.5
+				spellframes[#spellframes].yScale=spellframes[#spellframes].xScale
+				spellframes[#spellframes].x = xinvicial+ (((#spellframes-1)%4)*((espacio*spellframes[#spellframes].xScale)+4))
+				spellframes[#spellframes].y = yinvicial+(((espacio*spellframes[#spellframes].xScale)+4)*(math.floor((#spellframes-1)/4)))
 				spellframes[#spellframes]:addEventListener("tap",Hoo)
 				gspl:insert( spellframes[#spellframes] )
 				
 				spells[#spells+1]=display.newImageRect( "spells/"..p1.spells[i][1]..".png" ,80,80)
+				spells[#spells].xScale=1.2
+				spells[#spells].yScale=spells[#spells].xScale
 				spells[#spells].x = spellframes[#spellframes].x
 				spells[#spells].y = spellframes[#spellframes].y
 				gspl:insert( spells[#spells] )
@@ -2138,7 +2028,6 @@ function ShowSorcery()
 end
 
 function CastSorcery(name)
-	P1Sprite(4)
 	
 	book=false
 	for i=table.maxn(spells),1,-1 do
@@ -2165,14 +2054,18 @@ function CastSorcery(name)
 		end
 	end
 	if name=="Cleave" then
+		audio.Play(13)
+		P1Sprite(2)
 		local Damage=DamageCalc("mob",(math.random(15,20)/10),48,2)
 		mobHits((Damage),true,"SPL")
 		enemy.HP=enemy.HP-Damage
 		MobSprite(3)
 		
 	elseif name=="Gouge" then
+		P1Sprite(2)
 		local isHit=EvadeCalc("mob",64)
 		if isHit>0 then
+			audio.Play(13)
 			local Damage=DamageCalc("mob",(math.random(15,20)/10),48,2)
 			if (Damage)<=0 then
 				mobHits("BLK!",false,"SPL")
@@ -2188,17 +2081,21 @@ function CastSorcery(name)
 				mobHits((Damage),true,"SPL")
 			end
 		else
+			audio.Play(10)
 			mobHits("MSS!",false,"SPL")
 		end
 		
 	elseif name=="Healing" then
+		P1Sprite(4)
 		local p1=players.GetPlayer()
 		players.AddHP(math.floor(p1.MaxHP*.2))
 		hpHits((math.floor(p1.MaxHP*.2)),false,true)
 		
 	elseif name=="Fire Sword" then
+		P1Sprite(2)
 		local isHit=EvadeCalc("mob",64)
 		if isHit>0 then
+			audio.Play(13)
 			local Damage=DamageCalc("mob",(math.random(15,20)/10),48,2)
 			if (Damage)<=0 then
 				mobHits("BLK!",false,"SPL")
@@ -2214,10 +2111,12 @@ function CastSorcery(name)
 				mobHits((Damage),true,"SPL")
 			end
 		else
+			audio.Play(10)
 			mobHits("MSS!",false,"SPL")
 		end
 		
 	elseif name=="Fireball" then
+		P1Sprite(4)
 		local isHit=EvadeCalc("mob",64)
 		if isHit>0 then
 			if isHit>1 then
@@ -2256,6 +2155,7 @@ function CastSorcery(name)
 		end
 		
 	elseif name=="Ice Spear" then
+		P1Sprite(4)
 		local isHit=EvadeCalc("mob",64)
 		if isHit>0 then
 			local Damage=DamageCalc("mob",(math.random(15,20)/10),48,4)
@@ -2279,6 +2179,7 @@ function CastSorcery(name)
 		end
 		
 	elseif name=="Slow" then
+		P1Sprite(4)
 		enemy.stats[5]=(enemy.stats[5]*.2)
 		mobHits(("Frozen!"),false,"SPL")
 		enemy.status="FRZ"
@@ -2289,8 +2190,10 @@ function CastSorcery(name)
 		end
 		
 	elseif name=="Poison Blade" then
+		P1Sprite(2)
 		local isHit=EvadeCalc("mob",64)
 		if isHit>0 then
+			audio.Play(13)
 			if isHit>1 then
 				local Damage=DamageCalc("mob",(math.random(15,20)/10),48,4)
 				if (Damage)<=0 then
@@ -2317,6 +2220,7 @@ function CastSorcery(name)
 				end
 			end
 		else
+			audio.Play(10)
 			mobHits("MSS!",false,"SPL")
 		end
 		
