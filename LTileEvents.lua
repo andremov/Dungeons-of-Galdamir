@@ -623,3 +623,15 @@ function ShopCheck()
 		end
 	end
 end
+
+function SpawnerCheck()
+	local MS=builder.GetMSpawner()
+	local P1=players.GetPlayer()
+	local info=false
+	if (MS) then
+		if (P1) and (MS.loc==P1.loc) and (MS.room==P1.room) and (MS.cd==0) then
+			info=true
+		end
+	end
+	return info
+end

@@ -10,6 +10,7 @@ local widget=require "widget"
 local option=require("Loptions")
 local audio=require("Laudio")
 local b=require("Lmapbuilder")
+local m = require("Lmenu")
 local currentmap
 local Round
 local HowRed=0
@@ -25,7 +26,7 @@ local TileID=0
 local SizeID=3
 local CurSize
 local CurTile
-local Testing=false
+local Testing=true
 
 function GetCMap(value)
 	Round=WD.Circle()
@@ -80,7 +81,7 @@ function GetTiles()
 end
 
 function MapSizeMenu()
-	
+	m.FindMe(3)
 	function onBackRelease()
 		for i=opt.numChildren,1,-1 do
 			local child = opt[i]

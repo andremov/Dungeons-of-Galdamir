@@ -7,18 +7,31 @@ module(..., package.seeall)
 local m=require("Lmenu")
 --[[
 DUNGEONS OF GAL'DARAH
-CURRENT VERSION: GAMMA 1.1.0
+CURRENT VERSION: GAMMA 1.1.4
 
 Font1: Monotype Corsiva
 Font2: Game Over
 Font3: Viner Hand ITC
 Font4: Adobe Devanagari
 Font5: MoolBoran
+
+TO DO
+	OPEN & CLOSE SHOP AUDIO
+	FATIGUE DEATH?
+	PORTAL DEATH?
+	UNSPENT POINTS AUDIO
+	STEP AUDIO
+	COMBAT AUDIO
+	MUSIC REPEAT?
+	DEAL DAMAGE SFX
+	COD-LIKE DAMAGE GFX
+	LOW HEALTH SFX
+	SHOP STAT COMPARE
 --]]
 
 local RSS
-local GVersion="GAMMA 1.1.0"
-local cVersion="GAMA 1.1.0"
+local GVersion="GAMMA 1.1.4"
+local cVersion="GAMA 1.1.4"
 
 function HowDoIVersion(val)
 	if val==true then

@@ -549,7 +549,7 @@ function DisplayTile()
 		end	
 		
 		if(map2[count]=="z")then
-			finish=display.newImageRect( "tiles/"..TSet.."/stairup.png", 80, 80)
+			finish=display.newImageRect( "tiles/"..TSet.."/stairs.png", 80, 80)
 			finish.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			finish.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			finish.isVisible=false
@@ -1149,9 +1149,9 @@ function Eight()
 	Narrator[2].x=display.contentCenterX
 	Narrator[2].y=Narrator[1].y+45
 	
-	Narrator[3]=display.newText("Use the arrows to move",0, 0,"MoolBoran",40)
+	Narrator[3]=display.newText("Tap inside the square to move",0, 0,"MoolBoran",40)
 	Narrator[3]:setTextColor(70,255,70)
-	Narrator[3].x=display.contentWidth-140
+	Narrator[3].x=display.contentWidth-170
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)

@@ -43,10 +43,10 @@ function CreatePlayers(name)
 	local class=c.GetCharInfo(1)
 
 	if not (char) then
-		char=0
+		char=math.random(0,3)
 	end
 	if not (class) then
-		class=0
+		class=math.random(0,5)
 	end
 	
 	--Visual
@@ -69,7 +69,7 @@ function CreatePlayers(name)
 	player.lvl=1
 	player.MaxXP=50
 	player.XP=0
-	player.clsnames={"Viking","Warrior","Knight","Sorceror","Thief","Scholar"}
+	player.clsnames={"Viking","Warrior","Knight","Sorcerer","Thief","Scholar"}
 	player.char=char
 	player.class=class
 	--Extras
@@ -656,7 +656,7 @@ end
 
 function FinishLoading()
 	player.statnames={"Stamina","Attack","Defense","Magic","Dexterity","Intellect"}
-	player.clsnames={"Knight","Warrior","Thief","Viking","Sorceror","Scholar"}
+	player.clsnames={"Knight","Warrior","Thief","Viking","Sorcerer","Scholar"}
 	player.eqs={0,0,0,0,0,0}
 	player.bon={0,0,0,0,0,0}
 	player.weight=5

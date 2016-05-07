@@ -218,8 +218,12 @@ function MobSpawn()
 		end
 		
 		if CanSpawn==true and SpawnCD==0 then
-			LifeOverDeath(MS.loc,MS.room)
-			SpawnCD=math.random(10,15)
+			if (MS.cd==0) then
+				LifeOverDeath(MS.loc,MS.room)
+			else
+				MS.cd=MS.cd-1
+			end
+			SpawnCD=math.random(5,10)
 		end
 		
 	end
@@ -384,4 +388,11 @@ function LocationCheck(loc2check,room2check)
 		end
 	end
 	return foundIt
+end
+
+function DelayMobs()
+	local MS=builder.GetMSpawner()
+	if (MS) and (MS.cd==0) then
+		MS.cd=math.random(1,3)
+	end
 end

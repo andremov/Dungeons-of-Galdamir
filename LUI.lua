@@ -47,6 +47,14 @@ function Paused()
 	return isPaused
 end
 
+function ForcePause()
+	if isPaused==true then
+		inv.CloseErrthang()
+	else
+		Pause()
+	end
+end
+
 function UI(ready)
 	if ready==true then
 		PauseBtn = widget.newButton{
@@ -93,29 +101,29 @@ function UI(ready)
 		
 		pausetxt:toFront()
 		
-		bag = display.newImageRect("bag.png", 50, 50)
+		bag = display.newImageRect("bagbtn.png", 80, 80)
 		bag.x, bag.y = window.x+(25*1.28*1.5)-((390-6)/2), window.y+(25*1.28*1.5)-((166-6)/2)
-		bag.xScale = 1.28*1.5
+		bag.xScale = 1.2
 		bag.yScale = bag.xScale
 		bag:addEventListener("touch",OpenBag)
 		pwg:insert(bag)
 		
-		info = display.newImageRect("infobtn.png", 50, 50)
-		info.x, info.y = bag.x+(50*bag.xScale), bag.y
+		info = display.newImageRect("infobtn.png", 80, 80)
+		info.x, info.y = bag.x+(80*bag.xScale), bag.y
 		info.yScale = bag.yScale
 		info.xScale = bag.xScale
 		info:addEventListener("touch",OpenInfo)
 		pwg:insert(info)
 		
-		snd = display.newImageRect("sound.png",50,50)
-		snd.x,snd.y = info.x+(50*info.xScale), bag.y
+		snd = display.newImageRect("soundbtn.png",80,80)
+		snd.x,snd.y = info.x+(80*info.xScale), bag.y
 		snd.xScale=bag.xScale
 		snd.yScale=bag.yScale
 		snd:addEventListener("touch",OpenSnd)
 		pwg:insert(snd)
 		
-		uiexit = display.newImageRect("exit.png", 50, 50)
-		uiexit.x, uiexit.y = snd.x+(50*snd.xScale), bag.y
+		uiexit = display.newImageRect("magicbtn.png", 80, 80)
+		uiexit.x, uiexit.y = snd.x+(80*snd.xScale), bag.y
 		uiexit.yScale = bag.yScale
 		uiexit.xScale = bag.xScale
 		uiexit:addEventListener("touch",OpenExit)

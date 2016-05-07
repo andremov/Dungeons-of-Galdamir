@@ -22,6 +22,7 @@ local item=require("Litems")
 local sc=require("Lscore")
 local b=require("Lmapbuilder")
 local s=require("Lsaving")
+local m=require("Lmenu")
 local ginv
 local geqp
 local ginf
@@ -123,9 +124,9 @@ function ToggleBag()
 		items={}
 		curreqp={}
 		
-		invinterface=display.newImageRect("container.png", 570, 549)
-		invinterface.x,invinterface.y = display.contentWidth/2, 400
-		invinterface.xScale,invinterface.yScale=1.2280701755,1.2280701755
+		invinterface=display.newImageRect("container.png", 570, 507)
+		invinterface.x,invinterface.y = display.contentWidth/2, 440
+		invinterface.xScale,invinterface.yScale=1.2280701755,1.308003737
 		ginv:insert( invinterface )
 		isOpn=true
 		
@@ -366,6 +367,7 @@ end
 
 function ToggleExit()
 	if isOpn==false then
+		m.FindMe(9)
 		isOpn=true
 		gexui=display.newGroup()
 		
@@ -419,6 +421,7 @@ function ToggleExit()
 		gexui:toFront()
 		
 	elseif isOpn==true and (gexui) then
+		m.FindMe(6)
 		isOpn=false
 		for i=gexui.numChildren,1,-1 do
 			display.remove(gexui[i])
@@ -454,34 +457,42 @@ function StatChange()
 	for s=1,6 do
 		if p1.pnts>0 and p1.nat[s]<p1.lvl*10 then
 			pli[#pli+1]= widget.newButton{
-				label="+",
-				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=40,
 				defaultFile="sbutton.png",
 				overFile="sbutton-over.png",
-				width=90, height=90,
+				width=80, height=80,
 				onRelease = More
 			}
 			pli[#pli]:setReferencePoint( display.CenterReferencePoint )
 			pli[#pli].x = info[6+s].x+90
 			pli[#pli].y = info[6+s].y-10
 			ginf:insert(pli[#pli])
+			
+			pli[#pli+1]=display.newImageRect("+.png",11,11)
+			pli[#pli].x = pli[#pli-1].x
+			pli[#pli].y = pli[#pli-1].y
+			pli[#pli].xScale = 3.0
+			pli[#pli].yScale = 3.0
+			ginf:insert(pli[#pli])
 		end
 	end
 	for s=1,6 do
 		if p1.nat[s]>1 then
 			mini[#mini+1]= widget.newButton{
-				label="-",
-				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=40,
 				defaultFile="sbutton.png",
 				overFile="sbutton-over.png",
-				width=90, height=90,
+				width=80, height=80,
 				onRelease = Less
 			}
 			mini[#mini]:setReferencePoint( display.CenterReferencePoint )
 			mini[#mini].x = info[6+s].x-90
 			mini[#mini].y = info[6+s].y-10
+			ginf:insert(mini[#mini])
+			
+			mini[#mini+1]=display.newImageRect("-.png",11,11)
+			mini[#mini].x = mini[#mini-1].x
+			mini[#mini].y = mini[#mini-1].y
+			mini[#mini].xScale = 3.0
+			mini[#mini].yScale = 3.0
 			ginf:insert(mini[#mini])
 		end
 	end
@@ -489,7 +500,7 @@ function StatChange()
 	swapInfoBtn= widget.newButton{
 		defaultFile="sbutton.png",
 		overFile="sbutton-over.png",
-		width=90, height=90,
+		width=80, height=80,
 		onRelease = SwapInfo}
 	swapInfoBtn:setReferencePoint( display.CenterReferencePoint )
 	swapInfoBtn.x = display.contentWidth-60
@@ -713,7 +724,7 @@ function StatInfo()
 	swapInfoBtn= widget.newButton{
 		defaultFile="sbutton.png",
 		overFile="sbutton-over.png",
-		width=90, height=90,
+		width=80, height=80,
 		onRelease = SwapInfo}
 	swapInfoBtn:setReferencePoint( display.CenterReferencePoint )
 	swapInfoBtn.x = display.contentWidth-60
@@ -772,14 +783,7 @@ function SwapInfo()
 end
 
 function DoExit()
-	for i=gexui.numChildren,1,-1 do
-		display.remove(gexui[i])
-		gexui[i]=nil
-	end
-	gexui=nil
-	isOpn=false
-	ui.Pause(true)
-	WD.SrsBsns()
+	native.requestExit()
 end
 
 function MusicScroll( event )
@@ -826,10 +830,10 @@ end
 
 function More( event )
 	local statnum
-	for i=1,6 do
+	for i=1,12 do
 		if (pli[i]) then
 			if event.y+50>pli[i].y and event.y-50<pli[i].y and event.x+50>pli[i].x and event.x-50<pli[i].x then
-				statnum=i
+				statnum=math.ceil(i/2)
 			end
 		end
 	end
@@ -840,10 +844,10 @@ end
 
 function Less( event )
 	local statnum
-	for i=1,6 do
+	for i=1,12 do
 		if (mini[i]) then
 			if event.y+50>mini[i].y and event.y-50<mini[i].y and event.x+50>mini[i].x and event.x-50<mini[i].x then
-				statnum=i
+				statnum=math.ceil(i/2)
 			end
 		end
 	end
@@ -856,7 +860,7 @@ function DeathMenu(cause)
 	if isOpn==false then
 		gdm=display.newGroup()
 		isOpn=true
-		
+		m.FindMe(9)
 		DMenu=display.newImageRect("deathmenu.png", 700, 500)
 		DMenu.x,DMenu.y = display.contentCenterX, 450
 		Dthtxt=display.newGroup()
@@ -1008,7 +1012,6 @@ function AddItem(id,stacks,amount)
 end
 
 function UseMenu(id,slot)
-
 	if isUse==false then
 	
 		function UsedIt()

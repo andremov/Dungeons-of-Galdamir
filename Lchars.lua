@@ -7,6 +7,7 @@ module(..., package.seeall)
 local widget = require "widget"
 local o=require("Loptions")
 local a=require("Laudio")
+local m = require("Lmenu")
 local charname
 local charclass
 local charmenu
@@ -19,7 +20,7 @@ local info2
 local classmenu
 local currentchar
 local curmenu
-local Classes={"Viking","Warrior","Knight","Sorceror","Thief","Scholar"}
+local Classes={"Viking","Warrior","Knight","Sorcerer","Thief","Scholar"}
 local Stats={"STA","ATT","DEF","MGC","DEX","INT"}
 local Chars={"Luneth","Arc","Refia","Ingus"}
 
@@ -45,6 +46,7 @@ function ClassChoose( event )
 end
 
 function CharMenu()
+	m.FindMe(4)
 	if (charname) then
 		ClassMenu()
 	end
