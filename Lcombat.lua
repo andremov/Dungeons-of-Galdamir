@@ -55,7 +55,7 @@ local pseqs={
 		{name="walk3",  start=13, count=4, time=1000},
 		{name="walk4",  start=17, count=4, time=1000},
 		{name="stance",   start=21, count=2, time=1000},
-		{name="hit",   start=21, count=3, time=1000},
+		{name="hit",   start=23, count=1, time=1000},
 		{name="hurt",   start=24, count=1, time=1000},
 	}
 
@@ -718,11 +718,11 @@ end
 function P1Sprite(value)
 	if inCombat==true then
 		if (value)==(1) then--Create
-			psprite=display.newSprite( p1sprite[1], pseqs  )
+			psprite=display.newSprite( psheet, pseqs  )
 			psprite:setSequence( "stance" )
 			psprite.x=(display.contentWidth/2)-50
 			psprite.y=170
-			psprite.xScale=4.0
+			psprite.xScale=3.0
 			psprite.yScale=psprite.xScale
 			psprite:play()
 			gcm:insert(psprite)

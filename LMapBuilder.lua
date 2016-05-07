@@ -86,7 +86,7 @@ local mapsize
 local TSet
 
 function Essentials()
-	scale=1.2
+	scale=1.0
 	espacio=80*scale
 	xinicial=display.contentCenterX-(espacio)
 	yinicial=display.contentCenterY-(espacio)

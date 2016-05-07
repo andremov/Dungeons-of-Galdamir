@@ -95,7 +95,6 @@ function PlayMusic()
 	if Loaded==true then
 		local check=audio.isChannelPlaying(mChannel)
 		if check==false then
-			print (curMusic)
 			if curMusic==1 then
 				audio.setVolume( 0.5*Music, { channel=mChannel  })
 			elseif curMusic==2 then

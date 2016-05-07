@@ -25,7 +25,7 @@ local StrongForce
 local yCoord=856
 local check=119
 local xCoord=70
-local scale=3.2
+local scale=2.6
 local transp2
 local transp3
 local player

@@ -23,7 +23,7 @@ local inter
 local cwin
 local mtext
 local mwindow
-local scale=1.2
+local scale=1.0
 local espacio=80*scale
 local yinicial=display.contentHeight/2
 local xinicial=display.contentWidth/2
