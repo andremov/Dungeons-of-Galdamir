@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local widget = require "widget"
+local a = require("Laudio")
 local t=require("Ltutorial")
 local su=require("Lstartup")
 local sav=require("Lsaving")
@@ -203,6 +204,7 @@ function Refresh()
 end
 
 function onBackRelease()
+	a.Play(12)
 	for i=pmg.numChildren,1,-1 do
 		local child = pmg[i]
 		child.parent:remove( child )
@@ -213,6 +215,10 @@ function onBackRelease()
 end
 
 function goSlot1()
+<<<<<<< HEAD
+=======
+	a.Play(12)
+>>>>>>> G1.2.0
 	m.FindMe(6)
 	local saved=sav.CheckSave(1)
 	if saved~=false then
@@ -235,6 +241,10 @@ function goSlot1()
 end
 
 function goSlot2()
+<<<<<<< HEAD
+=======
+	a.Play(12)
+>>>>>>> G1.2.0
 	m.FindMe(6)
 	local saved=sav.CheckSave(2)
 	if saved~=false then
@@ -257,6 +267,10 @@ function goSlot2()
 end
 
 function goSlot3()
+<<<<<<< HEAD
+=======
+	a.Play(12)
+>>>>>>> G1.2.0
 	m.FindMe(6)
 	local saved=sav.CheckSave(3)
 	if saved~=false then
@@ -279,21 +293,25 @@ function goSlot3()
 end
 
 function cleanSlot1()
+	a.Play(12)
 	sav.WipeSave(1)
 	Refresh()
 end
 
 function cleanSlot2()
+	a.Play(12)
 	sav.WipeSave(2)
 	Refresh()
 end
 
 function cleanSlot3()
+	a.Play(12)
 	sav.WipeSave(3)
 	Refresh()
 end
 
 function onTutBtnRelease()
+	a.Play(12)
 	for i=pmg.numChildren,1,-1 do
 		local child = pmg[i]
 		child.parent:remove( child )
@@ -504,6 +522,7 @@ function Keyboard()
 end
 
 function Back2Menu()
+	a.Play(12)
 	DelKeyboard()
 	Display()
 	namedis=nil
@@ -524,6 +543,7 @@ function UpdateName()
 end
 
 function LetterChange(let)
+	a.Play(12)
 	if let==true then
 		curname=string.sub(curname,1,#curname-1)
 	else
@@ -547,6 +567,7 @@ function DelKeyboard()
 end
 
 function End()
+	a.Play(12)
 	DelKeyboard()
 	su.Startup(curname)
 	namedis=nil

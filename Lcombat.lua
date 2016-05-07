@@ -6,28 +6,18 @@
 module(..., package.seeall)
 local energysheet = graphics.newImageSheet( "energysprite.png", { width=60, height=60, numFrames=4 })
 local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height=25, numFrames=16 })
-local dexatt2 = graphics.newImageSheet( "enemy/dexatt2.png",{ width=32, height=33, numFrames=24 })
-local dexatt3 = graphics.newImageSheet( "enemy/dexatt3.png",{ width=32, height=33, numFrames=24 })
-local stadef2 = graphics.newImageSheet( "enemy/stadef2.png",{ width=55, height=32, numFrames=8 })
-local stadef3 = graphics.newImageSheet( "enemy/stadef3.png",{ width=55, height=32, numFrames=8 })
+local stadef = graphics.newImageSheet( "enemy/stadef.png",{ width=140, height=110, numFrames=15 })
 local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 })
-local statussheet = graphics.newImageSheet( "status.png", { width=88, height=40, numFrames=7 } )
-local player1 = graphics.newImageSheet( "player/0.png", { width=39, height=46, numFrames=25 } )
-local player2 = graphics.newImageSheet( "player/1.png", { width=24, height=33, numFrames=25 } )
-local player3 = graphics.newImageSheet( "player/2.png", { width=30, height=49, numFrames=25 } )
-local player4 = graphics.newImageSheet( "player/3.png", { width=33, height=53, numFrames=35 } )
-local player5 = graphics.newImageSheet( "player/4.png", { width=32, height=32, numFrames=80 } )
-local timersheet = graphics.newImageSheet( "timer.png",{ width=100, height=100, numFrames=25 })
-local mgc2 = graphics.newImageSheet( "enemy/mage2.png",{ width=30, height=40, numFrames=10 })
-local mgc3 = graphics.newImageSheet( "enemy/mage3.png",{ width=30, height=40, numFrames=10 })
+local dexatt = graphics.newImageSheet( "enemy/dexatt.png",{ width=64, height=64, numFrames=12 })
+local mgcint = graphics.newImageSheet( "enemy/mgcint.png",{ width=90, height=80, numFrames=12 })
+local statussheet = graphics.newImageSheet( "status.png", { width=80, height=80, numFrames=8 })
+local timersheet = graphics.newImageSheet( "timer.png",{ width=100, height=100, numFrames=25})
+local psheet = graphics.newImageSheet( "player.png", { width=24, height=32, numFrames=24 } )
 local hpsheet = graphics.newImageSheet("hp.png",{ width=200, height=30, numFrames=67 })
 local mpsheet = graphics.newImageSheet("mp.png",{ width=200, height=30, numFrames=67 })
 local epsheet = graphics.newImageSheet("ep.png",{ width=200, height=30, numFrames=67 })
-local p1sprite={player1,player2,player3,player4,player5}
+local p1sprite={player1,player2,player3,player4}
 local xCoord=display.contentWidth-250
-local dexatt={dexatt3,dexatt2}
-local stadef={stadef3,stadef2}
-local mgc={mgc3,mgc2}
 local yCoord=510
 local builder=require("Lmapbuilder")
 local players=require("Lplayers")
@@ -43,17 +33,14 @@ local q=require("Lquest")
 local gp=require("Lgold")
 local m=require("Lmenu")
 local ui=require("Lui")
-local SBookDisplayed
-local statusdisplay
 local timersprite
 local Automatic
+<<<<<<< HEAD
 local Spellbook
 local SorceryUI
+=======
+>>>>>>> G1.2.0
 local inCombat
-local outcomed
-local SorcIniX
-local SorcIniY
-local Sorcery
 local ptimer
 local etimer
 local CMenu
@@ -63,6 +50,22 @@ local modif
 local hits
 local gcm
 local gom
+<<<<<<< HEAD
+=======
+local pseqs={
+		{name="stand1", start=1,  count=1, time=1000},
+		{name="stand2", start=2,  count=1, time=1000},
+		{name="stand3", start=3,  count=1, time=1000},
+		{name="stand4", start=4,  count=1, time=1000},
+		{name="walk1",  start=5,  count=4, time=1000},
+		{name="walk2",  start=9,  count=4, time=1000},
+		{name="walk3",  start=13, count=4, time=1000},
+		{name="walk4",  start=17, count=4, time=1000},
+		{name="stance",   start=21, count=2, time=1000},
+		{name="hit",   start=23, count=1, time=1000},
+		{name="hurt",   start=24, count=1, time=1000},
+	}
+>>>>>>> G1.2.0
 
 function InTrouble()
 	if inCombat==true or outcomed==true then
@@ -73,17 +76,22 @@ function InTrouble()
 end
 
 function Essentials()
-	SorcIniX=display.contentCenterX-(190+20)
-	SorcIniY=display.contentHeight-120
-	SBookDisplayed=false
 	inCombat=false
 	outcomed=false
+<<<<<<< HEAD
 	yinvicial=180
 	xinvicial=75
 	Automatic=0
 	espaciox=64
 	espacioy=64
 	Sorcery={}
+=======
+	yinvicial=display.contentHeight-180
+	xinvicial=display.contentCenterX-((48*3)+4+2)
+	Automatic=0
+	espacio=64
+	book=false
+>>>>>>> G1.2.0
 	inv=false
 end
 
@@ -121,6 +129,7 @@ function DisplayCombat()
 	Runtime:addEventListener("enterFrame", ManageHits)
 	mov.CleanArrows()
 	players.CalmDownCowboy(false)
+	audio.changeMusic(3)
 	gcm=display.newGroup()
 	hits={}
 	m.FindMe(7)
@@ -258,6 +267,10 @@ end
 
 function HideActions()
 	
+	if Automatic==true then
+		Automatic=0
+	end
+	
 	if (AttackBtn) then
 		display.remove(AttackBtn)
 	end
@@ -278,8 +291,13 @@ function HideActions()
 		display.remove(AutoRecoverBtn)
 	end
 	
+<<<<<<< HEAD
 	if (GuardBtn) then
 		display.remove(GuardBtn)
+=======
+	if (SpellBtn) then
+		display.remove(SpellBtn)
+>>>>>>> G1.2.0
 	end
 	
 	if (BackBtn) then
@@ -290,6 +308,21 @@ function HideActions()
 		display.remove(AutoRunBtn)
 	end
 	
+<<<<<<< HEAD
+=======
+	if (AutoTxt) then
+		display.remove(AutoTxt)
+	end
+	
+	if (AutoTxt2) then
+		display.remove(AutoTxt2)
+	end
+	
+	if (AutoWin) then
+		display.remove(AutoWin)
+	end
+	
+>>>>>>> G1.2.0
 	AttackBtn=display.newImageRect("combataction3.png",342,86)
 	AttackBtn.x=timersprite.x-172
 	AttackBtn.y=timersprite.y-44
@@ -305,10 +338,10 @@ function HideActions()
 	ItemBtn.y = timersprite.y+44
 	gcm:insert( ItemBtn )
 	
-	GuardBtn=display.newImageRect("combataction3.png",342,86)
-	GuardBtn.x = AttackBtn.x
-	GuardBtn.y = ItemBtn.y
-	gcm:insert( GuardBtn )
+	SpellBtn=display.newImageRect("combataction3.png",342,86)
+	SpellBtn.x = AttackBtn.x
+	SpellBtn.y = ItemBtn.y
+	gcm:insert( SpellBtn )
 	
 	RecoverBtn=display.newImageRect("combataction3.png",342,86)
 	RecoverBtn.x = AttackBtn.x
@@ -320,6 +353,32 @@ function HideActions()
 	BackBtn.y = RecoverBtn.y
 	gcm:insert( BackBtn )
 	
+	AutoWin=display.newRect(0,0,400,60)
+	AutoWin:setFillColor(0,0,0,0)
+	AutoWin.x=display.contentCenterX
+	AutoWin.y=RecoverBtn.y+88
+	gcm:insert( AutoWin )
+	AutoWin:addEventListener("tap",AutoToggle)
+	
+	AutoTxt=display.newText("Automatic Actions:",0,0,"MoolBoran",55)
+	AutoTxt.x=display.contentCenterX-40
+	AutoTxt.y=AutoWin.y+10
+	gcm:insert( AutoTxt )
+	
+	if Automatic~=0 then
+		AutoTxt2=display.newText("On",0,0,"MoolBoran",55)
+		AutoTxt2:setTextColor(70,255,70)
+		AutoTxt2.x=AutoTxt.x+190
+		AutoTxt2.y=AutoTxt.y
+		gcm:insert( AutoTxt2 )
+	else
+		AutoTxt2=display.newText("Off",0,0,"MoolBoran",55)
+		AutoTxt2:setTextColor(255,70,70)
+		AutoTxt2.x=AutoTxt.x+190
+		AutoTxt2.y=AutoTxt.y
+		gcm:insert( AutoTxt2 )
+	end
+	
 	timersprite:toFront()
 end
 
@@ -327,7 +386,11 @@ function ShowActions()
 	ptimer=nil
 	local ep=timer.pause(etimer)
 	
+<<<<<<< HEAD
 	if Automatic==0 then
+=======
+	if Automatic==0 or Automatic==true then
+>>>>>>> G1.2.0
 	
 		if isDefend==true then
 			P1Sprite()
@@ -356,9 +419,9 @@ function ShowActions()
 			ItemBtn=nil
 		end
 		
-		if (GuardBtn) then
-			display.remove(GuardBtn)
-			GuardBtn=nil
+		if (SpellBtn) then
+			display.remove(SpellBtn)
+			SpellBtn=nil
 		end
 		
 		if (RecoverBtn) then
@@ -376,39 +439,63 @@ function ShowActions()
 			BackBtn=nil
 		end
 		
+<<<<<<< HEAD
 		if (AutoRunBtn) then
 			display.remove(AutoRunBtn)
 			AutoRunBtn=nil
+=======
+		if (AutoTxt) then
+			display.remove(AutoTxt)
+			AutoTxt=nil
+		end
+		
+		if (AutoTxt2) then
+			display.remove(AutoTxt2)
+			AutoTxt2=nil
+		end
+		
+		if (AutoWin) then
+			display.remove(AutoWin)
+			AutoWin=nil
+		end
+	
+		function AttackMe()
+			SetAuto(1)
+			HideActions()
+			PlayerAttacks(0)
+>>>>>>> G1.2.0
 		end
 		
 		if not(AttackBtn)then
 			AttackBtn= widget.newButton{
-				label="Attack",
+				label="Melee Attack",
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				fontSize=35,
 				defaultFile="combataction.png",
 				overFile="combataction2.png",
 				width=342, height=86,
-				onRelease = AttackType}
+				onRelease = AttackMe}
 			AttackBtn:setReferencePoint( display.CenterReferencePoint )
 			AttackBtn.x = timersprite.x-172
 			AttackBtn.y = timersprite.y-44
 			gcm:insert( AttackBtn )
 		end
 		
-		function toSorcery()		
-			ShowSorcery()
+		function AttackMa()
+			SetAuto(2)
+			HideActions()
+			PlayerAttacks(1)
 		end
-		
+	
 		if not(MagicBtn)then
 			MagicBtn= widget.newButton{
-				label="Spellbook",
+				label="Magic Attack",
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				fontSize=35,
 				defaultFile="combataction.png",
 				overFile="combataction2.png",
 				width=342, height=86,
-				onRelease = toSorcery}
+				onRelease = AttackMa}
 			MagicBtn:setReferencePoint( display.CenterReferencePoint )
 			MagicBtn.x = timersprite.x+172
 			MagicBtn.y = AttackBtn.y
@@ -436,30 +523,30 @@ function ShowActions()
 			gcm:insert( ItemBtn )
 		end
 		
-		function toDefend()
+		function toSorcery()	
 			HideActions()
 			
-			Guard()
+			ShowSorcery()
 		end
 		
-		if not(GuardBtn)then
-			GuardBtn= widget.newButton{
-				label="Guard",
+		if not(SpellBtn)then
+			SpellBtn= widget.newButton{
+				label="Spellbook",
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				fontSize=35,
 				defaultFile="combataction.png",
 				overFile="combataction2.png",
 				width=342, height=86,
-				onRelease = toDefend}
-			GuardBtn:setReferencePoint( display.CenterReferencePoint )
-			GuardBtn.x = AttackBtn.x
-			GuardBtn.y = ItemBtn.y
-			gcm:insert( GuardBtn )
+				onRelease = toSorcery}
+			SpellBtn:setReferencePoint( display.CenterReferencePoint )
+			SpellBtn.x = AttackBtn.x
+			SpellBtn.y = ItemBtn.y
+			gcm:insert( SpellBtn )
 		end
 		
 		function toRecover()
+			SetAuto(3)
 			HideActions()
-			
 			Recover()
 		end
 		
@@ -502,8 +589,8 @@ function ShowActions()
 		end
 		
 		function toRun()
+			SetAuto(4)
 			HideActions()
-			
 			RunAttempt()
 		end
 		
@@ -522,6 +609,7 @@ function ShowActions()
 			gcm:insert( BackBtn )
 		end
 		
+<<<<<<< HEAD
 		function toAutoRun()
 			HideActions()
 			TurnOnAuto(4)
@@ -543,6 +631,37 @@ function ShowActions()
 			AutoRunBtn.xScale = 0.75
 			AutoRunBtn.yScale = 0.75
 			gcm:insert( AutoRunBtn )
+=======
+		if not(AutoWin)then
+			AutoWin=display.newRect(0,0,400,60)
+			AutoWin:setFillColor(0,0,0,0)
+			AutoWin.x=display.contentCenterX
+			AutoWin.y=RecoverBtn.y+88
+			gcm:insert( AutoWin )
+			AutoWin:addEventListener("tap",AutoToggle)
+		end
+		
+		if not(AutoTxt)then
+			AutoTxt=display.newText("Automatic Actions:",0,0,"MoolBoran",55)
+			AutoTxt.x=display.contentCenterX-40
+			AutoTxt.y=AutoWin.y+10
+			gcm:insert( AutoTxt )
+		end
+		if not(AutoTxt2)then
+			if Automatic~=0 then
+				AutoTxt2=display.newText("On",0,0,"MoolBoran",55)
+				AutoTxt2:setTextColor(70,255,70)
+				AutoTxt2.x=AutoTxt.x+190
+				AutoTxt2.y=AutoTxt.y
+				gcm:insert( AutoTxt2 )
+			else
+				AutoTxt2=display.newText("Off",0,0,"MoolBoran",55)
+				AutoTxt2:setTextColor(255,70,70)
+				AutoTxt2.x=AutoTxt.x+190
+				AutoTxt2.y=AutoTxt.y
+				gcm:insert( AutoTxt2 )
+			end
+>>>>>>> G1.2.0
 		end
 	elseif Automatic==1 or Automatic==2 then
 		PlayerAttacks(Automatic-1)
@@ -615,90 +734,64 @@ end
 function MobSprite(value)
 	if inCombat==true then
 		if (value)==(1) then--Create
-			enemy.num=math.random(1,2)
 			if (enemy.class==1) or (enemy.class==3) then
-				--Sta/Def
+				--STA/DEF
 				eseqs={
-					{name="walk", start=1, count=4, time=1000},
-					{name="hit", start=5, count=3, loopCount=1, time=1000},
-					{name="hurt", start=8, count=1, time=1000}
+					{name="walk", start=1, count=3, time=1000},
+					{name="hit", start=6, count=10, loopCount=1, time=1000},
+					{name="hurt", start=5, count=1, time=1000}
 				}
-				esprite=display.newSprite( stadef[enemy.num], eseqs  )
+				esprite=display.newSprite( stadef, eseqs  )
 				esprite:setSequence( "walk" )
 				esprite.x=(display.contentWidth/2)+50
 				esprite.y=170
-				esprite.xScale=4.0
+				esprite.xScale=2.0
 				esprite.yScale=esprite.xScale
 				esprite:play()
 				gcm:insert(esprite)
 			elseif (enemy.class==2) or (enemy.class==5)then
-				--Att/Dex
+				--ATT/DEX
 				eseqs={
 					{name="walk", start=1, count=4, time=1000},
-					{name="hit", start=9, count=4, loopCount=1, time=1000},
-					{name="hurt", start=8, count=1, time=1000},
-					{name="hitalt", start=17, count=3, loopCount=1, time=1000}
+					{name="hit", start=7, count=6, loopCount=1, time=1000},
+					{name="hurt", start=6, count=1, time=1000},
 				}
-				esprite=display.newSprite( dexatt[enemy.num], eseqs  )
+				esprite=display.newSprite( dexatt, eseqs  )
 				esprite:setSequence( "walk" )
 				esprite.x=(display.contentWidth/2)+50
 				esprite.y=170
-				esprite.xScale=3.5
+				esprite.xScale=2.5
 				esprite.yScale=esprite.xScale
 				esprite:play()
 				gcm:insert(esprite)
 			elseif (enemy.class)==(4) or (enemy.class)==(6) then
+<<<<<<< HEAD
 				--MGC
+=======
+				--MGC/INT
+>>>>>>> G1.2.0
 				eseqs={
 					{name="walk", start=1, count=4, time=1000},
-					{name="hit", start=6, count=3, loopCount=1, time=1000},
-					{name="hurt", start=5, count=1, time=1000}
+					{name="hit", start=7, count=6, loopCount=1, time=1000},
+					{name="hurt", start=6, count=1, time=1000}
 				}
-				esprite=display.newSprite( mgc[enemy.num], eseqs  )
+				esprite=display.newSprite( mgcint, eseqs  )
 				esprite:setSequence( "walk" )
 				esprite.x=(display.contentWidth/2)+50
 				esprite.y=170
-				esprite.xScale=4.0
+				esprite.xScale=2.0
 				esprite.yScale=esprite.xScale
 				esprite:play()
 				gcm:insert(esprite)
 			end
 		end
 		if (value)==(2) then--Change to Hit
-			if (enemy.class==1) or (enemy.class==3) then
-				--Sta/Def
-				esprite:setSequence( "hit" )
-				esprite:play()
-			elseif (enemy.class==2) or (enemy.class==5)then
-				--Att/Dex
-				local roll=math.random(1,2)
-				if roll==1 then
-					esprite:setSequence( "hit" )
-					esprite:play()
-				elseif roll==2 then
-					esprite:setSequence( "hitalt" )
-					esprite:play()
-				end
-			elseif (enemy.class)==(4) then
-				--MGC
-				esprite:setSequence( "hit" )
-				esprite:play()
-			end
+			esprite:setSequence( "hit" )
+			esprite:play()
 		end
 		if (value)==(3) then--Change to Hurt
-			if (enemy.class==1) or (enemy.class==3) then
-				--Sta/Def
-				esprite:setSequence( "hurt" )
-				esprite:play()
-			elseif (enemy.class==2) or (enemy.class==5)then
-				--Att/Dex
-				esprite:setSequence( "hurt" )
-				esprite:play()
-			elseif (enemy.class)==(4) then
-				--MGC
-				esprite:setSequence( "hurt" )
-				esprite:play()
-			end
+			esprite:setSequence( "hurt" )
+			esprite:play()
 		end
 		if (value~=1)and(value~=2)and(value~=3)and(value~=4)then--Go Default
 			if (esprite)and(esprite.sequence~="walk")then
@@ -716,102 +809,17 @@ end
 function P1Sprite(value)
 	if inCombat==true then
 		if (value)==(1) then--Create
-			if p1.name=="Magus" then
-				pseqs={
-					{name="walk", start=1, count=3, time=1000},
-					{name="hit1", start=17, count=8, loopCount=1, time=1000},
-					{name="hit2", start=33, count=8, loopCount=1, time=1000},
-					{name="hit3", start=49, count=16, loopCount=1, time=1000},
-					{name="cast", start=65, count=7, time=1000},
-					{name="hurt", start=4, count=1, time=1000}
-				}
-				psprite=display.newSprite( p1sprite[5], pseqs  )
-				psprite:setSequence( "walk" )
-				psprite.x=(display.contentWidth/2)-50
-				psprite.y=170
-				psprite.xScale=3.0
-				psprite.yScale=psprite.xScale
-				psprite:play()
-				gcm:insert(psprite)
-			elseif (p1.char==0) then
-				pseqs={
-					{name="walk", start=1, count=4, time=1000},
-					{name="hit1", start=6, count=3, loopCount=1, time=1000},
-					{name="hit2", start=11, count=4, loopCount=1, time=1000},
-					{name="hit3", start=16, count=5, loopCount=1, time=1000},
-					{name="cast", start=21, count=2, time=1000},
-					{name="hurt", start=5, count=1, time=1000}
-				}
-				psprite=display.newSprite( p1sprite[1], pseqs  )
-				psprite:setSequence( "walk" )
-				psprite.x=(display.contentWidth/2)-50
-				psprite.y=170
-				psprite.xScale=4.0
-				psprite.yScale=psprite.xScale
-				psprite:play()
-				gcm:insert(psprite)
-			elseif (p1.char==1) then
-				pseqs={
-					{name="walk", start=1, count=2, time=1000},
-					{name="hit1", start=6, count=3, loopCount=1, time=1000},
-					{name="hit2", start=11, count=3, loopCount=1, time=1000},
-					{name="hit3", start=16, count=5, loopCount=1, time=1000},
-					{name="cast", start=21, count=2, time=1000},
-					{name="hurt", start=3, count=1, time=1000}
-				}
-				psprite=display.newSprite( p1sprite[2], pseqs  )
-				psprite:setSequence( "walk" )
-				psprite.x=(display.contentWidth/2)-50
-				psprite.y=170
-				psprite.xScale=4.0
-				psprite.yScale=psprite.xScale
-				psprite:play()
-				gcm:insert(psprite)
-			elseif (p1.char)==(2) then
-				pseqs={
-					{name="walk", start=1, count=4, time=1000},
-					{name="hit1", start=6, count=2, loopCount=1, time=1000},
-					{name="hit2", start=11, count=3, loopCount=1, time=1000},
-					{name="hit3", start=16, count=2, loopCount=1, time=1000},
-					{name="cast", start=21, count=2, time=1000},
-					{name="hurt", start=5, count=1, time=1000}
-				}
-				psprite=display.newSprite( p1sprite[3], pseqs  )
-				psprite:setSequence( "walk" )
-				psprite.x=(display.contentWidth/2)-50
-				psprite.y=170
-				psprite.xScale=4.0
-				psprite.yScale=psprite.xScale
-				psprite:play()
-				gcm:insert(psprite)
-			elseif (p1.char)==(3) then
-				pseqs={
-					{name="walk", start=1, count=2, time=600},
-					{name="cast", start=8, count=2, time=600},
-					{name="hit1", start=15, count=3, loopCount=1, time=400},
-					{name="hit2", start=22, count=4, loopCount=1, time=600},
-					{name="hit3", start=29, count=7, loopCount=1, time=1000},
-					{name="hurt", start=3, count=1, time=800}
-				}
-				psprite=display.newSprite( p1sprite[4], pseqs  )
-				psprite:setSequence( "walk" )
-				psprite.x=(display.contentWidth/2)-50
-				psprite.y=170
-				psprite.xScale=4.0
-				psprite.yScale=psprite.xScale
-				psprite:play()
-				gcm:insert(psprite)
-			end
+			psprite=display.newSprite( psheet, pseqs  )
+			psprite:setSequence( "stance" )
+			psprite.x=(display.contentWidth/2)-50
+			psprite.y=170
+			psprite.xScale=3.0
+			psprite.yScale=psprite.xScale
+			psprite:play()
+			gcm:insert(psprite)
 		end
 		if (value)==(2) then--Change to Hit
-			local hat=math.random(1,3)
-			if hat==1 then
-				psprite:setSequence( "hit1" )
-			elseif hat==2 then
-				psprite:setSequence( "hit2" )
-			else
-				psprite:setSequence( "hit3" )
-			end
+			psprite:setSequence( "hit" )
 			psprite:play()
 		end
 		if (value)==(3) then--Change to Hurt
@@ -819,13 +827,14 @@ function P1Sprite(value)
 			psprite:play()
 		end
 		if (value)==(4) then--Set to Casting
-			psprite:setSequence( "cast" )
+			audio.Play(11)
+			psprite:setSequence( "hit" )
 			psprite:play()
 		end
 		if (value~=1)and(value~=2)and(value~=3)and(value~=4) then--Go Default
-			if (psprite)and(psprite.sequence~="walk")then
+			if (psprite)and(psprite.sequence~="stance")then
 				if (psprite.frame==psprite.numFrames)or(psprite.sequence=="cast")then
-					psprite:setSequence( "walk" )
+					psprite:setSequence( "stance" )
 					psprite:play()
 				else
 					timer.performWithDelay(20,P1Sprite)
@@ -835,6 +844,7 @@ function P1Sprite(value)
 	end
 end
 
+<<<<<<< HEAD
 function AttackType()
 	ShowSorcery(true)
 	
@@ -1028,6 +1038,24 @@ function Guard()
 	p1.stats[3]=p1.stats[3]*1.5
 	isDefend=true
 	UpdateStats()
+=======
+function AutoToggle()
+	if Automatic~=0 then
+		AutoTxt2.text=("Off")
+		AutoTxt2:setTextColor(255,70,70)
+		Automatic=0
+	else
+		AutoTxt2.text=("On")
+		AutoTxt2:setTextColor(70,255,70)
+		Automatic=true
+	end
+end
+
+function SetAuto(auto)
+	if Automatic==true then
+		Automatic=auto
+	end
+>>>>>>> G1.2.0
 end
 
 function Recover()
@@ -1047,12 +1075,20 @@ function Recover()
 	if p1.MP>p1.MaxMP then
 		p1.MP=p1.MaxMP
 	end
+<<<<<<< HEAD
 	ShowSorcery(true)
+=======
+	
+>>>>>>> G1.2.0
 	P1Sprite(3)
 	p1.stats[3]=p1.stats[3]*0.75
 	isRecover=true
 	if Automatic==3 and p1.MP==p1.MaxMP and p1.EP==p1.MaxEP  then
+<<<<<<< HEAD
 		TurnOffAuto()
+=======
+		AutoToggle()
+>>>>>>> G1.2.0
 	end
 	UpdateStats()
 end
@@ -1065,6 +1101,10 @@ function MobsTurn()
 	
 	local isHit=EvadeCalc("p1",16)
 	if isHit>=(p1.stats[5]/6)*2 then
+<<<<<<< HEAD
+=======
+		audio.Play(13)
+>>>>>>> G1.2.0
 		local Damage
 		if isHit>=(p1.stats[5]/3)*5 then
 			if enemy.stats[2]>enemy.stats[4]then
@@ -1094,6 +1134,10 @@ function MobsTurn()
 			end
 		end
 	else
+<<<<<<< HEAD
+=======
+		audio.Play(10)
+>>>>>>> G1.2.0
 		hpHits("MSS!",false,false)
 	end
 	MobStatuses()
@@ -1457,7 +1501,7 @@ function UpdateStats(Secret)
 end
 
 function RunAttempt()
-	ShowSorcery(true)
+	
 	local RunChance=EvadeCalc("mob",48)
 	local MaxChance=MaxCalc()
 	if RunChance>0 then
@@ -1512,6 +1556,7 @@ function PlayerAttacks(atktype)
 		end
 	end
 	local isHit=EvadeCalc("mob",16)
+		audio.Play(13)
 		if isHit>0 then
 			if isHit>1 then
 			local Damage=DamageCalc("mob",(math.random(15,20)/10),force,atkstat)
@@ -1533,6 +1578,10 @@ function PlayerAttacks(atktype)
 			end
 		end
 	else
+<<<<<<< HEAD
+=======
+		audio.Play(10)
+>>>>>>> G1.2.0
 		mobHits("MSS!",false,false)
 	end
 	UpdateStats()
@@ -1578,10 +1627,14 @@ function EndTurn()
 		end
 		
 		if Automatic==3 and p1.MP==p1.MaxMP and p1.EP==p1.MaxEP  then
+<<<<<<< HEAD
 			TurnOffAuto()
+=======
+			AutoToggle()
+>>>>>>> G1.2.0
 		end
 		MobSprite()
-		if isDefend~=true and isRecover~=true then
+		if isRecover~=true then
 			P1Sprite()
 		end
 	elseif p1.HP<=0 then
@@ -1598,6 +1651,10 @@ function EndTurn()
 end
 
 function EndCombat(outcome)
+<<<<<<< HEAD
+=======
+	audio.changeMusic(2)
+>>>>>>> G1.2.0
 	Runtime:removeEventListener("enterFrame", ManageHits)
 	inCombat=false
 	for i=gcm.numChildren,1,-1 do
@@ -1620,6 +1677,10 @@ function EndCombat(outcome)
 		Runtime:addEventListener("enterFrame", players.ShowStats)
 		--------------------------------------------
 		if outcome=="Loss" then
+			for i=gom.numChildren,1,-1 do
+				local child = gom[i]
+				child.parent:remove( child )
+			end
 		--------------------------------------------
 		elseif (outcome)=="Win" then
 			q.UpdateQuest("mob",enemy.lvl)
@@ -1769,6 +1830,7 @@ function ManageHits()
 end
 
 function mobHits(amount,crit,special)
+<<<<<<< HEAD
 	P1=players.GetPlayer()
 	local size=55
 	if crit==true then
@@ -1830,12 +1892,78 @@ function mobHits(amount,crit,special)
 end
 
 function hpHits(amount,crit,special)
+=======
+>>>>>>> G1.2.0
 	P1=players.GetPlayer()
 	local size=55
 	if crit==true then
 		size=size*1.2
 	end
 	local hpos
+<<<<<<< HEAD
+=======
+	for i=1,5 do
+		if not (hits[i]) then
+			hpos=i
+		end
+	end
+	if not (hpos) then
+		display.remove(hits[1])
+		hits[1]=nil
+		hpos=1
+	end
+	if special==true then
+		-- Heal
+		hits[hpos]=display.newText( ("+"..amount), 0, 0, "MoolBoran", size )
+		hits[hpos]:setTextColor( 0, 100, 0)
+	elseif special=="BRN" then
+		-- BRN over time
+		hits[hpos]=display.newText( ("-"..amount), 0, 0, "MoolBoran", size )
+		hits[hpos]:setTextColor( 100, 0, 0)
+	elseif special=="BLD" then
+		-- BLD over time
+		hits[hpos]=display.newText( ("-"..amount), 0, 0, "MoolBoran", size )
+		hits[hpos]:setTextColor( 100, 0, 0)
+	elseif special=="PSN" then
+		-- PSN over time
+		hits[hpos]=display.newText( ("-"..amount), 0, 0, "MoolBoran", size )
+		hits[hpos]:setTextColor( 100, 0, 100)
+	elseif special=="SPL" then
+		if type(amount)=="string" then
+		-- spell missed
+			hits[hpos]=display.newText( (amount), 0, 0, "MoolBoran", size )
+			hits[hpos]:setTextColor(0,0,100)
+		else
+		-- spell hit
+			hits[hpos]=display.newText( ("-"..amount), 0, 0, "MoolBoran", size )
+			hits[hpos]:setTextColor(0,0,100)
+		end
+	else
+		if type(amount)=="string" then
+		-- hit missed
+			hits[hpos]=display.newText( (amount), 0, 0, "MoolBoran", size )
+			hits[hpos]:setTextColor(100,50,0)
+		else
+		-- hit hit
+			hits[hpos]=display.newText( ("-"..amount), 0, 0, "MoolBoran", size )
+			hits[hpos]:setTextColor( 0, 0, 0)
+		end
+	end
+	physics.addBody(hits[hpos], "kinematic", { friction=0.5,} )
+	hits[hpos].isFixedRotation = true
+	hits[hpos].x=LifeSymbol.x
+	hits[hpos].y=LifeSymbol.y+5
+	hits[hpos]:setLinearVelocity(-45,0)
+end
+
+function hpHits(amount,crit,special)
+	P1=players.GetPlayer()
+	local size=55
+	if crit==true then
+		size=size*1.2
+	end
+	local hpos
+>>>>>>> G1.2.0
 	for i=6,10 do
 		if not (hits[i]) then
 			hpos=i
@@ -1951,56 +2079,57 @@ function GetHits()
 	return hits
 end
 
-function ShowBag(action)
-	if inv==false and action~=true then
+function ShowBag()
+	if inv==false then
 		inv=true
+		
+		if (AutoTxt) then
+			display.remove(AutoTxt)
+		end
+		
+		if (AutoTxt2) then
+			display.remove(AutoTxt2)
+		end
+		
+		if (AutoWin) then
+			display.remove(AutoWin)
+		end
 		
 		ginv=display.newGroup()
 		items={}
 		items2={}
 		for i=1,table.maxn(p1.inv) do
-			if (p1.inv[i])~=nil and p1.inv[i][1]<=14 then
+			if (p1.inv[i])~=nil and p1.inv[i][1]<=17 then
 				local itmnme=item.ReturnInfo(p1.inv[i][1],0)
-				
-				items2[#items2+1]=display.newImageRect("itemframe.png",50,50)
-				items2[#items2].xScale=1.25*1.3
-				items2[#items2].yScale=1.25*1.3
-				items2[#items2].x = xinvicial+ (((#items2-1)%8)*((espaciox*items2[#items2].xScale)+4))
-				items2[#items2].y = display.contentHeight-yinvicial
-				
-				if p1.inv[i][1]==2 then
-					items[#items+1]=display.newSprite( HPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==3 then
-					items[#items+1]=display.newSprite( HPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==7 then
-					items[#items+1]=display.newSprite( MPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==8 then
-					items[#items+1]=display.newSprite( MPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				else
-					items[#items+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
-				end
-				items[#items].xScale=1.25
-				items[#items].yScale=1.25
-				items[#items].x = xinvicial+ (((#items-1)%8)*((espaciox*items[#items].xScale*1.3)+4))
-				items[#items].y = display.contentHeight-yinvicial
 				
 				function Gah()
 					UseItem(p1.inv[i][1],i)
 				end
+				items2[#items2+1]=display.newImageRect("itemframe.png",64,64)
+				items2[#items2].xScale=1.5
+				items2[#items2].yScale=items2[#items2].xScale
+				items2[#items2].x = xinvicial+(((#items2-1)%4)*((espacio*items2[#items2].xScale)+4))
+				items2[#items2].y = yinvicial+(((espacio*items2[#items2].xScale)+4)*(math.floor((#items2-1)/4)))
 				items2[#items2]:addEventListener("tap",Gah)
 				ginv:insert( items2[#items2] )
+				
+				items[#items+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
+				items[#items].xScale=items2[#items2].xScale
+				items[#items].yScale=items[#items].xScale
+				items[#items].x = items2[#items2].x
+				items[#items].y = items2[#items2].y
 				ginv:insert( items[#items] )
+				
+				items2[#items2]:toFront()
 				if p1.inv[i][2]~=1 then
 					if p1.inv[i][2]>9 then
 						items[#items].num=display.newText( (p1.inv[i][2]) ,items[#items].x+5,items[#items].y-5,"Game Over",80)
 						ginv:insert( items[#items].num )
+						items[#items].num:toFront()
 					elseif p1.inv[i][2]<=9 then
 						items[#items].num=display.newText( (p1.inv[i][2]) ,items[#items].x+15,items[#items].y-5,"Game Over",80)
 						ginv:insert( items[#items].num )
+						items[#items].num:toFront()
 					end
 				end
 			end
@@ -2022,7 +2151,7 @@ function ShowBag(action)
 		BackBtn.x = MagicBtn.x
 		BackBtn.y = RecoverBtn.y
 		gcm:insert( BackBtn )
-	elseif inv==true or action==true then
+	elseif inv==true then
 		inv=false
 		display.remove(BackBtn)
 		BackBtn=nil
@@ -2058,6 +2187,7 @@ function UseItem(id,slot)
 		ginv[i]=nil
 	end
 	ginv=nil
+	HideActions()
 	
 	if p1.inv[slot][2]==1 then
 		table.remove( p1.inv, slot )
@@ -2076,7 +2206,11 @@ function UseItem(id,slot)
 		elseif itemstats[4]>0 then
 			p1.HP=p1.HP+(itemstats[4])
 			if p1.HP>p1.MaxHP then
+<<<<<<< HEAD
 				p1.HP=p1.MaxHp
+=======
+				p1.HP=p1.MaxHP
+>>>>>>> G1.2.0
 			end
 			hpHits(itemstats[4],false,true)
 		end
@@ -2096,70 +2230,121 @@ function UseItem(id,slot)
 	UpdateStats()
 end
 
-function ShowSorcery(comm)
-	if comm==true then
-		if SBookDisplayed==true then
-			function deletion()
-				display.remove(SorceryUI)
-			end
-			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y+(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=deletion})
-			for i=table.maxn(Sorcery),1,-1 do
-				display.remove(Sorcery[i])
-				Sorcery[i]=nil
-			end
-			SBookDisplayed=false
+function ShowSorcery()
+	if book==false then
+		book=true
+		
+		if (AutoTxt) then
+			display.remove(AutoTxt)
 		end
-	else
-		if SBookDisplayed==false then
-			function finishSpells()
-				for i=1,table.maxn(Sorcery) do
-					Sorcery[i].isVisible=true
-					Sorcery[i]:toFront()
-				end
-			end
-			for s=1, table.maxn(p1.spells) do
-				if p1.spells[s][3]==true then
-					function toCast()
-						CastSorcery(p1.spells[s][1])
-					end
-					Sorcery[#Sorcery+1]=display.newText( (p1.spells[s][1].."  "..p1.spells[s][4].." MP".."  "..p1.spells[s][5].." EP"), SorcIniX, (SorcIniY-((#Sorcery-1)*50)), "Viner Hand ITC", 40)
-					Sorcery[#Sorcery]:setTextColor(50,50,50)
-					if (p1.spells[s][4])>p1.MP or (p1.spells[s][5])>p1.EP then
-						Sorcery[#Sorcery]:setTextColor(180,60,60)
-					else
-						Sorcery[#Sorcery]:addEventListener("tap",toCast)
-					end						
-					Sorcery[#Sorcery].isVisible=false
-				end
-			end
-			if table.maxn(Sorcery)==0 then
-				Sorcery[#Sorcery+1]=display.newText( ("No known Sorcery."), SorcIniX, (SorcIniY-((#Sorcery-1)*40)), "Viner Hand ITC", 40)
-				Sorcery[#Sorcery]:setTextColor(120,120,120)
-				Sorcery[#Sorcery].isVisible=false
-			end
-			
-			SorceryUI=display.newImageRect("scrollui4.png", 460, 600)
-			SorceryUI.x, SorceryUI.y = display.contentCenterX, display.contentHeight+300
-			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y-(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=finishSpells})
-			SBookDisplayed=true
-		elseif SBookDisplayed==true then
-			function deletion()
-				display.remove(SorceryUI)
-			end
-			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y+(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=deletion})
-			for i=table.maxn(Sorcery),1,-1 do
-				display.remove(Sorcery[i])
-				Sorcery[i]=nil
-			end
-			SBookDisplayed=false
+		
+		if (AutoTxt2) then
+			display.remove(AutoTxt2)
 		end
+		
+		if (AutoWin) then
+			display.remove(AutoWin)
+		end
+		
+		gspl=display.newGroup()
+		spells={}
+		spellframes={}
+		spellsep={}
+		spellsmp={}
+		for i=1,table.maxn(p1.spells) do
+			if (p1.spells[i][3])==true then
+				function Hoo()
+					CastSorcery(p1.spells[i][1])
+				end
+				spellframes[#spellframes+1]=display.newImageRect("itemframe.png",64,64)
+				spellframes[#spellframes].xScale=1.5
+				spellframes[#spellframes].yScale=spellframes[#spellframes].xScale
+				spellframes[#spellframes].x = xinvicial+ (((#spellframes-1)%4)*((espacio*spellframes[#spellframes].xScale)+4))
+				spellframes[#spellframes].y = yinvicial+(((espacio*spellframes[#spellframes].xScale)+4)*(math.floor((#spellframes-1)/4)))
+				gspl:insert( spellframes[#spellframes] )
+				
+				spells[#spells+1]=display.newImageRect( "spells/"..p1.spells[i][1]..".png" ,80,80)
+				spells[#spells].xScale=1.2
+				spells[#spells].yScale=spells[#spells].xScale
+				spells[#spells].x = spellframes[#spellframes].x
+				spells[#spells].y = spellframes[#spellframes].y
+				gspl:insert( spells[#spells] )
+				
+				spellframes[#spellframes]:toFront()
+				
+				if p1.spells[i][4]<=p1.MP and  p1.spells[i][5]<=p1.EP then
+					spellframes[#spellframes]:addEventListener("tap",Hoo)
+				else
+					spellframes[#spellframes]:setFillColor(255,70,70)
+					spellsmp[#spellsmp+1]=display.newText( (p1.spells[i][4].."MP"),0,0,"MoolBoran",35)
+					spellsmp[#spellsmp]:setTextColor(70,255,70)
+					spellsmp[#spellsmp].x=spellframes[#spellframes].x
+					spellsmp[#spellsmp].y=spellframes[#spellframes].y-10
+					gspl:insert( spellsmp[#spellsmp] )
+					
+					spellsep[#spellsep+1]=display.newText( (p1.spells[i][5].."EP"),0,0,"MoolBoran",35)
+					spellsep[#spellsep]:setTextColor(255,70,255)
+					spellsep[#spellsep].x=spellframes[#spellframes].x
+					spellsep[#spellsep].y=spellframes[#spellframes].y+10
+					gspl:insert( spellsep[#spellsep] )
+				end
+				
+			end
+		end
+		gspl:toFront()
+		
+		display.remove(BackBtn)
+		BackBtn=nil
+		
+		BackBtn=widget.newButton{
+			label="Close",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=30,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = ShowSorcery}
+		BackBtn:setReferencePoint( display.CenterReferencePoint )
+		BackBtn.x = MagicBtn.x
+		BackBtn.y = RecoverBtn.y
+		gcm:insert( BackBtn )
+	elseif book==true then
+		book=false
+		display.remove(BackBtn)
+		BackBtn=nil
+		for i=table.maxn(spells),1,-1 do
+			display.remove(spells[i])
+			spells[i]=nil
+			display.remove(spellframes[i])
+			spellframes[i]=nil
+		end
+		spells=nil
+		spellframes=nil
+		for i=gspl.numChildren,1,-1 do
+			display.remove(gspl[i])
+			gspl[i]=nil
+		end
+		gspl=nil
+		ShowActions()
 	end
 end
 
 function CastSorcery(name)
-	P1Sprite(4)
-	ShowSorcery(true)
 	
+	book=false
+	for i=table.maxn(spells),1,-1 do
+		display.remove(spells[i])
+		spells[i]=nil
+		display.remove(spellframes[i])
+		spellframes[i]=nil
+	end
+	spells=nil
+	spellframes=nil
+	for i=gspl.numChildren,1,-1 do
+		display.remove(gspl[i])
+		gspl[i]=nil
+	end
+	gspl=nil
 	HideActions()
 	
 	for s=1, table.maxn(p1.spells) do
@@ -2171,14 +2356,18 @@ function CastSorcery(name)
 		end
 	end
 	if name=="Cleave" then
+		audio.Play(13)
+		P1Sprite(2)
 		local Damage=DamageCalc("mob",(math.random(15,20)/10),48,2)
 		mobHits((Damage),true,"SPL")
 		enemy.HP=enemy.HP-Damage
 		MobSprite(3)
 		
 	elseif name=="Gouge" then
+		P1Sprite(2)
 		local isHit=EvadeCalc("mob",64)
 		if isHit>0 then
+			audio.Play(13)
 			local Damage=DamageCalc("mob",(math.random(15,20)/10),48,2)
 			if (Damage)<=0 then
 				mobHits("BLK!",false,"SPL")
@@ -2194,17 +2383,24 @@ function CastSorcery(name)
 				mobHits((Damage),true,"SPL")
 			end
 		else
+<<<<<<< HEAD
+=======
+			audio.Play(10)
+>>>>>>> G1.2.0
 			mobHits("MSS!",false,"SPL")
 		end
 		
 	elseif name=="Healing" then
+		P1Sprite(4)
 		local p1=players.GetPlayer()
 		players.AddHP(math.floor(p1.MaxHP*.2))
 		hpHits((math.floor(p1.MaxHP*.2)),false,true)
 		
 	elseif name=="Fire Sword" then
+		P1Sprite(2)
 		local isHit=EvadeCalc("mob",64)
 		if isHit>0 then
+			audio.Play(13)
 			local Damage=DamageCalc("mob",(math.random(15,20)/10),48,2)
 			if (Damage)<=0 then
 				mobHits("BLK!",false,"SPL")
@@ -2220,10 +2416,15 @@ function CastSorcery(name)
 				mobHits((Damage),true,"SPL")
 			end
 		else
+<<<<<<< HEAD
+=======
+			audio.Play(10)
+>>>>>>> G1.2.0
 			mobHits("MSS!",false,"SPL")
 		end
 		
 	elseif name=="Fireball" then
+		P1Sprite(4)
 		local isHit=EvadeCalc("mob",64)
 		if isHit>0 then
 			if isHit>1 then
@@ -2261,10 +2462,11 @@ function CastSorcery(name)
 			mobHits("MSS!",false,"SPL")
 		end
 		
-	elseif name=="Ice Sword" then
+	elseif name=="Ice Spear" then
+		P1Sprite(4)
 		local isHit=EvadeCalc("mob",64)
 		if isHit>0 then
-			local Damage=DamageCalc("mob",(math.random(15,20)/10),48,2)
+			local Damage=DamageCalc("mob",(math.random(15,20)/10),48,4)
 			if (Damage)<=0 then
 				mobHits("BLK!",false,"SPL")
 			else
@@ -2285,6 +2487,10 @@ function CastSorcery(name)
 		end
 		
 	elseif name=="Slow" then
+<<<<<<< HEAD
+=======
+		P1Sprite(4)
+>>>>>>> G1.2.0
 		enemy.stats[5]=(enemy.stats[5]*.2)
 		mobHits(("Frozen!"),false,"SPL")
 		enemy.status="FRZ"
@@ -2295,8 +2501,10 @@ function CastSorcery(name)
 		end
 		
 	elseif name=="Poison Blade" then
+		P1Sprite(2)
 		local isHit=EvadeCalc("mob",64)
 		if isHit>0 then
+			audio.Play(13)
 			if isHit>1 then
 				local Damage=DamageCalc("mob",(math.random(15,20)/10),48,4)
 				if (Damage)<=0 then
@@ -2323,6 +2531,10 @@ function CastSorcery(name)
 				end
 			end
 		else
+<<<<<<< HEAD
+=======
+			audio.Play(10)
+>>>>>>> G1.2.0
 			mobHits("MSS!",false,"SPL")
 		end
 		

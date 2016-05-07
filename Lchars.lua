@@ -20,7 +20,7 @@ local info2
 local classmenu
 local currentchar
 local curmenu
-local Classes={"Viking","Warrior","Knight","Sorceror","Thief","Scholar"}
+local Classes={"Viking","Warrior","Knight","Sorcerer","Thief","Scholar"}
 local Stats={"STA","ATT","DEF","MGC","DEX","INT"}
 local Chars={"Luneth","Arc","Refia","Ingus"}
 

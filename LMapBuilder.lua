@@ -86,7 +86,7 @@ local mapsize
 local TSet
 
 function Essentials()
-	scale=1.2
+	scale=1.0
 	espacio=80*scale
 	xinicial=display.contentCenterX-(espacio)
 	yinicial=display.contentCenterY-(espacio)
@@ -573,6 +573,15 @@ function BuildTile()
 				room[curroom][count]="x"
 			else
 				KeySpawned=true
+				SmallKey=display.newImageRect( "tiles/"..TSet.."/smallkey.png", 80, 80)
+				SmallKey.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+				SmallKey.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+				SmallKey.isVisible=false
+				SmallKey.loc=(count)
+				SmallKey.room=(curroom)
+				SmallKey.xScale=scale
+				SmallKey.yScale=SmallKey.xScale
+				Level:insert( SmallKey )
 				room[curroom][count]="k"
 				mbounds[curroom][count]=0
 			end
@@ -726,10 +735,10 @@ function BuildTile()
 				SmallKey.isVisible=false
 				SmallKey.loc=(count)
 				SmallKey.room=(curroom)
-				room[curroom][count]="k"
 				SmallKey.xScale=scale
 				SmallKey.yScale=SmallKey.xScale
 				Level:insert( SmallKey )
+				room[curroom][count]="k"
 				KeySpawned=true
 			end
 		end
@@ -1324,11 +1333,10 @@ function DisplayTile()
 			walls[curroom][count].yScale=walls[curroom][count].xScale
 			Level:insert(  walls[curroom][count] )
 			
-			Destructibles[curroom][count]=display.newSprite(rockbreaksheet,{name="rock",start=1,count=14,time=400,loopCount=1})
+			Destructibles[curroom][count]=display.newImageRect( "tiles/"..TSet.."/wall.png", 80, 80)
 			Destructibles[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			Destructibles[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			Destructibles[curroom][count].isVisible=false
-			Destructibles[curroom][count].exist=true
 			Destructibles[curroom][count].xScale=scale
 			Destructibles[curroom][count].yScale=Destructibles[curroom][count].xScale
 			Level:insert( Destructibles[curroom][count] )
@@ -1471,11 +1479,6 @@ end
 
 function Tiles()
 	TSet=handler.GetTiles()
-	
-	rockbreaksheet = graphics.newImageSheet( 
-		"tiles/"..TSet.."/break.png", 
-		{ width=80, height=80, numFrames=14 }
-	)
 	
 	portalorangesheet = graphics.newImageSheet( 
 		"tiles/"..TSet.."/porange.png", 

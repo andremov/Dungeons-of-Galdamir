@@ -4,12 +4,6 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local HPot2sheet = graphics.newImageSheet( "items/HealthPotion2.png", { width=64, height=64, numFrames=16 })
-local HPot3sheet = graphics.newImageSheet( "items/HealthPotion3.png", { width=64, height=64, numFrames=16 })
-local MPot2sheet = graphics.newImageSheet( "items/ManaPotion2.png", { width=64, height=64, numFrames=16 })
-local MPot3sheet = graphics.newImageSheet( "items/ManaPotion3.png", { width=64, height=64, numFrames=16 })
-local EPot2sheet = graphics.newImageSheet( "items/EnergyPotion2.png", { width=64, height=64, numFrames=16 })
-local EPot3sheet = graphics.newImageSheet( "items/EnergyPotion3.png", { width=64, height=64, numFrames=16 })
 local widget = require "widget"
 local a=require("Laudio")
 local g=require("Lgold")
@@ -25,6 +19,7 @@ local s=require("Lsaving")
 local m=require("Lmenu")
 local ginv
 local geqp
+local gbk
 local ginf
 local gdm
 local gum
@@ -65,28 +60,27 @@ local DeathMessages={
 		"Portal dismemberment.",
 		"I think your leg is over there.",
 		"Your blood didn't teleport...",
-		"Next time, keep your arms and legs in the portal at all times.",
+		"Stay inside the portal at all times.",
 		"Not your best teleport.",
 		"Did you find the secret cow level?",
 	},
 	-- Energy
 	{
 		"Falling unconscious in a dungeon.",
-		"\"Don't mind the energy\", they said, \"It won't kill you.'\", they said.",
 		"Should've kept some energy drinks handy.",
 		"So is having energy a priority to you now?",
-		"Should've gotten a good night's sleep before adventuring.",
+		"Should've gotten a good night's sleep.",
 	},
 }
 
 function Essentials()
 	p1=p.GetPlayer()
-	xinvicial=75
-	yinvicial=156
-	espaciox=64
-	espacioy=64
-	xeqpicial=75
-	yeqpicial=698
+	xinvicial=62
+	yinvicial=157
+	scale=1.2
+	espacio=64*scale
+	xeqpicial=62
+	yeqpicial=721.47998046875
 	statchangexs=200
 	statchangey=(display.contentCenterY)-70
 	statchangex=(display.contentCenterX)-statchangexs
@@ -98,19 +92,22 @@ end
 function CloseErrthang()
 	if not (gdm) then
 		if (gum) then
-			UseMenu()
+			UseMenu(false)
 		end
 		if (swg) then
-			ToggleSound()
+			ToggleSound(false)
 		end
 		if (ginf) then
-			ToggleInfo()
+			ToggleInfo(false)
 		end
 		if (ginv) then
-			ToggleBag()
+			ToggleBag(false)
 		end
 		if (gexui) then
-			ToggleExit()
+			ToggleExit(false)
+		end
+		if (gbk) then
+			ToggleSpells(false)
 		end
 		return true
 	else
@@ -118,15 +115,18 @@ function CloseErrthang()
 	end
 end
 
-function ToggleBag()
+function ToggleBag(sound)
 	if isOpn==false then
+		if sound~=false then
+			a.Play(3)
+		end
 		ginv=display.newGroup()
 		items={}
 		curreqp={}
 		
-		invinterface=display.newImageRect("container.png", 570, 549)
-		invinterface.x,invinterface.y = display.contentWidth/2, 400
-		invinterface.xScale,invinterface.yScale=1.2280701755,1.2280701755
+		invinterface=display.newImageRect("container.png", 570, 507)
+		invinterface.x,invinterface.y = display.contentWidth/2, 440
+		invinterface.xScale,invinterface.yScale=1.28,1.28
 		ginv:insert( invinterface )
 		isOpn=true
 		
@@ -136,31 +136,12 @@ function ToggleBag()
 			if (p1.inv[i])~=nil then
 				local itmnme=item.ReturnInfo(p1.inv[i][1],0)
 	--			print ("Player has "..p1.inv[i][2].." of "..itmnme..".")
-				if p1.inv[i][1]==2 then
-					items[#items+1]=display.newSprite( HPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==3 then
-					items[#items+1]=display.newSprite( HPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==7 then
-					items[#items+1]=display.newSprite( MPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==8 then
-					items[#items+1]=display.newSprite( MPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					items[#items]:play()
-				elseif p1.inv[i][1]==10 then
-					item[i]=display.newSprite( EPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					item[i]:play()
-				elseif p1.inv[i][1]==11 then
-					item[i]=display.newSprite( EPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					item[i]:play()
-				else
-					items[#items+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
-				end
-				items[#items].xScale=1.140625
-				items[#items].yScale=1.140625
-				items[#items].x = xinvicial+ (((#items-1)%9)*((espaciox*items[#items].xScale)+4))
-				items[#items].y = yinvicial+ ((math.floor((#items-1)/9))*((espacioy*items[#items].yScale)+4))
+	
+				items[#items+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
+				items[#items].xScale=scale
+				items[#items].yScale=scale
+				items[#items].x = xinvicial+ (((#items-1)%9)*(espacio+(3*1.28)))
+				items[#items].y = yinvicial+ ((math.floor((#items-1)/9))*(espacio+(3*1.28)))
 				function Gah()
 					UseMenu(p1.inv[i][1],i)
 				end
@@ -183,8 +164,8 @@ function ToggleBag()
 				local itmnme=item.ReturnInfo(p1.eqp[i][1],0)
 	--			print ("Player has "..itmnme.." equipped in slot number "..p1.eqp[i][2]..".")
 				curreqp[#curreqp+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
-				curreqp[#curreqp].xScale=1.140625
-				curreqp[#curreqp].yScale=1.140625
+				curreqp[#curreqp].xScale=scale
+				curreqp[#curreqp].yScale=scale
 				if p1.eqp[i][2]==6 then
 					plcmnt=1
 				elseif p1.eqp[i][2]==2 then
@@ -204,7 +185,7 @@ function ToggleBag()
 				elseif p1.eqp[i][2]==8 then
 					plcmnt=9
 				end
-				curreqp[#curreqp].x = xeqpicial+ (((plcmnt-1)%9)*((espaciox*curreqp[#curreqp].xScale)+4))
+				curreqp[#curreqp].x = xeqpicial+(((plcmnt-1)%9)*(espacio+(3*1.28)))
 				curreqp[#curreqp].y = yeqpicial
 				function Argh()
 					CheckMenu(p1.eqp[i][1])
@@ -221,6 +202,9 @@ function ToggleBag()
 	--		print "Player has nothing equipped."
 		end
 	elseif isOpn==true and (ginv) then
+		if sound~=false then
+			a.Play(4)
+		end
 		
 		if isUse==false then
 			for i=table.maxn(items),1,-1 do
@@ -262,8 +246,11 @@ function ToggleBag()
 	end
 end
 
-function ToggleInfo()
+function ToggleInfo(sound)
 	if isOpn==false then
+		if sound~=false then
+			a.Play(3)
+		end
 		isOpn=true
 		ginf=display.newGroup()
 		info={}
@@ -275,6 +262,9 @@ function ToggleInfo()
 		
 		StatInfo()
 	elseif isOpn==true and (ginf) then
+		if sound~=false then
+			a.Play(4)
+		end
 		display.remove(bkg)
 		bkg=nil
 		isOpn=false
@@ -301,8 +291,11 @@ function ToggleInfo()
 	end
 end
 
-function ToggleSound()
+function ToggleSound(sound)
 	if isOpn==false then
+		if sound~=false then
+			a.Play(3)
+		end
 		isOpn=true
 		swg=display.newGroup()
 	
@@ -356,6 +349,9 @@ function ToggleSound()
 		swg:insert(soundind)
 
 	elseif isOpn==true and (swg) then
+		if sound~=false then
+			a.Play(4)
+		end
 		isOpn=false
 		for i=swg.numChildren,1,-1 do
 			display.remove(swg[i])
@@ -365,8 +361,14 @@ function ToggleSound()
 	end
 end
 
-function ToggleExit()
+function ToggleExit(sound)
 	if isOpn==false then
+<<<<<<< HEAD
+=======
+		if sound~=false then
+			a.Play(3)
+		end
+>>>>>>> G1.2.0
 		m.FindMe(9)
 		isOpn=true
 		gexui=display.newGroup()
@@ -421,6 +423,12 @@ function ToggleExit()
 		gexui:toFront()
 		
 	elseif isOpn==true and (gexui) then
+<<<<<<< HEAD
+=======
+		if sound~=false then
+			a.Play(4)
+		end
+>>>>>>> G1.2.0
 		m.FindMe(6)
 		isOpn=false
 		for i=gexui.numChildren,1,-1 do
@@ -428,6 +436,136 @@ function ToggleExit()
 			gexui[i]=nil
 		end
 		gexui=nil
+	end
+end
+
+function ToggleSpells(sound)
+	if isOpn==false then
+		if sound~=false then
+			a.Play(3)
+		end
+		isOpn=true
+		gbk=display.newGroup()
+		spellicons={}
+		spellnames={}
+		spelltrigger={}
+		
+		bkg=display.newImageRect("bkgs/magicbkg.png", 768, 800)
+		bkg.x,bkg.y = display.contentWidth/2, 400
+		gbk:insert(bkg)
+		
+		for i=1,table.maxn(p1.spells) do
+		
+			spelltrigger[i]=display.newRect(0,0,310,80)
+			spelltrigger[i].x = 170
+			spelltrigger[i].y = 120+((i-1)*85)
+			spelltrigger[i]:setFillColor(0,0,0,0)
+			spelltrigger[i]:addEventListener("tap",SpellInfo)
+			gbk:insert(spelltrigger[i])
+			
+			if p1.spells[i][3]==true then
+				spellicons[i]=display.newImageRect(("spells/"..p1.spells[i][1]..".png"),80,80)
+				spellicons[i].x=60
+				spellicons[i].y=120+((i-1)*85)
+				gbk:insert(spellicons[i])
+				
+				spellnames[i]=display.newText((p1.spells[i][1]),spellicons[i].x+45,0,"MoolBoran",55)
+				spellnames[i].y=spellicons[i].y+20
+				spellnames[i]:setTextColor(0,0,0)
+				gbk:insert(spellnames[i])
+			else
+				spellicons[i]=display.newImageRect(("spells/"..p1.spells[i][1].." X.png"),80,80)
+				spellicons[i].x=60
+				spellicons[i].y=120+((i-1)*85)
+				gbk:insert(spellicons[i])
+				
+				spellnames[i]=display.newText(("???"),spellicons[i].x+45,0,"MoolBoran",55)
+				spellnames[i].y=spellicons[i].y+20
+				spellnames[i]:setTextColor(0,0,0)
+				gbk:insert(spellnames[i])
+			end
+		end
+		
+	elseif isOpn==true and (gbk) then
+		if sound~=false then
+			a.Play(4)
+		end
+		isOpn=false
+		for i=table.maxn(spellicons),1,-1 do
+			display.remove(spellicons[i])
+			spellicons[i]=nil
+		end
+		spellicons=nil
+		for i=table.maxn(spellnames),1,-1 do
+			display.remove(spellnames[i])
+			spellnames[i]=nil
+		end
+		spellnames=nil
+		for i=table.maxn(spelltrigger),1,-1 do
+			display.remove(spelltrigger[i])
+			spelltrigger[i]=nil
+		end
+		spelltrigger=nil
+		for i=gbk.numChildren,1,-1 do
+			display.remove(gbk[i])
+			gbk[i]=nil
+		end
+		gbk=nil
+	end
+end
+
+function SpellInfo( event )
+	local selectedSpell
+	for i=1,table.maxn(spelltrigger) do
+		if event.y>spelltrigger[i].y-40 and event.y<spelltrigger[i].y+40 then
+			selectedSpell=i
+		end
+	end
+	if (spellshown) then
+		for i=table.maxn(spellshown),1,-1 do
+			display.remove(spellshown[i])
+			spellshown[i]=nil
+		end
+		spellshown=nil
+	end
+	spellshown={}
+	
+	if p1.spells[selectedSpell][3]==true then
+		spellshown[1]=display.newText( (p1.spells[selectedSpell][1]),0,0,"MoolBoran",80)
+		spellshown[1].x=((display.contentWidth/4)*3)-50
+		spellshown[1].y=100
+		spellshown[1]:setTextColor(0,0,0)
+		gbk:insert(spellshown[1])
+		
+		spellshown[2]=display.newText( 
+			(p1.spells[selectedSpell][2]),
+			spellshown[1].x-190,
+			spellshown[1].y+50,
+			420,0,"MoolBoran",45
+		)
+		spellshown[2]:setTextColor(50,50,50)
+		gbk:insert(spellshown[2])
+		
+		spellshown[3]=display.newText( (p1.spells[selectedSpell][4].." MP"),0,0,"MoolBoran",65)
+		spellshown[3].x=spellshown[2].x-110
+		spellshown[3].y=spellshown[2].y+150
+		spellshown[3]:setTextColor(180,70,180)
+		gbk:insert(spellshown[3])
+		
+		spellshown[4]=display.newText( (p1.spells[selectedSpell][5].." EP"),0,0,"MoolBoran",65)
+		spellshown[4].x=spellshown[2].x+110
+		spellshown[4].y=spellshown[2].y+150
+		spellshown[4]:setTextColor(70,180,70)
+		gbk:insert(spellshown[4])
+	else
+		spellshown[1]=display.newText(
+			("You haven't learned this spell."),
+			((display.contentWidth/4)*3)-240,
+			150,
+			420,0,"MoolBoran",45
+		)
+		spellshown[1]:setTextColor(50,50,50)
+		gbk:insert(spellshown[1])
 	end
 end
 
@@ -457,34 +595,42 @@ function StatChange()
 	for s=1,6 do
 		if p1.pnts>0 and p1.nat[s]<p1.lvl*10 then
 			pli[#pli+1]= widget.newButton{
-				label="+",
-				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=40,
 				defaultFile="sbutton.png",
 				overFile="sbutton-over.png",
-				width=90, height=90,
+				width=80, height=80,
 				onRelease = More
 			}
 			pli[#pli]:setReferencePoint( display.CenterReferencePoint )
 			pli[#pli].x = info[6+s].x+90
 			pli[#pli].y = info[6+s].y-10
 			ginf:insert(pli[#pli])
+			
+			pli[#pli+1]=display.newImageRect("+.png",11,11)
+			pli[#pli].x = pli[#pli-1].x
+			pli[#pli].y = pli[#pli-1].y
+			pli[#pli].xScale = 3.0
+			pli[#pli].yScale = 3.0
+			ginf:insert(pli[#pli])
 		end
 	end
 	for s=1,6 do
 		if p1.nat[s]>1 then
 			mini[#mini+1]= widget.newButton{
-				label="-",
-				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=40,
 				defaultFile="sbutton.png",
 				overFile="sbutton-over.png",
-				width=90, height=90,
+				width=80, height=80,
 				onRelease = Less
 			}
 			mini[#mini]:setReferencePoint( display.CenterReferencePoint )
 			mini[#mini].x = info[6+s].x-90
 			mini[#mini].y = info[6+s].y-10
+			ginf:insert(mini[#mini])
+			
+			mini[#mini+1]=display.newImageRect("-.png",11,11)
+			mini[#mini].x = mini[#mini-1].x
+			mini[#mini].y = mini[#mini-1].y
+			mini[#mini].xScale = 3.0
+			mini[#mini].yScale = 3.0
 			ginf:insert(mini[#mini])
 		end
 	end
@@ -492,7 +638,7 @@ function StatChange()
 	swapInfoBtn= widget.newButton{
 		defaultFile="sbutton.png",
 		overFile="sbutton-over.png",
-		width=90, height=90,
+		width=80, height=80,
 		onRelease = SwapInfo}
 	swapInfoBtn:setReferencePoint( display.CenterReferencePoint )
 	swapInfoBtn.x = display.contentWidth-60
@@ -530,7 +676,7 @@ function StatChange()
 end
 
 function StatInfo()
-	local baseX=30
+	local baseX=50
 	local baseY=90
 	local SpacingX=300
 	local SpacingY=50
@@ -622,7 +768,7 @@ function StatInfo()
 		(
 			"Statistics:"
 		),
-		10,350,"MoolBoran",70
+		baseX-20,350,"MoolBoran",70
 	)
 	ginf:insert(info[#info])
 	
@@ -631,7 +777,7 @@ function StatInfo()
 			(
 				p1.statnames[s]
 			),
-			30,420+(45*(s-1)),"MoolBoran",60
+			baseX,420+(45*(s-1)),"MoolBoran",60
 		)
 		ginf:insert(info[#info])
 	end
@@ -640,7 +786,7 @@ function StatInfo()
 		(
 			"Stat Points: "..p1.pnts
 		),
-		30,690,"MoolBoran",60
+		baseX,690,"MoolBoran",60
 	)
 	ginf:insert(info[#info])
 	
@@ -704,19 +850,10 @@ function StatInfo()
 		ginf:insert(info[#info])
 	end
 	
-	if p1.name=="Magus" then
-		info[#info+1]=display.newImageRect("player/magus.png",120,120)
-		info[#info].x=display.contentWidth-120
-		info[#info].y=150
-		info[#info].xScale=1.5
-		info[#info].yScale=info[#info].xScale
-		ginf:insert(info[#info])
-	end
-	
 	swapInfoBtn= widget.newButton{
 		defaultFile="sbutton.png",
 		overFile="sbutton-over.png",
-		width=90, height=90,
+		width=80, height=80,
 		onRelease = SwapInfo}
 	swapInfoBtn:setReferencePoint( display.CenterReferencePoint )
 	swapInfoBtn.x = display.contentWidth-60
@@ -734,7 +871,10 @@ function StatInfo()
 	ginf:toFront()
 end
 
-function SwapInfo()
+function SwapInfo(sound)
+	if sound~=false then
+		a.Play(4)
+	end
 	if swapInfoBtn.state==false then
 		for i=table.maxn(info),1,-1 do
 			display.remove(info[i])
@@ -822,29 +962,29 @@ end
 
 function More( event )
 	local statnum
-	for i=1,6 do
+	for i=1,12 do
 		if (pli[i]) then
 			if event.y+50>pli[i].y and event.y-50<pli[i].y and event.x+50>pli[i].x and event.x-50<pli[i].x then
-				statnum=i
+				statnum=math.ceil(i/2)
 			end
 		end
 	end
 	p.Natural(statnum,1)
-	SwapInfo()
+	SwapInfo(false)
 	SwapInfo()
 end
 
 function Less( event )
 	local statnum
-	for i=1,6 do
+	for i=1,12 do
 		if (mini[i]) then
 			if event.y+50>mini[i].y and event.y-50<mini[i].y and event.x+50>mini[i].x and event.x-50<mini[i].x then
-				statnum=i
+				statnum=math.ceil(i/2)
 			end
 		end
 	end
 	p.Natural(statnum,-1)
-	SwapInfo()
+	SwapInfo(false)
 	SwapInfo()
 end
 
@@ -955,7 +1095,7 @@ function DeathMenu(cause)
 		Runtime:removeEventListener("enterFrame", g.GoldDisplay)
 		b.WipeMap()
 		mov.CleanArrows()
-		a.Stopbkg()
+		a.changeMusic(0)
 		s.WipeSave()
 		
 	elseif isOpn==true then
@@ -1005,6 +1145,9 @@ end
 
 function UseMenu(id,slot)
 	if isUse==false then
+		if id~=false then
+			a.Play(3)
+		end
 	
 		function UsedIt()
 			isUse=false
@@ -1079,7 +1222,7 @@ function UseMenu(id,slot)
 		end
 		
 		function EquippedIt()
-			
+			a.Play(8)
 			for i=1,table.maxn(p1.eqp) do
 				if (p1.eqp[i]) and (p1.eqp[i][1]) and (p1.eqp[i][2]) and (p1.eqp[i][2]==itemstats[3]) then
 					p1.inv[#p1.inv+1]={}
@@ -1348,9 +1491,12 @@ function UseMenu(id,slot)
 		end
 		
 	elseif isUse==true then
+		if id~=false then
+			a.Play(4)
+		end
 		SpecialUClose()
-		ToggleBag()
-		ToggleBag()
+		ToggleBag(false)
+		ToggleBag(false)
 	end
 end
 

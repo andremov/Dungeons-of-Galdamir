@@ -4,7 +4,6 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local gearsheet = graphics.newImageSheet( "gearsprite.png", { width=50, height=50, numFrames=30 })
 local widget = require "widget"
 local menu=require("Lmenu")
 local a=require("Laudio")
@@ -34,30 +33,6 @@ function DisplayOptions()
 	title:setTextColor(125,250,125)
 	optionz:insert(title)
 	
-	gear=display.newSprite( gearsheet, { name="gear", start=1, count=30, time=3000,}  )
-	gear.x=display.contentWidth
-	gear.y=display.contentHeight
-	gear.xScale=4.0
-	gear.yScale=4.0
-	gear:play()
-	optionz:insert(gear)
-	
-	gear2=display.newSprite( gearsheet, { name="gear2", start=1, count=30, time=4000,}  )
-	gear2.x=0
-	gear2.y=0
-	gear2.xScale=6.0
-	gear2.yScale=6.0
-	gear2:play()
-	optionz:insert(gear2)
-	
-	gear3=display.newSprite( gearsheet, { name="gear3", start=1, count=30, time=3500,}  )
-	gear3.x=0
-	gear3.y=display.contentHeight
-	gear3.xScale=5.0
-	gear3.yScale=5.0
-	gear3:play()
-	optionz:insert(gear3)
-	
 	BackBtn = widget.newButton{
 		label="Back",
 		labelColor = { default={255,255,255}, over={0,0,0} },
@@ -71,7 +46,7 @@ function DisplayOptions()
 	BackBtn.x = display.contentWidth*0.5
 	BackBtn.y = display.contentHeight-100
 	optionz:insert(BackBtn)
-	
+	--[[
 	Char = widget.newButton{
 		label="Character",
 		labelColor = { default={255,255,255}, over={0,0,0} },
@@ -85,7 +60,7 @@ function DisplayOptions()
 	Char.x = display.contentWidth*0.25
 	Char.y = display.contentHeight*0.5+210
 	optionz:insert(Char)
-	
+	]]
 	Map = widget.newButton{
 		label="Map",
 		labelColor = { default={255,255,255}, over={0,0,0} },
@@ -97,7 +72,7 @@ function DisplayOptions()
 	}
 	Map:setReferencePoint( display.CenterReferencePoint )
 	Map.x = display.contentWidth*0.75
-	Map.y = Char.y
+	Map.y = display.contentHeight*0.5+210
 	optionz:insert(Map)
 	
 	ScreBtn = widget.newButton{
@@ -111,7 +86,7 @@ function DisplayOptions()
 	}
 	ScreBtn:setReferencePoint( display.CenterReferencePoint )
 	ScreBtn.x = display.contentCenterX
-	ScreBtn.y = Char.y-100
+	ScreBtn.y = Map.y-100
 	optionz:insert(ScreBtn)
 	
 	scroll=display.newImageRect("scroll.png",600,50)
@@ -161,6 +136,7 @@ function DisplayOptions()
 end
 
 function onScreBtnRelease()
+	a.Play(12)
 	for i=optionz.numChildren,1,-1 do
 		local child = optionz[i]
 		child.parent:remove( child )
@@ -169,6 +145,7 @@ function onScreBtnRelease()
 end
 
 function onBackRelease()
+	a.Play(12)
 	for i=optionz.numChildren,1,-1 do
 		local child = optionz[i]
 		child.parent:remove( child )
@@ -178,6 +155,7 @@ function onBackRelease()
 end
 	
 function FunSize()
+	a.Play(12)
 	map.MapSizeMenu()
 	for i=optionz.numChildren,1,-1 do
 		local child = optionz[i]
@@ -186,6 +164,7 @@ function FunSize()
 end
 
 function onCharRelease()
+	a.Play(12)
 	for i=optionz.numChildren,1,-1 do
 		local child = optionz[i]
 		child.parent:remove( child )

@@ -132,12 +132,17 @@ function ShowMenu()
 	else
 		a.LoadSounds()
 	end
+<<<<<<< HEAD
 	
 	a.Menu(true)
+=======
+	a.changeMusic(1)
+>>>>>>> G1.2.0
 	Runtime:addEventListener( "key", onKeyEvent )
 end
 
 function SplashChange()
+	a.Play(12)
 	if (Splash) then
 		display.remove(Splash)
 		Splash=nil
@@ -148,6 +153,7 @@ end
 
 function onPlayBtnRelease()
 	if canGo==true then
+		a.Play(12)
 		for i=group.numChildren,1,-1 do
 			local child = group[i]
 			child.parent:remove( child )
@@ -162,26 +168,29 @@ function ReadySetGo()
 end
 
 function onUpdateBtnRelease( event )
-	print "!"
 	if canGo==true and event.phase=="ended" then
+		a.Play(12)
 		system.openURL( "tinyurl.com/dogcub3d" )
 	end
 end
 
 function openAd1( event )
 	if canGo==true and event.phase=="ended" then
+		a.Play(12)
 		system.openURL( "tinyurl.com/togcub3d" )
 	end
 end
 
 function openAd2( event )
 	if canGo==true and event.phase=="ended" then
+		a.Play(12)
 		system.openURL( "tinyurl.com/mogcub3d" )
 	end
 end
 
 function onOptnBtnRelease()
 	if canGo==true then
+		a.Play(12)
 		for i=group.numChildren,1,-1 do
 			local child = group[i]
 			child.parent:remove( child )
@@ -270,7 +279,11 @@ function onKeyEvent( event )
 		elseif CurMenu==7 then
 			inv.ToggleExit()
 		elseif CurMenu==8 then
+<<<<<<< HEAD
 		
+=======
+			
+>>>>>>> G1.2.0
 		elseif CurMenu==9 then
 			native.requestExit()
 		end

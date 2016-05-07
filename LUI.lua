@@ -101,33 +101,33 @@ function UI(ready)
 		
 		pausetxt:toFront()
 		
-		bag = display.newImageRect("bag.png", 50, 50)
+		bag = display.newImageRect("bagbtn.png", 80, 80)
 		bag.x, bag.y = window.x+(25*1.28*1.5)-((390-6)/2), window.y+(25*1.28*1.5)-((166-6)/2)
-		bag.xScale = 1.28*1.5
+		bag.xScale = 1.2
 		bag.yScale = bag.xScale
 		bag:addEventListener("touch",OpenBag)
 		pwg:insert(bag)
 		
-		info = display.newImageRect("infobtn.png", 50, 50)
-		info.x, info.y = bag.x+(50*bag.xScale), bag.y
+		info = display.newImageRect("infobtn.png", 80, 80)
+		info.x, info.y = bag.x+(80*bag.xScale), bag.y
 		info.yScale = bag.yScale
 		info.xScale = bag.xScale
 		info:addEventListener("touch",OpenInfo)
 		pwg:insert(info)
 		
-		snd = display.newImageRect("sound.png",50,50)
-		snd.x,snd.y = info.x+(50*info.xScale), bag.y
+		snd = display.newImageRect("soundbtn.png",80,80)
+		snd.x,snd.y = info.x+(80*info.xScale), bag.y
 		snd.xScale=bag.xScale
 		snd.yScale=bag.yScale
 		snd:addEventListener("touch",OpenSnd)
 		pwg:insert(snd)
 		
-		uiexit = display.newImageRect("exit.png", 50, 50)
-		uiexit.x, uiexit.y = snd.x+(50*snd.xScale), bag.y
-		uiexit.yScale = bag.yScale
-		uiexit.xScale = bag.xScale
-		uiexit:addEventListener("touch",OpenExit)
-		pwg:insert(uiexit)
+		magic = display.newImageRect("magicbtn.png", 80, 80)
+		magic.x, magic.y = snd.x+(80*snd.xScale), bag.y
+		magic.yScale = bag.yScale
+		magic.xScale = bag.xScale
+		magic:addEventListener("touch",OpenBook)
+		pwg:insert(magic)
 		
 		MapIndicators("create")
 	end
@@ -145,7 +145,7 @@ function Pause(mute)
 			isPaused=false
 		--	print "Game resumed."
 			if mute~=true then
-				audio.Play(5)
+				audio.Play(3)
 			end
 		elseif isPaused==false then
 			isPaused=true
@@ -155,7 +155,7 @@ function Pause(mute)
 			players.LetsYodaIt()
 		--	print "Game paused."
 			if mute~=true then
-				audio.Play(6)
+				audio.Play(4)
 			end
 		end
 	elseif busy==true then
@@ -200,26 +200,32 @@ function MovePause(val)
 end
 
 function OpenBag( event )
-	if event.phase=="ended" then
+	if event.phase=="ended" and isPaused==true then
 		inv.ToggleBag()
 	end
 end
 
 function OpenExit( event )
-	if event.phase=="ended" then
+	if event.phase=="ended" and isPaused==true then
 		inv.ToggleExit()
 	end
 end
 
 function OpenSnd( event )
-	if event.phase=="ended" then
+	if event.phase=="ended" and isPaused==true then
 		inv.ToggleSound()
 	end
 end
 
 function OpenInfo( event )
-	if event.phase=="ended" then
+	if event.phase=="ended" and isPaused==true then
 		inv.ToggleInfo()
+	end
+end
+
+function OpenBook( event )
+	if event.phase=="ended" and isPaused==true then
+		inv.ToggleSpells()
 	end
 end
 

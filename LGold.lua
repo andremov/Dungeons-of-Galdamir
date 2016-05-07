@@ -5,12 +5,12 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local coinsheet = graphics.newImageSheet( "coinsprite.png", { width=32, height=32, numFrames=8 } )
-local gpsheet = graphics.newImageSheet( "gp.png", { width=40, height=40, numFrames=12 } )
 local players = require("Lplayers")
 local physics = require "physics"
 local ui=require("Lui")
+local a=require("Laudio")
 local builder=require("Lmapbuilder")
-local DisplayS=2.0
+local DisplayS=1.25
 local Displayx=45
 local Displayy=30
 local GoldCount
@@ -39,6 +39,7 @@ function Coins()
 end
 
 function CallAddCoins(amount)
+	a.Play(1)
 	P1.gp=P1.gp+amount
 end
 
@@ -61,7 +62,15 @@ function GoldDisplay()
 		
 		GCDisplay:toFront()
 	end
-	CDisplayUpdate()
+	if not (CDisplay) then
+		CDisplay=display.newSprite( coinsheet, { name="coin", start=1, count=8, time=750}  )
+		CDisplay:setFillColor( 0, 0, 0, 0)
+		CDisplay.x, CDisplay.y = Displayx, Displayy+12
+		CDisplay.xScale=DisplayS
+		CDisplay.yScale=DisplayS
+		CDisplay:toFront()
+		CDisplay:play()
+	end
 	if (GoldCount<1000) then
 		GCDisplay.x = Displayx+60
 	else
@@ -102,51 +111,6 @@ function GoldDisplay()
 		GCDisplay:setTextColor( 255, 255, 50, transp)
 		CDisplay:setFillColor( transp, transp, transp, transp)
 	end
-end
-
-function CDisplayUpdate()
-	if not (CDisplay) then
-		CDisplay=display.newSprite( gpsheet, { name="gp", start=1, count=11, time=500}  )
-		CDisplay:setFillColor( 0, 0, 0, 0)
-		CDisplay.x, CDisplay.y = Displayx, Displayy
-		CDisplay.xScale=DisplayS
-		CDisplay.yScale=DisplayS
-	end
-	if (GoldCount<=1) then
-		CDisplay:setFrame(1)
-		CDisplay.x, CDisplay.y = Displayx, Displayy
-	elseif (GoldCount>1) and (GoldCount<=5)then
-		CDisplay:setFrame(2)
-		CDisplay.x, CDisplay.y = Displayx, Displayy
-	elseif (GoldCount>5) and (GoldCount<=10)then
-		CDisplay:setFrame(3)
-		CDisplay.x, CDisplay.y = Displayx, Displayy
-	elseif (GoldCount>10) and (GoldCount<=20)then
-		CDisplay:setFrame(4)
-		CDisplay.x, CDisplay.y = Displayx, Displayy
-	elseif (GoldCount>20) and (GoldCount<=40)then
-		CDisplay:setFrame(5)
-		CDisplay.x, CDisplay.y = Displayx, Displayy
-	elseif (GoldCount>40) and (GoldCount<=70)then
-		CDisplay:setFrame(6)
-		CDisplay.x, CDisplay.y = Displayx, Displayy
-	elseif (GoldCount>70) and (GoldCount<=100)then
-		CDisplay:setFrame(7)
-		CDisplay.x, CDisplay.y = Displayx, Displayy
-	elseif (GoldCount>100) and (GoldCount<=300)then
-		CDisplay:setFrame(8)
-		CDisplay.x, CDisplay.y = Displayx, Displayy
-	elseif (GoldCount>300) and (GoldCount<=500)then
-		CDisplay:setFrame(9)
-		CDisplay.x, CDisplay.y = Displayx, Displayy
-	elseif (GoldCount>500) and (GoldCount<=1000) then
-		CDisplay:setFrame(10)
-		CDisplay.x, CDisplay.y = Displayx, Displayy
-	elseif (GoldCount>1000) then
-		CDisplay:setFrame(11)
-		CDisplay.x, CDisplay.y = GCDisplay.x+70, GCDisplay.y
-	end
-	--CDisplay:toFront()
 end
 
 function ShowGCounter()

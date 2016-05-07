@@ -27,7 +27,7 @@ local col
 local row
 local SpawnCD=5
 local DidSomething
-local scale=1.2
+local scale=1.0
 local espacio=80*scale
 
 function DoTurns()

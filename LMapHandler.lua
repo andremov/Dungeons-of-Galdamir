@@ -83,6 +83,7 @@ end
 function MapSizeMenu()
 	m.FindMe(3)
 	function onBackRelease()
+		audio.Play(12)
 		for i=opt.numChildren,1,-1 do
 			local child = opt[i]
 			child.parent:remove( child )
@@ -91,51 +92,61 @@ function MapSizeMenu()
 	end
 	
 	function TinyMap()
+		audio.Play(12)
 		Size(1)
 		CurSize.text=("Current Map Size: Tiny")
 	end
 	
 	function SmallMap()
+		audio.Play(12)
 		Size(2)
 		CurSize.text=("Current Map Size: Small")
 	end
 	
 	function MedMap()
+		audio.Play(12)
 		Size(3)
 		CurSize.text=("Current Map Size: Medium")
 	end
 	
 	function LargeMap()
+		audio.Play(12)
 		Size(4)
 		CurSize.text=("Current Map Size: Large")
 	end
 	
 	function SecretMap()
+		audio.Play(12)
 		Size(5)
 		CurSize.text=("Current Map Size: Secret")
 	end
 	
 	function DefaultTSet()
+		audio.Play(12)
 		SetTile(0)
 		CurTile.text=("Current Tileset: Default")
 	end
 	
 	function NotebookTSet()
+		audio.Play(12)
 		SetTile(1)
 		CurTile.text=("Current Tileset: Notebook")
 	end
 	
 	function RealTSet()
+		audio.Play(12)
 		SetTile(2)
 		CurTile.text=("Current Tileset: Realistic")
 	end
 	
 	function BWTSet()
+		audio.Play(12)
 		SetTile(3)
 		CurTile.text=("Current Tileset: B&W")
 	end
 	
 	function SecretTSet()
+		audio.Play(12)
 		SetTile(4)
 		CurTile.text=("Current Tileset: Secret")
 	end
@@ -224,7 +235,7 @@ function MapSizeMenu()
 	NotebookTS.x = DefaultTS.x
 	NotebookTS.y = DefaultTS.y+100
 	opt:insert(NotebookTS)
-	
+	--[[
 	local RealTS = widget.newButton{
 		label="Realistic Tileset",
 		labelColor = { default={255,255,255}, over={0,0,0} },
@@ -252,7 +263,7 @@ function MapSizeMenu()
 	BWTS.x = RealTS.x
 	BWTS.y = RealTS.y+100
 	opt:insert(BWTS)
-	
+	--]]
 	title=display.newText("Map Customization",0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100

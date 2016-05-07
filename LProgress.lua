@@ -52,7 +52,7 @@ function FloorSign()
 			proftransp=0
 		end
 		profbkg:setFillColor(proftransp,proftransp,proftransp,proftransp)
-		profbkg2:setTextColor(0,0,0,proftransp)
+		profbkg2:setTextColor(255,255,255,proftransp)
 		floorcount:toFront()
 		timer.performWithDelay(20,FloorSign)
 	else
@@ -65,7 +65,7 @@ function FloorSign()
 		profbkg.x, profbkg.y = display.contentCenterX, display.contentCenterY-200
 		
 		profbkg2=display.newText( (Round), 0, 0, "Game Over", 100 )
-		profbkg2:setTextColor(0,0,0,proftransp)
+		profbkg2:setTextColor(255,255,255,proftransp)
 		profbkg2.x, profbkg2.y = profbkg.x, profbkg.y+20
 		
 		floorcount:insert(profbkg)
