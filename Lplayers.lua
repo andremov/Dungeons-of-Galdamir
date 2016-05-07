@@ -9,6 +9,7 @@ local energysheet = graphics.newImageSheet( "energysprite.png", { width=60, heig
 local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height=25, numFrames=16 } )
 local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 } )
 local xpsheet = graphics.newImageSheet( "xpbar.png", { width=392, height=40, numFrames=50 } )
+local psheet = graphics.newImageSheet( "player.png", { width=24, height=32, numFrames=24 } )
 local b=require("Lmapbuilder")
 local WD=require("Lprogress")
 local su=require("Lstartup")
@@ -24,12 +25,24 @@ local StrongForce
 local yCoord=856
 local check=119
 local xCoord=70
-local scale=1.2
+local scale=3.2
 local transp2
 local transp3
 local player
 local transp
 local Map
+local pseqs={
+		{name="stand1", start=1,  count=1, time=1000},
+		{name="stand2", start=2,  count=1, time=1000},
+		{name="stand3", start=3,  count=1, time=1000},
+		{name="stand4", start=4,  count=1, time=1000},
+		{name="walk1",  start=5,  count=4, time=500},
+		{name="walk2",  start=9,  count=4, time=500},
+		{name="walk3",  start=13, count=4, time=500},
+		{name="walk4",  start=17, count=4, time=500},
+		{name="hit",   start=21, count=3, time=1000},
+		{name="hurt",   start=24, count=1, time=1000},
+	}
 local names={
 		"Nameless",
 		"Orphan",
@@ -53,12 +66,11 @@ function CreatePlayers(name)
 	char=0
 	class=6
 	--Visual
-	player=display.newImageRect( "chars/"..char.."/"..class.."/char.png", 76 ,76)
+	player=display.newSprite( psheet, pseqs )
+	player:setSequence("stand1")
 	player.x, player.y = display.contentWidth/2, display.contentHeight/2
-	player:setStrokeColor(50, 50, 255)
 	player.xScale=scale
 	player.yScale=player.xScale
-	player.strokeWidth = 4
 	--Leveling
 	if name==nil or name=="" or name==" " then
 		player.name=names[math.random(1,table.maxn(names))]
@@ -119,6 +131,27 @@ function CreatePlayers(name)
 	if (player) then
 		Runtime:addEventListener("enterFrame",ShowStats)
 		su.FrontNCenter()
+	end
+end
+
+function SpriteSeq(value)
+	if value==false then
+		if player.sequence=="walk1" then
+			player:setSequence("stand1")
+			player:play()
+		elseif player.sequence=="walk2" then
+			player:setSequence("stand2")
+			player:play()
+		elseif player.sequence=="walk3" then
+			player:setSequence("stand3")
+			player:play()
+		elseif player.sequence=="walk4" then
+			player:setSequence("stand4")
+			player:play()
+		end
+	else
+		player:setSequence(value)
+		player:play()
 	end
 end
 

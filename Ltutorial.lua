@@ -12,16 +12,15 @@ local heartnsheet = graphics.newImageSheet("heartemptysprite.png",{ width=25, he
 local lavasheet = graphics.newImageSheet("tiles/0/lava.png",{ width=80, height=80, numFrames=20})
 local coinsheet = graphics.newImageSheet( "coinsprite.png", { width=32, height=32, numFrames=8 } )
 local energysheet = graphics.newImageSheet("energysprite.png",{ width=60, height=60, numFrames=4})
-local dexatt3 = graphics.newImageSheet( "enemy/dexatt3.png",{ width=32, height=33, numFrames=24 })
+local stadef = graphics.newImageSheet( "enemy/stadef.png",{ width=140, height=110, numFrames=15 })
 local heartsheet = graphics.newImageSheet("heartsprite.png",{ width=25, height=25, numFrames=16})
-local player1 = graphics.newImageSheet( "player/0.png", { width=39, height=46, numFrames=25 } )
 local timersheet = graphics.newImageSheet( "timer.png",{ width=100, height=100, numFrames=25 })
 local manasheet = graphics.newImageSheet("manasprite.png",{ width=60, height=60, numFrames=3})
+local psheet = graphics.newImageSheet( "player.png", { width=24, height=32, numFrames=24 } )
 local xpsheet = graphics.newImageSheet("xpbar.png",{ width=392, height=40, numFrames=50})
 local hpsheet = graphics.newImageSheet("hp.png",{ width=200, height=30, numFrames=67 })
 local mpsheet = graphics.newImageSheet("mp.png",{ width=200, height=30, numFrames=67 })
 local epsheet = graphics.newImageSheet("ep.png",{ width=200, height=30, numFrames=67 })
-local p=require("Lplayers")
 local mh=require("Lmaphandler")
 local physics = require "physics"
 local widget = require "widget"
@@ -32,6 +31,18 @@ local Progress
 local Function
 local eHits={}
 local pHits={}
+local pseqs={
+		{name="stand1", start=1,  count=1, time=1000},
+		{name="stand2", start=2,  count=1, time=1000},
+		{name="stand3", start=3,  count=1, time=1000},
+		{name="stand4", start=4,  count=1, time=1000},
+		{name="walk1",  start=5,  count=4, time=500},
+		{name="walk2",  start=9,  count=4, time=500},
+		{name="walk3",  start=13, count=4, time=500},
+		{name="walk4",  start=17, count=4, time=500},
+		{name="hit",   start=21, count=3, time=1000},
+		{name="hurt",   start=24, count=1, time=1000},
+	}
 
 function FromTheTop()
 	Function={
@@ -1808,12 +1819,11 @@ end
 function MobSprite(value)
 	if (value)==(1) then--Create
 		eseqs={
-			{name="walk", start=1, count=4, time=1000},
-			{name="hit", start=9, count=4, loopCount=1, time=1000},
-			{name="hurt", start=8, count=1, time=1000},
-			{name="hitalt", start=17, count=3, loopCount=1, time=1000}
+			{name="walk", start=1, count=3, time=1000},
+			{name="hit", start=6, count=10, loopCount=1, time=1000},
+			{name="hurt", start=5, count=1, time=1000}
 		}
-		esprite=display.newSprite( dexatt3, eseqs  )
+		esprite=display.newSprite( stadef, eseqs  )
 		esprite:setSequence( "walk" )
 		esprite.x=(display.contentWidth/2)+50
 		esprite.y=170
@@ -1823,14 +1833,8 @@ function MobSprite(value)
 		gcm:insert(esprite)
 	end
 	if (value)==(2) then--Change to Hit
-		local roll=math.random(1,2)
-		if roll==1 then
-			esprite:setSequence( "hit" )
-			esprite:play()
-		elseif roll==2 then
-			esprite:setSequence( "hitalt" )
-			esprite:play()
-		end
+		esprite:setSequence( "hit" )
+		esprite:play()
 	end
 	if (value)==(3) then--Change to Hurt
 		esprite:setSequence( "hurt" )
@@ -1850,16 +1854,8 @@ end
 
 function P1Sprite(value)
 	if (value)==(1) then--Create
-		pseqs={
-			{name="walk", start=1, count=4, time=1000},
-			{name="hit1", start=6, count=3, loopCount=1, time=1000},
-			{name="hit2", start=11, count=4, loopCount=1, time=1000},
-			{name="hit3", start=16, count=5, loopCount=1, time=1000},
-			{name="cast", start=21, count=2, time=1000},
-			{name="hurt", start=5, count=1, time=1000}
-		}
-		psprite=display.newSprite( player1, pseqs  )
-		psprite:setSequence( "walk" )
+		psprite=display.newSprite( psheet, pseqs  )
+		psprite:setSequence( "stance" )
 		psprite.x=(display.contentWidth/2)-50
 		psprite.y=170
 		psprite.xScale=4.0
@@ -1883,13 +1879,13 @@ function P1Sprite(value)
 		psprite:play()
 	end
 	if (value)==(4) then--Set to Casting
-		psprite:setSequence( "cast" )
+		psprite:setSequence( "hit" )
 		psprite:play()
 	end
 	if (value~=1)and(value~=2)and(value~=3)and(value~=4) then--Go Default
-		if (psprite)and(psprite.sequence~="walk")then
+		if (psprite)and(psprite.sequence~="stance")then
 			if (psprite.frame==psprite.numFrames)or(psprite.sequence=="cast")then
-				psprite:setSequence( "walk" )
+				psprite:setSequence( "stance" )
 				psprite:play()
 			else
 				timer.performWithDelay(20,P1Sprite)

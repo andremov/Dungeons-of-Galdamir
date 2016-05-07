@@ -26,7 +26,7 @@ local TileID=0
 local SizeID=3
 local CurSize
 local CurTile
-local Testing=true
+local Testing=false
 
 function GetCMap(value)
 	Round=WD.Circle()

@@ -788,10 +788,8 @@ function Up()
 			end
 		end
 	elseif CanMoveUp==true then
-		a.Step()
-		map=b.GetData(3)
+		CleanArrows()
 		P1=p.GetPlayer()
-		map.y=map.y+espacio
 		local energycost=math.floor(P1.weight/30)
 		if RoomChange=="U" then
 			P1.room=P1.room-5
@@ -805,7 +803,7 @@ function Up()
 		else
 			Toggle=Toggle-1
 		end
-		Visibility()
+		MoveMap(0,espacio)
 		if P1.EP>=energycost then
 			P1.EP=P1.EP-energycost
 		else
@@ -829,10 +827,8 @@ function Down()
 			end
 		end
 	elseif CanMoveDown==true then
-		a.Step()
-		map=b.GetData(3)
+		CleanArrows()
 		P1=p.GetPlayer()
-		map.y=map.y-espacio
 		local energycost=math.floor(P1.weight/30)
 		if RoomChange=="D" then
 			P1.room=P1.room+5
@@ -846,7 +842,7 @@ function Down()
 		else
 			Toggle=Toggle-1
 		end
-		Visibility()
+		MoveMap(0,-espacio)
 		if P1.EP>=energycost then
 			P1.EP=P1.EP-energycost
 		else
@@ -870,10 +866,8 @@ function Left()
 			end
 		end
 	elseif CanMoveLeft==true then
-		a.Step()
-		map=b.GetData(3)
+		CleanArrows()
 		P1=p.GetPlayer()
-		map.x=map.x+espacio
 		local energycost=math.floor(P1.weight/30)
 		if RoomChange=="L" then
 			P1.room=P1.room-1
@@ -887,7 +881,8 @@ function Left()
 		else
 			Toggle=Toggle-1
 		end
-		Visibility()
+		
+		MoveMap(espacio,0)
 		if P1.EP>=energycost then
 			P1.EP=P1.EP-energycost
 		else
@@ -911,10 +906,8 @@ function Right()
 			end
 		end
 	elseif CanMoveRight==true then
-		a.Step()
-		map=b.GetData(3)
+		CleanArrows()
 		P1=p.GetPlayer()
-		map.x=map.x-espacio
 		local energycost=math.floor(P1.weight/30)
 		if RoomChange=="R" then
 			P1.room=P1.room+1
@@ -928,7 +921,7 @@ function Right()
 		else
 			Toggle=Toggle-1
 		end
-		Visibility()
+		MoveMap(-espacio,0)
 		if P1.EP>=energycost then
 			P1.EP=P1.EP-energycost
 		else
@@ -936,5 +929,46 @@ function Right()
 			p.ReduceHP(math.ceil(deficit/2),"Energy")
 			P1.EP=0
 		end
+	end
+end
+
+function MoveMap(x,y)
+	map=b.GetData(3)
+	if (x) and (y) then
+		if x>0 then
+			--Right
+			p.SpriteSeq("walk2")
+		elseif x<0 then
+			--Left
+			p.SpriteSeq("walk4")
+		elseif y>0 then
+			--Up
+			p.SpriteSeq("walk3")
+		elseif y<0 then
+			--Down
+			p.SpriteSeq("walk1")
+		end
+		targetx=map.x+x
+		targety=map.y+y
+		stepcd=1
+	end
+	stepcd=stepcd-1
+	if (math.ceil((targetx-map.x)/1.5))~=0 then
+		map.x=map.x+math.ceil((targetx-map.x)/1.5)
+	end
+	if (math.ceil((targety-map.y)/1.5))~=0 then
+		map.y=map.y+math.ceil((targety-map.y)/1.5)
+	end
+	if stepcd==0 then
+		stepcd=3
+		a.Step()
+	end
+	if math.ceil((targetx-map.x)/1.5)==0 and math.ceil((targety-map.y)/1.5)==0 then
+		p.SpriteSeq(false)
+		map.x=targetx
+		map.y=targety
+		Visibility()
+	else
+		timer.performWithDelay(50,MoveMap)
 	end
 end

@@ -55,13 +55,17 @@ function Play(id)
 	if Loaded==true then
 		local check=audio.isChannelPlaying(id)
 		if check==false then
-			if Sound~=0.0 then
-				audio.setVolume( 1.0*Sound, { channel=id  })
-				audio.play( soundboard[id], {channel=id} )
-			end
 		else
 			audio.stop(id)
-			if Sound~=0.0 then
+		end
+		if Sound~=0.0 then
+			if id==12 then
+				audio.setVolume( 0.3*Sound, { channel=id  })
+				audio.play( soundboard[id], {channel=id} )
+			elseif id==7 then
+				audio.setVolume( 0.3*Sound, { channel=id  })
+				audio.play( soundboard[id], {channel=id} )
+			else
 				audio.setVolume( 1.0*Sound, { channel=id  })
 				audio.play( soundboard[id], {channel=id} )
 			end
@@ -91,22 +95,31 @@ function PlayMusic()
 	if Loaded==true then
 		local check=audio.isChannelPlaying(mChannel)
 		if check==false then
-			audio.setVolume( 0.5*Music, { channel=mChannel  })
+			print (curMusic)
+			if curMusic==1 then
+				audio.setVolume( 0.5*Music, { channel=mChannel  })
+			elseif curMusic==2 then
+				audio.setVolume( 0.2*Music, { channel=mChannel  })
+			elseif curMusic==3 then
+				audio.setVolume( 0.5*Music, { channel=mChannel  })
+			end
 			bkgmusic=audio.play( musicboard[curMusic], {channel=mChannel, onComplete=RepeatBkg} )
 			if Music==0.0 then
 				audio.pause(bkgmusic)
 			end
 		elseif check==true then
-			audio.fadeOut( { channel=mChannel, time=1000 } )
+			audio.fadeOut( { channel=mChannel, time=2000 } )
 		end
 	end
 end
 
 function changeMusic(data)
-	curMusic=data
-	if curMusic~=0 then
-		didChange=true
-		PlayMusic()
+	if curMusic~=data then
+		curMusic=data
+		if curMusic~=0 then
+			didChange=true
+			PlayMusic()
+		end
 	end
 end
 
@@ -117,7 +130,7 @@ end
 function RepeatBkg()
 	if didChange==true then
 		didChange=false
-		timer.performWithDelay(5000,PlayMusic)
+		timer.performWithDelay(3000,PlayMusic)
 	else
 		timer.performWithDelay(10000,PlayMusic)
 	end

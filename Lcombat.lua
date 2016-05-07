@@ -6,27 +6,18 @@
 module(..., package.seeall)
 local energysheet = graphics.newImageSheet( "energysprite.png", { width=60, height=60, numFrames=4 })
 local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height=25, numFrames=16 })
-local dexatt2 = graphics.newImageSheet( "enemy/dexatt2.png",{ width=32, height=33, numFrames=24 })
-local dexatt3 = graphics.newImageSheet( "enemy/dexatt3.png",{ width=32, height=33, numFrames=24 })
-local stadef2 = graphics.newImageSheet( "enemy/stadef2.png",{ width=55, height=32, numFrames=8 })
-local stadef3 = graphics.newImageSheet( "enemy/stadef3.png",{ width=55, height=32, numFrames=8 })
+local stadef = graphics.newImageSheet( "enemy/stadef.png",{ width=140, height=110, numFrames=15 })
 local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 })
-local statussheet = graphics.newImageSheet( "status.png", { width=80, height=80, numFrames=8 } )
-local player1 = graphics.newImageSheet( "player/0.png", { width=39, height=46, numFrames=25 } )
-local player2 = graphics.newImageSheet( "player/1.png", { width=24, height=33, numFrames=25 } )
-local player3 = graphics.newImageSheet( "player/2.png", { width=30, height=49, numFrames=25 } )
-local player4 = graphics.newImageSheet( "player/3.png", { width=33, height=53, numFrames=35 } )
-local timersheet = graphics.newImageSheet( "timer.png",{ width=100, height=100, numFrames=25 })
-local mgc2 = graphics.newImageSheet( "enemy/mage2.png",{ width=30, height=40, numFrames=10 })
-local mgc3 = graphics.newImageSheet( "enemy/mage3.png",{ width=30, height=40, numFrames=10 })
+local dexatt = graphics.newImageSheet( "enemy/dexatt.png",{ width=64, height=64, numFrames=12 })
+local mgcint = graphics.newImageSheet( "enemy/mgcint.png",{ width=90, height=80, numFrames=12 })
+local statussheet = graphics.newImageSheet( "status.png", { width=80, height=80, numFrames=8 })
+local timersheet = graphics.newImageSheet( "timer.png",{ width=100, height=100, numFrames=25})
+local psheet = graphics.newImageSheet( "player.png", { width=24, height=32, numFrames=24 } )
 local hpsheet = graphics.newImageSheet("hp.png",{ width=200, height=30, numFrames=67 })
 local mpsheet = graphics.newImageSheet("mp.png",{ width=200, height=30, numFrames=67 })
 local epsheet = graphics.newImageSheet("ep.png",{ width=200, height=30, numFrames=67 })
 local p1sprite={player1,player2,player3,player4}
 local xCoord=display.contentWidth-250
-local dexatt={dexatt3,dexatt2}
-local stadef={stadef3,stadef2}
-local mgc={mgc3,mgc2}
 local yCoord=510
 local builder=require("Lmapbuilder")
 local players=require("Lplayers")
@@ -54,6 +45,19 @@ local modif
 local hits
 local gcm
 local gom
+local pseqs={
+		{name="stand1", start=1,  count=1, time=1000},
+		{name="stand2", start=2,  count=1, time=1000},
+		{name="stand3", start=3,  count=1, time=1000},
+		{name="stand4", start=4,  count=1, time=1000},
+		{name="walk1",  start=5,  count=4, time=1000},
+		{name="walk2",  start=9,  count=4, time=1000},
+		{name="walk3",  start=13, count=4, time=1000},
+		{name="walk4",  start=17, count=4, time=1000},
+		{name="stance",   start=21, count=2, time=1000},
+		{name="hit",   start=21, count=3, time=1000},
+		{name="hurt",   start=24, count=1, time=1000},
+	}
 
 function InTrouble()
 	if inCombat==true or outcomed==true then
@@ -357,11 +361,7 @@ function ShowActions()
 	ptimer=nil
 	local ep=timer.pause(etimer)
 	
-	if Automatic==true then
-		Automatic=0
-	end
-	
-	if Automatic==0 then
+	if Automatic==0 or Automatic==true then
 	
 		if isDefend==true then
 			P1Sprite()
@@ -647,90 +647,60 @@ end
 function MobSprite(value)
 	if inCombat==true then
 		if (value)==(1) then--Create
-			enemy.num=math.random(1,2)
 			if (enemy.class==1) or (enemy.class==3) then
-				--Sta/Def
+				--STA/DEF
 				eseqs={
-					{name="walk", start=1, count=4, time=1000},
-					{name="hit", start=5, count=3, loopCount=1, time=1000},
-					{name="hurt", start=8, count=1, time=1000}
+					{name="walk", start=1, count=3, time=1000},
+					{name="hit", start=6, count=10, loopCount=1, time=1000},
+					{name="hurt", start=5, count=1, time=1000}
 				}
-				esprite=display.newSprite( stadef[enemy.num], eseqs  )
+				esprite=display.newSprite( stadef, eseqs  )
 				esprite:setSequence( "walk" )
 				esprite.x=(display.contentWidth/2)+50
 				esprite.y=170
-				esprite.xScale=4.0
+				esprite.xScale=2.0
 				esprite.yScale=esprite.xScale
 				esprite:play()
 				gcm:insert(esprite)
 			elseif (enemy.class==2) or (enemy.class==5)then
-				--Att/Dex
+				--ATT/DEX
 				eseqs={
 					{name="walk", start=1, count=4, time=1000},
-					{name="hit", start=9, count=4, loopCount=1, time=1000},
-					{name="hurt", start=8, count=1, time=1000},
-					{name="hitalt", start=17, count=3, loopCount=1, time=1000}
+					{name="hit", start=7, count=6, loopCount=1, time=1000},
+					{name="hurt", start=6, count=1, time=1000},
 				}
-				esprite=display.newSprite( dexatt[enemy.num], eseqs  )
+				esprite=display.newSprite( dexatt, eseqs  )
 				esprite:setSequence( "walk" )
 				esprite.x=(display.contentWidth/2)+50
 				esprite.y=170
-				esprite.xScale=3.5
+				esprite.xScale=2.5
 				esprite.yScale=esprite.xScale
 				esprite:play()
 				gcm:insert(esprite)
 			elseif (enemy.class)==(4) or (enemy.class)==(6) then
-				--MGC
+				--MGC/INT
 				eseqs={
 					{name="walk", start=1, count=4, time=1000},
-					{name="hit", start=6, count=3, loopCount=1, time=1000},
-					{name="hurt", start=5, count=1, time=1000}
+					{name="hit", start=7, count=6, loopCount=1, time=1000},
+					{name="hurt", start=6, count=1, time=1000}
 				}
-				esprite=display.newSprite( mgc[enemy.num], eseqs  )
+				esprite=display.newSprite( mgcint, eseqs  )
 				esprite:setSequence( "walk" )
 				esprite.x=(display.contentWidth/2)+50
 				esprite.y=170
-				esprite.xScale=4.0
+				esprite.xScale=2.0
 				esprite.yScale=esprite.xScale
 				esprite:play()
 				gcm:insert(esprite)
 			end
 		end
 		if (value)==(2) then--Change to Hit
-			if (enemy.class==1) or (enemy.class==3) then
-				--Sta/Def
-				esprite:setSequence( "hit" )
-				esprite:play()
-			elseif (enemy.class==2) or (enemy.class==5)then
-				--Att/Dex
-				local roll=math.random(1,2)
-				if roll==1 then
-					esprite:setSequence( "hit" )
-					esprite:play()
-				elseif roll==2 then
-					esprite:setSequence( "hitalt" )
-					esprite:play()
-				end
-			elseif (enemy.class)==(4) then
-				--MGC
-				esprite:setSequence( "hit" )
-				esprite:play()
-			end
+			esprite:setSequence( "hit" )
+			esprite:play()
 		end
 		if (value)==(3) then--Change to Hurt
-			if (enemy.class==1) or (enemy.class==3) then
-				--Sta/Def
-				esprite:setSequence( "hurt" )
-				esprite:play()
-			elseif (enemy.class==2) or (enemy.class==5)then
-				--Att/Dex
-				esprite:setSequence( "hurt" )
-				esprite:play()
-			elseif (enemy.class)==(4) then
-				--MGC
-				esprite:setSequence( "hurt" )
-				esprite:play()
-			end
+			esprite:setSequence( "hurt" )
+			esprite:play()
 		end
 		if (value~=1)and(value~=2)and(value~=3)and(value~=4)then--Go Default
 			if (esprite)and(esprite.sequence~="walk")then
@@ -748,85 +718,17 @@ end
 function P1Sprite(value)
 	if inCombat==true then
 		if (value)==(1) then--Create
-			if (p1.char==0) then
-				pseqs={
-					{name="walk", start=1, count=4, time=1000},
-					{name="hit1", start=6, count=3, loopCount=1, time=1000},
-					{name="hit2", start=11, count=4, loopCount=1, time=1000},
-					{name="hit3", start=16, count=5, loopCount=1, time=1000},
-					{name="cast", start=21, count=2, time=1000},
-					{name="hurt", start=5, count=1, time=1000}
-				}
-				psprite=display.newSprite( p1sprite[1], pseqs  )
-				psprite:setSequence( "walk" )
-				psprite.x=(display.contentWidth/2)-50
-				psprite.y=170
-				psprite.xScale=4.0
-				psprite.yScale=psprite.xScale
-				psprite:play()
-				gcm:insert(psprite)
-			elseif (p1.char==1) then
-				pseqs={
-					{name="walk", start=1, count=2, time=1000},
-					{name="hit1", start=6, count=3, loopCount=1, time=1000},
-					{name="hit2", start=11, count=3, loopCount=1, time=1000},
-					{name="hit3", start=16, count=5, loopCount=1, time=1000},
-					{name="cast", start=21, count=2, time=1000},
-					{name="hurt", start=3, count=1, time=1000}
-				}
-				psprite=display.newSprite( p1sprite[2], pseqs  )
-				psprite:setSequence( "walk" )
-				psprite.x=(display.contentWidth/2)-50
-				psprite.y=170
-				psprite.xScale=4.0
-				psprite.yScale=psprite.xScale
-				psprite:play()
-				gcm:insert(psprite)
-			elseif (p1.char)==(2) then
-				pseqs={
-					{name="walk", start=1, count=4, time=1000},
-					{name="hit1", start=6, count=2, loopCount=1, time=1000},
-					{name="hit2", start=11, count=3, loopCount=1, time=1000},
-					{name="hit3", start=16, count=2, loopCount=1, time=1000},
-					{name="cast", start=21, count=2, time=1000},
-					{name="hurt", start=5, count=1, time=1000}
-				}
-				psprite=display.newSprite( p1sprite[3], pseqs  )
-				psprite:setSequence( "walk" )
-				psprite.x=(display.contentWidth/2)-50
-				psprite.y=170
-				psprite.xScale=4.0
-				psprite.yScale=psprite.xScale
-				psprite:play()
-				gcm:insert(psprite)
-			elseif (p1.char)==(3) then
-				pseqs={
-					{name="walk", start=1, count=2, time=600},
-					{name="cast", start=8, count=2, time=600},
-					{name="hit1", start=15, count=3, loopCount=1, time=400},
-					{name="hit2", start=22, count=4, loopCount=1, time=600},
-					{name="hit3", start=29, count=7, loopCount=1, time=1000},
-					{name="hurt", start=3, count=1, time=800}
-				}
-				psprite=display.newSprite( p1sprite[4], pseqs  )
-				psprite:setSequence( "walk" )
-				psprite.x=(display.contentWidth/2)-50
-				psprite.y=170
-				psprite.xScale=4.0
-				psprite.yScale=psprite.xScale
-				psprite:play()
-				gcm:insert(psprite)
-			end
+			psprite=display.newSprite( p1sprite[1], pseqs  )
+			psprite:setSequence( "stance" )
+			psprite.x=(display.contentWidth/2)-50
+			psprite.y=170
+			psprite.xScale=4.0
+			psprite.yScale=psprite.xScale
+			psprite:play()
+			gcm:insert(psprite)
 		end
 		if (value)==(2) then--Change to Hit
-			local hat=math.random(1,3)
-			if hat==1 then
-				psprite:setSequence( "hit1" )
-			elseif hat==2 then
-				psprite:setSequence( "hit2" )
-			else
-				psprite:setSequence( "hit3" )
-			end
+			psprite:setSequence( "hit" )
 			psprite:play()
 		end
 		if (value)==(3) then--Change to Hurt
@@ -835,13 +737,13 @@ function P1Sprite(value)
 		end
 		if (value)==(4) then--Set to Casting
 			audio.Play(11)
-			psprite:setSequence( "cast" )
+			psprite:setSequence( "hit" )
 			psprite:play()
 		end
 		if (value~=1)and(value~=2)and(value~=3)and(value~=4) then--Go Default
-			if (psprite)and(psprite.sequence~="walk")then
+			if (psprite)and(psprite.sequence~="stance")then
 				if (psprite.frame==psprite.numFrames)or(psprite.sequence=="cast")then
-					psprite:setSequence( "walk" )
+					psprite:setSequence( "stance" )
 					psprite:play()
 				else
 					timer.performWithDelay(20,P1Sprite)
@@ -1441,7 +1343,7 @@ function EndTurn()
 end
 
 function EndCombat(outcome)
-	audio.changeMusic(1)
+	audio.changeMusic(2)
 	Runtime:removeEventListener("enterFrame", ManageHits)
 	inCombat=false
 	for i=gcm.numChildren,1,-1 do
@@ -1965,6 +1867,8 @@ function ShowSorcery()
 		gspl=display.newGroup()
 		spells={}
 		spellframes={}
+		spellsep={}
+		spellsmp={}
 		for i=1,table.maxn(p1.spells) do
 			if (p1.spells[i][3])==true then
 				function Hoo()
@@ -1975,7 +1879,6 @@ function ShowSorcery()
 				spellframes[#spellframes].yScale=spellframes[#spellframes].xScale
 				spellframes[#spellframes].x = xinvicial+ (((#spellframes-1)%4)*((espacio*spellframes[#spellframes].xScale)+4))
 				spellframes[#spellframes].y = yinvicial+(((espacio*spellframes[#spellframes].xScale)+4)*(math.floor((#spellframes-1)/4)))
-				spellframes[#spellframes]:addEventListener("tap",Hoo)
 				gspl:insert( spellframes[#spellframes] )
 				
 				spells[#spells+1]=display.newImageRect( "spells/"..p1.spells[i][1]..".png" ,80,80)
@@ -1986,6 +1889,23 @@ function ShowSorcery()
 				gspl:insert( spells[#spells] )
 				
 				spellframes[#spellframes]:toFront()
+				
+				if p1.spells[i][4]<=p1.MP and  p1.spells[i][5]<=p1.EP then
+					spellframes[#spellframes]:addEventListener("tap",Hoo)
+				else
+					spellframes[#spellframes]:setFillColor(255,70,70)
+					spellsmp[#spellsmp+1]=display.newText( (p1.spells[i][4].."MP"),0,0,"MoolBoran",35)
+					spellsmp[#spellsmp]:setTextColor(70,255,70)
+					spellsmp[#spellsmp].x=spellframes[#spellframes].x
+					spellsmp[#spellsmp].y=spellframes[#spellframes].y-10
+					gspl:insert( spellsmp[#spellsmp] )
+					
+					spellsep[#spellsep+1]=display.newText( (p1.spells[i][5].."EP"),0,0,"MoolBoran",35)
+					spellsep[#spellsep]:setTextColor(255,70,255)
+					spellsep[#spellsep].x=spellframes[#spellframes].x
+					spellsep[#spellsep].y=spellframes[#spellframes].y+10
+					gspl:insert( spellsep[#spellsep] )
+				end
 				
 			end
 		end
