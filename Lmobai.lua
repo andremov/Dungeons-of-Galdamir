@@ -27,7 +27,7 @@ local col
 local row
 local SpawnCD=5
 local DidSomething
-local scale=1.1
+local scale=1.2
 local espacio=80*scale
 local xinicial=display.contentCenterX-(espacio)
 local yinicial=display.contentCenterY-(espacio)

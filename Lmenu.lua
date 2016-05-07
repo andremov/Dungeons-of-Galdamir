@@ -107,7 +107,7 @@ function ShowMenu()
 	ad1.y=logo.y+30
 	ad1.xScale=2.0
 	ad1.yScale=ad1.xScale
-	ad1:addEventListener("tap",openAd1)
+	ad1:addEventListener("touch",openAd1)
 	group:insert(ad1)
 	
 	ad2=display.newImageRect("ad2.png",57,57)
@@ -115,7 +115,7 @@ function ShowMenu()
 	ad2.y=ad1.y
 	ad2.xScale=ad1.xScale
 	ad2.yScale=ad1.xScale
-	ad2:addEventListener("tap",openAd2)
+	ad2:addEventListener("touch",openAd2)
 	group:insert(ad2)
 	
 	Splash=s.GetSplash()
@@ -147,19 +147,19 @@ function ReadySetGo()
 end
 
 function onUpdateBtnRelease()
-	if canGo==true then
+	if canGo==true and event.phase=="ended" then
 		system.openURL( "tinyurl.com/dogcub3d" )
 	end
 end
 
 function openAd1()
-	if canGo==true then
+	if canGo==true and event.phase=="ended" then
 		system.openURL( "tinyurl.com/togcub3d" )
 	end
 end
 
 function openAd2()
-	if canGo==true then
+	if canGo==true and event.phase=="ended" then
 		system.openURL( "tinyurl.com/mogcub3d" )
 	end
 end
@@ -202,7 +202,7 @@ function isVersion(val)
 			VDisplay2.x=VDisplay.x
 			VDisplay2.y=VDisplay.y+45
 			group:insert(VDisplay2)
-			sign:addEventListener("tap",onUpdateBtnRelease)
+			sign:addEventListener("touch",onUpdateBtnRelease)
 			else
 				function Closure2()
 					isVersion(false)

@@ -17,8 +17,8 @@ Font5: MoolBoran
 --]]
 
 local RSS
-local GVersion="GAMMA 1.0.0"
-local cVersion="GAMA 1.0.0"
+local GVersion="GAMMA 1.0.1"
+local cVersion="GAMA 1.0.1"
 
 function HowDoIVersion(val)
 	if val==true then

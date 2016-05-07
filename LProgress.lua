@@ -78,7 +78,7 @@ end
 function FloorPort(up)
 	if up==true then
 		local P1=players.GetPlayer()
-		local size=builder.GetLevel(0)
+		local size=builder.GetData(0)
 		Round=Round+1
 		
 		FloorSign()

@@ -16,6 +16,7 @@ local c=require("Lchars")
 local a=require("Laudio")
 local i=require("Litems")
 local w=require("Lwindow")
+local ui=require("Lui")
 local su=require("Lstartup")
 local yCoord=856
 local xCoord=70
@@ -23,7 +24,7 @@ local Map
 local check=119
 local player
 local Cheat=false
-local scale=1.1
+local scale=1.2
 local StrongForce
 local transp
 local transp2
@@ -33,6 +34,7 @@ local names={
 		"Orphan",
 		"Smith",
 		"Slave",
+		"Hctib",
 	}
 	
 function CreatePlayers(name)
@@ -88,7 +90,7 @@ function CreatePlayers(name)
 		(player.nat[5]+player.eqs[5]+player.bon[5]+player.bst[5]),
 		(player.nat[6]+player.eqs[6]+player.bon[6]+player.bst[6]),
 	}
-	player.pnts=5
+	player.pnts=7
 	--Spells
 	player.spells={
 		{"Fireball","Cast a firey ball of death and burn the enemy.",true,10,5},
@@ -101,11 +103,11 @@ function CreatePlayers(name)
 	}
 	--Secondary Stats
 	player.portcd=0
-	player.MaxHP=(100*player.lvl)+(player.stats[1]*10)
+	player.MaxHP=(10*player.lvl)+(player.stats[1]*20)
+	player.MaxMP=(5*player.lvl)+(player.stats[6]*10)
+	player.MaxEP=(5*player.lvl)+(player.stats[6]*10)
 	player.HP=player.MaxHP
-	player.MaxMP=( (player.lvl*15)+(player.stats[6]*10) )
 	player.MP=player.MaxMP
-	player.MaxEP=( (player.lvl*15)+(player.stats[6]*10) )
 	player.EP=player.MaxEP
 	player.SPD=(1.00-(player.stats[5]/100))
 	--
@@ -330,21 +332,38 @@ function ShowStats()
 		transp4=0
 		StatSymbol=display.newImageRect("unspent.png",240,80)
 		StatSymbol.x = display.contentWidth-130
-		StatSymbol.y = display.contentHeight-250
+		StatSymbol.y = display.contentHeight-150
 		StatSymbol:toFront()
 		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
 		su.FrontNCenter()
 	end
 	
-	if player.pnts~=0 then
-		transp4=255
-		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
-	elseif player.pnts==0 and transp4~=0 then
+	if StrongForce==true then
+		StatSymbol:removeEventListener("touch",openStats)
 		transp4=transp4-(255/50)
 		if transp4<20 then
 			transp4=0
 		end
 		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
+	elseif player.pnts~=0 then
+		StatSymbol:removeEventListener("touch",openStats)
+		transp4=255
+		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
+		StatSymbol:addEventListener("touch",openStats)
+	elseif player.pnts==0 and transp4~=0 then
+		StatSymbol:removeEventListener("touch",openStats)
+		transp4=transp4-(255/50)
+		if transp4<20 then
+			transp4=0
+		end
+		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
+	end
+end
+
+function openStats( event )
+	if event.phase=="ended" then
+		ui.Pause(true)
+		w.ToggleInfo()
 	end
 end
 
@@ -421,9 +440,9 @@ function StatCheck()
 		(player.nat[6]+player.eqs[6]+player.bon[6]+player.bst[6]),
 	}
 	player.SPD=(1.00-(player.stats[5]/100))
-	player.MaxHP=(100*player.lvl)+(player.stats[1]*10)
-	player.MaxMP=(player.lvl*15)+(player.stats[6]*10)
-	player.MaxEP=(player.lvl*15)+(player.stats[6]*10)
+	player.MaxHP=(10*player.lvl)+(player.stats[1]*20)
+	player.MaxMP=(5*player.lvl)+(player.stats[6]*10)
+	player.MaxEP=(5*player.lvl)+(player.stats[6]*10)
 	if player.HP>player.MaxHP then
 		player.HP=player.MaxHP
 	end

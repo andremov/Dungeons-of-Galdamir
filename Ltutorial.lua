@@ -3370,6 +3370,24 @@ function titleCheck()
 end
 
 function SixtyFive()
+	display.remove(LifeDisplay)
+	display.remove(LifeWindow)
+	display.remove(LifeSymbol)
+	display.remove(ManaDisplay)
+	display.remove(ManaWindow)
+	display.remove(ManaSymbol)
+	display.remove(EnergyDisplay)
+	display.remove(EnergyWindow)
+	display.remove(EnergySymbol)
+	LifeDisplay=nil
+	LifeWindow=nil
+	LifeSymbol=nil
+	ManaDisplay=nil
+	ManaWindow=nil
+	ManaSymbol=nil
+	EnergyDisplay=nil
+	EnergyWindow=nil
+	EnergySymbol=nil
 	display.remove(boundary)
 	boundary=nil
 	display.remove(titleLogo)

@@ -12,7 +12,7 @@ local ghs=display.newGroup()
 local Score
 local GVersion
 local OKVers={
-		"GAMMA 1.0.0",
+		"GAMMA 1.0.1",
 	}
 local Default={
 		"Brownie S.",10000,
@@ -52,25 +52,26 @@ end
 
 function Scoring(round,p1,size)
 	Score=(
-		(round-1)
+		p1.gp/round
 	)
 	Score=(
-		Score+1
+		Score*((size/10)-1)
+	)
+	local process=(
+		p1.stats[1]+p1.stats[2]+p1.stats[3]+p1.stats[4]+p1.stats[5]+p1.stats[6]
+	)
+	local process=(
+		process/(15+(p1.lvl*4))
 	)
 	Score=(
-		p1.gp/Score
+		math.floor(Score*process)
 	)
-	Score=(
-		Score^((size/10)-1)
-	)
-	Score=(
-		math.floor(Score*((p1.stats[1]+p1.stats[2]+p1.stats[3]+p1.stats[4]+p1.stats[5]+p1.stats[6])/6))
-	)
-	isHigh(Score,p1.name)
-	return Score
+	local hs=isHigh(Score,p1.name)
+	return Score,hs
 end
 
 function isHigh(val,name)
+	local banner=false
 	if val~=nil then
 		CheckScore()
 		Sve={}
@@ -90,6 +91,7 @@ function isHigh(val,name)
 			end
 		end
 		if overIt~=false then
+			banner=true
 			local fh, errStr = io.open( path, "r+" )
 			
 			fh:write( Sve[1], "\n" )
@@ -110,6 +112,7 @@ function isHigh(val,name)
 		end
 	end
 	CleanScores()
+	return banner
 end
 
 function HighScores()

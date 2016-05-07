@@ -70,7 +70,7 @@ function Essentials()
 	SBookDisplayed=false
 	inCombat=false
 	outcomed=false
-	yinvicial=156
+	yinvicial=180
 	xinvicial=75
 	espaciox=64
 	espacioy=64
@@ -176,8 +176,8 @@ function HideActions()
 		display.remove(ItemBtn)
 	end
 	
-	if (RunBtn) then
-		display.remove(RunBtn)
+	if (GuardBtn) then
+		display.remove(GuardBtn)
 	end
 	
 	if (BackBtn) then
@@ -199,14 +199,14 @@ function HideActions()
 	ItemBtn.y = timersprite.y+44
 	gcm:insert( ItemBtn )
 	
-	RunBtn=display.newImageRect("combataction3.png",342,86)
-	RunBtn.x = MagicBtn.x
-	RunBtn.y = timersprite.y+44
-	gcm:insert( RunBtn )
+	GuardBtn=display.newImageRect("combataction3.png",342,86)
+	GuardBtn.x = MagicBtn.x
+	GuardBtn.y = timersprite.y+44
+	gcm:insert( GuardBtn )
 	
 	BackBtn=display.newImageRect("combataction3.png",342,86)
 	BackBtn.x = display.contentCenterX
-	BackBtn.y = display.contentHeight-150
+	BackBtn.y = GuardBtn.y+88
 	gcm:insert( BackBtn )
 	
 	timersprite:toFront()
@@ -215,6 +215,11 @@ end
 function ShowActions()
 	ptimer=nil
 	local ep=timer.pause(etimer)
+	if isDefend==true then
+		P1Sprite()
+		p1.stats[3]=p1.stats[3]/1.5
+		isDefend=false
+	end
 	
 	if (AttackBtn) then
 		display.remove(AttackBtn)
@@ -231,9 +236,9 @@ function ShowActions()
 		ItemBtn=nil
 	end
 	
-	if (RunBtn) then
-		display.remove(RunBtn)
-		RunBtn=nil
+	if (GuardBtn) then
+		display.remove(GuardBtn)
+		GuardBtn=nil
 	end
 	
 	if (BackBtn) then
@@ -296,14 +301,35 @@ function ShowActions()
 		gcm:insert( ItemBtn )
 	end
 	
+	function toDefend()
+		HideActions()
+		
+		Guard()
+	end
+	
+	if not(GuardBtn)then
+		GuardBtn= widget.newButton{
+			label="Guard",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=35,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = toDefend}
+		GuardBtn:setReferencePoint( display.CenterReferencePoint )
+		GuardBtn.x = MagicBtn.x
+		GuardBtn.y = ItemBtn.y
+		gcm:insert( GuardBtn )
+	end
+	
 	function toRun()
 		HideActions()
 		
 		RunAttempt()
 	end
 	
-	if not(RunBtn)then
-		RunBtn= widget.newButton{
+	if not(BackBtn)then
+		BackBtn= widget.newButton{
 			label="Retreat",
 			labelColor = { default={0,0,0}, over={255,255,255} },
 			fontSize=35,
@@ -311,20 +337,20 @@ function ShowActions()
 			overFile="combataction2.png",
 			width=342, height=86,
 			onRelease = toRun}
-		RunBtn:setReferencePoint( display.CenterReferencePoint )
-		RunBtn.x = MagicBtn.x
-		RunBtn.y = ItemBtn.y
-		gcm:insert( RunBtn )
-	end
-	
-	if not(BackBtn)then
-		BackBtn=display.newImageRect("combataction3.png",342,86)
+		BackBtn:setReferencePoint( display.CenterReferencePoint )
 		BackBtn.x = display.contentCenterX
-		BackBtn.y = display.contentHeight-150
+		BackBtn.y = GuardBtn.y+88
 		gcm:insert( BackBtn )
 	end
 	
 	timersprite:toFront()
+end
+
+function Guard()
+	P1Sprite(3)
+	p1.stats[3]=p1.stats[3]*1.5
+	isDefend=true
+	UpdateStats()
 end
 
 function AttackType()
@@ -345,9 +371,9 @@ function AttackType()
 		ItemBtn=nil
 	end
 	
-	if (RunBtn) then
-		display.remove(RunBtn)
-		RunBtn=nil
+	if (GuardBtn) then
+		display.remove(GuardBtn)
+		GuardBtn=nil
 	end
 	
 	if (BackBtn) then
@@ -402,10 +428,10 @@ function AttackType()
 	ItemBtn.y = timersprite.y+44
 	gcm:insert( ItemBtn )
 	
-	RunBtn=display.newImageRect("combataction3.png",342,86)
-	RunBtn.x = MagicBtn.x
-	RunBtn.y = timersprite.y+44
-	gcm:insert( RunBtn )
+	GuardBtn=display.newImageRect("combataction3.png",342,86)
+	GuardBtn.x = MagicBtn.x
+	GuardBtn.y = timersprite.y+44
+	gcm:insert( GuardBtn )
 	
 	if not(BackBtn)then
 		BackBtn=widget.newButton{
@@ -809,8 +835,8 @@ function CreateMobStats()
 			enemy.stats[s]=1+enemy.bonus[s]
 		end
 		enemy.status=false
-		enemy.pnts=(5*enemy.lvl)
-		enemy.pnts=enemy.pnts
+		enemy.pnts=(4.5*enemy.lvl)
+		enemy.pnts=math.floor(enemy.pnts+1)
 		for i=1,enemy.pnts do
 			enemy.min=math.min(enemy.stats[1],enemy.stats[2],enemy.stats[3],enemy.stats[4],enemy.stats[5])
 			local astats={}
@@ -841,10 +867,8 @@ function CreateMobStats()
 	enemy.classnames={"Gladiator","Berserker","Gladiator","Wizard","Berserker"}
 	enemy.classname=enemy.classnames[enemy.class]
 	MobSprite(1)
-	enemy.MaxHP=(100*enemy.lvl)+(enemy.stats[1]*10)
-	enemy.MaxMP=(enemy.lvl*15)+(enemy.stats[4]*10)
+	enemy.MaxHP=(30*enemy.lvl)+(enemy.stats[1]*20)
 	enemy.HP=enemy.MaxHP
-	enemy.MP=enemy.MaxMP
 	enemy.SPD=(1.00-(enemy.stats[5]/100))
 	
 	UpdateStats()
@@ -1174,7 +1198,7 @@ function PlayerAttacks(atktype)
 		p1.EP=p1.EP-math.ceil(1.5*(p1.stats[atkstat]/5))
 		if p1.EP<0 then
 			p1.EP=0
-			force=8
+			force=4
 		else
 			force=16
 		end
@@ -1183,14 +1207,14 @@ function PlayerAttacks(atktype)
 		p1.MP=p1.MP-math.ceil(1.5*(p1.stats[atkstat]/5))
 		if p1.MP<0 then
 			p1.MP=0
-			force=8
+			force=4
 		else
 			force=16
 		end
 	end
 	local isHit=EvadeCalc("mob",16)
 	if isHit>=(enemy.stats[5]/6)*2 then
-		if isHit>=(enemy.stats[5]/3)*5 then
+		if isHit>=(enemy.stats[5]/3)*7 then
 			local Damage=DamageCalc("mob",(math.random(15,20)/10),force,atkstat)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,false)
@@ -1245,7 +1269,9 @@ function EndTurn()
 		end
 		
 		MobSprite()
-		P1Sprite()
+		if isDefend~=true then
+			P1Sprite()
+		end
 	elseif p1.HP<=0 then
 		function closure1()
 			EndCombat("Loss")
@@ -1433,14 +1459,24 @@ function Hits(damage,crit,target,special)
 		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 50 )
 		hits[#hits]:setTextColor( 150, 0, 150)
 	elseif special=="SPL" then
-		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 50 )
-		hits[#hits]:setTextColor(20,20,200)
+		if type(damage)=="string" then
+			hits[#hits+1]=display.newText( (damage), 0, 0, "MoolBoran", 50 )
+			hits[#hits]:setTextColor(20,20,200)
+		else
+			hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 50 )
+			hits[#hits]:setTextColor(20,20,200)
+		end
 	elseif crit==true then
 		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 70 )
 		hits[#hits]:setTextColor( 150, 0, 0)
 	elseif crit==false then
-		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 50 )
-		hits[#hits]:setTextColor( 0, 0, 0)
+		if type(damage)=="string" then
+			hits[#hits+1]=display.newText( (damage), 0, 0, "MoolBoran", 50 )
+			hits[#hits]:setTextColor(20,20,200)
+		else
+			hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 50 )
+			hits[#hits]:setTextColor( 0, 0, 0)
+		end
 	end
 	physics.addBody(hits[#hits], "dynamic", { friction=0.5,} )
 	hits[#hits].isFixedRotation = true
@@ -1472,12 +1508,11 @@ function ShowBag(action)
 			if (p1.inv[i])~=nil and p1.inv[i][1]<=8 then
 				local itmnme=item.ReturnInfo(p1.inv[i][1],0)
 				
-				items2[#items2+1]=display.newRect(0,0,65,65)
-				items2[#items2]:setFillColor(50,50,50)
-				items2[#items2].xScale=1.25
-				items2[#items2].yScale=1.25
+				items2[#items2+1]=display.newImageRect("itemframe.png",50,50)
+				items2[#items2].xScale=1.25*1.3
+				items2[#items2].yScale=1.25*1.3
 				items2[#items2].x = xinvicial+ (((#items2-1)%8)*((espaciox*items2[#items2].xScale)+4))
-				items2[#items2].y = display.contentHeight-250
+				items2[#items2].y = display.contentHeight-yinvicial
 				
 				if p1.inv[i][1]==2 then
 					items[#items+1]=display.newSprite( HPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
@@ -1497,7 +1532,7 @@ function ShowBag(action)
 				items[#items].xScale=1.25
 				items[#items].yScale=1.25
 				items[#items].x = xinvicial+ (((#items-1)%8)*((espaciox*items[#items].xScale)+4))
-				items[#items].y = display.contentHeight-250
+				items[#items].y = display.contentHeight-yinvicial
 				
 				function Gah()
 					UseItem(p1.inv[i][1],i)
@@ -1534,7 +1569,7 @@ function ShowBag(action)
 			onRelease = toItems}
 		BackBtn:setReferencePoint( display.CenterReferencePoint )
 		BackBtn.x = display.contentCenterX
-		BackBtn.y = display.contentHeight-150
+		BackBtn.y = GuardBtn.y+88
 		gcm:insert( BackBtn )
 	elseif inv==true or action==true then
 		inv=false
@@ -1670,7 +1705,7 @@ function CastSorcery(name)
 		end
 	end
 	if name=="Cleave" then
-		local Damage=MagicCalc((math.random(15,20)/10),22)
+		local Damage=DamageCalc("mob",(math.random(15,20)/10),32,2)
 		Hits((Damage),true,true,"SPL")
 		enemy.HP=enemy.HP-Damage
 		MobSprite(3)
@@ -1685,7 +1720,7 @@ function CastSorcery(name)
 	
 		local isHit=EvadeCalc("mob",64)
 		if isHit>=(enemy.stats[5]/6)*2 then
-			local Damage=MagicCalc((math.random(15,20)/10),22)
+			local Damage=DamageCalc("mob",(math.random(15,20)/10),32,2)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,"SPL")
 			else
@@ -1709,7 +1744,7 @@ function CastSorcery(name)
 		local isHit=EvadeCalc("mob",64)
 		if isHit>=(enemy.stats[5]/6)*2 then
 			if isHit>=(enemy.stats[5]/3)*5 then
-				local Damage=MagicCalc((math.random(15,20)/10),22)
+				local Damage=DamageCalc("mob",(math.random(15,20)/10),32,4)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
 				else
@@ -1725,7 +1760,7 @@ function CastSorcery(name)
 					Hits((Damage),true,true,"SPL")
 				end
 			else
-				local Damage=MagicCalc(1,22)
+				local Damage=DamageCalc("mob",1,32,4)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
 				else
@@ -1749,7 +1784,7 @@ function CastSorcery(name)
 	
 		local isHit=EvadeCalc("mob",64)
 		if isHit>=(enemy.stats[5]/6)*2 then
-			local Damage=MagicCalc((math.random(15,20)/10),22)
+			local Damage=DamageCalc("mob",(math.random(15,20)/10),32,2)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,"SPL")
 			else
@@ -1772,7 +1807,7 @@ function CastSorcery(name)
 		local isHit=EvadeCalc("mob",64)
 		if isHit>=(enemy.stats[5]/6)*2 then
 			if isHit>=(enemy.stats[5]/3)*5 then
-				local Damage=MagicCalc((math.random(15,20)/10),22)
+				local Damage=DamageCalc("mob",(math.random(15,20)/10),32,4)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
 				else
@@ -1784,7 +1819,7 @@ function CastSorcery(name)
 					Hits((Damage),true,true,"SPL")
 				end
 			else
-				local Damage=MagicCalc(1,22)
+				local Damage=DamageCalc("mob",1,32,2)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
 				else
@@ -1813,47 +1848,25 @@ function NoMansLand()
 	end
 end
 
-function MagicCalc(crit,cmd)
-	local Damage
-	Damage=(
-		((p1.stats[4]*1.5)-enemy.stats[3])*5
-	)
-	Damage=(
-		((Damage*cmd/16)*crit)
-	)
-	Damage=(
-		Damage*((math.random((10+(p1.stats[4]*0.5)),(10+(p1.stats[4]*1.5))))/10)
-	)
-	Damage=(Damage*0.65)
-	Damage=math.floor(Damage)
-	return Damage
-end
-
 function DamageCalc(tar,crit,cmd,atkstat)
 	local Damage
 	if tar=="p1" then
 		Damage=(
-			((enemy.stats[2]*1.5)-p1.stats[3])*5
+			((enemy.stats[2]*(math.random(5,15)/10))-p1.stats[3])
 		)
 		Damage=(
 			((Damage*cmd/16)*crit)
 		)
-		Damage=(
-			Damage*((math.random((10+(enemy.stats[2]*0.5)),(10+(enemy.stats[2]*1.5))))/10)
-		)
-		Damage=(Damage*0.65)
+		Damage=(Damage*0.4)
 		Damage=math.floor(Damage)
 	elseif tar=="mob" then
 		Damage=(
-			((p1.stats[atkstat]*1.5)-enemy.stats[3])*5
+			((p1.stats[atkstat]*(math.random(5,15)/10))-enemy.stats[3])
 		)
 		Damage=(
 			((Damage*cmd/16)*crit)
 		)
-		Damage=(
-			Damage*((math.random((10+(p1.stats[atkstat]*0.5)),(10+(p1.stats[atkstat]*1.5))))/10)
-		)
-		Damage=(Damage*0.65)
+		Damage=(Damage*0.4)
 		Damage=math.floor(Damage)
 	end
 	return Damage

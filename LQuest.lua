@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local coinsheet = graphics.newImageSheet( "bluecoinsprite.png", { width=32, height=32, numFrames=8 } )
+local qsheet = graphics.newImageSheet( "quest.png", { width=447, height=80, numFrames=7 } )
 local b=require("Lmapbuilder")
 local gp=require("Lgold")
 local WD=require("Lprogress")
@@ -16,6 +17,7 @@ local NumKills
 local CurKills
 local MobLvl
 local NumItem
+local QUpdate
 local CurItem
 local AmCoins
 local coins={}
@@ -39,9 +41,10 @@ function CreateQuest()
 		if roll>=6 then
 	--		print "Quest get."
 			HasQuest=true
-			QWindow=display.newImageRect("quest.png",447,80)
+			QWindow=display.newSprite( qsheet, { name="quest", start=1, count=7, time=1000,loopCount=1}  )
 			QWindow.x= display.contentWidth-225
 			QWindow.y= 40
+			QWindow:play()
 			gqm:insert(QWindow)
 			
 			QTitle=display.newText("Current Quest:",display.contentWidth-380,-5,"MoolBoran",40)
@@ -121,28 +124,163 @@ function UpdateQuest(val,val2)
 	if HasQuest==true then
 		if QuestType==1 and val=="mob" then
 	--		print "Quests updated."
+			QWindow:setFrame(1)
+			QWindow:play()
 			CurKills=CurKills+1
 			QText.text=("Defeat "..NumKills.." mobs. ("..CurKills.."/"..NumKills..")")
 			if CurKills==NumKills then
+				if (QUpdate)then
+					Runtime:removeEventListener("enterFrame",HandleIt)
+					display.remove(QUpdate)
+					QUpdate=nil
+					display.remove(QUWindow)
+					QUWindow=nil
+				end
+				transp=255
+				
+				QUpdate=display.newText(("Quest complete!"),0,0,"MoolBoran",70)
+				QUpdate.x=display.contentCenterX
+				QUpdate.y=display.contentHeight*.25
+				Runtime:addEventListener("enterFrame",HandleIt)
+				
+				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
+				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow.x=QUpdate.x
+				QUWindow.y=QUpdate.y-15
+				
 				QuestComplete()
+			else
+				if (QUpdate)then
+					Runtime:removeEventListener("enterFrame",HandleIt)
+					display.remove(QUpdate)
+					QUpdate=nil
+					display.remove(QUWindow)
+					QUWindow=nil
+				end
+				transp=255
+				QUpdate=display.newText((QText.text),0,0,"MoolBoran",70)
+				QUpdate.x=display.contentCenterX
+				QUpdate.y=display.contentHeight*.25
+				Runtime:addEventListener("enterFrame",HandleIt)
+				
+				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
+				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow.x=QUpdate.x
+				QUWindow.y=QUpdate.y-15
 			end
 		end
 		if QuestType==2 and val=="itm" then
 	--		print "Quests updated."
+			QWindow:setFrame(1)
+			QWindow:play()
 			CurItem=CurItem+1
 			QText.text=(ItemNames[ItemName].."s: ("..CurItem.."/"..NumItem..")")
 			if CurItem==NumItem then
+				if (QUpdate)then
+					Runtime:removeEventListener("enterFrame",HandleIt)
+					display.remove(QUpdate)
+					QUpdate=nil
+					display.remove(QUWindow)
+					QUWindow=nil
+				end
+				transp=255
+				QUpdate=display.newText(("Quest complete!"),0,0,"MoolBoran",70)
+				QUpdate.x=display.contentCenterX
+				QUpdate.y=display.contentHeight*.25
+				Runtime:addEventListener("enterFrame",HandleIt)
+				
+				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
+				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow.x=QUpdate.x
+				QUWindow.y=QUpdate.y-15
+				
 				QuestComplete()
+			else
+				if (QUpdate)then
+					Runtime:removeEventListener("enterFrame",HandleIt)
+					display.remove(QUpdate)
+					QUpdate=nil
+					display.remove(QUWindow)
+					QUWindow=nil
+				end
+				transp=255
+				QUpdate=display.newText((QText.text),0,0,"MoolBoran",70)
+				QUpdate.x=display.contentCenterX
+				QUpdate.y=display.contentHeight*.25
+				Runtime:addEventListener("enterFrame",HandleIt)
+				
+				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
+				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow.x=QUpdate.x
+				QUWindow.y=QUpdate.y-15
 			end
 		end
 		if QuestType==3 and val=="mob" and val2==MobLvl then
 	--		print "Quests updated."
+			QWindow:setFrame(1)
+			QWindow:play()
 			CurKills=CurKills+1
 			QText.text=("Defeat "..NumKills.." level "..MobLvl.." mobs. ("..CurKills.."/"..NumKills..")")
 			if CurKills==NumKills then
+				if (QUpdate)then
+					Runtime:removeEventListener("enterFrame",HandleIt)
+					display.remove(QUpdate)
+					QUpdate=nil
+					display.remove(QUWindow)
+					QUWindow=nil
+				end
+				transp=255
+				QUpdate=display.newText(("Quest complete!"),0,0,"MoolBoran",70)
+				QUpdate.x=display.contentCenterX
+				QUpdate.y=display.contentHeight*.25
+				QUpdate:setTextColor( transp, transp, transp, transp)
+				Runtime:addEventListener("enterFrame",HandleIt)
+				
+				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
+				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow.x=QUpdate.x
+				QUWindow.y=QUpdate.y-15
+				
 				QuestComplete()
+			else
+				if (QUpdate)then
+					Runtime:removeEventListener("enterFrame",HandleIt)
+					display.remove(QUpdate)
+					QUpdate=nil
+					display.remove(QUWindow)
+					QUWindow=nil
+				end
+				transp=255
+				QUpdate=display.newText((QText.text),0,0,"MoolBoran",70)
+				QUpdate.x=display.contentCenterX
+				QUpdate.y=display.contentHeight*.25
+				Runtime:addEventListener("enterFrame",HandleIt)
+				
+				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
+				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow.x=QUpdate.x
+				QUWindow.y=QUpdate.y-15
 			end
 		end
+	end
+end
+
+function HandleIt()
+	if transp<100 then
+		transp=0
+	else
+		transp=transp-(255/350)
+	end
+	QUWindow:toFront()
+	QUWindow:setFillColor( 0, 0, 0,transp/2)
+	QUpdate:toFront()
+	QUpdate:setTextColor( transp, transp, transp, transp)
+	if transp==0 then
+		Runtime:removeEventListener("enterFrame",HandleIt)
+		display.remove(QUpdate)
+		QUpdate=nil
+		display.remove(QUWindow)
+		QUWindow=nil
 	end
 end
 

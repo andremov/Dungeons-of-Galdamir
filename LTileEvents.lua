@@ -208,7 +208,7 @@ function onLavaCollision()
 			if ((i)==(P1.loc)) and (P1.HP~=0)then
 				local damage=(math.floor(P1.MaxHP*0.02))
 				player.ReduceHP(damage,"Lava")
-				timer.performWithDelay(100,onLavaCollision)
+				timer.performWithDelay(200,onLavaCollision)
 			end
 		end
 	end
@@ -242,7 +242,7 @@ function LayOnHands()
 				twinkles[#twinkles].yScale=2.5
 				twinkles[#twinkles]:play()
 			end
-			local heal=(math.floor(P1.MaxHP*0.01))
+			local heal=(math.ceil(P1.MaxHP*0.01))
 			players.AddHP(heal)
 			for i=1, table.maxn(twinkles) do
 				if (twinkles[i]) and (twinkles[i].frame)and (twinkles[i].frame>13) then

@@ -174,7 +174,7 @@ function onBackRelease()
 		child.parent:remove( child )
 	end
 	menu.ShowMenu()
-	menu.ReadySetGo()
+	timer.performWithDelay(100,menu.ReadySetGo)
 end
 	
 function FunSize()

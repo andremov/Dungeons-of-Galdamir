@@ -21,6 +21,7 @@ local saveSlot
 local EqpStrt
 local OKVers={
 		"GAMMA 1.0.0",
+		"GAMMA 1.0.1",
 	}
 
 function Load()
@@ -104,6 +105,7 @@ function Load()
 	--	print "Save loaded successfully."
 		LoadMap()
 		b.Rebuild(false)
+		su.ShowContinue()
 	else
 	--	print "Save incompatible. Deleting..."
 		WipeSave()
@@ -207,15 +209,27 @@ function Save()
 end
 
 function WipeSave(slot)
-	local path = system.pathForFile(  "DoGSave"..slot..".sav", system.DocumentsDirectory )
-	local fh, errStr = io.open( path, "w+" )
-	fh:write("")
-	io.close( fh )
-	
-	local path = system.pathForFile(  "DoGMapSave"..slot..".sav", system.DocumentsDirectory )
-	local fh, errStr = io.open( path, "w+" )
-	fh:write("")
-	io.close( fh )
+	if not(slot)then
+		local path = system.pathForFile(  "DoGSave"..saveSlot..".sav", system.DocumentsDirectory )
+		local fh, errStr = io.open( path, "w+" )
+		fh:write("")
+		io.close( fh )
+		
+		local path = system.pathForFile(  "DoGMapSave"..saveSlot..".sav", system.DocumentsDirectory )
+		local fh, errStr = io.open( path, "w+" )
+		fh:write("")
+		io.close( fh )
+	else
+		local path = system.pathForFile(  "DoGSave"..slot..".sav", system.DocumentsDirectory )
+		local fh, errStr = io.open( path, "w+" )
+		fh:write("")
+		io.close( fh )
+		
+		local path = system.pathForFile(  "DoGMapSave"..slot..".sav", system.DocumentsDirectory )
+		local fh, errStr = io.open( path, "w+" )
+		fh:write("")
+		io.close( fh )
+	end
 end
 
 function SaveMap()

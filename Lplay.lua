@@ -209,7 +209,7 @@ function onBackRelease()
 	end
 	pmg=nil
 	m.ShowMenu()
-	m.ReadySetGo()
+	timer.performWithDelay(100,menu.ReadySetGo)
 end
 
 function goSlot1()
@@ -300,7 +300,7 @@ function onTutBtnRelease()
 end
 
 function Keyboard()
-	local letters={
+--[[	local letters={
 		"A","B","C","D","E","F","G",
 		"H","I","J","K","L","M","N",
 		"O","P","Q","R","S","T","U",
@@ -309,6 +309,16 @@ function Keyboard()
 		"h","i","j","k","l","m","n",
 		"o","p","q","r","s","t","u",
 		"v","w","x","y","z",
+	}]]
+	local letters1={
+		"Q","W","E","R","T","Y","U","I","O","P",
+		"A","S","D","F","G","H","J","K","L",
+		"Z","X","C","V","B","N","M",
+	}
+	local letters2={
+		"q","w","e","r","t","y","u","i","o","p",
+		"a","s","d","f","g","h","j","k","l",
+		"z","x","c","v","b","n","m",
 	}
 	keys={}
 	keys2={}
@@ -324,10 +334,50 @@ function Keyboard()
 	title:setTextColor(125,250,125)
 	kbrd:insert(title)
 	
-	for i=1,table.maxn(letters)/2 do
-		keys[i]=display.newText( (letters[i]) ,0,0,"MoolBoran",110)
-		keys[i].x=80+(75*((i-1)%9))
-		keys[i].y=((display.contentHeight/2)-120)+(90*math.floor((i-1)/9))
+	for i=1,10 do
+		keys[i]=display.newText( (letters1[i]) ,0,0,"MoolBoran",110)
+		keys[i].x=40+(75*(i-1))
+		keys[i].y=((display.contentHeight/2)-120)
+		kbrd:insert( keys[i] )
+		
+		kbacks[i]=display.newRect(0,0,70,70)
+		kbacks[i].x=keys[i].x
+		kbacks[i].y=keys[i].y-20
+		kbacks[i]:setFillColor(0,0,0,0)
+		kbrd:insert( kbacks[i] )
+		
+		function Input()
+			LetterChange(keys[i].text)
+		end
+		
+		kbacks[i]:addEventListener("tap",Input)
+	end
+	
+	for i=11,19 do
+		local s=i-10
+		keys[i]=display.newText( (letters1[i]) ,0,0,"MoolBoran",110)
+		keys[i].x=80+(75*(s-1))
+		keys[i].y=((display.contentHeight/2)-120)+80
+		kbrd:insert( keys[i] )
+		
+		kbacks[i]=display.newRect(0,0,70,70)
+		kbacks[i].x=keys[i].x
+		kbacks[i].y=keys[i].y-20
+		kbacks[i]:setFillColor(0,0,0,0)
+		kbrd:insert( kbacks[i] )
+		
+		function Input()
+			LetterChange(keys[i].text)
+		end
+		
+		kbacks[i]:addEventListener("tap",Input)
+	end
+	
+	for i=20,26 do
+		local s=i-19
+		keys[i]=display.newText( (letters1[i]) ,0,0,"MoolBoran",110)
+		keys[i].x=160+(75*(s-1))
+		keys[i].y=((display.contentHeight/2)-120)+160
 		kbrd:insert( keys[i] )
 		
 		kbacks[i]=display.newRect(0,0,70,70)
@@ -344,10 +394,50 @@ function Keyboard()
 	end
 	
 	
-	for i=table.maxn(letters)/2+1,table.maxn(letters) do
-		keys2[i]=display.newText( (letters[i]) ,0,0,"MoolBoran",110)
-		keys2[i].x=80+(75*((i-1-table.maxn(letters)/2)%9))
-		keys2[i].y=((display.contentHeight/2)+160)+(90*math.floor((i-1-table.maxn(letters)/2)/9))
+	for i=1,10 do
+		keys2[i]=display.newText( (letters2[i]) ,0,0,"MoolBoran",110)
+		keys2[i].x=40+(75*(i-1))
+		keys2[i].y=((display.contentHeight/2)+160)
+		kbrd:insert( keys2[i] )
+		
+		kbacks2[i]=display.newRect(0,0,70,70)
+		kbacks2[i].x=keys2[i].x
+		kbacks2[i].y=keys2[i].y-20
+		kbacks2[i]:setFillColor(0,0,0,0)
+		kbrd:insert( kbacks2[i] )
+		
+		function Input()
+			LetterChange(keys2[i].text)
+		end
+		
+		kbacks2[i]:addEventListener("tap",Input)
+	end
+	
+	for i=11,19 do
+		local s=i-10
+		keys2[i]=display.newText( (letters2[i]) ,0,0,"MoolBoran",110)
+		keys2[i].x=80+(75*(s-1))
+		keys2[i].y=((display.contentHeight/2)+160)+80
+		kbrd:insert( keys2[i] )
+		
+		kbacks2[i]=display.newRect(0,0,70,70)
+		kbacks2[i].x=keys2[i].x
+		kbacks2[i].y=keys2[i].y-20
+		kbacks2[i]:setFillColor(0,0,0,0)
+		kbrd:insert( kbacks2[i] )
+		
+		function Input()
+			LetterChange(keys2[i].text)
+		end
+		
+		kbacks2[i]:addEventListener("tap",Input)
+	end
+	
+	for i=20,26 do
+		local s=i-19
+		keys2[i]=display.newText( (letters2[i]) ,0,0,"MoolBoran",110)
+		keys2[i].x=160+(75*(s-1))
+		keys2[i].y=((display.contentHeight/2)+160)+160
 		kbrd:insert( keys2[i] )
 		
 		kbacks2[i]=display.newRect(0,0,70,70)
@@ -373,12 +463,12 @@ function Keyboard()
 		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
-		width=252, height=55,
+		width=216, height=90,
 		onRelease = Backspace
 	}
 	DelBtn:setReferencePoint( display.CenterReferencePoint )
 	DelBtn.x = display.contentCenterX
-	DelBtn.y = display.contentHeight-40
+	DelBtn.y = display.contentHeight-55
 	kbrd:insert( DelBtn )
 	
 	EndBtn = widget.newButton{
@@ -387,12 +477,12 @@ function Keyboard()
 		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
-		width=252, height=55,
+		width=216, height=90,
 		onRelease = End
 	}
 	EndBtn:setReferencePoint( display.CenterReferencePoint )
 	EndBtn.x = display.contentWidth-130
-	EndBtn.y = display.contentHeight-40
+	EndBtn.y = display.contentHeight-55
 	kbrd:insert( EndBtn )
 	
 	BackBtn = widget.newButton{
@@ -401,12 +491,12 @@ function Keyboard()
 		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
-		width=252, height=55,
+		width=216, height=90,
 		onRelease = Back2Menu
 	}
 	BackBtn:setReferencePoint( display.CenterReferencePoint )
 	BackBtn.x = 130
-	BackBtn.y = display.contentHeight-40
+	BackBtn.y = display.contentHeight-55
 	kbrd:insert( BackBtn )
 end
 

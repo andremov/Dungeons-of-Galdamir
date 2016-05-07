@@ -43,83 +43,91 @@ function Paused()
 	return isPaused
 end
 
-function UI()
-	P1=players.GetPlayer()
-	pwg=display.newGroup()
-	isPaused=false
-	
-	window=display.newRect(0,0,335,140)
-	window:setFillColor(100,100,100,150)
-	window.x,window.y=(display.contentWidth+170), display.contentHeight-80
-	window.loc=0
-	pwg:insert(window)
-	
-	pausetxt=display.newText("Game Paused.",0,0,"MoolBoran",60)
-	pausetxt.x=window.x
-	pausetxt.y=window.y-80
-	pwg:insert(pausetxt)
-	
-	pausewin=display.newRect(0,0,(#pausetxt.text)*24,38)
-	pausewin:setFillColor(0,0,0,150)
-	pausewin.x=pausetxt.x
-	pausewin.y=pausetxt.y-15
-	pwg:insert(pausewin)
-	
-	pausetxt:toFront()
-	
-	PauseBtn = widget.newButton{
-		defaultFile="pauseon.png",
-		overFile="pauseoff.png",
-		width=65, height=65,
-		onRelease = Pause
-	}
-	PauseBtn:setReferencePoint( display.CenterReferencePoint )
-	PauseBtn.x = window.x-220
-	PauseBtn.y = window.y
-	PauseBtn.xScale = 1.3
-	PauseBtn.yScale = PauseBtn.xScale
-	pwg:insert(PauseBtn)
-	
-	bag = display.newImageRect("bag.png", 50, 50)
-	bag.x, bag.y = window.x-128, window.y-32
-	bag.xScale = 1.28
-	bag.yScale = bag.xScale
-	bag:addEventListener("touch",OpenBag)
-	pwg:insert(bag)
-	
-	info = display.newImageRect("infobtn.png", 50, 50)
-	info.x, info.y = bag.x+(50*bag.xScale), bag.y
-	info.yScale = bag.yScale
-	info.xScale = bag.xScale
-	info:addEventListener("touch",OpenInfo)
-	pwg:insert(info)
-	
-	snd = display.newImageRect("sound.png",50,50)
-	snd.x,snd.y = info.x+(50*info.xScale), bag.y
-	snd.xScale=bag.xScale
-	snd.yScale=bag.yScale
-	snd:addEventListener("touch",OpenSnd)
-	pwg:insert(snd)
-	
-	uiexit = display.newImageRect("exit.png", 50, 50)
-	uiexit.x, uiexit.y = snd.x+(50*snd.xScale), bag.y
-	uiexit.yScale = bag.yScale
-	uiexit.xScale = bag.xScale
-	uiexit:addEventListener("touch",OpenExit)
-	pwg:insert(uiexit)
-	
-	MapIndicators("create")
+function UI(ready)
+	if ready==true then
+		PauseBtn = widget.newButton{
+			defaultFile="pauseon.png",
+			overFile="pauseoff.png",
+			width=65, height=65,
+			onRelease = Pause
+		}
+		PauseBtn:setReferencePoint( display.CenterReferencePoint )
+		PauseBtn.x = window.x+150
+		PauseBtn.y = window.y-180
+		PauseBtn.xScale = 1.3
+		PauseBtn.yScale = PauseBtn.xScale
+		pwg:insert(PauseBtn)
+	else
+		if (pwg) then
+			for i=pwg.numChildren,1,-1 do
+				display.remove(pwg[i])
+				pwg[i]=nil		
+			end	
+			pwg=nil
+		end
+		P1=players.GetPlayer()
+		pwg=display.newGroup()
+		isPaused=false
+		
+		window=display.newRect(0,0,390,166)
+		window:setFillColor(100,100,100,150)
+		window.x,window.y=(display.contentWidth-200), display.contentHeight+130
+		window.loc=0
+		window.ready=1
+		pwg:insert(window)
+		
+		pausetxt=display.newText("Game Paused.",0,0,"MoolBoran",60)
+		pausetxt.x=window.x
+		pausetxt.y=window.y-90
+		pwg:insert(pausetxt)
+		
+		pausewin=display.newRect(0,0,(#pausetxt.text)*24,38)
+		pausewin:setFillColor(0,0,0,150)
+		pausewin.x=pausetxt.x
+		pausewin.y=pausetxt.y-15
+		pwg:insert(pausewin)
+		
+		pausetxt:toFront()
+		
+		bag = display.newImageRect("bag.png", 50, 50)
+		bag.x, bag.y = window.x+(25*1.28*1.5)-((390-6)/2), window.y+(25*1.28*1.5)-((166-6)/2)
+		bag.xScale = 1.28*1.5
+		bag.yScale = bag.xScale
+		bag:addEventListener("touch",OpenBag)
+		pwg:insert(bag)
+		
+		info = display.newImageRect("infobtn.png", 50, 50)
+		info.x, info.y = bag.x+(50*bag.xScale), bag.y
+		info.yScale = bag.yScale
+		info.xScale = bag.xScale
+		info:addEventListener("touch",OpenInfo)
+		pwg:insert(info)
+		
+		snd = display.newImageRect("sound.png",50,50)
+		snd.x,snd.y = info.x+(50*info.xScale), bag.y
+		snd.xScale=bag.xScale
+		snd.yScale=bag.yScale
+		snd:addEventListener("touch",OpenSnd)
+		pwg:insert(snd)
+		
+		uiexit = display.newImageRect("exit.png", 50, 50)
+		uiexit.x, uiexit.y = snd.x+(50*snd.xScale), bag.y
+		uiexit.yScale = bag.yScale
+		uiexit.xScale = bag.xScale
+		uiexit:addEventListener("touch",OpenExit)
+		pwg:insert(uiexit)
+		
+		MapIndicators("create")
+	end
 end
 
 function Pause(mute)
 	local busy=inv.OpenWindow()
 	local shap=shp.AtTheMall()
 	local fight=c.InTrouble()
-	if busy==false and shap==false and fight==false then
+	if busy==false and shap==false and fight==false and window.ready==1 then
 		portsprsnt.txt.text=(P1.portcd)
 		MovePause(true)
-		gold.ShowGCounter()
-		players.LetsYodaIt()
 		if isPaused==true then
 			isPaused=false
 	--		print "Game resumed."
@@ -129,6 +137,8 @@ function Pause(mute)
 		elseif isPaused==false then
 			isPaused=true
 			m.ShowArrows("clean")
+			gold.ShowGCounter()
+			players.LetsYodaIt()
 	--		print "Game paused."
 			if mute~=true then
 				audio.Play(6)
@@ -144,17 +154,29 @@ end
 
 function MovePause(val)
 	if (pwg) then
-		if pwg.x==0 and val~=true then
+		if not (PauseBtn) then
+			timer.performWithDelay(50,MovePause)
+		elseif pwg.y==0 and val~=true then
 			window.loc=0
+			window.ready=1
 			m.Visibility()
-		elseif pwg.x==-350 and val~=true then
+			gold.ShowGCounter()
+			players.LetsYodaIt()
+		elseif pwg.y==-216 and val~=true then
 			window.loc=1
+			window.ready=1
 		else
 			if window.loc==0 then
-				pwg.x=pwg.x-35
+				window.ready=0
+				pwg.y=pwg.y-27
+				PauseBtn.y=PauseBtn.y+27
+				PauseBtn.x=PauseBtn.x-50
 				timer.performWithDelay(50,MovePause)
 			elseif window.loc==1 then
-				pwg.x=pwg.x+35
+				window.ready=0
+				pwg.y=pwg.y+27
+				PauseBtn.y=PauseBtn.y-27
+				PauseBtn.x=PauseBtn.x+50
 				timer.performWithDelay(50,MovePause)
 			end
 		end
@@ -188,7 +210,7 @@ end
 function MapIndicators(val)
 	if val=="create" then
 		portsprsnt = display.newImageRect("portalspresent.png",80,80)
-		portsprsnt.x, portsprsnt.y = bag.x, bag.y+(50*1.28)
+		portsprsnt.x, portsprsnt.y = bag.x-16, bag.y+(50*1.28)+17
 		portsprsnt.xScale,portsprsnt.yScale=0.8,0.8
 		portsprsnt.isVisible=false
 		pwg:insert(portsprsnt)
@@ -254,7 +276,7 @@ function MapIndicators(val)
 		pwg:insert(msnprsnt)
 	
 		keynprsnt = display.newImageRect("keyno.png",80,80)
-		keynprsnt.x,keynprsnt.y = msprsnt.x, portsprsnt.y-(80*0.8)
+		keynprsnt.x,keynprsnt.y = msprsnt.x+(80*0.8), portsprsnt.y
 		keynprsnt.xScale = 0.8
 		keynprsnt.yScale = keynprsnt.xScale
 		pwg:insert(keynprsnt)
@@ -262,7 +284,7 @@ function MapIndicators(val)
 		keyprsnt = display.newImageRect("keyget.png",80,80)
 		keyprsnt.x,keyprsnt.y = keynprsnt.x, keynprsnt.y
 		keyprsnt.xScale = keynprsnt.xScale
-		keyprsnt.yScale =	keynprsnt.xScale
+		keyprsnt.yScale =keynprsnt.xScale
 		keyprsnt.isVisible=false
 		pwg:insert(keyprsnt)
 	end

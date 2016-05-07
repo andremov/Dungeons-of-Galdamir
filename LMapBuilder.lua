@@ -79,7 +79,7 @@ local TSet
 
 function Essentials()
 	ui.CleanSlate()
-	scale=1.1
+	scale=1.2
 	espacio=80*scale
 	xinicial=display.contentCenterX-(espacio)
 	yinicial=display.contentCenterY-(espacio)
@@ -186,7 +186,7 @@ function DisplayMap()
 		timer.performWithDelay(0.2,DisplayMap)
 	else
 		mob.ReceiveMobs(mobs)
-		local check=su.Continue()
+		local check=su.ShowContinue()
 		display.remove(loadtxt)
 		loadtxt=nil
 		if check==false then
@@ -226,21 +226,21 @@ function DisplayMap()
 			end
 			if side==true then
 				p.PlayerLoc(false)
-				m.Visibility()
+			--	m.Visibility()
 				if CurRound%2==0 then
 	--				print "Abnormal Progression, Even Floor"
 				else
 	--				print "Abnormal Progression, Odd Floor"
-					Level.x=Level.x-((math.sqrt(mapsize)-3)*80)
-					Level.y=Level.y-((math.sqrt(mapsize)-3)*80)
+					Level.x=Level.x-((math.sqrt(mapsize)-3)*espacio)
+					Level.y=Level.y-((math.sqrt(mapsize)-3)*espacio)
 				end
 			elseif side==false then
 				p.PlayerLoc(true)
-				m.Visibility()
+			--	m.Visibility()
 				if CurRound%2==0 then
 	--				print "Normal Progression, Even Floor"
-					Level.x=Level.x-((math.sqrt(mapsize)-3)*80)
-					Level.y=Level.y-((math.sqrt(mapsize)-3)*80)
+					Level.x=Level.x-((math.sqrt(mapsize)-3)*espacio)
+					Level.y=Level.y-((math.sqrt(mapsize)-3)*espacio)
 				else
 	--				print "Normal Progression, Odd Floor"
 				end
@@ -309,15 +309,15 @@ function Extras()
 	end
 	
 	if KeySpawned==false then
-		mbounds[finish.loc]=1
-		boundary[finish.loc]=1
+		mbounds[finish]=1
+		boundary[finish]=1
 	else
-		mbounds[finish.loc]=0
-		boundary[finish.loc]=0
-		Gate=walls[finish.loc]
+		mbounds[finish]=0
+		boundary[finish]=0
+		Gate=walls[finish]
 		Gate=display.newImageRect( "tiles/"..TSet.."/jail.png", 80, 80)
-		Gate.x=xinicial+((((finish.loc-1)%math.sqrt(mapsize)))*espacio)
-		Gate.y=yinicial+(math.floor((finish.loc-1)/math.sqrt(mapsize))*espacio)
+		Gate.x=xinicial+((((finish-1)%math.sqrt(mapsize)))*espacio)
+		Gate.y=yinicial+(math.floor((finish-1)/math.sqrt(mapsize))*espacio)
 		Gate.isVisible=false
 		Gate.xScale=scale
 		Gate.yScale=Gate.xScale
@@ -697,6 +697,7 @@ function RandomizeTile()
 						if ThinkinWithPortals==true then
 							map2[count]="n"
 							BluePortal=true
+							BPLoc=count
 						else
 							map2[count]="x"
 						end
@@ -740,11 +741,28 @@ function RandomizeTile()
 	end
 	
 	if count~=mapsize+1 then
-	elseif OrangePortal==true and BluePortal==false and RedPortal==false then
-		map2[OPLoc]="ñ"
-		RedPortal=true
-		OrangePortal=false
-		OPLoc=nil
+	else
+		local sz=math.sqrt(mapsize)
+		if OrangePortal==true and (OPLoc) then
+			if boundary[OPLoc+1]==0 and boundary[OPLoc-1]==0 and boundary[OPLoc-sz]==0 and boundary[OPLoc+sz]==0 then
+				OrangePortal=false
+				map2[OPLoc]="o"
+				OPLoc=nil
+			end
+		end
+		if BluePortal==true and (BPLoc) then
+			if boundary[BPLoc+1]==0 and boundary[BPLoc-1]==0 and boundary[BPLoc-sz]==0 and boundary[BPLoc+sz]==0 then
+				BluePortal=false
+				map2[BPLoc]="o"
+				BPLoc=nil
+			end
+		end
+		if (OPLoc) and OrangePortal==true and BluePortal==false and RedPortal==false then
+			map2[OPLoc]="ñ"
+			RedPortal=true
+			OrangePortal=false
+			OPLoc=nil
+		end
 	end
 end
 
@@ -1060,49 +1078,30 @@ function DisplayTile()
 		
 		if(map2[count]=="z")then
 			local curround=WD.Circle()
-			if curround%2==0 then
-				if didStair==false then
-					finish=walls[count]
-					finish=display.newImageRect( "tiles/"..TSet.."/stairup.png", 80, 80)
-					finish.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-					finish.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-					finish.isVisible=false
-					finish.loc=(count)
-					finish.xScale=scale
-					finish.yScale=finish.xScale
-					Level:insert( finish )
-					didStair=true
-				elseif didStair==true then
-					walls[count]=display.newImageRect( "tiles/"..TSet.."/stairdown.png", 80, 80)
-					walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-					walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-					walls[count].isVisible=false
-					walls[count].xScale=scale
-					walls[count].yScale=walls[count].xScale
-					Level:insert( walls[count] )
-					didStair=false
+			if didStair==false then
+				walls[count]=walls[count]
+				walls[count]=display.newImageRect( "tiles/"..TSet.."/stairup.png", 80, 80)
+				walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+				walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+				walls[count].isVisible=false
+				walls[count].xScale=scale
+				walls[count].yScale=walls[count].xScale
+				Level:insert( walls[count] )
+				didStair=true
+				if curround%2==0  then
+					finish=(count)
 				end
-			else
-				if didStair==true then
-					finish=walls[count]
-					finish=display.newImageRect( "tiles/"..TSet.."/stairup.png", 80, 80)
-					finish.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-					finish.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-					finish.isVisible=false
-					finish.xScale=scale
-					finish.yScale=finish.xScale
-					finish.loc=(count)
-					Level:insert( finish )
-					didStair=false
-				elseif didStair==false then
-					walls[count]=display.newImageRect( "tiles/"..TSet.."/stairdown.png", 80, 80)
-					walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-					walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-					walls[count].isVisible=false
-					walls[count].xScale=scale
-					walls[count].yScale=walls[count].xScale
-					Level:insert( walls[count] )
-					didStair=true
+			elseif didStair==true then
+				walls[count]=display.newImageRect( "tiles/"..TSet.."/stairdown.png", 80, 80)
+				walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+				walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+				walls[count].isVisible=false
+				walls[count].xScale=scale
+				walls[count].yScale=walls[count].xScale
+				Level:insert( walls[count] )
+				didStair=false
+				if curround%2~=0  then
+					finish=(count)
 				end
 			end
 		end
@@ -1289,11 +1288,8 @@ function Show(IDs)
 		if (Chests[i]) then
 			Chests[i].isVisible=true
 		end
-		if (finish.loc==i) then
-			finish.isVisible=true
-			if (Gate) then
-				Gate.isVisible=true
-			end
+		if (finish==i) and (Gate) then
+			Gate.isVisible=true
 		end
 	end
 	local canArr=wdow.OpenWindow()
@@ -1404,8 +1400,8 @@ function TheGates(action)
 			SmallKey=nil
 		end
 		display.remove(Gate)
-		mbounds[finish.loc]=1
-		boundary[finish.loc]=1
+		mbounds[finish]=1
+		boundary[finish]=1
 	end
 end
 

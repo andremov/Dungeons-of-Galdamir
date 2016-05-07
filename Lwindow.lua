@@ -160,6 +160,10 @@ function ToggleBag()
 				end
 				curreqp[#curreqp].x = xeqpicial+ (((plcmnt-1)%9)*((espaciox*curreqp[#curreqp].xScale)+4))
 				curreqp[#curreqp].y = yeqpicial
+				function Argh()
+					CheckMenu(p1.eqp[i][1])
+				end
+				curreqp[#curreqp]:addEventListener("tap",Argh)
 				ginv:insert( curreqp[#curreqp] )
 			end
 		end
@@ -410,7 +414,7 @@ function ToggleInfo()
 			mini={}
 			for n=1,6 do
 				--
-				if (p1.nat[n]+1)<(p1.lvl*12) then
+				if (p1.nat[n]+1)<=(p1.lvl*10) then
 					pli[n]=widget.newButton{
 						defaultFile="+.png",
 						overFile="+2.png",
@@ -423,7 +427,7 @@ function ToggleInfo()
 					ginf:insert(pli[n])
 				end
 				--
-				if p1.nat[n]-1~=0 then
+				if p1.nat[n]~=1 then
 					mini[n]=widget.newButton{
 						defaultFile="-.png",
 						overFile="-2.png",
@@ -710,7 +714,7 @@ function DeathMenu(cause)
 		Round=WD.Circle()
 		p1=p.GetPlayer()
 		size=b.GetData(0)
-		scre=sc.Scoring( Round , p1 , (math.sqrt(size)) )
+		scre,hs=sc.Scoring( Round , p1 , (math.sqrt(size)) )
 		Round=tostring(Round)
 		GCount=tostring(p1.gp)
 		GInfoTxt=display.newGroup()
@@ -738,10 +742,24 @@ function DeathMenu(cause)
 		InfoTxt5.y=InfoTxt1.y
 		GInfoTxt:insert( InfoTxt5 )
 		
-		InfoTxt6=display.newText(("Score: "..scre),0,0,"MoolBoran", 60 )
-		InfoTxt6.x=display.contentCenterX
-		InfoTxt6.y=display.contentCenterY+20
-		GInfoTxt:insert( InfoTxt6 )
+		if hs==true then
+			InfoTxt6=display.newText(("New high score:"),0,0,"MoolBoran", 60 )
+			InfoTxt6:setTextColor(70, 255, 70)
+			InfoTxt6.x=display.contentCenterX
+			InfoTxt6.y=display.contentCenterY-20
+			GInfoTxt:insert( InfoTxt6 )
+		else
+			InfoTxt6=display.newText(("Score:"),0,0,"MoolBoran", 60 )
+			InfoTxt6:setTextColor(70, 255, 70)
+			InfoTxt6.x=display.contentCenterX
+			InfoTxt6.y=display.contentCenterY-20
+			GInfoTxt:insert( InfoTxt6 )
+		end
+		
+		InfoTxt7=display.newText((scre),0,0,"MoolBoran", 60 )
+		InfoTxt7.x=display.contentCenterX
+		InfoTxt7.y=display.contentCenterY+40
+		GInfoTxt:insert( InfoTxt7 )
 		
 		gdm:insert( Dthtxt )
 		gdm:insert( GInfoTxt )
@@ -820,10 +838,18 @@ function UseMenu(id,slot)
 					p.AddHP(itemstats[4])
 				end
 				ToggleBag()
+				ToggleBag()
 			elseif itemstats[3]==1 then
 				p.AddMP(itemstats[4])
 				ToggleBag()
+				ToggleBag()
+			elseif itemstats[3]==2 then
+				p.AddEP(itemstats[4])
+				ToggleBag()
+				ToggleBag()
 			else
+				ToggleBag()
+				ui.Pause(true)
 				if itemstats[4]==0 then
 					WD.FloorPort(false)
 				elseif itemstats[4]==1 then
@@ -832,7 +858,6 @@ function UseMenu(id,slot)
 					s.Save()
 				end
 			end
-			ToggleBag()
 		end
 		
 		function LearnedIt()
@@ -924,6 +949,11 @@ function UseMenu(id,slot)
 				items[i]:removeEventListener("tap",Gah)
 			end
 		end
+		for i=1,table.maxn(curreqp) do
+			if curreqp[i] then
+				curreqp[i]:removeEventListener("tap",Argh)
+			end
+		end
 		
 		local backbtn= widget.newButton{
 			label="Back",
@@ -955,6 +985,11 @@ function UseMenu(id,slot)
 			item.ReturnInfo(id,4)
 		}
 		
+		local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
+		lolname.x=display.contentWidth/2
+		lolname.y=(display.contentHeight/2)-120
+		gum:insert( lolname )
+		
 		if itemstats[1]==0 then
 			local usebtn= widget.newButton{
 				label="Use",
@@ -969,11 +1004,6 @@ function UseMenu(id,slot)
 			usebtn.x = (display.contentWidth/4)-50
 			usebtn.y = (display.contentHeight/2)+30
 			gum:insert( usebtn )
-			
-			local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
-			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-120
-			gum:insert( lolname )
 			
 			local descrip=display.newText( (itemstats[5]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
@@ -995,11 +1025,6 @@ function UseMenu(id,slot)
 			equipbtn.x = (display.contentWidth/4)-50
 			equipbtn.y = (display.contentHeight/2)+30
 			gum:insert( equipbtn )
-			
-			local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
-			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-120
-			gum:insert( lolname )
 			
 			local itmfound=false
 			local equipstats
@@ -1083,11 +1108,6 @@ function UseMenu(id,slot)
 				gum:insert( usebtn )
 			end
 			
-			local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
-			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-120
-			gum:insert( lolname )
-			
 			local descrip=display.newText( (itemstats[3]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
 			descrip.x=display.contentWidth/2
@@ -1109,11 +1129,6 @@ function UseMenu(id,slot)
 			learnbtn.x = (display.contentWidth/4)-50
 			learnbtn.y = (display.contentHeight/2)+30
 			gum:insert( learnbtn )
-			
-			local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
-			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-120
-			gum:insert( lolname )
 			
 			local descrip=display.newText( (itemstats[4]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
@@ -1138,11 +1153,6 @@ function UseMenu(id,slot)
 			boostbtn.y = (display.contentHeight/2)+30
 			gum:insert( boostbtn )
 			
-			local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
-			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-120
-			gum:insert( lolname )
-			
 			local descrip=display.newText( (itemstats[4]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
 			descrip.x=display.contentWidth/2
@@ -1151,6 +1161,87 @@ function UseMenu(id,slot)
 			
 		end
 		
+	elseif isUse==true then
+		SpecialUClose()
+		ToggleBag()
+		ToggleBag()
+	end
+end
+
+function CheckMenu(id)
+
+	if isUse==false then
+		gum=display.newGroup()
+		gum:toFront()
+		isUse=true
+		
+	--	print ("Player wants to use item "..id..", in slot "..slot..".")
+		window=display.newImageRect("usemenu.png", 768, 308)
+		window.x,window.y = display.contentWidth/2, 450
+		gum:insert( window )
+		
+		for i=1,table.maxn(items) do
+			if items[i] then
+				items[i]:removeEventListener("tap",Gah)
+			end
+		end
+		for i=1,table.maxn(curreqp) do
+			if curreqp[i] then
+				curreqp[i]:removeEventListener("tap",Argh)
+			end
+		end
+		
+		local backbtn= widget.newButton{
+			label="Back",
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			fontSize=30,
+			defaultFile="cbutton.png",
+			overFile="cbutton-over.png",
+			width=200, height=55,
+			onRelease = CheckMenu}
+		backbtn:setReferencePoint( display.CenterReferencePoint )
+		backbtn.x = (display.contentWidth/2)
+		backbtn.y = (display.contentHeight/2)+30
+		gum:insert( backbtn )
+		
+		itemstats={
+			item.ReturnInfo(id,4)
+		}
+		
+		local lolname=display.newText( (itemstats[2]) ,0,0,"MoolBoran",90)
+		lolname.x=display.contentWidth/2
+		lolname.y=(display.contentHeight/2)-120
+		gum:insert( lolname )
+		
+		if itemstats[1]==1 then
+			
+			statchange={
+				itemstats[4],
+				itemstats[5],
+				itemstats[6],
+				itemstats[7],
+				itemstats[8],
+				itemstats[9]
+			}
+			stattxts={}
+			
+			local stats={"STA","ATT","DEF","MGC","DEX","INT"}
+			for c=1,6 do
+				if statchange[c]>0 then
+					stattxts[c]=display.newText( (stats[c].." +"..statchange[c]),0,0,"MoolBoran",60)
+					stattxts[c]:setTextColor( 60, 180, 60)
+					stattxts[c].x=statchangex+(statchangexs*((c-1)%3))
+					stattxts[c].y=statchangey+(50*math.floor((c-1)/3))
+					gum:insert( stattxts[c] )
+				elseif statchange[c]<0 then
+					stattxts[c]=display.newText( (stats[c].." "..statchange[c]) ,0,0,"MoolBoran",60)
+					stattxts[c]:setTextColor( 180, 60, 60)
+					stattxts[c].x=statchangex+(statchangexs*((c-1)%3))
+					stattxts[c].y=statchangey+(50*math.floor((c-1)/3))
+					gum:insert( stattxts[c] )
+				end
+			end
+		end
 	elseif isUse==true then
 		SpecialUClose()
 		ToggleBag()

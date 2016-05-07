@@ -18,7 +18,7 @@ local mup
 local mdown
 local mleft
 local inter
-local scale=1.1
+local scale=1.2
 local espacio=80*scale
 local yinicial=display.contentHeight/2
 local xinicial=display.contentWidth/2
@@ -458,12 +458,14 @@ end
 
 function GoinDown( event )
 	if event.phase=="ended" then
+		ShowArrows("clean")
 		WD.FloorPort(false)
 	end
 end
 
 function GoinUp( event )
 	if event.phase=="ended" then
+		ShowArrows("clean")
 		WD.Win()
 	end
 end
