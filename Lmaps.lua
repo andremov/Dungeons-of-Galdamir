@@ -20,11 +20,12 @@ k-keyblock				l-lava
 m-portal1				n-portal2
 ñ-portal3				o-wall
 p-						q-alwaysbreakable
-r-random				s-
+r-random				s-shop
 t-						u-mobspawner
 v-						w-water
 x-walkable				y-
-z-start/finish			
+z-start/finish	
+
 H = 10x10
 S = 20x20
 M = 30x30
@@ -60,7 +61,7 @@ test1={
 	"b","x","m","x","x","x","x","x","x","b",
 	"b","x","x","x","x","x","x","x","x","b",
 	"b","x","x","x","h","j","x","x","x","b",
-	"b","x","x","x","u","x","x","x","x","b",
+	"b","x","x","x","u","s","x","x","x","b",
 	"b","x","x","x","x","x","x","x","x","b",
 	"b","x","x","x","x","x","x","n","x","b",
 	"b","x","x","x","x","x","x","x","z","b",

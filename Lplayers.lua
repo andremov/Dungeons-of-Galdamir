@@ -86,12 +86,12 @@ function CreatePlayers(name)
 	--Spells
 	player.spells={
 		{"Fireball","Cast a firey ball of death and burn the enemy.",true,30},
-		{"Cleave","Hits for twice maximum daSorceror. Can't be evaded.",false,20},
+		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,20},
 		{"Slow","Reduces enemy's dexterity.",false,50},
 		{"Poison Blade","Inflicts poison.",false,50},
-		{"Fire Sword","Hits for twice daSorceror and inflicts a burn.",false,50},
+		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,50},
 		{"Healing","Heals for 20% of maximum Hit Points.",false,60},
-		{"Ice Sword","Hits for twice daSorceror and reduces enemy's dexterity.",false,120},
+		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,120},
 	}
 	--Secondary Stats
 	player.portcd=0
@@ -409,9 +409,11 @@ end
 function LvlFanfare()
 	if not (LvlWindow) then
 		transp10=255
-		LvlWindow=newImageRect("levelup.png",330,142)
+		LvlWindow=display.newImageRect("fanfarelevelup.png",330,142)
+		LvlWindow.xScale=2
+		LvlWindow.yScale=LvlWindow.xScale
 		LvlWindow.x=display.contentCenterX
-		LvlWindow.y=display.contentCenterY-100
+		LvlWindow.y=display.contentCenterY-250
 		LvlWindow:toFront()
 		LvlWindow:setFillColor( transp10, transp10, transp10, transp10)
 		timer.performWithDelay(10,LvlFanfare)
@@ -421,9 +423,11 @@ function LvlFanfare()
 			display.remove(LvlWindow)
 			LvlWindow=nil
 		else
-			transp10=transp10-(255/100)
+			transp10=transp10-(255/50)
+			LvlWindow:setFillColor( transp10, transp10, transp10, transp10)
+			LvlWindow:toFront()
+			timer.performWithDelay(2,LvlFanfare)
 		end
-		LvlWindow:setFillColor( transp10, transp10, transp10, transp10)
 	end
 end
 
@@ -461,7 +465,7 @@ function ModStats(sta,att,def,mgc,dex,int)
 	player.eqs[3]=player.eqs[3]+def
 	player.eqs[4]=player.eqs[4]+mgc
 	player.eqs[5]=player.eqs[5]+dex
-	player.eqs[6]=player.eqs[6]+dex
+	player.eqs[6]=player.eqs[6]+int
 	StatCheck()
 end
 

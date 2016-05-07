@@ -64,9 +64,11 @@ function CreateQuest()
 					QText:setTextColor( 0, 0, 0)
 					gqm:insert(QText)
 					if NumKills==0 then
+						print "Quest Error. Wiping quest..."
 						WipeQuest()
 					end
 				else
+					print "Quest Error. Wiping quest..."
 					WipeQuest()
 				end
 			end
@@ -101,9 +103,11 @@ function CreateQuest()
 					QText:setTextColor( 0, 0, 0)
 					gqm:insert(QText)
 					if NumKills==0 then
+						print "Quest Error. Wiping quest..."
 						WipeQuest()
 					end
 				else
+					print "Quest Error. Wiping quest..."
 					WipeQuest()
 				end
 			end

@@ -1244,17 +1244,31 @@ function DisplayMap()
 		end
 		
 		if(map2[count]=="s")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
-			walls[count].isVisible=false
-			Level:insert( walls[count] )
-			
-			Shops[count]=display.newImageRect( "tiles/"..TSet.."/shop.png", 80, 80)
-			Shops[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
-			Shops[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
-			Shops[count].isVisible=false
-			Level:insert(Shops[count])
+			local scount=0
+			for z=1,table.maxn(Shops)do
+				if (Shops[z]) then
+					scount=scount+1
+				end
+			end
+			if scount<=(mapsize/10) then
+				walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+				walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+				walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+				walls[count].isVisible=false
+				Level:insert( walls[count] )
+				
+				Shops[count]=display.newImageRect( "tiles/"..TSet.."/shop.png", 80, 80)
+				Shops[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+				Shops[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+				Shops[count].isVisible=false
+				Level:insert(Shops[count])
+			else
+				walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+				walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+				walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+				walls[count].isVisible=false
+				Level:insert( walls[count] )
+			end
 		end
 		
 		if(map2[count]=="x")then
@@ -2205,6 +2219,11 @@ function DisplayMap()
 			Level:insert( walls[count] )
 		end	
 		
+	end
+	
+	if count==mapsize then
+		loadtxt.text=("Done.")
+		loadtxt:toFront()
 	end
 	
 	if count~=mapsize then

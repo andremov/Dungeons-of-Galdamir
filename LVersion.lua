@@ -23,10 +23,6 @@ For Logo:
 	5. Glow - 6,10,75
 ----------------------
 
-	Mob Bug
-	Combat Changes
-	Reduce Shop Prices
-	Scroll of Salvation = extra drop
 	Int Equipment
 	
 --]]

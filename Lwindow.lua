@@ -11,6 +11,7 @@ local MPot3sheet = graphics.newImageSheet( "items/ManaPotion3.png", { width=64, 
 local widget = require "widget"
 local audio=require("LAudio")
 local g=require("LGold")
+local c=require("lcombat")
 local mov=require("Lmovement")
 local p=require("Lplayers")
 local WD=require("LProgress")
@@ -60,11 +61,17 @@ function CloseErrthang()
 	end
 end
 
-function ToggleBag()
+function ToggleBag(opt)
 	if isOpn==false then
 		ginv=display.newGroup()
 		items={}
 		curreqp={}
+		
+		if (opt==false) then
+			canEqp=false
+		else
+			canEqp=true
+		end
 		
 		invinterface=display.newImageRect("container.png", 570, 549)
 		invinterface.x,invinterface.y = display.contentWidth/2, 400
@@ -153,6 +160,24 @@ function ToggleBag()
 	elseif isOpn==true and (ginv) then
 		
 		if isUse==false then
+			for i=table.maxn(items),1,-1 do
+				display.remove(items[i])
+				items[i]=nil
+			end
+			items=nil
+			for i=table.maxn(curreqp),1,-1 do
+				display.remove(curreqp[i])
+				curreqp[i]=nil
+			end
+			curreqp=nil
+			isOpn=false
+			for i=ginv.numChildren,1,-1 do
+				display.remove(ginv[i])
+				ginv[i]=nil
+			end
+			ginv=nil
+		else
+			SpecialUClose()
 			for i=table.maxn(items),1,-1 do
 				display.remove(items[i])
 				items[i]=nil
@@ -515,20 +540,21 @@ function UseMenu(id,slot)
 	if isUse==false then
 	
 		function UsedIt()
-			
 			isUse=false
 			for i=gum.numChildren,1,-1 do
 				local child = gum[i]
 				child.parent:remove( child )
 			end
+			gum=nil
 			if amount==1 then
 				table.remove( p1.inv, slot )
 			elseif amount~=1 then
 				p1.inv[slot][2]=p1.inv[slot][2]-1
 			end
-			ToggleBag()
 			if itemstats[3]==0 then
-				ToggleBag()
+				if canEqp~=false then
+					ToggleBag()
+				end
 				if itemstats[4]<0 then
 					WD.Hurt("Poison",(itemstats[4]*-1))
 				elseif itemstats[4]>0 then
@@ -536,7 +562,9 @@ function UseMenu(id,slot)
 				end
 			elseif itemstats[3]==1 then
 				p.GrantMana(itemstats[4])
-				ToggleBag()
+				if canEqp~=false then
+					ToggleBag()
+				end
 			else
 				if itemstats[4]==0 then
 					WD.FloorPort(false)
@@ -545,6 +573,11 @@ function UseMenu(id,slot)
 				elseif itemstats[4]==2 then
 					s.Save()
 				end
+			end
+			if canEqp~=false then
+				ToggleBag()
+			else
+				c.toItems(true)
 			end
 		end
 		
@@ -557,9 +590,14 @@ function UseMenu(id,slot)
 				local child = gum[i]
 				child.parent:remove( child )
 			end
+			gum=nil
 			table.remove( inv, slot )
-			ToggleBag()
-			ToggleBag()
+			if canEqp~=false then
+				ToggleBag()
+				ToggleBag()
+			else
+				c.toItems(true)
+			end
 		end
 		
 		function StatBoost()
@@ -570,13 +608,18 @@ function UseMenu(id,slot)
 				local child = gum[i]
 				child.parent:remove( child )
 			end
+			gum=nil
 			if amount==1 then
 				table.remove( inv, slot )
 			elseif amount~=1 then
 				p1.inv[slot][2]=p1.inv[slot][2]-1
 			end
-			ToggleBag()
-			ToggleBag()
+			if canEqp~=false then
+				ToggleBag()
+				ToggleBag()
+			else
+				c.toItems(true)
+			end
 		end
 		
 		function EquippedIt()
@@ -599,6 +642,7 @@ function UseMenu(id,slot)
 				local child = gum[i]
 				child.parent:remove( child )
 			end
+			gum=nil
 			
 			table.remove( p1.inv, slot )
 			
@@ -616,6 +660,7 @@ function UseMenu(id,slot)
 				local child = gum[i]
 				child.parent:remove( child )
 			end
+			gum=nil
 			table.remove( p1.inv, slot )
 			ToggleBag()
 			ToggleBag()
@@ -635,232 +680,268 @@ function UseMenu(id,slot)
 			end
 		end
 	
+		local backbtn= widget.newButton{
+			label="Back",
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			fontSize=30,
+			defaultFile="cbutton.png",
+			overFile="cbutton2.png",
+			width=200, height=55,
+			onRelease = UseMenu}
+		backbtn:setReferencePoint( display.CenterReferencePoint )
+		backbtn.x = (display.contentWidth/2)
+		backbtn.y = (display.contentHeight/2)+30
+		gum:insert( backbtn )
+	
+		if canEqp~=false then
+			local dropbtn= widget.newButton{
+				label="Drop",
+				labelColor = { default={255,255,255}, over={0,0,0} },
+				fontSize=30,
+				defaultFile="cbutton.png",
+				overFile="cbutton2.png",
+				width=200, height=55,
+				onRelease = DroppedIt}
+			dropbtn:setReferencePoint( display.CenterReferencePoint )
+			dropbtn.x = ((display.contentWidth/4)*3)+50
+			dropbtn.y = (display.contentHeight/2)+30
+			gum:insert( dropbtn )
+		end
+		
 		itemstats={
 			item.ReturnInfo(id,4)
 		}
 		
 		if itemstats[1]==0 then
-		
-			local usebtn= widget.newButton{
-				label="Use",
-				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
-				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
-				width=200, height=55,
-				onRelease = UsedIt
-			}
-			usebtn:setReferencePoint( display.CenterReferencePoint )
-			usebtn.x = (display.contentWidth/4)-50
-			usebtn.y = (display.contentHeight/2)+30
-			gum:insert( usebtn )
-			
-			local lolname=display.newText( (itemstats[2]) ,0,0,"Game Over",110)
-			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-150
-			gum:insert( lolname )
-			
-			local descrip=display.newText( (itemstats[5]) ,0,0,"Game Over",85)
-			descrip:setTextColor( 180, 180, 180)
-			descrip.x=display.contentWidth/2
-			descrip.y=(display.contentHeight/2)-80
-			gum:insert( descrip )
+			if canEqp==false and itemstats[3]~=0 and itemstats[3]~=1 and itemstats[4]>=0 and itemstats[4]<=2 then
+				SpecialUClose()
+			else
+				local usebtn= widget.newButton{
+					label="Use",
+					labelColor = { default={255,255,255}, over={0,0,0} },
+					fontSize=30,
+					defaultFile="cbutton.png",
+					overFile="cbutton2.png",
+					width=200, height=55,
+					onRelease = UsedIt
+				}
+				usebtn:setReferencePoint( display.CenterReferencePoint )
+				usebtn.x = (display.contentWidth/4)-50
+				usebtn.y = (display.contentHeight/2)+30
+				gum:insert( usebtn )
+				
+				local lolname=display.newText( (itemstats[2]) ,0,0,"Game Over",110)
+				lolname.x=display.contentWidth/2
+				lolname.y=(display.contentHeight/2)-150
+				gum:insert( lolname )
+				
+				local descrip=display.newText( (itemstats[5]) ,0,0,"Game Over",85)
+				descrip:setTextColor( 180, 180, 180)
+				descrip.x=display.contentWidth/2
+				descrip.y=(display.contentHeight/2)-80
+				gum:insert( descrip )
+			end
 		end	
 		if itemstats[1]==1 then
-		
-			local eqpstatchnge=false
-			local itmfound=false
-			
-			local equipbtn= widget.newButton{
-				label="Equip",
-				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
-				defaultFile="cbutton.png",
-				overFile="cbutton2.png",
-				width=200, height=55,
-				onRelease = EquippedIt
-			}
-			equipbtn:setReferencePoint( display.CenterReferencePoint )
-			equipbtn.x = (display.contentWidth/4)-50
-			equipbtn.y = (display.contentHeight/2)+30
-			gum:insert( equipbtn )
-			
-			local lolname=display.newText( (itemstats[2]) ,0,0,"Game Over",110)
-			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-150
-			gum:insert( lolname )
-			
-			local equipstats
-			for i=1,table.maxn(p1.eqp) do
-				if p1.eqp[i][2]==itemstats[3] then
-					equipstats={item.ReturnInfo(p1.eqp[i][1],4)}
-					
-					itmfound=true
-					
+			if canEqp==true then
+				local eqpstatchnge=false
+				local itmfound=false
+				
+				local equipbtn= widget.newButton{
+					label="Equip",
+					labelColor = { default={255,255,255}, over={0,0,0} },
+					fontSize=30,
+					defaultFile="cbutton.png",
+					overFile="cbutton2.png",
+					width=200, height=55,
+					onRelease = EquippedIt
+				}
+				equipbtn:setReferencePoint( display.CenterReferencePoint )
+				equipbtn.x = (display.contentWidth/4)-50
+				equipbtn.y = (display.contentHeight/2)+30
+				gum:insert( equipbtn )
+				
+				local lolname=display.newText( (itemstats[2]) ,0,0,"Game Over",110)
+				lolname.x=display.contentWidth/2
+				lolname.y=(display.contentHeight/2)-150
+				gum:insert( lolname )
+				
+				local equipstats
+				for i=1,table.maxn(p1.eqp) do
+					if p1.eqp[i][2]==itemstats[3] then
+						equipstats={item.ReturnInfo(p1.eqp[i][1],4)}
+						
+						itmfound=true
+						
+					end
 				end
+				
+				if itmfound==false then
+					equipstats={0,0,0,0,0,0,0,0,0}
+				end
+				
+				statchange={
+					itemstats[4]-equipstats[4],
+					itemstats[5]-equipstats[5],
+					itemstats[6]-equipstats[6],
+					itemstats[7]-equipstats[7],
+					itemstats[8]-equipstats[8],
+					itemstats[9]-equipstats[9]
+				}		
+				
+				if statchange[1]>0 then
+					stabonus=display.newText( ("STA +"..statchange[1]) ,0,0,"Game Over",85)
+					stabonus:setTextColor( 60, 180, 60)
+					stabonus.x=statchangex+(statchangexs*0)
+					stabonus.y=statchangey
+					gum:insert( stabonus )
+					eqpstatchnge=true
+				elseif statchange[1]<0 then
+					stabonus=display.newText( ("STA "..statchange[1]) ,0,0,"Game Over",85)
+					stabonus:setTextColor( 180, 60, 60)
+					stabonus.x=statchangex+(statchangexs*0)
+					stabonus.y=statchangey
+					gum:insert( stabonus )
+					eqpstatchnge=true
+				end
+				
+				if statchange[2]>0 then
+					attbonus=display.newText( ("ATT +"..statchange[2]) ,0,0,"Game Over",85)
+					attbonus:setTextColor( 60, 180, 60)
+					attbonus.x=statchangex+(statchangexs*1)
+					attbonus.y=statchangey
+					gum:insert( attbonus )
+					eqpstatchnge=true
+				elseif statchange[2]<0 then
+					attbonus=display.newText( ("ATT "..statchange[2]) ,0,0,"Game Over",85)
+					attbonus:setTextColor( 180, 60, 60)
+					attbonus.x=statchangex+(statchangexs*1)
+					attbonus.y=statchangey
+					gum:insert( attbonus )
+					eqpstatchnge=true
+				end
+				
+				if statchange[3]>0 then
+					accbonus=display.newText( ("DEF +"..statchange[3]) ,0,0,"Game Over",85)
+					accbonus:setTextColor( 60, 180, 60)
+					accbonus.x=statchangex+(statchangexs*2)
+					accbonus.y=statchangey
+					gum:insert( accbonus )
+					eqpstatchnge=true
+				elseif statchange[3]<0 then
+					accbonus=display.newText( ("DEF "..statchange[3]) ,0,0,"Game Over",85)
+					accbonus:setTextColor( 180, 60, 60)
+					accbonus.x=statchangex+(statchangexs*2)
+					accbonus.y=statchangey
+					gum:insert( accbonus )
+					eqpstatchnge=true
+				end
+				
+				if statchange[4]>0 then
+					defbonus=display.newText( ("MGC +"..statchange[4]) ,0,0,"Game Over",85)
+					defbonus:setTextColor( 60, 180, 60)
+					defbonus.x=statchangex+(statchangexs*3)
+					defbonus.y=statchangey
+					gum:insert( defbonus )
+					eqpstatchnge=true
+				elseif statchange[4]<0 then
+					defbonus=display.newText( ("MGC "..statchange[4]) ,0,0,"Game Over",85)
+					defbonus:setTextColor( 180, 60, 60)
+					defbonus.x=statchangex+(statchangexs*3)
+					defbonus.y=statchangey
+					gum:insert( defbonus )
+					eqpstatchnge=true
+				end
+				
+				if statchange[5]>0 then
+					dexbonus=display.newText( ("DEX +"..statchange[5]) ,0,0,"Game Over",85)
+					dexbonus:setTextColor( 60, 180, 60)
+					dexbonus.x=statchangex+(statchangexs*4)
+					dexbonus.y=statchangey
+					gum:insert( dexbonus )
+					eqpstatchnge=true
+				elseif statchange[5]<0 then
+					dexbonus=display.newText( ("DEX "..statchange[5]) ,0,0,"Game Over",85)
+					dexbonus:setTextColor( 180, 60, 60)
+					dexbonus.x=statchangex+(statchangexs*4)
+					dexbonus.y=statchangey
+					gum:insert( dexbonus )
+					eqpstatchnge=true
+				end
+				
+				if statchange[6]>0 then
+					intbonus=display.newText( ("INT +"..statchange[5]) ,0,0,"Game Over",85)
+					intbonus:setTextColor( 60, 180, 60)
+					intbonus.x=statchangex+(statchangexs*5)
+					intbonus.y=statchangey
+					gum:insert(intbonus)
+					eqpstatchnge=true
+				elseif statchange[6]<0 then
+					intbonus=display.newText( ("INT "..statchange[5]) ,0,0,"Game Over",85)
+					intbonus:setTextColor( 180, 60, 60)
+					intbonus.x=statchangex+(statchangexs*5)
+					intbonus.y=statchangey
+					gum:insert(intbonus)
+					eqpstatchnge=true
+				end
+				
+				if eqpstatchnge==false then
+					stabonus=display.newText( ("No change.") ,0,0,"Game Over",85)
+					stabonus:setTextColor( 180, 180, 180)
+					stabonus.x=display.contentWidth/2
+					stabonus.y=statchangey
+					gum:insert( stabonus )
+				end
+			else
+				SpecialUClose()
 			end
-			
-			if itmfound==false then
-				equipstats={0,0,0,0,0,0,0,0,0}
-			end
-			
-			statchange={
-				itemstats[4]-equipstats[4],
-				itemstats[5]-equipstats[5],
-				itemstats[6]-equipstats[6],
-				itemstats[7]-equipstats[7],
-				itemstats[8]-equipstats[8],
-				itemstats[9]-equipstats[9]
-			}		
-			
-			if statchange[1]>0 then
-				stabonus=display.newText( ("STA +"..statchange[1]) ,0,0,"Game Over",85)
-				stabonus:setTextColor( 60, 180, 60)
-				stabonus.x=statchangex+(statchangexs*0)
-				stabonus.y=statchangey
-				gum:insert( stabonus )
-				eqpstatchnge=true
-			elseif statchange[1]<0 then
-				stabonus=display.newText( ("STA "..statchange[1]) ,0,0,"Game Over",85)
-				stabonus:setTextColor( 180, 60, 60)
-				stabonus.x=statchangex+(statchangexs*0)
-				stabonus.y=statchangey
-				gum:insert( stabonus )
-				eqpstatchnge=true
-			end
-			
-			if statchange[2]>0 then
-				attbonus=display.newText( ("ATT +"..statchange[2]) ,0,0,"Game Over",85)
-				attbonus:setTextColor( 60, 180, 60)
-				attbonus.x=statchangex+(statchangexs*1)
-				attbonus.y=statchangey
-				gum:insert( attbonus )
-				eqpstatchnge=true
-			elseif statchange[2]<0 then
-				attbonus=display.newText( ("ATT "..statchange[2]) ,0,0,"Game Over",85)
-				attbonus:setTextColor( 180, 60, 60)
-				attbonus.x=statchangex+(statchangexs*1)
-				attbonus.y=statchangey
-				gum:insert( attbonus )
-				eqpstatchnge=true
-			end
-			
-			if statchange[3]>0 then
-				accbonus=display.newText( ("DEF +"..statchange[3]) ,0,0,"Game Over",85)
-				accbonus:setTextColor( 60, 180, 60)
-				accbonus.x=statchangex+(statchangexs*2)
-				accbonus.y=statchangey
-				gum:insert( accbonus )
-				eqpstatchnge=true
-			elseif statchange[3]<0 then
-				accbonus=display.newText( ("DEF "..statchange[3]) ,0,0,"Game Over",85)
-				accbonus:setTextColor( 180, 60, 60)
-				accbonus.x=statchangex+(statchangexs*2)
-				accbonus.y=statchangey
-				gum:insert( accbonus )
-				eqpstatchnge=true
-			end
-			
-			if statchange[4]>0 then
-				defbonus=display.newText( ("MGC +"..statchange[4]) ,0,0,"Game Over",85)
-				defbonus:setTextColor( 60, 180, 60)
-				defbonus.x=statchangex+(statchangexs*3)
-				defbonus.y=statchangey
-				gum:insert( defbonus )
-				eqpstatchnge=true
-			elseif statchange[4]<0 then
-				defbonus=display.newText( ("MGC "..statchange[4]) ,0,0,"Game Over",85)
-				defbonus:setTextColor( 180, 60, 60)
-				defbonus.x=statchangex+(statchangexs*3)
-				defbonus.y=statchangey
-				gum:insert( defbonus )
-				eqpstatchnge=true
-			end
-			
-			if statchange[5]>0 then
-				dexbonus=display.newText( ("DEX +"..statchange[5]) ,0,0,"Game Over",85)
-				dexbonus:setTextColor( 60, 180, 60)
-				dexbonus.x=statchangex+(statchangexs*4)
-				dexbonus.y=statchangey
-				gum:insert( dexbonus )
-				eqpstatchnge=true
-			elseif statchange[5]<0 then
-				dexbonus=display.newText( ("DEX "..statchange[5]) ,0,0,"Game Over",85)
-				dexbonus:setTextColor( 180, 60, 60)
-				dexbonus.x=statchangex+(statchangexs*4)
-				dexbonus.y=statchangey
-				gum:insert( dexbonus )
-				eqpstatchnge=true
-			end
-			
-			if statchange[6]>0 then
-				intbonus=display.newText( ("INT +"..statchange[5]) ,0,0,"Game Over",85)
-				intbonus:setTextColor( 60, 180, 60)
-				intbonus.x=statchangex+(statchangexs*5)
-				intbonus.y=statchangey
-				gum:insert(intbonus)
-				eqpstatchnge=true
-			elseif statchange[6]<0 then
-				intbonus=display.newText( ("INT "..statchange[5]) ,0,0,"Game Over",85)
-				intbonus:setTextColor( 180, 60, 60)
-				intbonus.x=statchangex+(statchangexs*5)
-				intbonus.y=statchangey
-				gum:insert(intbonus)
-				eqpstatchnge=true
-			end
-			
-			if eqpstatchnge==false then
-				stabonus=display.newText( ("No change.") ,0,0,"Game Over",85)
-				stabonus:setTextColor( 180, 180, 180)
-				stabonus.x=display.contentWidth/2
-				stabonus.y=statchangey
-				gum:insert( stabonus )
-			end
-			
 		end
 		if itemstats[1]==2 then
-		
-			if itemstats[4]==0 or itemstats[4]==1 then
-				local usebtn= widget.newButton{
-					label="Teleport",
-					labelColor = { default={255,255,255}, over={0,0,0} },
-					fontSize=30,
-					defaultFile="cbutton.png",
-					overFile="cbutton2.png",
-					width=200, height=55,
-					onRelease = UsedIt
-				}
-				usebtn:setReferencePoint( display.CenterReferencePoint )
-				usebtn.x = (display.contentWidth/4)-50
-				usebtn.y = (display.contentHeight/2)+30
-				gum:insert( usebtn )
-			elseif itemstats[4]==2 then
-				local usebtn= widget.newButton{
-					label="Save",
-					labelColor = { default={255,255,255}, over={0,0,0} },
-					fontSize=30,
-					defaultFile="cbutton.png",
-					overFile="cbutton2.png",
-					width=200, height=55,
-					onRelease = UsedIt
-				}
-				usebtn:setReferencePoint( display.CenterReferencePoint )
-				usebtn.x = (display.contentWidth/4)-50
-				usebtn.y = (display.contentHeight/2)+30
-				gum:insert( usebtn )
+			if canEqp==true then
+				if itemstats[4]==0 or itemstats[4]==1 then
+					local usebtn= widget.newButton{
+						label="Teleport",
+						labelColor = { default={255,255,255}, over={0,0,0} },
+						fontSize=30,
+						defaultFile="cbutton.png",
+						overFile="cbutton2.png",
+						width=200, height=55,
+						onRelease = UsedIt
+					}
+					usebtn:setReferencePoint( display.CenterReferencePoint )
+					usebtn.x = (display.contentWidth/4)-50
+					usebtn.y = (display.contentHeight/2)+30
+					gum:insert( usebtn )
+				elseif itemstats[4]==2 then
+					local usebtn= widget.newButton{
+						label="Save",
+						labelColor = { default={255,255,255}, over={0,0,0} },
+						fontSize=30,
+						defaultFile="cbutton.png",
+						overFile="cbutton2.png",
+						width=200, height=55,
+						onRelease = UsedIt
+					}
+					usebtn:setReferencePoint( display.CenterReferencePoint )
+					usebtn.x = (display.contentWidth/4)-50
+					usebtn.y = (display.contentHeight/2)+30
+					gum:insert( usebtn )
+				end
+				
+				local lolname=display.newText( (itemstats[2]) ,0,0,"Game Over",110)
+				lolname.x=display.contentWidth/2
+				lolname.y=(display.contentHeight/2)-150
+				gum:insert( lolname )
+				
+				local descrip=display.newText( (itemstats[3]) ,0,0,"Game Over",85)
+				descrip:setTextColor( 180, 180, 180)
+				descrip.x=display.contentWidth/2
+				descrip.y=(display.contentHeight/2)-80
+				gum:insert( descrip )
+				
+			else
+				SpecialUClose()
 			end
-			
-			local lolname=display.newText( (itemstats[2]) ,0,0,"Game Over",110)
-			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-150
-			gum:insert( lolname )
-			
-			local descrip=display.newText( (itemstats[3]) ,0,0,"Game Over",85)
-			descrip:setTextColor( 180, 180, 180)
-			descrip.x=display.contentWidth/2
-			descrip.y=(display.contentHeight/2)-80
-			gum:insert( descrip )
-			
 		end
 		if itemstats[1]==3 then	
 		
@@ -919,32 +1000,6 @@ function UseMenu(id,slot)
 			
 		end
 		
-		local backbtn= widget.newButton{
-			label="Back",
-			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
-			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
-			width=200, height=55,
-			onRelease = UseMenu}
-		backbtn:setReferencePoint( display.CenterReferencePoint )
-		backbtn.x = (display.contentWidth/2)
-		backbtn.y = (display.contentHeight/2)+30
-		gum:insert( backbtn )
-		
-		local dropbtn= widget.newButton{
-			label="Drop",
-			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
-			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
-			width=200, height=55,
-			onRelease = DroppedIt}
-		dropbtn:setReferencePoint( display.CenterReferencePoint )
-		dropbtn.x = ((display.contentWidth/4)*3)+50
-		dropbtn.y = (display.contentHeight/2)+30
-		gum:insert( dropbtn )
-		
 	elseif isUse==true then
 		isUse=false
 		statchange={}
@@ -956,6 +1011,16 @@ function UseMenu(id,slot)
 		ToggleBag()
 		ToggleBag()
 	end
+end
+
+function SpecialUClose()
+	isUse=false
+	statchange={}
+	for i=gum.numChildren,1,-1 do
+		local child = gum[i]
+		child.parent:remove( child )
+	end
+	gum=nil
 end
 
 function OpenWindow()
