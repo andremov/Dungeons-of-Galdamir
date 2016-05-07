@@ -21,7 +21,7 @@ local AmCoins
 local coins={}
 local ItemName
 local ItemNames={
-		"Wedding Ring",
+		"Magical Trinket",
 		"Guard Insignia",
 		"Ancient Book",
 	}
@@ -39,10 +39,10 @@ function CreateQuest()
 			HasQuest=true
 			QWindow=display.newImageRect("quest.png",447,80)
 			QWindow.x= display.contentWidth-225
-			QWindow.y= 140
+			QWindow.y= 40
 			gqm:insert(QWindow)
 			
-			QTitle=display.newText("Current Quest:",display.contentWidth-380,108,native.systemfont,30)
+			QTitle=display.newText("Current Quest:",display.contentWidth-380,8,native.systemfont,30)
 			QTitle:setTextColor( 0, 0, 0)
 			gqm:insert(QTitle)
 			

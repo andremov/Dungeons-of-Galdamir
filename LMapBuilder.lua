@@ -257,7 +257,7 @@ function Gen()
 		loadtxt:toFront()
 		local CanBeDone=bin.animate(boundary)
 		if CanBeDone==false then
-			loadtxt.text=("Map Failed.\n   Retrying.")
+			loadtxt.text=("Map Failed.\n   Retrying...")
 			loadtxt:toFront()
 			print "Map failed."
 			timer.performWithDelay(500,YouShallNowPass)

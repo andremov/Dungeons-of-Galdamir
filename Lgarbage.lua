@@ -60,7 +60,6 @@ function CalcMoves(level)
 	end
 	
 	while listk > 0 do
-		print "Working?"
      	local lowestF = openlist[listk].f
 	  	curSquareIndex = listk
 		for k = listk, 1, -1 do
@@ -215,14 +214,12 @@ function CalcPath(closedlist)
 	for n=table.getn(pathIndex),1,-1 do
 	table.insert(path,{x=closedlist[pathIndex[n] ].x, y=closedlist[pathIndex[n] ].y})
 	end
-	print "Done?"
 	closedlist=nil
 	return path
 end
 
 function animate(level)
 	path = CalcPath(CalcMoves(level))
-	print "Done?"
 	if path==nil then
 		return false
 	else
