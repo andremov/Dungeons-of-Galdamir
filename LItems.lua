@@ -312,18 +312,18 @@ function Essentials()
 	scrolls={
 		{"ScrollOfCleave",		"Cleave",		"Teaches the \"Cleave\" sorcery."},
 		{"ScrollOfFireSword",	"Fire Sword",	"Teaches the \"Fire Sword\" sorcery."},
-		{"ScrollOfIceSword",	"Ice Sword",	"Teaches the \"Ice Sword\" sorcery."},
+		{"ScrollOfIceSpear",	"Ice Spear",	"Teaches the \"Ice Spear\" sorcery."},
 		{"ScrollOfHealing",		"Healing",		"Teaches the \"Healing\" sorcery."},
 		{"ScrollOfSlow",		"Slow",			"Teaches the \"Slow\" sorcery."},
 		{"ScrollOfPoison",		"Poison Blade",	"Teaches the \"Poison Blade\" sorcery."},
 	}
 	gems={
-		{"GemBlue",		3,"Glows with a blue light.\nIt seems tough to break."},
-		{"GemPurple",	4,"Glows with a purple light.\nIt has some strange aura emanating from it."},
-		{"GemPink",		1,"Glows with a pink light.\nIt pounds faintly every once in a while."},
-		{"GemRed",		2,"Glows with a red light.\nIt vibrates angrily every once in a while."},
-		{"GemYellow",	5,"Glows with a yellow light.\nIt seems lightweight and sharp."},
-		{"GemGreen",	6,"Glows with a green light.\nSymbols seem to spin around the orb inside."},
+		{"MountainRune",3,"Tough like a mountain."},
+		{"PurpleRune",	4,"Writings of ancient ways to channel magic."},
+		{"BloodRune",	1,"More blood to spill."},
+		{"RedRune",		2,"Writings of ancient battle stances."},
+		{"SnakeRune",	5,"Fast and deadly like a snake."},
+		{"EyeRune",		6,"Open to knowledge like an eye."},
 	}
 	special={
 		{"UpperScroll",			"Teleports you to an upper floor.",1},
@@ -341,20 +341,20 @@ function Essentials()
 		{"IronAxe",0,					0,		3,		0,		0,		1,		0},
 		{"EversteelSword",0,			1,		5,		2,		1,		2,		1},
 		--								STA 	ATT		DEF		MGC		DEX		INT
-		{"LeatherCap",2,				0,		0,		0,		1,		1,		0},
+		{"LeatherHood",2,				0,		0,		0,		1,		1,		0},
 		{"LeatherTunic",4,				0,		0,		0,		1,		1,		0},
 		{"LeatherPants",5,				0,		0,		0,		1,		1,		0},
 		{"LeatherShoes",8,				0,		0,		0,		1,		1,		0},
 		--								STA 	ATT		DEF		MGC		DEX		INT
-		{"ChainHelm",2,					0,		0,		1,		1,		1,		0},
-		{"ChainPlate",4,				0,		0,		0,		2,		1,		0},
-		{"ChainLeggings",5,				0,		0,		0,		2,		1,		0},
-		{"ChainBoots",8,				0,		0,		0,		2,		1,		0},
+		{"MailHelm",2,					0,		0,		1,		1,		1,		0},
+		{"MailArmor",4,				0,		0,		0,		2,		1,		0},
+		{"MailLeggings",5,				0,		0,		0,		2,		1,		0},
+		{"MailBoots",8,				0,		0,		0,		2,		1,		0},
 		--								STA 	ATT		DEF		MGC		DEX		INT
-		{"IronHelm",2,					0,		0,		1,		3,		0,		0},
-		{"IronPlate",4,					0,		0,		0,		4,		0,		0},
-		{"IronLeggings",5,				0,		0,		0,		4,		0,		0},
-		{"IronBoots",8,					0,		0,		0,		3,		1,		0},
+		{"PlateHelm",2,					0,		0,		1,		3,		0,		0},
+		{"PlateArmor",4,					0,		0,		0,		4,		0,		0},
+		{"PlateLeggings",5,				0,		0,		0,		4,		0,		0},
+		{"PlateBoots",8,					0,		0,		0,		3,		1,		0},
 		--								STA 	ATT		DEF		MGC		DEX		INT
 		{"DiamondHelm",2,				0,		0,		1,		4,		0,		0},
 		{"DiamondPlate",4,				1,		0,		0,		4,		0,		0},

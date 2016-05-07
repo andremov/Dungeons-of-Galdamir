@@ -78,7 +78,7 @@ function CreatePlayers(name)
 	--Extras
 	player.gp=0
 	player.eqp={  }
-	player.inv={ {1,10} }
+	player.inv={ {1,10}, }
 	player.weight=5
 	--Stats
 	player.statnames=	{"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity",	"Intellect"}

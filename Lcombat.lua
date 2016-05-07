@@ -42,17 +42,9 @@ local q=require("Lquest")
 local gp=require("Lgold")
 local m=require("Lmenu")
 local ui=require("Lui")
-local SBookDisplayed
-local statusdisplay
 local timersprite
 local Automatic
-local Spellbook
-local SorceryUI
 local inCombat
-local outcomed
-local SorcIniX
-local SorcIniY
-local Sorcery
 local ptimer
 local etimer
 local CMenu
@@ -72,9 +64,6 @@ function InTrouble()
 end
 
 function Essentials()
-	SorcIniX=display.contentCenterX-(190+20)
-	SorcIniY=display.contentHeight-120
-	SBookDisplayed=false
 	inCombat=false
 	outcomed=false
 	yinvicial=180
@@ -82,7 +71,7 @@ function Essentials()
 	Automatic=0
 	espaciox=64
 	espacioy=64
-	Sorcery={}
+	book=false
 	inv=false
 end
 
@@ -395,7 +384,9 @@ function ShowActions()
 			gcm:insert( AttackBtn )
 		end
 		
-		function toSorcery()		
+		function toSorcery()	
+			HideActions()
+			
 			ShowSorcery()
 		end
 		
@@ -818,7 +809,7 @@ function P1Sprite(value)
 end
 
 function AttackType()
-	ShowSorcery(true)
+	
 	
 	if (AttackBtn) then
 		display.remove(AttackBtn)
@@ -1005,7 +996,7 @@ function TurnOffAuto()
 end
 
 function Guard()
-	ShowSorcery(true)
+	
 	P1Sprite(3)
 	p1.stats[3]=p1.stats[3]*1.5
 	isDefend=true
@@ -1029,7 +1020,7 @@ function Recover()
 	if p1.MP>p1.MaxMP then
 		p1.MP=p1.MaxMP
 	end
-	ShowSorcery(true)
+	
 	P1Sprite(3)
 	p1.stats[3]=p1.stats[3]*0.75
 	isRecover=true
@@ -1439,7 +1430,7 @@ function UpdateStats(Secret)
 end
 
 function RunAttempt()
-	ShowSorcery(true)
+	
 	local RunChance=EvadeCalc("mob",48)
 	local MaxChance=MaxCalc()
 	if RunChance>0 then
@@ -1933,8 +1924,8 @@ function GetHits()
 	return hits
 end
 
-function ShowBag(action)
-	if inv==false and action~=true then
+function ShowBag()
+	if inv==false then
 		inv=true
 		
 		ginv=display.newGroup()
@@ -1944,11 +1935,16 @@ function ShowBag(action)
 			if (p1.inv[i])~=nil and p1.inv[i][1]<=14 then
 				local itmnme=item.ReturnInfo(p1.inv[i][1],0)
 				
+				function Gah()
+					UseItem(p1.inv[i][1],i)
+				end
 				items2[#items2+1]=display.newImageRect("itemframe.png",50,50)
 				items2[#items2].xScale=1.25*1.3
 				items2[#items2].yScale=1.25*1.3
 				items2[#items2].x = xinvicial+ (((#items2-1)%8)*((espaciox*items2[#items2].xScale)+4))
 				items2[#items2].y = display.contentHeight-yinvicial
+				items2[#items2]:addEventListener("tap",Gah)
+				ginv:insert( items2[#items2] )
 				
 				if p1.inv[i][1]==2 then
 					items[#items+1]=display.newSprite( HPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
@@ -1967,15 +1963,10 @@ function ShowBag(action)
 				end
 				items[#items].xScale=1.25
 				items[#items].yScale=1.25
-				items[#items].x = xinvicial+ (((#items-1)%8)*((espaciox*items[#items].xScale*1.3)+4))
-				items[#items].y = display.contentHeight-yinvicial
-				
-				function Gah()
-					UseItem(p1.inv[i][1],i)
-				end
-				items2[#items2]:addEventListener("tap",Gah)
-				ginv:insert( items2[#items2] )
+				items[#items].x = items2[#items2].x
+				items[#items].y = items2[#items2].y
 				ginv:insert( items[#items] )
+				
 				if p1.inv[i][2]~=1 then
 					if p1.inv[i][2]>9 then
 						items[#items].num=display.newText( (p1.inv[i][2]) ,items[#items].x+5,items[#items].y-5,"Game Over",80)
@@ -2004,7 +1995,7 @@ function ShowBag(action)
 		BackBtn.x = MagicBtn.x
 		BackBtn.y = RecoverBtn.y
 		gcm:insert( BackBtn )
-	elseif inv==true or action==true then
+	elseif inv==true then
 		inv=false
 		display.remove(BackBtn)
 		BackBtn=nil
@@ -2040,6 +2031,7 @@ function UseItem(id,slot)
 		ginv[i]=nil
 	end
 	ginv=nil
+	HideActions()
 	
 	if p1.inv[slot][2]==1 then
 		table.remove( p1.inv, slot )
@@ -2058,7 +2050,7 @@ function UseItem(id,slot)
 		elseif itemstats[4]>0 then
 			p1.HP=p1.HP+(itemstats[4])
 			if p1.HP>p1.MaxHP then
-				p1.HP=p1.MaxHp
+				p1.HP=p1.MaxHP
 			end
 			hpHits(itemstats[4],false,true)
 		end
@@ -2078,70 +2070,90 @@ function UseItem(id,slot)
 	UpdateStats()
 end
 
-function ShowSorcery(comm)
-	if comm==true then
-		if SBookDisplayed==true then
-			function deletion()
-				display.remove(SorceryUI)
-			end
-			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y+(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=deletion})
-			for i=table.maxn(Sorcery),1,-1 do
-				display.remove(Sorcery[i])
-				Sorcery[i]=nil
-			end
-			SBookDisplayed=false
-		end
-	else
-		if SBookDisplayed==false then
-			function finishSpells()
-				for i=1,table.maxn(Sorcery) do
-					Sorcery[i].isVisible=true
-					Sorcery[i]:toFront()
+function ShowSorcery()
+	if book==false then
+		book=true
+		
+		gspl=display.newGroup()
+		spells={}
+		spellframes={}
+		for i=1,table.maxn(p1.spells) do
+			if (p1.spells[i][3])==true then
+				function Hoo()
+					CastSorcery(p1.spells[i][1])
 				end
+				spellframes[#spellframes+1]=display.newImageRect("itemframe.png",50,50)
+				spellframes[#spellframes].xScale=1.25*1.3
+				spellframes[#spellframes].yScale=1.25*1.3
+				spellframes[#spellframes].x = xinvicial+ (((#spellframes-1)%8)*((espaciox*spellframes[#spellframes].xScale)+4))
+				spellframes[#spellframes].y = display.contentHeight-yinvicial
+				spellframes[#spellframes]:addEventListener("tap",Hoo)
+				gspl:insert( spellframes[#spellframes] )
+				
+				spells[#spells+1]=display.newImageRect( "spells/"..p1.spells[i][1]..".png" ,80,80)
+				spells[#spells].x = spellframes[#spellframes].x
+				spells[#spells].y = spellframes[#spellframes].y
+				gspl:insert( spells[#spells] )
+				
+				spellframes[#spellframes]:toFront()
+				
 			end
-			for s=1, table.maxn(p1.spells) do
-				if p1.spells[s][3]==true then
-					function toCast()
-						CastSorcery(p1.spells[s][1])
-					end
-					Sorcery[#Sorcery+1]=display.newText( (p1.spells[s][1].."  "..p1.spells[s][4].." MP".."  "..p1.spells[s][5].." EP"), SorcIniX, (SorcIniY-((#Sorcery-1)*50)), "Viner Hand ITC", 40)
-					Sorcery[#Sorcery]:setTextColor(50,50,50)
-					if (p1.spells[s][4])>p1.MP or (p1.spells[s][5])>p1.EP then
-						Sorcery[#Sorcery]:setTextColor(180,60,60)
-					else
-						Sorcery[#Sorcery]:addEventListener("tap",toCast)
-					end						
-					Sorcery[#Sorcery].isVisible=false
-				end
-			end
-			if table.maxn(Sorcery)==0 then
-				Sorcery[#Sorcery+1]=display.newText( ("No known Sorcery."), SorcIniX, (SorcIniY-((#Sorcery-1)*40)), "Viner Hand ITC", 40)
-				Sorcery[#Sorcery]:setTextColor(120,120,120)
-				Sorcery[#Sorcery].isVisible=false
-			end
-			
-			SorceryUI=display.newImageRect("scrollui4.png", 460, 600)
-			SorceryUI.x, SorceryUI.y = display.contentCenterX, display.contentHeight+300
-			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y-(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=finishSpells})
-			SBookDisplayed=true
-		elseif SBookDisplayed==true then
-			function deletion()
-				display.remove(SorceryUI)
-			end
-			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y+(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=deletion})
-			for i=table.maxn(Sorcery),1,-1 do
-				display.remove(Sorcery[i])
-				Sorcery[i]=nil
-			end
-			SBookDisplayed=false
 		end
+		gspl:toFront()
+		
+		display.remove(BackBtn)
+		BackBtn=nil
+		
+		BackBtn=widget.newButton{
+			label="Close",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=30,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = ShowSorcery}
+		BackBtn:setReferencePoint( display.CenterReferencePoint )
+		BackBtn.x = MagicBtn.x
+		BackBtn.y = RecoverBtn.y
+		gcm:insert( BackBtn )
+	elseif book==true then
+		book=false
+		display.remove(BackBtn)
+		BackBtn=nil
+		for i=table.maxn(spells),1,-1 do
+			display.remove(spells[i])
+			spells[i]=nil
+			display.remove(spellframes[i])
+			spellframes[i]=nil
+		end
+		spells=nil
+		spellframes=nil
+		for i=gspl.numChildren,1,-1 do
+			display.remove(gspl[i])
+			gspl[i]=nil
+		end
+		gspl=nil
+		ShowActions()
 	end
 end
 
 function CastSorcery(name)
 	P1Sprite(4)
-	ShowSorcery(true)
 	
+	book=false
+	for i=table.maxn(spells),1,-1 do
+		display.remove(spells[i])
+		spells[i]=nil
+		display.remove(spellframes[i])
+		spellframes[i]=nil
+	end
+	spells=nil
+	spellframes=nil
+	for i=gspl.numChildren,1,-1 do
+		display.remove(gspl[i])
+		gspl[i]=nil
+	end
+	gspl=nil
 	HideActions()
 	
 	for s=1, table.maxn(p1.spells) do

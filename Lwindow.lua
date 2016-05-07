@@ -25,6 +25,7 @@ local s=require("Lsaving")
 local m=require("Lmenu")
 local ginv
 local geqp
+local gbk
 local ginf
 local gdm
 local gum
@@ -80,12 +81,12 @@ local DeathMessages={
 
 function Essentials()
 	p1=p.GetPlayer()
-	xinvicial=75
-	yinvicial=156
-	espaciox=64
-	espacioy=64
-	xeqpicial=75
-	yeqpicial=698
+	xinvicial=62
+	yinvicial=157
+	scale=1.2
+	espacio=64*scale
+	xeqpicial=62
+	yeqpicial=721.47998046875
 	statchangexs=200
 	statchangey=(display.contentCenterY)-70
 	statchangex=(display.contentCenterX)-statchangexs
@@ -111,6 +112,9 @@ function CloseErrthang()
 		if (gexui) then
 			ToggleExit()
 		end
+		if (gbk) then
+			ToggleSpells()
+		end
 		return true
 	else
 		return false
@@ -125,7 +129,7 @@ function ToggleBag()
 		
 		invinterface=display.newImageRect("container.png", 570, 507)
 		invinterface.x,invinterface.y = display.contentWidth/2, 440
-		invinterface.xScale,invinterface.yScale=1.2280701755,1.308003737
+		invinterface.xScale,invinterface.yScale=1.28,1.28
 		ginv:insert( invinterface )
 		isOpn=true
 		
@@ -156,10 +160,10 @@ function ToggleBag()
 				else
 					items[#items+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
 				end
-				items[#items].xScale=1.140625
-				items[#items].yScale=1.140625
-				items[#items].x = xinvicial+ (((#items-1)%9)*((espaciox*items[#items].xScale)+4))
-				items[#items].y = yinvicial+ ((math.floor((#items-1)/9))*((espacioy*items[#items].yScale)+4))
+				items[#items].xScale=scale
+				items[#items].yScale=scale
+				items[#items].x = xinvicial+ (((#items-1)%9)*(espacio+(3*1.28)))
+				items[#items].y = yinvicial+ ((math.floor((#items-1)/9))*(espacio+(3*1.28)))
 				function Gah()
 					UseMenu(p1.inv[i][1],i)
 				end
@@ -182,8 +186,8 @@ function ToggleBag()
 				local itmnme=item.ReturnInfo(p1.eqp[i][1],0)
 	--			print ("Player has "..itmnme.." equipped in slot number "..p1.eqp[i][2]..".")
 				curreqp[#curreqp+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
-				curreqp[#curreqp].xScale=1.140625
-				curreqp[#curreqp].yScale=1.140625
+				curreqp[#curreqp].xScale=scale
+				curreqp[#curreqp].yScale=scale
 				if p1.eqp[i][2]==6 then
 					plcmnt=1
 				elseif p1.eqp[i][2]==2 then
@@ -203,7 +207,7 @@ function ToggleBag()
 				elseif p1.eqp[i][2]==8 then
 					plcmnt=9
 				end
-				curreqp[#curreqp].x = xeqpicial+ (((plcmnt-1)%9)*((espaciox*curreqp[#curreqp].xScale)+4))
+				curreqp[#curreqp].x = xeqpicial+(((plcmnt-1)%9)*(espacio+(3*1.28)))
 				curreqp[#curreqp].y = yeqpicial
 				function Argh()
 					CheckMenu(p1.eqp[i][1])
@@ -427,6 +431,130 @@ function ToggleExit()
 			gexui[i]=nil
 		end
 		gexui=nil
+	end
+end
+
+function ToggleSpells()
+	if isOpn==false then
+		isOpn=true
+		gbk=display.newGroup()
+		spellicons={}
+		spellnames={}
+		spelltrigger={}
+		
+		bkg=display.newImageRect("bkgs/magicbkg.png", 768, 800)
+		bkg.x,bkg.y = display.contentWidth/2, 400
+		gbk:insert(bkg)
+		
+		for i=1,table.maxn(p1.spells) do
+		
+			spelltrigger[i]=display.newRect(0,0,310,80)
+			spelltrigger[i].x = 170
+			spelltrigger[i].y = 120+((i-1)*85)
+			spelltrigger[i]:setFillColor(0,0,0,0)
+			spelltrigger[i]:addEventListener("tap",SpellInfo)
+			gbk:insert(spelltrigger[i])
+			
+			if p1.spells[i][3]==true then
+				spellicons[i]=display.newImageRect(("spells/"..p1.spells[i][1]..".png"),80,80)
+				spellicons[i].x=60
+				spellicons[i].y=120+((i-1)*85)
+				gbk:insert(spellicons[i])
+				
+				spellnames[i]=display.newText((p1.spells[i][1]),spellicons[i].x+45,0,"MoolBoran",55)
+				spellnames[i].y=spellicons[i].y+20
+				spellnames[i]:setTextColor(0,0,0)
+				gbk:insert(spellnames[i])
+			else
+				spellicons[i]=display.newImageRect(("spells/"..p1.spells[i][1].." X.png"),80,80)
+				spellicons[i].x=60
+				spellicons[i].y=120+((i-1)*85)
+				gbk:insert(spellicons[i])
+				
+				spellnames[i]=display.newText(("???"),spellicons[i].x+45,0,"MoolBoran",55)
+				spellnames[i].y=spellicons[i].y+20
+				spellnames[i]:setTextColor(0,0,0)
+				gbk:insert(spellnames[i])
+			end
+		end
+		
+	elseif isOpn==true and (gbk) then
+		isOpn=false
+		for i=table.maxn(spellicons),1,-1 do
+			display.remove(spellicons[i])
+			spellicons[i]=nil
+		end
+		spellicons=nil
+		for i=table.maxn(spellnames),1,-1 do
+			display.remove(spellnames[i])
+			spellnames[i]=nil
+		end
+		spellnames=nil
+		for i=table.maxn(spelltrigger),1,-1 do
+			display.remove(spelltrigger[i])
+			spelltrigger[i]=nil
+		end
+		spelltrigger=nil
+		for i=gbk.numChildren,1,-1 do
+			display.remove(gbk[i])
+			gbk[i]=nil
+		end
+		gbk=nil
+	end
+end
+
+function SpellInfo( event )
+	local selectedSpell
+	for i=1,table.maxn(spelltrigger) do
+		if event.y>spelltrigger[i].y-40 and event.y<spelltrigger[i].y+40 then
+			selectedSpell=i
+		end
+	end
+	if (spellshown) then
+		for i=table.maxn(spellshown),1,-1 do
+			display.remove(spellshown[i])
+			spellshown[i]=nil
+		end
+		spellshown=nil
+	end
+	spellshown={}
+	
+	if p1.spells[selectedSpell][3]==true then
+		spellshown[1]=display.newText( (p1.spells[selectedSpell][1]),0,0,"MoolBoran",80)
+		spellshown[1].x=((display.contentWidth/4)*3)-50
+		spellshown[1].y=100
+		spellshown[1]:setTextColor(0,0,0)
+		gbk:insert(spellshown[1])
+		
+		spellshown[2]=display.newText( 
+			(p1.spells[selectedSpell][2]),
+			spellshown[1].x-190,
+			spellshown[1].y+50,
+			420,0,"MoolBoran",45
+		)
+		spellshown[2]:setTextColor(50,50,50)
+		gbk:insert(spellshown[2])
+		
+		spellshown[3]=display.newText( (p1.spells[selectedSpell][4].." MP"),0,0,"MoolBoran",65)
+		spellshown[3].x=spellshown[2].x-110
+		spellshown[3].y=spellshown[2].y+150
+		spellshown[3]:setTextColor(180,70,180)
+		gbk:insert(spellshown[3])
+		
+		spellshown[4]=display.newText( (p1.spells[selectedSpell][5].." EP"),0,0,"MoolBoran",65)
+		spellshown[4].x=spellshown[2].x+110
+		spellshown[4].y=spellshown[2].y+150
+		spellshown[4]:setTextColor(70,180,70)
+		gbk:insert(spellshown[4])
+	else
+		spellshown[1]=display.newText(
+			("You haven't learned this spell."),
+			((display.contentWidth/4)*3)-240,
+			150,
+			420,0,"MoolBoran",45
+		)
+		spellshown[1]:setTextColor(50,50,50)
+		gbk:insert(spellshown[1])
 	end
 end
 

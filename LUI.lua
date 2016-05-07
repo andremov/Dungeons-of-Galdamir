@@ -122,12 +122,12 @@ function UI(ready)
 		snd:addEventListener("touch",OpenSnd)
 		pwg:insert(snd)
 		
-		uiexit = display.newImageRect("magicbtn.png", 80, 80)
-		uiexit.x, uiexit.y = snd.x+(80*snd.xScale), bag.y
-		uiexit.yScale = bag.yScale
-		uiexit.xScale = bag.xScale
-		uiexit:addEventListener("touch",OpenExit)
-		pwg:insert(uiexit)
+		magic = display.newImageRect("magicbtn.png", 80, 80)
+		magic.x, magic.y = snd.x+(80*snd.xScale), bag.y
+		magic.yScale = bag.yScale
+		magic.xScale = bag.xScale
+		magic:addEventListener("touch",OpenBook)
+		pwg:insert(magic)
 		
 		MapIndicators("create")
 	end
@@ -220,6 +220,12 @@ end
 function OpenInfo( event )
 	if event.phase=="ended" then
 		inv.ToggleInfo()
+	end
+end
+
+function OpenBook( event )
+	if event.phase=="ended" then
+		inv.ToggleSpells()
 	end
 end
 
