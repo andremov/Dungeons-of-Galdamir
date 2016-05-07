@@ -221,10 +221,12 @@ function ShowMenu()
 	background:setReferencePoint( display.TopLeftReferencePoint )
 	background.x, background.y = 0, 0
 	
-	local titleLogo = display.newImageRect( "title.png", 720, 98 )
+	local titleLogo = display.newImageRect( "titleB.png", 477, 254 )
 	titleLogo:setReferencePoint( display.CenterReferencePoint )
 	titleLogo.x = display.contentWidth * 0.5
 	titleLogo.y = 100
+	titleLogo.xScale=0.75
+	titleLogo.yScale=titleLogo.xScale
 	saved=sav.CheckSave()
 	scr.CheckScore()
 	if saved==true then
@@ -269,13 +271,13 @@ function ShowMenu()
 	PlayBtn.y = ContBtn.y+100
 	
 	TutBtn = widget.newButton{
-		label="Tutorial (WIP)",
+		label="TBA",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="inactive.png",
+		overFile="inactive-over.png",
 		width=308, height=80,
-		onRelease = onTutBtnRelease
+		--onRelease = onTutBtnRelease
 	}
 	TutBtn:setReferencePoint( display.CenterReferencePoint )
 	TutBtn.x = display.contentWidth*0.5
@@ -500,7 +502,7 @@ function Keyboard()
 		onRelease = Back2Menu
 	}
 	keys2[#keys2]:setReferencePoint( display.CenterReferencePoint )
-	keys2[#keys2].x = display.contentCenterX
+	keys2[#keys2].x = 130
 	keys2[#keys2].y = display.contentHeight-40
 	kbrd:insert( keys2[#keys2] )
 end

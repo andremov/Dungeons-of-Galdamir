@@ -252,7 +252,7 @@ function Gen()
 	RandomMap()
 	
 	if count~=mapsize+1 then
-		timer.performWithDelay(10,Gen)
+		timer.performWithDelay(5,Gen)
 	else
 		loadtxt.text=("Testing Map...")
 		loadtxt:toFront()
@@ -699,7 +699,6 @@ function DisplayMap()
 		Level:insert( dmobs )
 		Level:toBack()
 		bkg:toBack()
-		su.Continue()
 		Extras()
 		mob.ReceiveMobs(mobs)
 		q.CreateQuest()
@@ -749,8 +748,7 @@ function DisplayMap()
 			end
 		end
 		m.ShowArrows()
-		ui.Pause()
-		wdow.ToggleInfo()
+		su.Continue()
 		print "Map Built."
 	end
 end
@@ -881,9 +879,11 @@ end
 
 function WipeMap()
 	mob.WipeMobs()
-	for i=Level.numChildren,1,-1 do
-		display.remove(Level[i])
-		Level[i]=nil
+	if (Level) then
+		for i=Level.numChildren,1,-1 do
+			display.remove(Level[i])
+			Level[i]=nil
+		end
 	end
 	bkg:toBack()
 end

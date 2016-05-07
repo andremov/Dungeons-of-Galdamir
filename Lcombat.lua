@@ -63,8 +63,8 @@ function Essentials()
 	SBookDisplayed=false
 	Sorcery={}
 	inCombat=false
-	SorcIniX=display.contentWidth/2-20
-	SorcIniY=50
+	SorcIniX=20
+	SorcIniY=display.contentHeight-120
 	outcomed=false
 end
 
@@ -214,7 +214,7 @@ function MobsTurn()
 	local pp=timer.pause(ptimer)
 	
 	local isHit=EvadeCalc("p1",16)
-	if isHit>=(p1.stats[5]/3)*2 then
+	if isHit>=(p1.stats[5]/6)*2 then
 		if isHit>=(p1.stats[5]/3)*5 then
 			local Damage=DamageCalc("p1",(math.random(15,20)/10),16)
 			if (Damage)<=0 then
@@ -291,9 +291,9 @@ function MoveSprites()
 			movcd=0
 		end
 		--Enemy
-		if (esprite.y==180) then
+		if (esprite.y==120) then
 			esprite.y=esprite.y+1
-		elseif (esprite.y==270) then
+		elseif (esprite.y==240) then
 			esprite.y=esprite.y-1
 		elseif movcd==0 then
 			if psprite.y+10>esprite.y and psprite.y-10<esprite.y then
@@ -314,9 +314,9 @@ function MoveSprites()
 		end
 		
 		--Player
-		if (psprite.y==180) then
+		if (psprite.y==120) then
 			psprite.y=psprite.y+1
-		elseif (psprite.y==270) then
+		elseif (psprite.y==240) then
 			psprite.y=psprite.y-1
 		elseif movcd==0 then
 			if psprite.y+10>esprite.y and psprite.y-10<esprite.y then
@@ -773,7 +773,6 @@ function RunAttempt()
 	local RunChance,MaxChance=EvadeCalc("mob",48)
 	if RunChance>=(enemy.stats[5]/3) or MaxChance<(enemy.stats[5]/3)*2 then
 		EndCombat("Ran")
-		inCombat=false
 	else
 		EndTurn()
 	end
@@ -782,7 +781,7 @@ end
 function PlayerAttacks()
 	ShowSorcery(true)
 	local isHit=EvadeCalc("mob",16)
-	if isHit>=(enemy.stats[5]/3)*2 then
+	if isHit>=(enemy.stats[5]/6)*2 then
 		if isHit>=(enemy.stats[5]/3)*5 then
 			local Damage=DamageCalc("mob",(math.random(15,20)/10),16)
 			if (Damage)<=0 then
@@ -844,6 +843,7 @@ function EndTurn()
 end
 
 function EndCombat(outcome)
+	inCombat=false
 	gcm:insert(HitGroup)
 	for i=gcm.numChildren,1,-1 do
 		display.remove(gcm[i])
@@ -975,7 +975,6 @@ function AcceptOutcome()
 			hits[i]=nil
 		end
 	end
-	inCombat=false
 	mov.ShowArrows()
 end
 
@@ -1025,7 +1024,7 @@ function ShowSorcery(dumb)
 			function deletion()
 				display.remove(SorceryUI)
 			end
-			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y-(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=deletion})
+			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y+(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=deletion})
 			for i=table.maxn(Sorcery),1,-1 do
 				display.remove(Sorcery[i])
 				Sorcery[i]=nil
@@ -1040,38 +1039,36 @@ function ShowSorcery(dumb)
 					Sorcery[i]:toFront()
 				end
 			end
-			Spellbook=players.LearnSorcery(true)
-			for s=1, table.maxn(Spellbook),5 do
-				if Spellbook[s+2]==true then
+			for s=1, table.maxn(p1.spells) do
+				if p1.spells[s][3]==true then
 					function toCast()
-						CastSorcery(Spellbook[s])
+						CastSorcery(p1.spells[s][1])
 					end
-					Sorcery[#Sorcery+1]=display.newText( (Spellbook[s].."  "..Spellbook[s+3].."/"..Spellbook[s+4]), SorcIniX, (SorcIniY+((#Sorcery-1)*50)), "Viner Hand ITC", 40)
+					Sorcery[#Sorcery+1]=display.newText( (p1.spells[s][1].."  "..p1.spells[s][4].." MP"), SorcIniX, (SorcIniY-((#Sorcery-1)*50)), "Viner Hand ITC", 40)
 					Sorcery[#Sorcery]:setTextColor(50,50,50)
-					if (Spellbook[s+3])==0 then
+					if (p1.spells[s][4])>p1.MP then
 						Sorcery[#Sorcery]:setTextColor(180,60,60)
 					else
 						Sorcery[#Sorcery]:addEventListener("tap",toCast)
 					end						
 					Sorcery[#Sorcery].isVisible=false
-					SorcDisplayed=true
 				end
 			end
 			if table.maxn(Sorcery)==0 then
-				Sorcery[#Sorcery+1]=display.newText( ("No known Sorcery."), SorcIniX, (SorcIniY+((#Sorcery-1)*40)), "Viner Hand ITC", 40)
+				Sorcery[#Sorcery+1]=display.newText( ("No known Sorcery."), SorcIniX, (SorcIniY-((#Sorcery-1)*40)), "Viner Hand ITC", 40)
 				Sorcery[#Sorcery]:setTextColor(120,120,120)
 				Sorcery[#Sorcery].isVisible=false
 			end
 			
 			SorceryUI=display.newImageRect("scrollui4.png", 460, 600)
-			SorceryUI.x, SorceryUI.y = display.contentWidth-230, -300
-			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y+(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=finishSpells})
+			SorceryUI.x, SorceryUI.y = 230, display.contentHeight+300
+			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y-(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=finishSpells})
 			SBookDisplayed=true
 		elseif SBookDisplayed==true then
 			function deletion()
 				display.remove(SorceryUI)
 			end
-			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y-(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=deletion})
+			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y+(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=deletion})
 			for i=table.maxn(Sorcery),1,-1 do
 				display.remove(Sorcery[i])
 				Sorcery[i]=nil
@@ -1083,14 +1080,13 @@ end
 
 function CastSorcery(name)
 	ShowSorcery(true)
-	Spellbook=players.LearnSorcery(true)
-	for s=1, table.maxn(Spellbook),5 do
-		if Spellbook[s]==name then
-			Spellbook[s+3]=Spellbook[s+3]-1	
+	for s=1, table.maxn(p1.spells) do
+		if p1.spells[s][1]==name then
+			p1.MP=p1.MP-p1.spells[s][4]
 		end
 	end
 	if name=="Cleave" then
-		local Damage=DamageCalc("mob",(math.random(15,20)/10),22)
+		local Damage=MagicCalc((math.random(15,20)/10),22)
 		Hits((Damage),true,true,"SPL")
 		enemy.HP=enemy.HP-Damage
 		if enemy.HP<=0 then
@@ -1123,8 +1119,8 @@ function CastSorcery(name)
 	elseif name=="Fire Sword" then
 	
 		local isHit=EvadeCalc("mob",32)
-		if isHit>=(enemy.stats[5]/3)*2 then
-			local Damage=DamageCalc("mob",(math.random(15,20)/10),22)
+		if isHit>=(enemy.stats[5]/6)*2 then
+			local Damage=MagicCalc((math.random(15,20)/10),22)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,"SPL")
 			else
@@ -1156,9 +1152,9 @@ function CastSorcery(name)
 	elseif name=="Fireball" then
 	
 		local isHit=EvadeCalc("mob",32)
-		if isHit>=(enemy.stats[5]/3)*2 then
+		if isHit>=(enemy.stats[5]/6)*2 then
 			if isHit>=(enemy.stats[5]/3)*5 then
-				local Damage=DamageCalc("mob",(math.random(15,20)/10),22)
+				local Damage=MagicCalc((math.random(15,20)/10),22)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
 				else
@@ -1174,7 +1170,7 @@ function CastSorcery(name)
 					Hits((Damage),true,true,"SPL")
 				end
 			else
-				local Damage=DamageCalc("mob",1,22)
+				local Damage=MagicCalc(1,22)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
 				else
@@ -1207,8 +1203,8 @@ function CastSorcery(name)
 	elseif name=="Ice Sword" then
 	
 		local isHit=EvadeCalc("mob",32)
-		if isHit>=(enemy.stats[5]/3)*2 then
-			local Damage=DamageCalc("mob",(math.random(15,20)/10),22)
+		if isHit>=(enemy.stats[5]/6)*2 then
+			local Damage=MagicCalc((math.random(15,20)/10),22)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,"SPL")
 			else
@@ -1249,9 +1245,9 @@ function CastSorcery(name)
 	elseif name=="Poison Blade" then
 	
 		local isHit=EvadeCalc("mob",32)
-		if isHit>=(enemy.stats[5]/3)*2 then
+		if isHit>=(enemy.stats[5]/6)*2 then
 			if isHit>=(enemy.stats[5]/3)*5 then
-				local Damage=DamageCalc("mob",(math.random(15,20)/10),22)
+				local Damage=MagicCalc((math.random(15,20)/10),22)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
 				else
@@ -1263,7 +1259,7 @@ function CastSorcery(name)
 					Hits((Damage),true,true,"SPL")
 				end
 			else
-				local Damage=DamageCalc("mob",1,22)
+				local Damage=MagicCalc(1,22)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
 				else
@@ -1295,11 +1291,27 @@ end
 function NoMansLand()
 	for h=1,table.maxn(hits) do
 		if (hits[h]) and (hits[h].y) then
-			if hits[h].y>=display.contentHeight-260 then
+			if hits[h].y>=280 then
 				display.remove(hits[h])
 			end
 		end
 	end
+end
+
+function MagicCalc(crit,cmd)
+	local Damage
+	Damage=(
+		((p1.stats[4]*1.5)-enemy.stats[3])*5
+	)
+	Damage=(
+		((Damage*cmd/16)*crit)
+	)
+	Damage=(
+		Damage*((math.random((10+(p1.stats[4]*0.5)),(10+(p1.stats[4]*1.5))))/10)
+	)
+	Damage=(Damage*0.65)
+	Damage=math.floor(Damage)
+	return Damage
 end
 
 function DamageCalc(tar,crit,cmd)

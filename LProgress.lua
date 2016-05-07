@@ -19,6 +19,7 @@ local com=require("Lcombat")
 local sav=require("LSaving")
 local shp=require("LShop")
 local q=require("LQuest")
+local su=require("LStartup")
 local RoundTax=5
 local Level
 local Life
@@ -224,6 +225,7 @@ function FloorPort(up)
 		if Round%(math.ceil(5/(math.sqrt(size)/5)))==0 then
 			shp.DisplayShop()
 		end
+		su.Startup(false)
 		builder.YouShallNowPass(false)
 		sav.Save()
 		
@@ -235,6 +237,7 @@ function FloorPort(up)
 		
 		print ("Floor: " ..Round)
 		q.WipeQuest()
+		su.Startup(false)
 		builder.YouShallNowPass(true)
 		sav.Save()
 	end
@@ -255,6 +258,7 @@ function Win()
 		gpgain=(10*math.sqrt(size))
 	end
 	gp.CallAddCoins(gpgain)
+	su.Startup(false)
 	builder.YouShallNowPass(false)
 	sav.Save()
 end
@@ -273,6 +277,7 @@ function Lrn2WinNub()
 		gpgain=(10*math.sqrt(size))
 	end
 	gp.CallAddCoins(gpgain)
+	su.Startup(false)
 	builder.YouShallNowPass(true)
 	sav.Save()
 end
@@ -291,7 +296,8 @@ function SrsBsns()
 	display.remove(P1)
 	players.Statless()
 	gp.CleanCounter()
-	m.ReadySetGo()
+	builder.WipeMap()
 	m.ShowMenu()
+	m.ReadySetGo()
 end
 

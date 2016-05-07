@@ -41,13 +41,6 @@ function CreatePlayers(name)
 	if not (class) then
 		class=0
 	end
-	local classbonus={}
-	--				STA	ATT	DEF	MGC	DEX
-	classbonus[1]=	{1,	1,	2,	1,	1	}
-	classbonus[2]=	{1,	2,	1,	1,	1	}
-	classbonus[3]=	{1,	1,	1,	1,	2	}
-	classbonus[4]=	{2,	1,	1,	1,	1	}
-	classbonus[5]=	{1,	1,	1,	2,	1	}
 	
 	--Visual
 	player=display.newImageRect( "chars/"..char.."/"..class.."/char.png", 76 ,76)
@@ -55,10 +48,10 @@ function CreatePlayers(name)
 	player:setStrokeColor(50, 50, 255)
 	player.strokeWidth = 4
 	--Leveling
-	if (name) then
-		player.name=name
-	else
+	if name==nil or name=="" or name==" " then
 		player.name=names[math.random(1,table.maxn(names))]
+	else
+		player.name=name
 	end
 	player.lvl=1
 	player.MaxXP=50
@@ -71,21 +64,9 @@ function CreatePlayers(name)
 	player.eqp={  }
 	player.inv={ {1,10} }
 	--Stats
-	player.statbonus={}
-	player.statbonus[1]=classbonus[class+1][1]
-	player.statbonus[2]=classbonus[class+1][2]
-	player.statbonus[3]=classbonus[class+1][3]
-	player.statbonus[4]=classbonus[class+1][4]
-	player.statbonus[5]=classbonus[class+1][5]
-	player.statnames=	{"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity",}
-	player.eqs=			{0,			0,			0,			0,			0,}
-	player.nat={
-		((1)+player.statbonus[1]),
-		((1)+player.statbonus[2]),
-		((1)+player.statbonus[3]),
-		((1)+player.statbonus[4]),
-		((1)+player.statbonus[5])
-	}
+	player.statnames=	{"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity"}
+	player.eqs=			{0,			0,			0,			0,			0}
+	player.nat=			{2,			2,			2,			2,			2}
 	player.stats={
 		(player.nat[1]+player.eqs[1]),
 		(player.nat[2]+player.eqs[2]),
@@ -260,6 +241,12 @@ function ShowStats()
 		XPSymbol.y = 27
 		XPSymbol:toFront()
 		XPSymbol:setFillColor(transp2,transp2,transp2,transp2)
+		
+		XPDisplay=display.newText( ((XPSymbol.frame*2).."%"), 0, 0, "Game Over", 85 )
+		XPDisplay.x = XPSymbol.x
+		XPDisplay.y = XPSymbol.y
+		XPDisplay:toFront()
+		XPDisplay:setTextColor( 0, 0, 0,transp2)
 	end
 	
 end
@@ -305,10 +292,30 @@ function Statless()
 	display.remove(ManaDisplay)
 	display.remove(ManaSymbol)
 	display.remove(XPSymbol)
+	display.remove(XPDisplay)
+	LifeDisplay=nil
+	LifeSymbol=nil
+	ManaDisplay=nil
+	ManaSymbol=nil
+	XPDisplay=nil
+	XPSymbol=nil
 end
 
 function StatBoost(stat)
-	player.stats[stat]=player.stats[stat]+1
+	player.nat[stat]=player.nat[stat]+1
+end
+
+function Natural(statnum,amnt)
+	player.nat[statnum]=player.nat[statnum]+amnt
+	player.pnts=player.pnts-(amnt)
+	player.stats={
+		(player.nat[1]+player.eqs[1]),
+		(player.nat[2]+player.eqs[2]),
+		(player.nat[3]+player.eqs[3]),
+		(player.nat[4]+player.eqs[4]),
+		(player.nat[5]+player.eqs[5]),
+	}
+	player.SPD=(1.00-(player.stats[5]/100))
 end
 
 function GrantXP(orbs)
@@ -341,27 +348,30 @@ function LvlUp()
 end
 
 function OhCrap()
-	if XPSymbol.frame~=(math.floor(player.XP)) then
-		if XPSymbol.frame==43 and player.XP>player.MaxXP then
-			LvlUp()
-		elseif XPSymbol.frame>(math.floor(player.XP/player.MaxXP)) then
-			XPSymbol:setFrame(1)
-			transp2=255
-			XPSymbol:setFillColor(transp2,transp2,transp2,transp2)
-			timer.performWithDelay(50,OhCrap)
-		elseif XPSymbol.frame<(math.floor(player.XP/player.MaxXP)) then
-			XPSymbol:setFrame(XPSymbol.frame+1)
-			transp2=255
-			XPSymbol:setFillColor(transp2,transp2,transp2,transp2)
-			timer.performWithDelay(50,OhCrap)
-		elseif XPSymbol.frame==(math.floor(player.XP/player.MaxXP)) and transp2~=0 then
-			transp2=255-(255/50)
-			if transp2<20 then
-				transp2=0
-			end
-			XPSymbol:setFillColor(transp2,transp2,transp2,transp2)
-			timer.performWithDelay(50,OhCrap)
+	if XPSymbol.frame==50 and player.XP>player.MaxXP then
+		LvlUp()
+	elseif XPSymbol.frame>math.floor((player.XP/player.MaxXP)*50) then
+		XPSymbol:setFrame(1)
+		transp2=255
+		XPSymbol:setFillColor(transp2,transp2,transp2,transp2)
+		XPDisplay:setTextColor( 0, 0, 0,transp2)
+		XPDisplay.text=((XPSymbol.frame*2).."%")
+		timer.performWithDelay(50,OhCrap)
+	elseif XPSymbol.frame<math.floor((player.XP/player.MaxXP)*50) then
+		XPSymbol:setFrame(XPSymbol.frame+1)
+		transp2=255
+		XPSymbol:setFillColor(transp2,transp2,transp2,transp2)
+		XPDisplay:setTextColor( 0, 0, 0,transp2)
+		XPDisplay.text=((XPSymbol.frame*2).."%")
+		timer.performWithDelay(50,OhCrap)
+	elseif XPSymbol.frame==math.floor((player.XP/player.MaxXP)*50) and transp2~=0 then
+		transp2=transp2-(255/50)
+		if transp2<20 then
+			transp2=0
 		end
+		XPSymbol:setFillColor(transp2,transp2,transp2,transp2)
+		XPDisplay:setTextColor( 0, 0, 0,transp2)
+		timer.performWithDelay(50,OhCrap)
 	end
 end
 
@@ -392,10 +402,10 @@ function ModStats(sta,att,acc,def,dex)
 end
 
 function LearnSorcery(name)
-	for m=1,table.maxn(player.spells),5 do
+	for m=1,table.maxn(player.spells) do
 		if player.spells[m][1]==name then
 			player.spells[m][3]=true
-			print ("Player learned: "..player.spells[m])
+			print ("Player learned: "..player.spells[m][1])
 		end
 	end
 end
@@ -406,25 +416,11 @@ function LoadPlayer( cls,chr,stam,atk,dfnc,mgk,dxtrty,lv,xpnts,hitp,manp,neim,go
 	player=nil
 	local char =chr
 	local class=cls
-	local classbonus={}
-	--				STA	ATT	DEF	MGC	DEX
-	classbonus[1]=	{1,	2,	1,	1,	1	}
-	classbonus[2]=	{1,	1,	2,	1,	1	}
-	classbonus[3]=	{1,	1,	1,	1,	2	}
-	classbonus[4]=	{2,	1,	1,	1,	1	}
-	classbonus[5]=	{1,	1,	1,	2,	1	}
 	
 	player=display.newImageRect( "chars/"..char.."/"..class.."/char.png", 76 ,76)
 	player.x, player.y = display.contentWidth/2, display.contentHeight/2
 	player:setStrokeColor(50, 50, 255)
 	player.strokeWidth = 4
-	
-	player.statbonus={}
-	player.statbonus[1]=classbonus[class+1][1]
-	player.statbonus[2]=classbonus[class+1][2]
-	player.statbonus[3]=classbonus[class+1][3]
-	player.statbonus[4]=classbonus[class+1][4]
-	player.statbonus[5]=classbonus[class+1][5]
 	
 	player.name=neim
 	
@@ -447,11 +443,7 @@ function LoadPlayer( cls,chr,stam,atk,dfnc,mgk,dxtrty,lv,xpnts,hitp,manp,neim,go
 	player.nat[3]=dfnc
 	player.nat[4]=mgk
 	player.nat[5]=dxtrty
-	print (player.nat[1])
-	print (player.nat[2])
-	print (player.nat[3])
-	print (player.nat[4])
-	print (player.nat[5])
+	
 	player.stats={}
 	player.stats={
 		(player.nat[1]+player.eqs[1]),

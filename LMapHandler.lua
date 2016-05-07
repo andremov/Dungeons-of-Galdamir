@@ -24,7 +24,7 @@ local TileID=0
 local SizeID=2
 local CurSize
 local CurTile
-local Testing=false
+local Testing=true
 
 function GetCMap()
 	Round=WD.Circle()
@@ -158,6 +158,16 @@ function MapSizeMenu()
 		opt:insert(CurTile)
 	end
 	
+	function RealTSet()
+		audio.Play(12)
+		SetTile(2)
+		display.remove(CurTile)
+		CurTile = display.newText( ("Current Tileset: Realistic"), 0, 0, "Game Over", 110 )
+		CurTile.x=display.contentWidth*0.5
+		CurTile.y= display.contentHeight*0.31+400
+		opt:insert(CurTile)
+	end
+	
 	local SmallBtn = widget.newButton{
 	label="Small Map",
 	labelColor = { default={0,0,0}, over={255,255,255} },
@@ -242,6 +252,20 @@ function MapSizeMenu()
 	NotebookTS.y = DefaultTS.y+90
 	opt:insert(NotebookTS)
 	
+	local RealTS = widget.newButton{
+	label="Realistic Tileset",
+	labelColor = { default={0,0,0}, over={255,255,255} },
+	fontSize=30,
+	defaultFile="button.png",
+	overFile="button-over.png",
+	width=308, height=80,
+	onRelease = RealTSet
+	}
+	RealTS:setReferencePoint( display.CenterReferencePoint )
+	RealTS.x = NotebookTS.x
+	RealTS.y = NotebookTS.y+90
+	opt:insert(RealTS)
+	
 	local BWTS = widget.newButton{
 	label="Black & White Tileset",
 	labelColor = { default={0,0,0}, over={255,255,255} },
@@ -252,8 +276,8 @@ function MapSizeMenu()
 	onRelease = BWTSet
 	}
 	BWTS:setReferencePoint( display.CenterReferencePoint )
-	BWTS.x = NotebookTS.x
-	BWTS.y = NotebookTS.y+90
+	BWTS.x = RealTS.x
+	BWTS.y = RealTS.y+90
 	opt:insert(BWTS)
 	
 	local Back = widget.newButton{

@@ -353,8 +353,6 @@ function WipeMobs()
 			end
 		end
 		mobs=nil
-	else
-		builder.GetMobGroup(true)
 	end
 end
 	

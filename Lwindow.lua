@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- InventoryManager.lua
+-- Windows.lua
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
@@ -222,81 +222,79 @@ function ToggleInfo()
 		)
 		ginf:insert(info[2])
 		
-		info[9]=display.newText(
+		info[3]=display.newText(
 			(
 				"MP: "..p1.MP.."/"..p1.MaxMP.."\n"..
 				"XP: "..p1.XP.."/"..p1.MaxXP.."\n"
 			),
 			info[2].x+200,80,native.systemFont,40
 		)
-		ginf:insert(info[9])
+		ginf:insert(info[3])
 		
-		info[3]=display.newText(
+		info[4]=display.newText(
 			(
 				"Statistics:".."\n"	
 			),
 			10,350,native.systemFontBold,50
 		)
-		ginf:insert(info[3])
-		
-		info[4]=display.newText(
-			(
-				"Stamina: ".."\n"..
-				"Attack: ".."\n"..
-				"Defense: ".."\n"..
-				"Magic: ".."\n"..
-				"Dexterity: ".."\n"..
-				"Stat Points: "..p1.pnts.."\n"
-			),
-			30,420,native.systemFont,40
-		)
 		ginf:insert(info[4])
 		
-		info[5]=display.newText(
-			(
-				p1.nat[1].."\n"..
-				p1.nat[2].."\n"..
-				p1.nat[3].."\n"..
-				p1.nat[4].."\n"..
-				p1.nat[5].."\n"
-			),
-			info[4].x+220,420,native.systemFont,40
-		)
-		ginf:insert(info[5])
+		for s=1,5 do
+			info[#info+1]=display.newText(
+				(
+					p1.statnames[s]
+				),
+				30,420+(45*(s-1)),native.systemFont,40
+			)
+			ginf:insert(info[#info])
+		end
 		
-		info[6]=display.newText(
+		info[#info+1]=display.newText(
 			(
-				"+"..p1.eqs[1].."\n"..
-				"+"..p1.eqs[2].."\n"..
-				"+"..p1.eqs[3].."\n"..
-				"+"..p1.eqs[4].."\n"..
-				"+"..p1.eqs[5].."\n"
+				"Stat Points: "..p1.pnts
 			),
-			info[5].x+120,420,native.systemFont,40
+			30,645,native.systemFont,40
 		)
-		info[6]:setTextColor(50,200,50)
-		ginf:insert(info[6])
+		ginf:insert(info[#info])
 		
-		info[7]=display.newText(
-			(
-				"= "..p1.stats[1].."\n"..
-				"= "..p1.stats[2].."\n"..
-				"= "..p1.stats[3].."\n"..
-				"= "..p1.stats[4].."\n"..
-				"= "..p1.stats[5].."\n"
-			),
-			info[6].x+50,420,native.systemFont,40
-		)
-		ginf:insert(info[7])
+		for s=1,5 do
+			info[#info+1]=display.newText(
+				(
+					p1.nat[s]
+				),
+				info[6].x+220,420+(45*(s-1)),native.systemFont,40
+			)
+			ginf:insert(info[#info])
+		end
+		
+		for s=1,5 do
+			info[#info+1]=display.newText(
+				(
+				"+"..p1.eqs[s]
+				),
+				info[11].x+120,420+(45*(s-1)),native.systemFont,40
+			)
+			info[#info]:setTextColor(50,200,50)
+			ginf:insert(info[#info])
+		end
+		
+		for s=1,5 do
+			info[#info+1]=display.newText(
+				(
+					"= "..p1.stats[s]
+				),
+				info[17].x+50,420+(45*(s-1)),native.systemFont,40
+			)
+			ginf:insert(info[#info])
+		end
 		
 		if p1.name=="Magus" then
-			info[8]=display.newImageRect("player/Magus.png",120,120)
-			info[8].x=display.contentWidth-130
-			info[8].y=130
-			info[8].xScale=2.0
-			info[8].yScale=info[8].xScale
-			ginf:insert(info[8])
-		
+			info[#info+1]=display.newImageRect("player/Magus.png",120,120)
+			info[#info].x=display.contentWidth-130
+			info[#info].y=130
+			info[#info].xScale=2.0
+			info[#info].yScale=info[#info].xScale
+			ginf:insert(info[#info])
 		end
 		if p1.pnts~=0 then
 			pli={}
@@ -311,7 +309,7 @@ function ToggleInfo()
 						onRelease = More,
 					}
 					pli[n].xScale,pli[n].yScale=2.0,2.0
-					pli[n].x = info[5].x+45
+					pli[n].x = info[10+n].x+45
 					pli[n].y = 445+((n-1)*45)
 					ginf:insert(pli[n])
 				end
@@ -324,7 +322,7 @@ function ToggleInfo()
 						onRelease = Less,
 					}
 					mini[n].xScale,mini[n].yScale=2.0,2.0
-					mini[n].x = info[5].x-75
+					mini[n].x = info[10+n].x-75
 					mini[n].y = 445+((n-1)*45)
 					ginf:insert(mini[n])
 				end
@@ -342,7 +340,7 @@ function ToggleInfo()
 			onRelease = onToMenuBtnRelease}
 		ExitBtn:setReferencePoint( display.CenterReferencePoint )
 		ExitBtn.x = display.contentWidth-150
-		ExitBtn.y = 740
+		ExitBtn.y = 30
 		ginf:insert(ExitBtn)
 		
 	elseif isOpn==true and (ginf) then
@@ -369,18 +367,9 @@ function More( event )
 			end
 		end
 	end
-	p1.nat[statnum]=p1.nat[statnum]+1
-	p1.pnts=p1.pnts-1
-	p1.stats={
-		(p1.nat[1]+p1.eqs[1]),
-		(p1.nat[2]+p1.eqs[2]),
-		(p1.nat[3]+p1.eqs[3]),
-		(p1.nat[4]+p1.eqs[4]),
-		(p1.nat[5]+p1.eqs[5]),
-	}
+	p.Natural(statnum,1)
 	ToggleInfo()
 	ToggleInfo()
-	p1.SPD=(1.00-(p1.stats[5]/100))
 end
 
 function Less( event )
@@ -392,18 +381,9 @@ function Less( event )
 			end
 		end
 	end
-	p1.nat[statnum]=p1.nat[statnum]-1
-	p1.pnts=p1.pnts+1
-	p1.stats={
-		(p1.nat[1]+p1.eqs[1]),
-		(p1.nat[2]+p1.eqs[2]),
-		(p1.nat[3]+p1.eqs[3]),
-		(p1.nat[4]+p1.eqs[4]),
-		(p1.nat[5]+p1.eqs[5]),
-	}
+	p.Natural(statnum,-1)
 	ToggleInfo()
 	ToggleInfo()
-	p1.SPD=(1.00-(p1.stats[5]/100))
 end
 
 function DeathMenu(cause)
@@ -1045,7 +1025,7 @@ end
 function onToMenuBtnRelease()
 	audio.Play(12)
 	if (gdm) then
-	DeathMenu()
+		DeathMenu()
 	end
 	if (ginf) then
 		ToggleInfo()

@@ -159,24 +159,24 @@ function QuestComplete()
 			local gold=math.floor((Round*NumKills)/2)
 			if gold>0 then
 				gp.CallAddCoins(gold)
-				AmCoins=gold
 			end
+			AmCoins=gold
 		end
 		if QuestType==2 then
 			local Round=WD.Circle()
 			local gold=math.floor((Round*(NumItem*3))/2)
 			if gold>0 then
 				gp.CallAddCoins(gold)
-				AmCoins=gold
 			end
+			AmCoins=gold
 		end
 		if QuestType==3 then
 			local Round=WD.Circle()
 			local gold=math.floor((Round*NumKills*MobLvl)/2)
 			if gold>0 then
 				gp.CallAddCoins(gold)
-				AmCoins=gold
 			end
+			AmCoins=gold
 		end
 		BlueCoins()
 		BlueCoinz()

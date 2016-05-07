@@ -22,12 +22,17 @@ local m=require("Lmovement")
 local sav=require("LSaving")
 local Round
 local Loading
+local DoStuff
 
 function Startup(val)
-	print "GAME LOADING..."
-	physics.start()
-	physics.setGravity(0,30)
-	
+	if val~=false then
+		print "GAME LOADING..."
+		physics.start()
+		physics.setGravity(0,30)
+		DoStuff=true
+	elseif val==false then
+		DoStuff=false
+	end
 	Loading=display.newGroup()
 	
 	local loadbkg = display.newImage("bkgs/bkg_leveldark.png", true)
@@ -68,25 +73,28 @@ function Startup(val)
 		Loading:insert( contxt )
 	
 	end
-	
-	if val==true then
-		function WrapIt()
-			Operations()
+	if DoStuff==true then
+		if val==true then
+			function WrapIt()
+				Operations()
+			end
+			timer.performWithDelay(1000, (WrapIt) )
+			timer.performWithDelay(1010, (sav.Load) )
+		else
+			function WrapIt()
+				Operations(val)
+			end
+			timer.performWithDelay(1000, (WrapIt) )
 		end
-		timer.performWithDelay(1000, (WrapIt) )
-		timer.performWithDelay(1010, (sav.Load) )
-	else
-		function WrapIt()
-			Operations(val)
-		end
-		timer.performWithDelay(1000, (WrapIt) )
 	end
 end
 
 	
 function Continue()
-	Runtime:addEventListener("enterFrame", gp.GoldDisplay)
-	Runtime:removeEventListener("enterFrame",FrontNCenter)
+	if DoStuff==true then
+		Runtime:addEventListener("enterFrame", gp.GoldDisplay)
+		Runtime:removeEventListener("enterFrame",FrontNCenter)
+	end
 	for i=Loading.numChildren,1,-1 do
 		if (Loading[i]) then
 			display.remove(Loading[i])
@@ -94,8 +102,12 @@ function Continue()
 		end
 	end
 	Loading=nil
-	audio.Play(3)
-	audio.Play(10)
+	if DoStuff==true then
+		ui.Pause()
+		inv.ToggleInfo()
+		audio.Play(3)
+		audio.Play(10)
+	end
 end
 	
 function Operations(name)
