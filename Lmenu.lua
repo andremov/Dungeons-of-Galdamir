@@ -254,7 +254,6 @@ function onKeyEvent( event )
 
 	if ( "back" == keyName and phase == "up" ) then
 		if CurMenu==0 then
-			native.requestExit()
 		elseif CurMenu==1 then
 			p.onBackRelease()
 		elseif CurMenu==2 then

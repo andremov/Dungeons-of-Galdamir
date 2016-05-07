@@ -119,6 +119,7 @@ function Continue( event )
 			ui.UI(true)
 			if DoLoad==true then
 				DoLoad=false
+				m.Visibility()
 			else
 				ui.Pause(true)
 				inv.ToggleInfo()

@@ -43,10 +43,10 @@ function CreatePlayers(name)
 	local class=c.GetCharInfo(1)
 
 	if not (char) then
-		char=0
+		char=math.random(0,3)
 	end
 	if not (class) then
-		class=0
+		class=math.random(0,5)
 	end
 	
 	--Visual
