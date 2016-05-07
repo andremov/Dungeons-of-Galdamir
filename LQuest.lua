@@ -5,9 +5,9 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local coinsheet = graphics.newImageSheet( "bluecoinsprite.png", { width=32, height=32, numFrames=8 } )
-local b=require("LMapBuilder")
-local gp=require("LGold")
-local WD=require("LProgress")
+local b=require("Lmapbuilder")
+local gp=require("Lgold")
+local WD=require("Lprogress")
 local mob=require("Lmobai")
 local HasQuest
 local gqm
@@ -24,6 +24,8 @@ local ItemNames={
 		"Magical Trinket",
 		"Guard Insignia",
 		"Ancient Book",
+		"Mirror Fragment",
+		"Dragon Claw",
 	}
 
 function Essentials()
@@ -35,19 +37,19 @@ function CreateQuest()
 	if HasQuest==false then
 		local roll=math.random(1,10)
 		if roll>=6 then
-			print "Quest get."
+	--		print "Quest get."
 			HasQuest=true
 			QWindow=display.newImageRect("quest.png",447,80)
 			QWindow.x= display.contentWidth-225
 			QWindow.y= 40
 			gqm:insert(QWindow)
 			
-			QTitle=display.newText("Current Quest:",display.contentWidth-380,8,native.systemfont,30)
+			QTitle=display.newText("Current Quest:",display.contentWidth-380,5,"MoolBoran",40)
 			QTitle:setTextColor( 0, 0, 0)
 			gqm:insert(QTitle)
 			
 			QuestType=math.random(1,3)
-			print ("QuestID: "..QuestType)
+	--		print ("QuestID: "..QuestType)
 			if QuestType==1 then
 				local mobs=mob.GetMobGroup()
 				local mobcount=0
@@ -60,15 +62,15 @@ function CreateQuest()
 				if mobcount>=mobPerc then
 					CurKills=0
 					NumKills=math.random(1,math.floor(mobcount/mobPerc))
-					QText=display.newText(("Defeat "..NumKills.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+15,native.systemfont,30)
+					QText=display.newText(("Defeat "..NumKills.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+8,"MoolBoran",40)
 					QText:setTextColor( 0, 0, 0)
 					gqm:insert(QText)
 					if NumKills==0 then
-						print "Quest Error. Wiping quest..."
+	--					print "Quest Error. Wiping quest..."
 						WipeQuest()
 					end
 				else
-					print "Quest Error. Wiping quest..."
+	--				print "Quest Error. Wiping quest..."
 					WipeQuest()
 				end
 			end
@@ -78,7 +80,7 @@ function CreateQuest()
 				ItemName=(math.random(1,table.maxn(ItemNames)))
 				NumItem=math.ceil(ItemName/2)
 				
-				QText=display.newText((ItemNames[ItemName].."s: ("..CurItem.."/"..NumItem..")"),display.contentWidth-380,QTitle.y+15,native.systemfont,30)
+				QText=display.newText((ItemNames[ItemName].."s: ("..CurItem.."/"..NumItem..")"),display.contentWidth-380,QTitle.y+8,"MoolBoran",40)
 				QText:setTextColor( 0, 0, 0)
 				gqm:insert(QText)
 			end
@@ -99,15 +101,15 @@ function CreateQuest()
 					local round=WD.Circle()
 					MobLvl=(math.random(1,zonas)+(zonas*(round-1)))
 					
-					QText=display.newText(("Defeat "..NumKills.." level "..MobLvl.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+15,native.systemfont,30)
+					QText=display.newText(("Defeat "..NumKills.." level "..MobLvl.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+8,"MoolBoran",40)
 					QText:setTextColor( 0, 0, 0)
 					gqm:insert(QText)
 					if NumKills==0 then
-						print "Quest Error. Wiping quest..."
+	--					print "Quest Error. Wiping quest..."
 						WipeQuest()
 					end
 				else
-					print "Quest Error. Wiping quest..."
+	--				print "Quest Error. Wiping quest..."
 					WipeQuest()
 				end
 			end
@@ -118,7 +120,7 @@ end
 function UpdateQuest(val,val2)
 	if HasQuest==true then
 		if QuestType==1 and val=="mob" then
-			print "Quests updated."
+	--		print "Quests updated."
 			CurKills=CurKills+1
 			QText.text=("Defeat "..NumKills.." mobs. ("..CurKills.."/"..NumKills..")")
 			if CurKills==NumKills then
@@ -126,7 +128,7 @@ function UpdateQuest(val,val2)
 			end
 		end
 		if QuestType==2 and val=="itm" then
-			print "Quests updated."
+	--		print "Quests updated."
 			CurItem=CurItem+1
 			QText.text=(ItemNames[ItemName].."s: ("..CurItem.."/"..NumItem..")")
 			if CurItem==NumItem then
@@ -134,7 +136,7 @@ function UpdateQuest(val,val2)
 			end
 		end
 		if QuestType==3 and val=="mob" and val2==MobLvl then
-			print "Quests updated."
+	--		print "Quests updated."
 			CurKills=CurKills+1
 			QText.text=("Defeat "..NumKills.." level "..MobLvl.." mobs. ("..CurKills.."/"..NumKills..")")
 			if CurKills==NumKills then
@@ -146,7 +148,7 @@ end
 
 function WipeQuest()
 	if HasQuest==true then
-		print "Quests wiped."
+	--	print "Quests wiped."
 		for i=gqm.numChildren,1,-1 do
 			local child = gqm[i]
 			child.parent:remove( child )
@@ -157,7 +159,7 @@ end
 
 function QuestComplete()
 	if HasQuest==true then
-		print "Quest complete!"
+	--	print "Quest complete!"
 		if QuestType==1 then
 			local Round=WD.Circle()
 			local gold=math.floor((Round*NumKills)/2)

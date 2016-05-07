@@ -4,22 +4,22 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local builder=require("LMapBuilder")
+local builder=require("Lmapbuilder")
 local players=require("Lplayers")
 local m=require("Lmenu")
 local mob=require("Lmobai")
-local handler=require("LMapHandler")
+local handler=require("Lmaphandler")
 local mov=require("Lmovement")
-local col=require("LTileEvents")
-local audio=require("LAudio")
-local gp=require("LGold")
+local col=require("Ltileevents")
+local audio=require("Laudio")
+local gp=require("Lgold")
 local inv=require("Lwindow")
-local ui=require("LUI")
+local ui=require("Lui")
 local com=require("Lcombat")
-local sav=require("LSaving")
-local shp=require("LShop")
-local q=require("LQuest")
-local su=require("LStartup")
+local sav=require("Lsaving")
+local shp=require("Lshop")
+local q=require("Lquest")
+local su=require("Lstartup")
 local RoundTax=5
 local HighCard
 local Level
@@ -83,7 +83,7 @@ function FloorPort(up)
 		
 		FloorSign()
 		
-		print ("Floor: " ..Round)
+	--	print ("Floor: " ..Round)
 		q.WipeQuest()
 		if Round>HighCard then
 			HighCard=Round
@@ -97,7 +97,7 @@ function FloorPort(up)
 			shp.DisplayShop()
 		end
 		su.Startup(false)
-		builder.YouShallNowPass(false)
+		builder.Rebuild(false)
 		sav.Save()
 		
 	elseif up==false and Round>1 then
@@ -106,10 +106,10 @@ function FloorPort(up)
 		
 		FloorSign()
 		
-		print ("Floor: " ..Round)
+	--	print ("Floor: " ..Round)
 		q.WipeQuest()
 		su.Startup(false)
-		builder.YouShallNowPass(true)
+		builder.Rebuild(true)
 		sav.Save()
 	end
 end
@@ -121,8 +121,8 @@ function Win()
 
 	FloorSign()
 
-	--print "Player won."
-	print ("Floor: " ..Round)
+--	print "Player won."
+--	print ("Floor: " ..Round)
 	q.WipeQuest()
 	if Round>HighCard then
 		HighCard=Round
@@ -133,7 +133,7 @@ function Win()
 		gp.CallAddCoins(gpgain)
 	end
 	su.Startup(false)
-	builder.YouShallNowPass(false)
+	builder.Rebuild(false)
 	sav.Save()
 end
 
@@ -143,8 +143,8 @@ function Lrn2WinNub()
 
 	FloorSign()
 	
-	--print "Player went through a Red Portal."
-	print ("Floor: " ..Round)
+--	print "Player went through a Red Portal."
+--	print ("Floor: " ..Round)
 	q.WipeQuest()
 	if Round>HighCard then
 		HighCard=Round
@@ -155,7 +155,7 @@ function Lrn2WinNub()
 		gp.CallAddCoins(gpgain)
 	end
 	su.Startup(false)
-	builder.YouShallNowPass(true)
+	builder.Rebuild(true)
 	sav.Save()
 end
 
@@ -166,7 +166,7 @@ end
 function SrsBsns()
 	Runtime:removeEventListener("enterFrame", gp.GoldDisplay)
 	Runtime:removeEventListener("enterFrame", players.ShowStats)
-	print "Player went back to menu."
+--	print "Player went back to menu."
 	ui.CleanSlate()
 	local P1=players.GetPlayer()
 	q.WipeQuest()

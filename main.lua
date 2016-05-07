@@ -6,11 +6,11 @@
 -- hide the status bar
 display.setStatusBar( display.HiddenStatusBar )
 local loadsheet = graphics.newImageSheet( "spriteload.png", { width=50, height=50, numFrames=8 } )
-local startup=require("LStartup")
+local startup=require("Lstartup")
 local menu = require("Lmenu")
 local widget = require "widget"
 local bin = require("Lgarbage")
-local v=require("LVersion")
+local v=require("Lversion")
 local GVersion=v.HowDoIVersion(false)
 local loadbkg
 local load1
@@ -53,7 +53,11 @@ local loadtxt
 	loadtxt.y = load1.y
 	Loading2:insert( loadtxt )
 	
+<<<<<<< HEAD
 	logo=display.newImageRect("SymbolW.png",240,390)
+=======
+	logo=display.newImageRect("Symbol3W.png",206,206)
+>>>>>>> B1.9.0
 	logo.x=display.contentWidth/2
 	logo.y=display.contentHeight/2
 	logo.xScale=1

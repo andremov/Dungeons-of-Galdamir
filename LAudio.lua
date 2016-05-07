@@ -8,11 +8,13 @@ local Sound
 local Music
 local Stawp
 local soundboard
+local bkgMus=true
+
 
 function LoadSounds()
 	if not (soundboard)then
-		Sound=true
-		Music=true
+		Sound=1.0
+		Music=1.0
 		Stawp=true
 		soundboard={}
 		soundboard[1] = audio.loadSound		("sounds/gold.wav")
@@ -40,18 +42,18 @@ end
 function Play(id)
 	local check=audio.isChannelPlaying(id)
 	if check==false and (soundboard[1]) then
-		if id==10 and Stawp==false then
-		--[[audio.setVolume( 0.1, { channel=id  })
+		if id==10 and Stawp==false and bkgMus==true then
+			audio.setVolume( 0.1*Music, { channel=id  })
 			bkgmusic=audio.play( soundboard[id], {channel=id, onComplete=RepeatBkg} )
-			if Music==false then
+			if Music==0.0 then
 				audio.pause(bkgmusic)
-			end]]
-		elseif Sound==true then
+			end
+		elseif Sound~=0.0 then
 			if id==13 then
 				id=id+(math.random(0,4))
 			end
 			if id==15 or id==16 then
-				audio.setVolume( 0.4, { channel=id  })
+				audio.setVolume( 0.4*Sound, { channel=id  })
 			end
 			audio.play( soundboard[id], {channel=id} )
 		end
@@ -74,24 +76,17 @@ function RepeatBkg()
 	timer.performWithDelay(10000,BkgMusic)
 end
 
-function SimpleMMute()
-	Music=false
-	local check=audio.isChannelPlaying(10)
-	if check==true then
+function MusicVol(value)
+	Music=value
+	if Music==0.0 then
 		audio.pause(bkgmusic)
+	else
+		audio.setVolume( 0.1*Music, { channel=10  })
 	end
 end
 
-function SimpleMUnmute()
-	Music=true
-end
-
-function SimpleSMute()
-	Sound=false
-end
-
-function SimpleSUnmute()
-	Sound=true
+function SoundVol(value)
+	Sound=value
 end
 
 function sfx()

@@ -8,8 +8,8 @@ local coinsheet = graphics.newImageSheet( "coinsprite.png", { width=32, height=3
 local gpsheet = graphics.newImageSheet( "gp.png", { width=40, height=40, numFrames=12 } )
 local players = require("Lplayers")
 local physics = require "physics"
-local ui=require("LUI")
-local builder=require("LMapBuilder")
+local ui=require("Lui")
+local builder=require("Lmapbuilder")
 local DisplayS=2.0
 local Displayx=45
 local Displayy=30
@@ -50,9 +50,16 @@ function GoldDisplay()
 	if not (GCDisplay) then
 		transp=0
 		GCDisplay = display.newText( (GoldCount), 0, 0, "Game Over", 100 )
-		GCDisplay:setTextColor( 255, 255, 0, transp)
+		GCDisplay:setTextColor( 255, 255, 50, transp)
 		GCDisplay.y = Displayy+10
 		GCDisplay.x = Displayx+20
+		
+		GWindow = display.newRect (0,0,#GCDisplay.text*22,40)
+		GWindow:setFillColor( 150, 150, 150,transp/2)
+		GWindow.x=GCDisplay.x
+		GWindow.y=GCDisplay.y+5
+		
+		GCDisplay:toFront()
 	end
 	CDisplayUpdate()
 	if (GoldCount<1000) then
@@ -67,7 +74,14 @@ function GoldDisplay()
 		else
 			transp=transp-(255/100)
 		end
-		GCDisplay:setTextColor( 255, 255, 0, transp)
+		display.remove(GWindow)
+		GWindow = display.newRect (0,0,#GCDisplay.text*22,40)
+		GWindow:setFillColor( 150, 150, 150,transp/2)
+		GWindow.x=GCDisplay.x
+		GWindow.y=GCDisplay.y+5
+		
+		GCDisplay:toFront()
+		GCDisplay:setTextColor( 255, 255, 50, transp)
 		CDisplay:setFillColor( transp, transp, transp, transp)
 	else
 		if GoldCount<P1.gp then
@@ -76,7 +90,14 @@ function GoldDisplay()
 			GoldCount=GoldCount-1
 		end
 		transp=255
-		GCDisplay:setTextColor( 255, 255, 0, transp)
+		display.remove(GWindow)
+		GWindow = display.newRect (0,0,#GCDisplay.text*22,40)
+		GWindow:setFillColor( 150, 150, 150,transp/2)
+		GWindow.x=GCDisplay.x
+		GWindow.y=GCDisplay.y+5
+		
+		GCDisplay:toFront()
+		GCDisplay:setTextColor( 255, 255, 50, transp)
 		CDisplay:setFillColor( transp, transp, transp, transp)
 	end
 end

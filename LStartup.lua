@@ -5,21 +5,21 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local loadsheet = graphics.newImageSheet( "spriteload.png", { width=50, height=50, numFrames=8 } )
-local handler=require("LMapHandler")
-local gp=require("LGold")
-local builder=require("LMapBuilder")
+local handler=require("Lmaphandler")
+local gp=require("Lgold")
+local builder=require("Lmapbuilder")
 local players=require("Lplayers")
-local audio=require("LAudio")
-local col=require("LTileEvents")
+local audio=require("Laudio")
+local col=require("Ltileevents")
 local com=require("Lcombat")
-local ui=require("LUI")
-local q=require("LQuest")
+local ui=require("Lui")
+local q=require("Lquest")
 local inv=require("Lwindow")
-local itm=require("LItems")
+local itm=require("Litems")
 local physics = require "physics"
-local WD=require("LProgress")
+local WD=require("Lprogress")
 local m=require("Lmovement")
-local sav=require("LSaving")
+local sav=require("Lsaving")
 local Round
 local Loading
 local DoStuff
@@ -27,7 +27,7 @@ local DoLoad=false
 
 function Startup(val)
 	if val~=false then
-		print "GAME LOADING..."
+	--	print "Game loading..."
 		physics.start()
 		physics.setGravity(0,30)
 		DoStuff=true
@@ -128,15 +128,15 @@ function Operations(name)
 	players.CreatePlayers(name)
 	gp.Essentials()
 --	players.WhosYourDaddy()
-	builder.Gen()
+	builder.BuildMap()
 	com.Essentials()
 	itm.Essentials()
 	inv.Essentials()
 	
 	Runtime:addEventListener("enterFrame", col.removeOffscreenItems)
-	print "Game loaded successfully."
+--	print "Game loaded successfully."
 	Round=WD.Circle()
-	print ("Floor: "..Round)
+--	print ("Floor: "..Round)
 end
 
 function Operations2()
