@@ -110,6 +110,7 @@ function CreatePlayers(name)
 	player.HP=player.MaxHP
 	player.MaxMP=( (player.lvl*15)+(player.stats[4]*10) )
 	player.MP=player.MaxMP
+	player.SPD=(1.00-(player.stats[5]/100))
 	--
 	if (player) then
 		Runtime:addEventListener("enterFrame",ShowStats)
@@ -162,17 +163,14 @@ function ShowStats()
 		LifeDisplay:setTextColor( 255, 255, 255,transp)
 		LifeDisplay.x = 160
 		LifeDisplay.y = display.contentHeight-115
-		LifeDisplay:toFront()
 	end
 	if not(LifeSymbol) then
-		LifeSymbol=display.newSprite( heartfsheet, {name="heart",start=1,
-		count=16,time=(1800)} )
+		LifeSymbol=display.newSprite( heartfsheet, {name="heart",start=1,count=16,time=(1800)} )
 		LifeSymbol.yScale=3.75
 		LifeSymbol.xScale=3.75
 		LifeSymbol.x = 50
 		LifeSymbol.y = display.contentHeight-110
 		LifeSymbol:play()
-		LifeSymbol:toFront()
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
 	end
 	
@@ -199,7 +197,6 @@ function ShowStats()
 		LifeSymbol.x = 50
 		LifeSymbol.y = display.contentHeight-110
 		LifeSymbol:play()
-		LifeSymbol:toFront()
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
 	elseif (math.floor((player.HP/player.MaxHP)*100))<20 and not (player.HP==0) and player.life~=2 then
 		display.remove(LifeSymbol)
@@ -210,7 +207,6 @@ function ShowStats()
 		LifeSymbol.x = 50
 		LifeSymbol.y = display.contentHeight-110
 		LifeSymbol:play()
-		LifeSymbol:toFront()
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
 	elseif player.life~=0 and not ((math.floor((player.HP/player.MaxHP)*100))<20) then
 		display.remove(LifeSymbol)
@@ -222,7 +218,6 @@ function ShowStats()
 		LifeSymbol.x = 50
 		LifeSymbol.y = display.contentHeight-110
 		LifeSymbol:play()
-		LifeSymbol:toFront()
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
 	end
 -- Mana
@@ -232,17 +227,14 @@ function ShowStats()
 		ManaDisplay:setTextColor( 255, 255, 255,transp3)
 		ManaDisplay.x = LifeDisplay.x
 		ManaDisplay.y = display.contentHeight-55
-		ManaDisplay:toFront()
 	end
 	if not (ManaSymbol) then
-		ManaSymbol=display.newSprite( manasheet, {name="mana",start=1,
-		count=3,time=500} )
+		ManaSymbol=display.newSprite( manasheet, {name="mana",start=1,count=3,time=500} )
 		ManaSymbol.yScale=1.0625
 		ManaSymbol.xScale=1.0625
 		ManaSymbol.x = LifeSymbol.x
 		ManaSymbol.y = display.contentHeight-50
 		ManaSymbol:play()
-		ManaSymbol:toFront()
 		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
 	end
 	
@@ -396,6 +388,7 @@ function ModStats(sta,att,acc,def,dex)
 		(player.nat[4]+player.eqs[4]),
 		(player.nat[5]+player.eqs[5]),
 	}
+	player.SPD=(1.00-(player.stats[5]/100))
 end
 
 function LearnSorcery(name)
@@ -486,6 +479,7 @@ function LoadPlayer( cls,chr,stam,atk,dfnc,mgk,dxtrty,lv,xpnts,hitp,manp,neim,go
 		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,120},
 	}
 	
+	player.SPD=(1.00-(player.stats[5]/100))
 	local size=b.GetData(0)
 	local curround=WD.Circle()
 	if curround%2==0 then

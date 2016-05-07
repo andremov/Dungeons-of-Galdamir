@@ -8,6 +8,7 @@ local col=require("LTileEvents")
 local ui=require("LUI")
 local su=require("LStartup")
 local handler=require("LMapHandler")
+local wdow=require("Lwindow")
 local mob=require("Lmobai")
 local m=require("Lmovement")
 local WD=require("LProgress")
@@ -255,7 +256,9 @@ function Gen()
 	else
 		loadtxt.text=("Testing Map...")
 		loadtxt:toFront()
-		local CanBeDone=bin.animate(boundary)
+	--	local CanBeDone=bin.animate(boundary)
+	--	local CanBeDone=true
+		local CanBeDone=Pathfinding()
 		if CanBeDone==false then
 			loadtxt.text=("Map Failed.\n   Retrying...")
 			loadtxt:toFront()
@@ -703,7 +706,7 @@ function DisplayMap()
 		
 		display.remove(loadtxt)
 		loadtxt=nil
-			
+		
 		local CurRound=WD.Circle()
 		if (RedPortal==true) then
 			ui.MapIndicators("RP")
@@ -746,6 +749,8 @@ function DisplayMap()
 			end
 		end
 		m.ShowArrows()
+		ui.Pause()
+		wdow.ToggleInfo()
 		print "Map Built."
 	end
 end
@@ -883,6 +888,64 @@ function WipeMap()
 	bkg:toBack()
 end
 
+function Pathfinding()
+	steps={}
+	curpos=math.sqrt(mapsize)+2
+	posmoves={}
+	deadends={}
+	target=mapsize-(math.sqrt(mapsize)+1)
+	
+	while curpos~=true and curpos~=false do
+		if curpos==target then
+			curpos=true
+		else
+			if boundary[curpos+math.sqrt(mapsize)]==1 then
+				posmoves[#posmoves+1]=curpos+math.sqrt(mapsize)
+			end
+			if boundary[curpos+1]==1 then
+				posmoves[#posmoves+1]=curpos+1
+			end
+			if boundary[curpos-math.sqrt(mapsize)]==1 then
+				posmoves[#posmoves+1]=curpos-math.sqrt(mapsize)
+			end
+			if boundary[curpos-1]==1 then
+				posmoves[#posmoves+1]=curpos-1
+			end
+			for s=1,table.maxn(steps)do
+				for p=table.maxn(posmoves),1,-1 do
+					if posmoves[p]==steps[s] then
+						table.remove(posmoves,p)
+					end
+				end
+			end
+			for d=1,table.maxn(deadends)do
+				for p=table.maxn(posmoves),1,-1 do
+					if posmoves[p]==deadends[d] then
+						table.remove(posmoves,p)
+					end
+				end
+			end
+			if (posmoves[1]) then
+				steps[#steps+1]=curpos
+				curpos=posmoves[1]
+				for p=table.maxn(posmoves),1,-1 do
+					table.remove(posmoves,p)
+				end
+			elseif (steps[#steps]) then
+				deadends[#deadends+1]=curpos
+				curpos=steps[#steps]
+				table.remove(steps,table.maxn(steps))
+				for p=table.maxn(posmoves),1,-1 do
+					table.remove(posmoves,p)
+				end
+			else
+				curpos=false
+			end
+		end
+	end
+	return curpos
+end
+	
 function TheGates(action)
 	if action=="key" then
 		return SmallKey

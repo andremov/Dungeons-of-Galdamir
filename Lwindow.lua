@@ -213,15 +213,22 @@ function ToggleInfo()
 		
 		info[2]=display.newText(
 			(
-				"Level: "..p1.lvl.."\n"..
 				"HP: "..p1.HP.."/"..p1.MaxHP.."\n"..
-				"MP: "..p1.MP.."/"..p1.MaxMP.."\n"..
-				"XP: "..p1.XP.."/"..p1.MaxXP.."\n"..
+				"Level: "..p1.lvl.."\n"..
 				"Gold: "..p1.gp.."\n"
 			),
 			30,80,native.systemFont,40
 		)
 		ginf:insert(info[2])
+		
+		info[9]=display.newText(
+			(
+				"MP: "..p1.MP.."/"..p1.MaxMP.."\n"..
+				"XP: "..p1.XP.."/"..p1.MaxXP.."\n"
+			),
+			info[2].x+200,80,native.systemFont,40
+		)
+		ginf:insert(info[9])
 		
 		info[3]=display.newText(
 			(
@@ -359,6 +366,7 @@ function More( event )
 	}
 	ToggleInfo()
 	ToggleInfo()
+	p1.SPD=(1.00-(p1.stats[5]/100))
 end
 
 function Less( event )
@@ -381,6 +389,7 @@ function Less( event )
 	}
 	ToggleInfo()
 	ToggleInfo()
+	p1.SPD=(1.00-(p1.stats[5]/100))
 end
 
 function DeathMenu(cause)
