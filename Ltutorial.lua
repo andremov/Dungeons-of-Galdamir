@@ -222,10 +222,10 @@ function BuildTile()
 			map2[count]="n"
 		end
 	
-		if(map[count]=="ï¿½")then
+		if(map[count]=="ñ")then
 			boundary[count]=1
 			mbounds[count]=1
-			map2[count]="ï¿½"
+			map2[count]="ñ"
 		end
 		
 		if(map[count]=="o")then
@@ -417,7 +417,7 @@ function DisplayTile()
 			Level:insert( BP )
 		end
 	
-		if(map2[count]=="ï¿½")then
+		if(map2[count]=="ñ")then
 			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)

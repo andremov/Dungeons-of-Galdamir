@@ -230,11 +230,6 @@ end
 function ShowActions()
 	ptimer=nil
 	local ep=timer.pause(etimer)
-	if isDefend==true then
-		P1Sprite()
-		p1.stats[3]=p1.stats[3]/1.5
-		isDefend=false
-	end
 	
 	if isDefend==true then
 		P1Sprite()
@@ -426,13 +421,6 @@ function Recover()
 	P1Sprite(3)
 	p1.stats[3]=p1.stats[3]*0.75
 	isRecover=true
-	UpdateStats()
-end
-
-function Guard()
-	P1Sprite(3)
-	p1.stats[3]=p1.stats[3]*1.5
-	isDefend=true
 	UpdateStats()
 end
 

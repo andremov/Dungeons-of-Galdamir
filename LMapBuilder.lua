@@ -608,13 +608,13 @@ function BuildTile()
 			end
 		end
 		
-		if(map[count]=="ï¿½")then
+		if(map[count]=="ñ")then
 			boundary[curroom][count]=1
 			mbounds[curroom][count]=1
 			if(RedPortal==false)then
 				RedPortal=true
 				RPLoc=count
-				room[curroom][count]="ï¿½"
+				room[curroom][count]="ñ"
 			elseif(RedPortal==true)then
 				room[curroom][count]="x"
 			end
@@ -788,7 +788,7 @@ function BuildTile()
 			BluePortal=true
 		end
 	
-		if(room[curroom][count]=="ï¿½")then
+		if(room[curroom][count]=="ñ")then
 			boundary[curroom][count]=1
 			mbounds[curroom][count]=1
 			RedPortal=true
@@ -924,7 +924,7 @@ function RandomizeTile()
 						end
 					elseif OrangePortal==true and RedPortal==false then
 						if OPRoom~=curroom then
-							room[curroom][count]="ï¿½"
+							room[curroom][count]="ñ"
 							RedPortal=true
 							RPLoc=count
 							RPRoom=curroom
@@ -958,7 +958,7 @@ function RandomizeTile()
 								ThinkinWithPortals=false
 							end
 							if ThinkinWithPortals==true then
-								room[curroom][count]="ï¿½"
+								room[curroom][count]="ñ"
 								RedPortal=true
 								RPLoc=count
 								RPRoom=curroom
@@ -1092,9 +1092,6 @@ function DisplayTile()
 		loadtxt.text=("Displaying Room "..curroom.."...\n".."             "..math.floor((count/mapsize)*100).."%")
 		loadtxt:toFront()
 	end
-	if TileIDsNum==true then
-		num={}
-	end
 	
 	if count~=mapsize+1 then
 	
@@ -1131,6 +1128,7 @@ function DisplayTile()
 			MS.isVisible=false
 			MS.loc=(count)
 			MS.room=(curroom)
+			MS.cd=0
 			MS.xScale=scale
 			MS.yScale=MS.xScale
 			Level:insert( MS )
@@ -1278,7 +1276,7 @@ function DisplayTile()
 			Level:insert( BP )
 		end
 		
-		if(room[curroom][count]=="ï¿½")then
+		if(room[curroom][count]=="ñ")then
 			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
@@ -1570,33 +1568,6 @@ function Show(IDs)
 			if (EnergyPad==true) and (EP.loc==t) and (EP.room==r) then
 				EP:pause()
 			end
-		end
-		if (LavaBlocks[i]) then
-			LavaBlocks[i]:pause()
-		end
-		if (WaterBlocks[i]) then
-			WaterBlocks[i]:pause()
-		end
-		if (OrangePortal==true) and (OP.loc==i) then
-			OP:pause()
-		end
-		if (BluePortal==true) and (BP.loc==i) then
-			BP:pause()
-		end
-		if (RedPortal==true) and (RP.loc==i) then
-			RP:pause()
-		end
-		if (Spawner==true) and (MS.loc==i) then
-			MS:pause()
-		end
-		if (ManaPad==true) and (MP.loc==i) then
-			MP:pause()
-		end
-		if (HealPad==true) and (HP.loc==i) then
-			HP:pause()
-		end
-		if (EnergyPad==true) and (EP.loc==i) then
-			EP:pause()
 		end
 	end
 	for r in pairs(IDs) do

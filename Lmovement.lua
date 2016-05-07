@@ -12,6 +12,7 @@ local coll=require("Ltileevents")
 local mob=require("Lmobai")
 local c=require("Lcombat")
 local sho=require("Lshop")
+local g=require("Lgold")
 local mobs
 local mright
 local mup
@@ -56,6 +57,7 @@ function ShowArrows()
 		mwindow:setFillColor( 0, 0, 0, 122)
 		mwindow.x=mtext.x
 		mwindow.y=mtext.y-15
+		mtext:toFront()
 		
 		Toggle=math.random(5,10)
 		timer.performWithDelay(200,mob.DoTurns)
@@ -71,6 +73,7 @@ function ShowArrows()
 		mobs=mob.GetMobGroup()
 		Ports=coll.PortCheck()
 		Shop=coll.ShopCheck()
+		Spawner=coll.SpawnerCheck()
 		
 		if not(cwin) then
 			local halfX=display.contentCenterX
@@ -198,6 +201,16 @@ function ShowArrows()
 			inter.yScale=inter.xScale
 			inter:toFront()
 			inter:addEventListener( "touch",ShopInteract)
+		end
+		
+		if Spawner==true then
+			inter=display.newImageRect("interact8.png",80,80)
+			inter.x=xinicial
+			inter.y=yinicial
+			inter.xScale=scale
+			inter.yScale=inter.xScale
+			inter:toFront()
+			inter:addEventListener( "touch",YouNoSpawn)
 		end
 		
 		if Ports~=false then
@@ -592,9 +605,6 @@ function Visibility()
 					Tiles[#Tiles+1]=false
 				else
 					Tiles[#Tiles+1]=false
-				else
-					Seen[(p1.loc-(r*size))]=1
-					Tiles[#Tiles+1]=true
 				end
 			end
 		end
@@ -640,9 +650,6 @@ function Visibility()
 					Tiles[#Tiles+1]=false
 				else
 					Tiles[#Tiles+1]=false
-				else
-					Seen[(p1.loc+(r*size))]=1
-					Tiles[#Tiles+1]=true
 				end
 			end
 		end
@@ -741,6 +748,15 @@ function GoinDown( event )
 	if event.phase=="ended" then
 		CleanArrows()
 		WD.FloorPort(false)
+	end
+end
+
+function YouNoSpawn( event )
+	if event.phase=="ended" then
+		local Round=WD.Circle()
+		CleanArrows()
+		mob.DelayMobs()
+		g.CallCoins(Round)
 	end
 end
 

@@ -22,7 +22,7 @@ g-						h-healpad
 i-energypad				j-manapad
 k-keyblock				l-lava
 m-orange				n-blue
-ï¿½-red					o-wall
+ñ-red					o-wall
 p-						q-alwaysbreakable
 r-random				s-shop
 t-						u-darkblue

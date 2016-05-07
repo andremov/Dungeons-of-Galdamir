@@ -779,6 +779,8 @@ function DoExit()
 	gexui=nil
 	isOpn=false
 	ui.Pause(true)
+	g.ShowGCounter()
+	p.LetsYodaIt()
 	WD.SrsBsns()
 end
 

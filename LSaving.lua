@@ -16,7 +16,6 @@ local gp=require("Lgold")
 local canMap=false
 local saveSlot
 local InvStrt
-local saveSlot
 local EqpStrt
 local SplStrt
 local SplEnd

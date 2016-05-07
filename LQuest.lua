@@ -147,6 +147,7 @@ function UpdateQuest(val,val2)
 				QUWindow:setFillColor( 0, 0, 0,transp/2)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
+				QUpdate:toFront()
 				
 				QuestComplete()
 			else
@@ -167,6 +168,7 @@ function UpdateQuest(val,val2)
 				QUWindow:setFillColor( 0, 0, 0,transp/2)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
+				QUpdate:toFront()
 			end
 		end
 		if QuestType==2 and val=="itm" then
@@ -193,6 +195,7 @@ function UpdateQuest(val,val2)
 				QUWindow:setFillColor( 0, 0, 0,transp/2)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
+				QUpdate:toFront()
 				
 				QuestComplete()
 			else
@@ -213,6 +216,7 @@ function UpdateQuest(val,val2)
 				QUWindow:setFillColor( 0, 0, 0,transp/2)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
+				QUpdate:toFront()
 			end
 		end
 		if QuestType==3 and val=="mob" and val2==MobLvl then
@@ -240,6 +244,7 @@ function UpdateQuest(val,val2)
 				QUWindow:setFillColor( 0, 0, 0,transp/2)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
+				QUpdate:toFront()
 				
 				QuestComplete()
 			else
@@ -260,6 +265,7 @@ function UpdateQuest(val,val2)
 				QUWindow:setFillColor( 0, 0, 0,transp/2)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
+				QUpdate:toFront()
 			end
 		end
 	end
