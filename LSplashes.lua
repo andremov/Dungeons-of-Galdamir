@@ -48,12 +48,16 @@ local S={
 	"Techniques!",
 	"Energy!",
 	"Limited Shops!",
+	"RSS Feeds!",
+	"Version Checks!",
+	"Fatigue!",
+	"Quests!",
 }
 
 function GetSplash()
 	local chooser=math.random(1,table.maxn(S))
 	Splash=S[chooser]
-	Splashtxt = display.newEmbossedText((Splash),20,185,"MoolBoran", 80 )
+	Splashtxt = display.newEmbossedText((Splash),20,170,"MoolBoran", 80 )
 	Splashtxt:setTextColor( 255, 255, 0)
 	Splashtxt:toFront()
 	return Splashtxt

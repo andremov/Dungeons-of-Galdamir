@@ -44,7 +44,7 @@ function CreateQuest()
 			QWindow.y= 40
 			gqm:insert(QWindow)
 			
-			QTitle=display.newText("Current Quest:",display.contentWidth-380,5,"MoolBoran",40)
+			QTitle=display.newText("Current Quest:",display.contentWidth-380,-5,"MoolBoran",40)
 			QTitle:setTextColor( 0, 0, 0)
 			gqm:insert(QTitle)
 			

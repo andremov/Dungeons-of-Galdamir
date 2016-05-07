@@ -13,6 +13,8 @@ local Score
 local GVersion
 local OKVers={
 		"BETA 1.9.0",
+		"BETA 1.9.1",
+		"BETA 1.9.2",
 	}
 local Default={
 		"Brownie S.",10000,

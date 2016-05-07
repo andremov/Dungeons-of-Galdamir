@@ -50,7 +50,7 @@ function UI()
 	
 	window=display.newRect(0,0,335,140)
 	window:setFillColor(100,100,100,150)
-	window.x,window.y=(display.contentWidth+170), display.contentHeight-90
+	window.x,window.y=(display.contentWidth+170), display.contentHeight-80
 	window.loc=0
 	pwg:insert(window)
 	
@@ -76,6 +76,8 @@ function UI()
 	PauseBtn:setReferencePoint( display.CenterReferencePoint )
 	PauseBtn.x = window.x-220
 	PauseBtn.y = window.y
+	PauseBtn.xScale = 1.3
+	PauseBtn.yScale = PauseBtn.xScale
 	pwg:insert(PauseBtn)
 	
 	bag = display.newImageRect("bag.png", 50, 50)
@@ -116,6 +118,8 @@ function Pause(mute)
 	if busy==false and shap==false and fight==false then
 		portsprsnt.txt.text=(P1.portcd)
 		MovePause(true)
+		gold.ShowGCounter()
+		players.LetsYodaIt()
 		if isPaused==true then
 			isPaused=false
 	--		print "Game resumed."
@@ -139,18 +143,20 @@ function Pause(mute)
 end
 
 function MovePause(val)
-	if pwg.x==0 and val~=true then
-		window.loc=0
-		m.ShowArrows()
-	elseif pwg.x==-350 and val~=true then
-		window.loc=1
-	else
-		if window.loc==0 then
-			pwg.x=pwg.x-35
-			timer.performWithDelay(50,MovePause)
-		elseif window.loc==1 then
-			pwg.x=pwg.x+35
-			timer.performWithDelay(50,MovePause)
+	if (pwg) then
+		if pwg.x==0 and val~=true then
+			window.loc=0
+			m.ShowArrows()
+		elseif pwg.x==-350 and val~=true then
+			window.loc=1
+		else
+			if window.loc==0 then
+				pwg.x=pwg.x-35
+				timer.performWithDelay(50,MovePause)
+			elseif window.loc==1 then
+				pwg.x=pwg.x+35
+				timer.performWithDelay(50,MovePause)
+			end
 		end
 	end
 end

@@ -23,6 +23,7 @@ local Map
 local check=119
 local player
 local Cheat=false
+local StrongForce
 local transp
 local transp2
 local transp3
@@ -173,7 +174,7 @@ function ShowStats()
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
 	end
 	
-	if ((player.HP.."/"..player.MaxHP))~=LifeDisplay.text then
+	if ((player.HP.."/"..player.MaxHP))~=LifeDisplay.text or StrongForce==true then
 		transp=255
 		LifeDisplay.text=((player.HP.."/"..player.MaxHP))
 		
@@ -186,7 +187,7 @@ function ShowStats()
 		LifeDisplay:toFront()
 		LifeDisplay:setTextColor( 255, 255, 255,transp)
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
-	elseif ((player.HP.."/"..player.MaxHP))==LifeDisplay.text and transp~=0 and player.HP==player.MaxHP then
+	elseif ((player.HP.."/"..player.MaxHP))==LifeDisplay.text and transp~=0 and player.HP==player.MaxHP and StrongForce~=true then
 		transp=transp-(255/50)
 		if transp<20 then
 			transp=0
@@ -233,7 +234,7 @@ function ShowStats()
 		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
 	end
 	
-	if ((player.MP.."/"..player.MaxMP))~=ManaDisplay.text then
+	if ((player.MP.."/"..player.MaxMP))~=ManaDisplay.text or StrongForce==true then
 		transp3=255
 		ManaDisplay.text=((player.MP.."/"..player.MaxMP))
 		
@@ -246,7 +247,7 @@ function ShowStats()
 		ManaDisplay:toFront()
 		ManaDisplay:setTextColor( 255, 255, 255,transp3)
 		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
-	elseif ((player.MP.."/"..player.MaxMP))==ManaDisplay.text and transp3~=0 and player.MP==player.MaxMP then
+	elseif ((player.MP.."/"..player.MaxMP))==ManaDisplay.text and transp3~=0 and player.MP==player.MaxMP and StrongForce~=true then
 		transp3=transp3-(255/50)
 		if transp3<20 then
 			transp3=0
@@ -282,7 +283,7 @@ function ShowStats()
 		EnergySymbol:setFillColor(transp5,transp5,transp5,transp5)
 	end
 	
-	if ((player.EP.."/"..player.MaxEP))~=EnergyDisplay.text then
+	if ((player.EP.."/"..player.MaxEP))~=EnergyDisplay.text or StrongForce==true then
 		transp5=255
 		EnergyDisplay.text=((player.EP.."/"..player.MaxEP))
 		
@@ -295,7 +296,7 @@ function ShowStats()
 		EnergyDisplay:toFront()
 		EnergyDisplay:setTextColor( 255, 255, 255,transp5)
 		EnergySymbol:setFillColor(transp5,transp5,transp5,transp5)
-	elseif ((player.EP.."/"..player.MaxEP))==EnergyDisplay.text and transp5~=0 and player.EP==player.MaxEP then
+	elseif ((player.EP.."/"..player.MaxEP))==EnergyDisplay.text and transp5~=0 and player.EP==player.MaxEP and StrongForce~=true then
 		transp5=transp5-(255/50)
 		if transp5<20 then
 			transp5=0
@@ -341,6 +342,14 @@ function ShowStats()
 			transp4=0
 		end
 		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
+	end
+end
+
+function LetsYodaIt()
+	if StrongForce~=true then
+		StrongForce=true
+	else
+		StrongForce=false
 	end
 end
 

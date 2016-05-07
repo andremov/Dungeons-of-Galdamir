@@ -227,7 +227,7 @@ function ToggleInfo()
 				(
 					"I AM ERROR."
 				),
-				10,10,"MoolBoran",80
+				display.contentCenterX/2,10,"MoolBoran",80
 			)
 			ginf:insert(info[1])
 		else
@@ -235,7 +235,7 @@ function ToggleInfo()
 				(
 					p1.name
 				),
-				10,10,"MoolBoran",80
+				display.contentCenterX/2,10,"MoolBoran",80
 			)
 			ginf:insert(info[1])
 		end
@@ -419,7 +419,7 @@ function ToggleInfo()
 					}
 					pli[n].xScale,pli[n].yScale=2.0,2.0
 					pli[n].x = info[17+n].x+45
-					pli[n].y = 445+((n-1)*45)
+					pli[n].y = 450+((n-1)*45)
 					ginf:insert(pli[n])
 				end
 				--
@@ -432,7 +432,7 @@ function ToggleInfo()
 					}
 					mini[n].xScale,mini[n].yScale=2.0,2.0
 					mini[n].x = info[17+n].x-75
-					mini[n].y = 445+((n-1)*45)
+					mini[n].y = 450+((n-1)*45)
 					ginf:insert(mini[n])
 				end
 			end
@@ -458,23 +458,27 @@ function ToggleSound()
 	if isOpn==false then
 		isOpn=true
 		swg=display.newGroup()
-		
+	
 		window=display.newImageRect("usemenu.png",768,308)
 		window.x=display.contentCenterX
 		window.y=display.contentCenterY
 		swg:insert(window)
-		
+	
 		scroll=display.newImageRect("scroll.png",600,50)
 		scroll.x=display.contentCenterX
 		scroll.y=display.contentCenterY-40
+		scroll.xScale=1.15
+		scroll.yScale=scroll.xScale
 		scroll:addEventListener("touch",MusicScroll)
 		swg:insert(scroll)
 		
 		local m=a.muse()
 		m=m*10
 		scrollind=display.newImageRect("scrollind.png",15,50)
-		scrollind.x=display.contentCenterX-290+( m*58 )
+		scrollind.x=display.contentCenterX-(290*scroll.xScale)+( m*(290*scroll.xScale)/5 )
 		scrollind.y=scroll.y
+		scrollind.xScale=1.45
+		scrollind.yScale=scrollind.xScale
 		swg:insert(scrollind)
 		
 		musicind=display.newText( ("Music Volume: "..(m*10).."%"),0,0,"MoolBoran",50 )
@@ -483,16 +487,20 @@ function ToggleSound()
 		swg:insert(musicind)
 		
 		scroll2=display.newImageRect("scroll.png",600,50)
-		scroll2.x=display.contentCenterX
-		scroll2.y=scroll.y+80
+		scroll2.x=scroll.x
+		scroll2.y=scroll.y+100
+		scroll2.xScale=scroll.xScale
+		scroll2.yScale=scroll.xScale
 		scroll2:addEventListener("touch",SoundScroll)
 		swg:insert(scroll2)
 		
 		local s=a.sfx()
 		s=s*10
 		scrollind2=display.newImageRect("scrollind.png",15,50)
-		scrollind2.x=display.contentCenterX-290+( s*58 )
+		scrollind2.x=display.contentCenterX-(290*scroll.xScale)+( s*(290*scroll.xScale)/5 )
 		scrollind2.y=scroll2.y
+		scrollind2.xScale=scrollind.xScale
+		scrollind2.yScale=scrollind.xScale
 		swg:insert(scrollind2)
 		
 		soundind=display.newText( ("Sound Volume: "..(s*10).."%"),0,0,"MoolBoran",50 )
@@ -581,23 +589,24 @@ function DoExit()
 	end
 	gexui=nil
 	isOpn=false
+	ui.Pause(true)
 	WD.SrsBsns()
 end
 
 function MusicScroll( event )
-	if event.x>display.contentCenterX+290 then
-		scrollind.x=display.contentCenterX+290
+	if event.x>display.contentCenterX+(290*scroll.xScale) then
+		scrollind.x=display.contentCenterX+(290*scroll.xScale)
 		a.MusicVol(1.0)
 		musicind.text=("Music Volume: "..(1.0*100).."%")
-	elseif event.x<display.contentCenterX-290 then
-		scrollind.x=display.contentCenterX-290
+	elseif event.x<display.contentCenterX-(290*scroll.xScale) then
+		scrollind.x=display.contentCenterX-(290*scroll.xScale)
 		a.MusicVol(0.0)
 		musicind.text=("Music Volume: "..(0.0*100).."%")
 	else
-		for s=1,10 do
-			local x=display.contentCenterX-290+( (s-1)*58 )
-			if event.x>x-29 and event.x<x+29 then
-				scrollind.x=display.contentCenterX-290+( (s-1)*58 )
+		for s=1,11 do
+			local x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*58 )
+			if event.x>x-(290*scroll.xScale)/10 and event.x<x+(290*scroll.xScale)/10 then
+				scrollind.x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*(290*scroll.xScale)/5 )
 				a.MusicVol((s-1)/10)
 				musicind.text=("Music Volume: "..((s-1)*10).."%")
 			end
@@ -606,19 +615,19 @@ function MusicScroll( event )
 end
 
 function SoundScroll( event )
-	if event.x>display.contentCenterX+290 then
-		scrollind2.x=display.contentCenterX+290
+	if event.x>display.contentCenterX+(290*scroll.xScale) then
+		scrollind2.x=display.contentCenterX+(290*scroll.xScale)
 		a.SoundVol(1.0)
 		soundind.text=("Sound Volume: "..(1.0*100).."%")
-	elseif event.x<display.contentCenterX-290 then
-		scrollind2.x=display.contentCenterX-290
+	elseif event.x<display.contentCenterX-(290*scroll.xScale) then
+		scrollind2.x=display.contentCenterX-(290*scroll.xScale)
 		a.SoundVol(0.0)
 		soundind.text=("Sound Volume: "..(0.0*100).."%")
 	else
-		for s=1,10 do
-			local x=display.contentCenterX-290+( (s-1)*58 )
-			if event.x>x-29 and event.x<x+29 then
-				scrollind2.x=display.contentCenterX-290+( (s-1)*58 )
+		for s=1,11 do
+			local x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*58 )
+			if event.x>x-(290*scroll.xScale)/10 and event.x<x+(290*scroll.xScale)/10 then
+				scrollind2.x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*(290*scroll.xScale)/5 )
 				a.SoundVol((s-1)/10)
 				soundind.text=("Sound Volume: "..((s-1)*10).."%")
 			end

@@ -155,15 +155,19 @@ function DisplayOptions()
 	
 	scroll=display.newImageRect("scroll.png",600,50)
 	scroll.x=display.contentCenterX
-	scroll.y=display.contentCenterY-160
+	scroll.y=display.contentCenterY-170
+	scroll.xScale=1.25
+	scroll.yScale=scroll.xScale
 	scroll:addEventListener("touch",MusicScroll)
 	optionz:insert(scroll)
 	
 	local m=a.muse()
 	m=m*10
 	scrollind=display.newImageRect("scrollind.png",15,50)
-	scrollind.x=display.contentCenterX-290+( m*58 )
-	scrollind.y=display.contentCenterY-160
+	scrollind.x=display.contentCenterX-(290*scroll.xScale)+( m*(290*scroll.xScale)/5 )
+	scrollind.y=scroll.y
+	scrollind.xScale=1.5
+	scrollind.yScale=scrollind.xScale
 	optionz:insert(scrollind)
 	
 	musicind=display.newText( ("Music Volume: "..(m*10).."%"),0,0,"MoolBoran",50 )
@@ -173,15 +177,19 @@ function DisplayOptions()
 	
 	scroll2=display.newImageRect("scroll.png",600,50)
 	scroll2.x=display.contentCenterX
-	scroll2.y=display.contentCenterY-80
+	scroll2.y=display.contentCenterY-70
+	scroll2.xScale=scroll.xScale
+	scroll2.yScale=scroll.xScale
 	scroll2:addEventListener("touch",SoundScroll)
 	optionz:insert(scroll2)
 	
 	local s=a.sfx()
 	s=s*10
 	scrollind2=display.newImageRect("scrollind.png",15,50)
-	scrollind2.x=display.contentCenterX-290+( s*58 )
-	scrollind2.y=display.contentCenterY-80
+	scrollind2.x=display.contentCenterX-(290*scroll.xScale)+( s*(290*scroll.xScale)/5 )
+	scrollind2.y=scroll2.y
+	scrollind2.xScale=scrollind.xScale
+	scrollind2.yScale=scrollind.xScale
 	optionz:insert(scrollind2)
 	
 	soundind=display.newText( ("Sound Volume: "..(s*10).."%"),0,0,"MoolBoran",50 )
@@ -192,19 +200,19 @@ function DisplayOptions()
 end
 
 function MusicScroll( event )
-	if event.x>display.contentCenterX+290 then
-		scrollind.x=display.contentCenterX+290
+	if event.x>display.contentCenterX+(290*scroll.xScale) then
+		scrollind.x=display.contentCenterX+(290*scroll.xScale)
 		a.MusicVol(1.0)
 		musicind.text=("Music Volume: "..(1.0*100).."%")
-	elseif event.x<display.contentCenterX-290 then
-		scrollind.x=display.contentCenterX-290
+	elseif event.x<display.contentCenterX-(290*scroll.xScale) then
+		scrollind.x=display.contentCenterX-(290*scroll.xScale)
 		a.MusicVol(0.0)
 		musicind.text=("Music Volume: "..(0.0*100).."%")
 	else
-		for s=1,10 do
-			local x=display.contentCenterX-290+( (s-1)*58 )
-			if event.x>x-29 and event.x<x+29 then
-				scrollind.x=display.contentCenterX-290+( (s-1)*58 )
+		for s=1,11 do
+			local x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*58 )
+			if event.x>x-(290*scroll.xScale)/10 and event.x<x+(290*scroll.xScale)/10 then
+				scrollind.x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*(290*scroll.xScale)/5 )
 				a.MusicVol((s-1)/10)
 				musicind.text=("Music Volume: "..((s-1)*10).."%")
 			end
@@ -213,19 +221,19 @@ function MusicScroll( event )
 end
 
 function SoundScroll( event )
-	if event.x>display.contentCenterX+290 then
-		scrollind2.x=display.contentCenterX+290
+	if event.x>display.contentCenterX+(290*scroll.xScale) then
+		scrollind2.x=display.contentCenterX+(290*scroll.xScale)
 		a.SoundVol(1.0)
 		soundind.text=("Sound Volume: "..(1.0*100).."%")
-	elseif event.x<display.contentCenterX-290 then
-		scrollind2.x=display.contentCenterX-290
+	elseif event.x<display.contentCenterX-(290*scroll.xScale) then
+		scrollind2.x=display.contentCenterX-(290*scroll.xScale)
 		a.SoundVol(0.0)
 		soundind.text=("Sound Volume: "..(0.0*100).."%")
 	else
-		for s=1,10 do
-			local x=display.contentCenterX-290+( (s-1)*58 )
-			if event.x>x-29 and event.x<x+29 then
-				scrollind2.x=display.contentCenterX-290+( (s-1)*58 )
+		for s=1,11 do
+			local x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*58 )
+			if event.x>x-(290*scroll.xScale)/10 and event.x<x+(290*scroll.xScale)/10 then
+				scrollind2.x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*(290*scroll.xScale)/5 )
 				a.SoundVol((s-1)/10)
 				soundind.text=("Sound Volume: "..((s-1)*10).."%")
 			end

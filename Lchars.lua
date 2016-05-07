@@ -45,9 +45,8 @@ function ClassChoose( event )
 end
 
 function CharMenu()
-	if (charclass) then
+	if (charname) then
 		ClassMenu()
-		CurrentChar()
 	end
 	if not (charmenu) then
 		charmenu=display.newGroup()
@@ -102,12 +101,11 @@ function CharMenu()
 end
 
 function ClassMenu()
+	if (charclass) then
+		CurrentChar()
+	end
 	if not (classmenu) then
 		classmenu=display.newGroup()
-	end
-	for i=classmenu.numChildren,1,-1 do
-		local child = classmenu[i]
-		child.parent:remove( child )
 	end
 	if not (imgs2) then
 		imgs2={}
@@ -121,22 +119,26 @@ function ClassMenu()
 	if not (info2) then
 		info2={}
 	end
+	for i=classmenu.numChildren,1,-1 do
+		local child = classmenu[i]
+		child.parent:remove( child )
+	end
 	
 	for i=1,table.maxn(Classes) do
 		info[i]=display.newText((Classes[i]), 0, 0, "MoolBoran", 40)
 		info[i].x = (display.contentWidth/7)*i
 		info[i].y = display.contentHeight*0.4+80
-		charmenu:insert(info[i])
+		classmenu:insert(info[i])
 		
 		info2[i]=display.newText(("+"..Stats[i]), 0, 0, "MoolBoran", 40)
 		info2[i].x = info[i].x
 		info2[i].y = info[i].y+42
-		charmenu:insert(info2[i])
+		classmenu:insert(info2[i])
 		
 		imgs2[i]=display.newImageRect("chars/"..charname.."/"..(i-1).."/char.png",65,65)
 		imgs2[i].x = info[i].x
 		imgs2[i].y = info[i].y-80
-		charmenu:insert(imgs2[i])
+		classmenu:insert(imgs2[i])
 	
 		btns2[i] = widget.newButton{
 			defaultFile="charbutton.png",
@@ -147,7 +149,7 @@ function ClassMenu()
 		btns2[i]:setReferencePoint( display.CenterReferencePoint )
 		btns2[i].x = info[i].x
 		btns2[i].y = imgs2[i].y
-		charmenu:insert(btns2[i])
+		classmenu:insert(btns2[i])
 	end
 end
 

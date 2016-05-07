@@ -497,14 +497,14 @@ function Visibility()
 end
 
 function PortInteract( event )
-	if event.phase=="began" then
+	if event.phase~="ended" then
 		ShowArrows("clean")
 		coll.Port()
 	end
 end
 
 function ShopInteract( event )
-	if event.phase=="began" then
+	if event.phase~="ended" then
 		ShowArrows("clean")
 		function closure1()
 			sho.DisplayShop(p1.loc)
@@ -514,19 +514,19 @@ function ShopInteract( event )
 end
 
 function GoinDown( event )
-	if event.phase=="began" then
+	if event.phase~="ended" then
 		WD.FloorPort(false)
 	end
 end
 
 function GoinUp( event )
-	if event.phase=="began" then
+	if event.phase~="ended" then
 		WD.Win()
 	end
 end
 
 function moveplayerup( event )
-	if event.phase=="began" then
+	if event.phase~="ended" then
 		map=b.GetData(3)
 		P1=p.GetPlayer()
 		map.y=map.y+80
@@ -541,7 +541,7 @@ function moveplayerup( event )
 end
 
 function moveplayerdown( event )
-	if event.phase=="began" then
+	if event.phase~="ended" then
 		map=b.GetData(3)
 		P1=p.GetPlayer()
 		map.y=map.y-80
@@ -556,7 +556,7 @@ function moveplayerdown( event )
 end	
 
 function moveplayerleft( event )
-	if event.phase=="began" then
+	if event.phase~="ended" then
 		map=b.GetData(3)
 		P1=p.GetPlayer()
 		map.x=map.x+80
@@ -571,7 +571,7 @@ function moveplayerleft( event )
 end	
 
 function moveplayerright( event )
-	if event.phase=="began" then
+	if event.phase~="ended" then
 		map=b.GetData(3)
 		P1=p.GetPlayer()
 		map.x=map.x-80
@@ -586,7 +586,7 @@ function moveplayerright( event )
 end
 
 function attackup( event )
-	if event.phase=="began" then
+	if event.phase~="ended" then
 		ShowArrows("clean")
 		--
 		for i=1, table.maxn(mobs) do
@@ -603,7 +603,7 @@ function attackup( event )
 end
 
 function attackdown( event )
-	if event.phase=="began" then
+	if event.phase~="ended" then
 		ShowArrows("clean")
 		--
 		for i=1, table.maxn(mobs) do
@@ -620,7 +620,7 @@ function attackdown( event )
 end	
 
 function attackleft( event )
-	if event.phase=="began" then
+	if event.phase~="ended" then
 		ShowArrows("clean")
 		--
 		for i=1, table.maxn(mobs) do
@@ -637,7 +637,7 @@ function attackleft( event )
 end	
 
 function attackright( event )
-	if event.phase=="began" then
+	if event.phase~="ended" then
 		ShowArrows("clean")
 		--
 		for i=1, table.maxn(mobs) do
