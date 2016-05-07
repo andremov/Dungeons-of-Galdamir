@@ -181,8 +181,8 @@ function ItemDrop(boost)
 			
 			local skrlrl=math.random(1,10)
 			if skrlrl>8 then
-				lolname2.text=(asdname.." + "..itemlist[26][1])
-				inv.AddItem(26,itemlist[26][2])
+				lolname2.text=(asdname.." + "..itemlist[29][1])
+				inv.AddItem(29,itemlist[29][2])
 			end
 			
 			return true

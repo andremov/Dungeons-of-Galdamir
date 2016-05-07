@@ -4,12 +4,12 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local EnergyPadsheet = graphics.newImageSheet("tiles/0/energypadsprite.png",{ width=80, height=80, numFrames=30})
-local HealPadsheet = graphics.newImageSheet("tiles/0/healpadsprite.png",{ width=80, height=80, numFrames=30})
-local ManaPadsheet = graphics.newImageSheet("tiles/0/manapadsprite.png",{ width=80, height=80, numFrames=30})
-local watersheet = graphics.newImageSheet("tiles/0/watersprite.png",{ width=80, height=80, numFrames=30})
+local EnergyPadsheet = graphics.newImageSheet("tiles/0/epad.png",{ width=80, height=80, numFrames=30})
+local HealPadsheet = graphics.newImageSheet("tiles/0/hpad.png",{ width=80, height=80, numFrames=30})
+local ManaPadsheet = graphics.newImageSheet("tiles/0/mpad.png",{ width=80, height=80, numFrames=30})
+local watersheet = graphics.newImageSheet("tiles/0/water.png",{ width=80, height=80, numFrames=30})
 local heartnsheet = graphics.newImageSheet("heartemptysprite.png",{ width=25, height=25, numFrames=16})
-local lavasheet = graphics.newImageSheet("tiles/0/spritelava.png",{ width=80, height=80, numFrames=20})
+local lavasheet = graphics.newImageSheet("tiles/0/lava.png",{ width=80, height=80, numFrames=20})
 local coinsheet = graphics.newImageSheet( "coinsprite.png", { width=32, height=32, numFrames=8 } )
 local energysheet = graphics.newImageSheet("energysprite.png",{ width=60, height=60, numFrames=4})
 local dexatt3 = graphics.newImageSheet( "enemy/dexatt3.png",{ width=32, height=33, numFrames=24 })
@@ -222,10 +222,10 @@ function BuildTile()
 			map2[count]="n"
 		end
 	
-		if(map[count]=="ñ")then
+		if(map[count]=="ï¿½")then
 			boundary[count]=1
 			mbounds[count]=1
-			map2[count]="ñ"
+			map2[count]="ï¿½"
 		end
 		
 		if(map[count]=="o")then
@@ -417,7 +417,7 @@ function DisplayTile()
 			Level:insert( BP )
 		end
 	
-		if(map2[count]=="ñ")then
+		if(map2[count]=="ï¿½")then
 			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)

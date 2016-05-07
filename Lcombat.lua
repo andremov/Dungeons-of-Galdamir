@@ -11,7 +11,7 @@ local dexatt3 = graphics.newImageSheet( "enemy/dexatt3.png",{ width=32, height=3
 local stadef2 = graphics.newImageSheet( "enemy/stadef2.png",{ width=55, height=32, numFrames=8 })
 local stadef3 = graphics.newImageSheet( "enemy/stadef3.png",{ width=55, height=32, numFrames=8 })
 local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 })
-local statussheet = graphics.newImageSheet( "status.png", { width=88, height=40, numFrames=6 } )
+local statussheet = graphics.newImageSheet( "status.png", { width=88, height=40, numFrames=7 } )
 local player1 = graphics.newImageSheet( "player/0.png", { width=39, height=46, numFrames=25 } )
 local player2 = graphics.newImageSheet( "player/1.png", { width=24, height=33, numFrames=25 } )
 local player3 = graphics.newImageSheet( "player/2.png", { width=30, height=49, numFrames=25 } )
@@ -45,6 +45,8 @@ local ui=require("Lui")
 local SBookDisplayed
 local statusdisplay
 local timersprite
+local BleedLimit
+local AutoAttack
 local Spellbook
 local SorceryUI
 local BurnLimit
@@ -72,6 +74,7 @@ function Essentials()
 	outcomed=false
 	yinvicial=180
 	xinvicial=75
+	AutoAttack=0
 	espaciox=64
 	espacioy=64
 	Sorcery={}
@@ -87,6 +90,7 @@ function Attacking(victim)
 			DisplayCombat()
 		else
 			print "!E"
+			timer.performWithDelay(20,mov.Visibility)
 		end
 	end
 end
@@ -100,6 +104,7 @@ function Attacked(victim)
 			DisplayCombat()
 		else
 			print "!E"
+			timer.performWithDelay(20,mov.Visibility)
 		end
 	end
 end
@@ -109,7 +114,8 @@ function DisplayCombat()
 	Runtime:removeEventListener("enterFrame", gp.GoldDisplay)
 	Runtime:addEventListener("enterFrame", NoMansLand)
 	HitGroup=display.newGroup()
-	mov.ShowArrows("clean")
+	mov.CleanArrows()
+	players.CalmDownCowboy(false)
 	gcm=display.newGroup()
 	hits={}
 	
@@ -176,6 +182,10 @@ function HideActions()
 		display.remove(ItemBtn)
 	end
 	
+	if (RecoverBtn) then
+		display.remove(RecoverBtn)
+	end
+	
 	if (GuardBtn) then
 		display.remove(GuardBtn)
 	end
@@ -195,18 +205,23 @@ function HideActions()
 	gcm:insert( MagicBtn )
 	
 	ItemBtn=display.newImageRect("combataction3.png",342,86)
-	ItemBtn.x = AttackBtn.x
+	ItemBtn.x = MagicBtn.x
 	ItemBtn.y = timersprite.y+44
 	gcm:insert( ItemBtn )
 	
 	GuardBtn=display.newImageRect("combataction3.png",342,86)
-	GuardBtn.x = MagicBtn.x
-	GuardBtn.y = timersprite.y+44
+	GuardBtn.x = AttackBtn.x
+	GuardBtn.y = ItemBtn.y
 	gcm:insert( GuardBtn )
 	
+	RecoverBtn=display.newImageRect("combataction3.png",342,86)
+	RecoverBtn.x = AttackBtn.x
+	RecoverBtn.y = ItemBtn.y+88
+	gcm:insert( RecoverBtn )
+	
 	BackBtn=display.newImageRect("combataction3.png",342,86)
-	BackBtn.x = display.contentCenterX
-	BackBtn.y = GuardBtn.y+88
+	BackBtn.x = MagicBtn.x
+	BackBtn.y = RecoverBtn.y
 	gcm:insert( BackBtn )
 	
 	timersprite:toFront()
@@ -221,129 +236,197 @@ function ShowActions()
 		isDefend=false
 	end
 	
-	if (AttackBtn) then
-		display.remove(AttackBtn)
-		AttackBtn=nil
+	if isDefend==true then
+		P1Sprite()
+		p1.stats[3]=p1.stats[3]/1.5
+		isDefend=false
+	end
+	if isRecover==true then
+		P1Sprite()
+		p1.stats[3]=p1.stats[3]/0.75
+		isRecover=false
 	end
 	
-	if (MagicBtn) then
-		display.remove(MagicBtn)
-		MagicBtn=nil
-	end
-	
-	if (ItemBtn) then
-		display.remove(ItemBtn)
-		ItemBtn=nil
-	end
-	
-	if (GuardBtn) then
-		display.remove(GuardBtn)
-		GuardBtn=nil
-	end
-	
-	if (BackBtn) then
-		display.remove(BackBtn)
-		BackBtn=nil
-	end
-	
-	if not(AttackBtn)then
-		AttackBtn= widget.newButton{
-			label="Attack",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = AttackType}
-		AttackBtn:setReferencePoint( display.CenterReferencePoint )
-		AttackBtn.x = timersprite.x-172
-		AttackBtn.y = timersprite.y-44
-		gcm:insert( AttackBtn )
-	end
-	
-	function toSorcery()		
-		ShowSorcery()
-	end
-	
-	if not(MagicBtn)then
-		MagicBtn= widget.newButton{
-			label="Spellbook",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = toSorcery}
-		MagicBtn:setReferencePoint( display.CenterReferencePoint )
-		MagicBtn.x = timersprite.x+172
-		MagicBtn.y = AttackBtn.y
-		gcm:insert( MagicBtn )
-	end
-	
-	function toItems()
-		HideActions()
+	if AutoAttack==0 then
+		if (AttackBtn) then
+			display.remove(AttackBtn)
+			AttackBtn=nil
+		end
 		
-		ShowBag()
-	end
-	
-	if not(ItemBtn)then
-		ItemBtn= widget.newButton{
-			label="Inventory",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = toItems}
-		ItemBtn:setReferencePoint( display.CenterReferencePoint )
-		ItemBtn.x = AttackBtn.x
-		ItemBtn.y = timersprite.y+44
-		gcm:insert( ItemBtn )
-	end
-	
-	function toDefend()
-		HideActions()
+		if (MagicBtn) then
+			display.remove(MagicBtn)
+			MagicBtn=nil
+		end
 		
-		Guard()
-	end
-	
-	if not(GuardBtn)then
-		GuardBtn= widget.newButton{
-			label="Guard",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = toDefend}
-		GuardBtn:setReferencePoint( display.CenterReferencePoint )
-		GuardBtn.x = MagicBtn.x
-		GuardBtn.y = ItemBtn.y
-		gcm:insert( GuardBtn )
-	end
-	
-	function toRun()
-		HideActions()
+		if (ItemBtn) then
+			display.remove(ItemBtn)
+			ItemBtn=nil
+		end
 		
-		RunAttempt()
+		if (GuardBtn) then
+			display.remove(GuardBtn)
+			GuardBtn=nil
+		end
+		
+		if (RecoverBtn) then
+			display.remove(RecoverBtn)
+			RecoverBtn=nil
+		end
+		
+		if (BackBtn) then
+			display.remove(BackBtn)
+			BackBtn=nil
+		end
+		
+		if not(AttackBtn)then
+			AttackBtn= widget.newButton{
+				label="Attack",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="combataction.png",
+				overFile="combataction2.png",
+				width=342, height=86,
+				onRelease = AttackType}
+			AttackBtn:setReferencePoint( display.CenterReferencePoint )
+			AttackBtn.x = timersprite.x-172
+			AttackBtn.y = timersprite.y-44
+			gcm:insert( AttackBtn )
+		end
+		
+		function toSorcery()		
+			ShowSorcery()
+		end
+		
+		if not(MagicBtn)then
+			MagicBtn= widget.newButton{
+				label="Spellbook",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="combataction.png",
+				overFile="combataction2.png",
+				width=342, height=86,
+				onRelease = toSorcery}
+			MagicBtn:setReferencePoint( display.CenterReferencePoint )
+			MagicBtn.x = timersprite.x+172
+			MagicBtn.y = AttackBtn.y
+			gcm:insert( MagicBtn )
+		end
+		
+		function toItems()
+			HideActions()
+			
+			ShowBag()
+		end
+		
+		if not(ItemBtn)then
+			ItemBtn= widget.newButton{
+				label="Inventory",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="combataction.png",
+				overFile="combataction2.png",
+				width=342, height=86,
+				onRelease = toItems}
+			ItemBtn:setReferencePoint( display.CenterReferencePoint )
+			ItemBtn.x = MagicBtn.x
+			ItemBtn.y = timersprite.y+44
+			gcm:insert( ItemBtn )
+		end
+		
+		function toDefend()
+			HideActions()
+			
+			Guard()
+		end
+		
+		if not(GuardBtn)then
+			GuardBtn= widget.newButton{
+				label="Guard",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="combataction.png",
+				overFile="combataction2.png",
+				width=342, height=86,
+				onRelease = toDefend}
+			GuardBtn:setReferencePoint( display.CenterReferencePoint )
+			GuardBtn.x = AttackBtn.x
+			GuardBtn.y = ItemBtn.y
+			gcm:insert( GuardBtn )
+		end
+		
+		function toRecover()
+			HideActions()
+			
+			Recover()
+		end
+		
+		if not(RecoverBtn)then
+			RecoverBtn= widget.newButton{
+				label="Recover",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="combataction.png",
+				overFile="combataction2.png",
+				width=342, height=86,
+				onRelease = toRecover}
+			RecoverBtn:setReferencePoint( display.CenterReferencePoint )
+			RecoverBtn.x = AttackBtn.x
+			RecoverBtn.y = ItemBtn.y+88
+			gcm:insert( RecoverBtn )
+		end
+		
+		function toRun()
+			HideActions()
+			
+			RunAttempt()
+		end
+		
+		if not(BackBtn)then
+			BackBtn= widget.newButton{
+				label="Retreat",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="combataction.png",
+				overFile="combataction2.png",
+				width=342, height=86,
+				onRelease = toRun}
+			BackBtn:setReferencePoint( display.CenterReferencePoint )
+			BackBtn.x = MagicBtn.x
+			BackBtn.y = RecoverBtn.y
+			gcm:insert( BackBtn )
+		end
+	else
+		PlayerAttacks(AutoAttack-1)
 	end
-	
-	if not(BackBtn)then
-		BackBtn= widget.newButton{
-			label="Retreat",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = toRun}
-		BackBtn:setReferencePoint( display.CenterReferencePoint )
-		BackBtn.x = display.contentCenterX
-		BackBtn.y = GuardBtn.y+88
-		gcm:insert( BackBtn )
-	end
-	
 	timersprite:toFront()
+end
+
+function Guard()
+	ShowSorcery(true)
+	P1Sprite(3)
+	p1.stats[3]=p1.stats[3]*1.5
+	isDefend=true
+	UpdateStats()
+end
+
+function Recover()
+	if p1.EP~=p1.MaxEP then
+		p1.EP=p1.EP+(math.ceil((p1.stats[1])/1.5))
+	end
+	if p1.MP~=p1.MaxMP then
+		p1.MP=p1.MP+(math.ceil((p1.stats[1])/1.5))
+	end
+	if p1.EP>p1.MaxMP then
+		p1.EP=p1.MaxMP
+	end
+	if p1.MP>p1.MaxEP then
+		p1.MP=p1.MaxEP
+	end
+	ShowSorcery(true)
+	P1Sprite(3)
+	p1.stats[3]=p1.stats[3]*0.75
+	isRecover=true
+	UpdateStats()
 end
 
 function Guard()
@@ -374,6 +457,11 @@ function AttackType()
 	if (GuardBtn) then
 		display.remove(GuardBtn)
 		GuardBtn=nil
+	end
+	
+	if (RecoverBtn) then
+		display.remove(RecoverBtn)
+		RecoverBtn=nil
 	end
 	
 	if (BackBtn) then
@@ -423,15 +511,67 @@ function AttackType()
 		gcm:insert( MagicBtn )
 	end
 	
-	ItemBtn=display.newImageRect("combataction3.png",342,86)
-	ItemBtn.x = AttackBtn.x
-	ItemBtn.y = timersprite.y+44
-	gcm:insert( ItemBtn )
+	if not(MagicBtn)then
+		MagicBtn= widget.newButton{
+			label="Magic Attack",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=35,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = AttackMa}
+		MagicBtn:setReferencePoint( display.CenterReferencePoint )
+		MagicBtn.x = timersprite.x+172
+		MagicBtn.y = AttackBtn.y
+		gcm:insert( MagicBtn )
+	end
 	
-	GuardBtn=display.newImageRect("combataction3.png",342,86)
-	GuardBtn.x = MagicBtn.x
-	GuardBtn.y = timersprite.y+44
-	gcm:insert( GuardBtn )
+	function AutoAttackMe()
+		HideActions()
+		TurnOnAuto(1)
+		PlayerAttacks(0)
+	end
+	
+	if not(GuardBtn)then
+		GuardBtn= widget.newButton{
+			label="Auto Melee Attack",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=35,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = AutoAttackMe}
+		GuardBtn:setReferencePoint( display.CenterReferencePoint )
+		GuardBtn.x = AttackBtn.x
+		GuardBtn.y = timersprite.y+44
+		gcm:insert( GuardBtn )
+	end
+	
+	function AutoAttackMa()
+		HideActions()
+		TurnOnAuto(2)
+		PlayerAttacks(1)
+	end
+	
+	if not(ItemBtn)then
+		ItemBtn= widget.newButton{
+			label="Auto Magic Attack",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=35,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = AutoAttackMa}
+		ItemBtn:setReferencePoint( display.CenterReferencePoint )
+		ItemBtn.x = MagicBtn.x
+		ItemBtn.y = timersprite.y+44
+		gcm:insert( ItemBtn )
+	end
+	
+	RecoverBtn=display.newImageRect("combataction3.png",342,86)
+	RecoverBtn.x = AttackBtn.x
+	RecoverBtn.y = ItemBtn.y+88
+	gcm:insert( RecoverBtn )
 	
 	if not(BackBtn)then
 		BackBtn=widget.newButton{
@@ -443,12 +583,34 @@ function AttackType()
 			width=342, height=86,
 			onRelease = ShowActions}
 		BackBtn:setReferencePoint( display.CenterReferencePoint )
-		BackBtn.x = display.contentCenterX
-		BackBtn.y = display.contentHeight-150
+		BackBtn.x = MagicBtn.x
+		BackBtn.y = RecoverBtn.y
 		gcm:insert( BackBtn )
 	end
 	
 	timersprite:toFront()
+end
+
+function TurnOnAuto(auto)
+	NoAutoBtn= widget.newButton{
+		label="Turn Off Auto Attack",
+		labelColor = { default={0,0,0}, over={255,255,255} },
+		fontSize=35,
+		defaultFile="combataction.png",
+		overFile="combataction2.png",
+		width=342, height=86,
+		onRelease = TurnOffAuto}
+	NoAutoBtn:setReferencePoint( display.CenterReferencePoint )
+	NoAutoBtn.x = display.contentCenterX
+	NoAutoBtn.y = display.contentHeight-50
+	gcm:insert( NoAutoBtn )
+	AutoAttack=auto
+end
+
+function TurnOffAuto()
+	display.remove(NoAutoBtn)
+	NoAutoBtn=nil
+	AutoAttack=0
 end
 
 function MobsTurn()
@@ -459,8 +621,13 @@ function MobsTurn()
 	
 	local isHit=EvadeCalc("p1",16)
 	if isHit>=(p1.stats[5]/6)*2 then
+		local Damage
 		if isHit>=(p1.stats[5]/3)*5 then
-			local Damage=DamageCalc("p1",(math.random(15,20)/10),16)
+			if enemy.stats[2]>enemy.stats[4]then
+				Damage=DamageCalc("p1",(math.random(15,20)/10),16,2)
+			else
+				Damage=DamageCalc("p1",(math.random(15,20)/10),16,4)
+			end
 			if (Damage)<=0 then
 				Hits("BLK!",false,false,false)
 			else
@@ -469,7 +636,11 @@ function MobsTurn()
 				Hits((Damage),true,false,false)
 			end
 		else
-			local Damage=DamageCalc("p1",1,16)
+			if enemy.stats[2]>enemy.stats[4]then
+				Damage=DamageCalc("p1",1,16,2)
+			else
+				Damage=DamageCalc("p1",1,16,4)
+			end
 			if (Damage)<=0 then
 				Hits("BLK!",false,false,false)
 			else
@@ -494,6 +665,19 @@ function MobStatuses()
 		elseif BurnLimit<=0 then
 			if BurnLimit<0 then
 				BurnLimit=0
+			end
+			statusdisplay:setFrame(1)
+			enemy.status=false
+		end
+	elseif enemy.status=="BLD" then
+		if BleedLimit>0 then
+			local Bleed=(math.floor(enemy.MaxHP*.1))
+			enemy.HP=enemy.HP-Bleed
+			BleedLimit=BleedLimit-1
+			Hits((Bleed),false,true,"BLD")
+		elseif BleedLimit<=0 then
+			if BleedLimit<0 then
+				BleedLimit=0
 			end
 			statusdisplay:setFrame(1)
 			enemy.status=false
@@ -797,7 +981,7 @@ function CreateMobStats()
 	local size=builder.GetData(0)
 	local col=(math.floor(enemy.loc%(math.sqrt(size))))
 	local row=(math.floor(enemy.loc/(math.sqrt(size))))+1
-	local zonas=((math.sqrt(size))/10)
+	local zonas=math.ceil((math.sqrt(size))/10)
 	local round=WD.Circle()
 	
 	if not (enemy.bonus) then
@@ -816,7 +1000,7 @@ function CreateMobStats()
 				if col>((math.sqrt(size)/zonas)*(zonas-z)) and col<=((math.sqrt(size)/zonas)*((zonas+1)-z)) and row>=((math.sqrt(size)/zonas)*(zonas-z)) then
 					enemy.lvl=(z+(zonas*(round-1)))
 				elseif row>((math.sqrt(size)/zonas)*(zonas-z)) and row<=((math.sqrt(size)/zonas)*((zonas+1)-z)) and col>=((math.sqrt(size)/zonas)*((zonas+1)-z)) then
-					enemy.lvl=(z+(zonas*(round-1)))
+					enemy.lvl(z+(zonas*(round-1)))
 				end
 			end
 		else
@@ -827,6 +1011,17 @@ function CreateMobStats()
 					enemy.lvl=(z+(zonas*(round-1)))
 				end
 			end
+		end
+		if enemy.room~=1 then
+			local roomx=math.floor((enemy.room-1)%5)
+			local roomy=math.floor((enemy.room-1)/5)
+			local maxroom
+			if roomx>roomy then
+				maxroom=roomx
+			else
+				maxroom=roomy
+			end
+			enemy.lvl=enemy.lvl+(zonas*maxroom)
 		end
 	end
 	if not (enemy.stats) then
@@ -867,7 +1062,7 @@ function CreateMobStats()
 	enemy.classnames={"Gladiator","Berserker","Gladiator","Wizard","Berserker"}
 	enemy.classname=enemy.classnames[enemy.class]
 	MobSprite(1)
-	enemy.MaxHP=(30*enemy.lvl)+(enemy.stats[1]*20)
+	enemy.MaxHP=(10*enemy.lvl)+(enemy.stats[1]*(15+math.random(1,7)))
 	enemy.HP=enemy.MaxHP
 	enemy.SPD=(1.00-(enemy.stats[5]/100))
 	
@@ -906,7 +1101,7 @@ function UpdateStats(Secret)
 		
 
 	-- Level
-		statusdisplay=display.newSprite( statussheet, { name="status", start=1, count=6, time=800 }  )
+		statusdisplay=display.newSprite( statussheet, { name="status", start=1, count=7, time=800 }  )
 		statusdisplay.yScale=0.75
 		statusdisplay.xScale=statusdisplay.yScale
 		statusdisplay.x = LifeDisplay.x-150
@@ -1175,14 +1370,11 @@ function UpdateStats(Secret)
 	end
 end
 
-function InTrouble()
-	return inCombat
-end
-
 function RunAttempt()
 	ShowSorcery(true)
-	local RunChance,MaxChance=EvadeCalc("mob",48)
-	if RunChance>=(enemy.stats[5]/3) or MaxChance<(enemy.stats[5]/3)*2 then
+	local RunChance=EvadeCalc("mob",48)
+	local MaxChance=MaxCalc()
+	if RunChance>0 or MaxChance==0 then
 		EndCombat("Ran")
 	else
 		EndTurn()
@@ -1190,12 +1382,20 @@ function RunAttempt()
 end
 
 function PlayerAttacks(atktype)
-	P1Sprite(2)
+	if atktype==0 then
+		P1Sprite(2)
+	elseif atktype==1 then
+		P1Sprite(4)
+	end
 	local atkstat
 	local force
 	if atktype==0 then
 		atkstat=2
-		p1.EP=p1.EP-math.ceil(1.5*(p1.stats[atkstat]/5))
+		local amount=math.floor(1.5*(p1.stats[atkstat]/2.5))
+		if amount<1 then
+			amount=1
+		end
+		p1.EP=p1.EP-amount
 		if p1.EP<0 then
 			p1.EP=0
 			force=4
@@ -1204,7 +1404,11 @@ function PlayerAttacks(atktype)
 		end
 	elseif atktype==1 then
 		atkstat=4
-		p1.MP=p1.MP-math.ceil(1.5*(p1.stats[atkstat]/5))
+		local amount=math.floor(1.5*(p1.stats[atkstat]/2.5))
+		if amount<1 then
+			amount=1
+		end
+		p1.MP=p1.MP-amount
 		if p1.MP<0 then
 			p1.MP=0
 			force=4
@@ -1213,8 +1417,8 @@ function PlayerAttacks(atktype)
 		end
 	end
 	local isHit=EvadeCalc("mob",16)
-	if isHit>=(enemy.stats[5]/6)*2 then
-		if isHit>=(enemy.stats[5]/3)*7 then
+		if isHit>0 then
+			if isHit>1 then
 			local Damage=DamageCalc("mob",(math.random(15,20)/10),force,atkstat)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,false)
@@ -1260,16 +1464,22 @@ function EndTurn()
 				timer.performWithDelay(20,EndTurn)
 			end
 			if p1.EP~=p1.MaxEP then
-				p1.EP=p1.EP+(math.ceil((p1.stats[1])/5))
+				p1.EP=p1.EP+(math.ceil((p1.stats[1])/2.5))
 			end
 			if p1.MP~=p1.MaxMP then
-				p1.MP=p1.MP+(math.ceil((p1.stats[1])/5))
+				p1.MP=p1.MP+(math.ceil((p1.stats[1])/2.5))
+			end
+			if p1.EP>p1.MaxMP then
+				p1.EP=p1.MaxMP
+			end
+			if p1.MP>p1.MaxEP then
+				p1.MP=p1.MaxEP
 			end
 			UpdateStats(true)
 		end
 		
 		MobSprite()
-		if isDefend~=true then
+		if isDefend~=true and isRecover~=true then
 			P1Sprite()
 		end
 	elseif p1.HP<=0 then
@@ -1294,6 +1504,8 @@ function EndCombat(outcome)
 	end
 	gcm=nil
 	Created=nil
+	AutoAttack=0
+	players.CalmDownCowboy(true)
 	
 	if outcomed==false then
 		
@@ -1449,32 +1661,44 @@ end
 
 function Hits(damage,crit,target,special)
 	P1=players.GetPlayer()
+	local size=55
+	if crit==true then
+		size=size*1.2
+	end
 	if special==true then
-		hits[#hits+1]=display.newText( ("+"..damage), 0, 0, "MoolBoran", 50 )
+		-- Heal
+		hits[#hits+1]=display.newText( ("+"..damage), 0, 0, "MoolBoran", size )
 		hits[#hits]:setTextColor( 0, 150, 0)
 	elseif special=="BRN" then
-		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 50 )
+		-- BRN over time
+		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", size )
 		hits[#hits]:setTextColor( 200, 0, 0)
+	elseif special=="BLD" then
+		-- BLD over time
+		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", size )
+		hits[#hits]:setTextColor( 230, 10, 10)
 	elseif special=="PSN" then
-		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 50 )
+		-- PSN over time
+		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", size )
 		hits[#hits]:setTextColor( 150, 0, 150)
 	elseif special=="SPL" then
 		if type(damage)=="string" then
-			hits[#hits+1]=display.newText( (damage), 0, 0, "MoolBoran", 50 )
+		-- spell missed
+			hits[#hits+1]=display.newText( (damage), 0, 0, "MoolBoran", size )
 			hits[#hits]:setTextColor(20,20,200)
 		else
-			hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 50 )
+		-- spell hit
+			hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", size )
 			hits[#hits]:setTextColor(20,20,200)
 		end
-	elseif crit==true then
-		hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 70 )
-		hits[#hits]:setTextColor( 150, 0, 0)
-	elseif crit==false then
+	else
 		if type(damage)=="string" then
-			hits[#hits+1]=display.newText( (damage), 0, 0, "MoolBoran", 50 )
-			hits[#hits]:setTextColor(20,20,200)
+		-- hit missed
+			hits[#hits+1]=display.newText( (damage), 0, 0, "MoolBoran", size )
+			hits[#hits]:setTextColor(255,150,20)
 		else
-			hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 50 )
+		-- hit hit
+			hits[#hits+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", size )
 			hits[#hits]:setTextColor( 0, 0, 0)
 		end
 	end
@@ -1505,7 +1729,7 @@ function ShowBag(action)
 		items={}
 		items2={}
 		for i=1,table.maxn(p1.inv) do
-			if (p1.inv[i])~=nil and p1.inv[i][1]<=8 then
+			if (p1.inv[i])~=nil and p1.inv[i][1]<=14 then
 				local itmnme=item.ReturnInfo(p1.inv[i][1],0)
 				
 				items2[#items2+1]=display.newImageRect("itemframe.png",50,50)
@@ -1531,7 +1755,7 @@ function ShowBag(action)
 				end
 				items[#items].xScale=1.25
 				items[#items].yScale=1.25
-				items[#items].x = xinvicial+ (((#items-1)%8)*((espaciox*items[#items].xScale)+4))
+				items[#items].x = xinvicial+ (((#items-1)%8)*((espaciox*items[#items].xScale*1.3)+4))
 				items[#items].y = display.contentHeight-yinvicial
 				
 				function Gah()
@@ -1552,9 +1776,6 @@ function ShowBag(action)
 			end
 		end
 		ginv:toFront()
-		if table.maxn(p1.inv)==0 then
-			print "Inventory is empty."
-		end
 		
 		display.remove(BackBtn)
 		BackBtn=nil
@@ -1566,10 +1787,10 @@ function ShowBag(action)
 			defaultFile="combataction.png",
 			overFile="combataction2.png",
 			width=342, height=86,
-			onRelease = toItems}
+			onRelease = ShowBag}
 		BackBtn:setReferencePoint( display.CenterReferencePoint )
-		BackBtn.x = display.contentCenterX
-		BackBtn.y = GuardBtn.y+88
+		BackBtn.x = MagicBtn.x
+		BackBtn.y = RecoverBtn.y
 		gcm:insert( BackBtn )
 	elseif inv==true or action==true then
 		inv=false
@@ -1705,22 +1926,42 @@ function CastSorcery(name)
 		end
 	end
 	if name=="Cleave" then
-		local Damage=DamageCalc("mob",(math.random(15,20)/10),32,2)
+		local Damage=DamageCalc("mob",(math.random(15,20)/10),48,2)
 		Hits((Damage),true,true,"SPL")
 		enemy.HP=enemy.HP-Damage
 		MobSprite(3)
 		
+	elseif name=="Gouge" then
+		local isHit=EvadeCalc("mob",64)
+		if isHit>0 then
+			local Damage=DamageCalc("mob",(math.random(15,20)/10),48,2)
+			if (Damage)<=0 then
+				Hits("BLK!",false,true,"SPL")
+			else
+				statusdisplay:setFrame(7)
+				enemy.status="BLD"
+				Hits(("Bleed!"),false,true,"SPL")
+				BleedLimit=p1.stats[4]
+				if BleedLimit>15 then
+					BleedLimit=20
+				end
+				enemy.HP=enemy.HP-Damage
+				MobSprite(3)
+				Hits((Damage),true,true,"SPL")
+			end
+		else
+			Hits("MSS!",false,true,"SPL")
+		end
+		
 	elseif name=="Healing" then
-	
 		local p1=players.GetPlayer()
 		players.AddHP(math.floor(p1.MaxHP*.2))
 		Hits((math.floor(p1.MaxHP*.2)),false,false,true)
 		
 	elseif name=="Fire Sword" then
-	
 		local isHit=EvadeCalc("mob",64)
-		if isHit>=(enemy.stats[5]/6)*2 then
-			local Damage=DamageCalc("mob",(math.random(15,20)/10),32,2)
+		if isHit>0 then
+			local Damage=DamageCalc("mob",(math.random(15,20)/10),48,2)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,"SPL")
 			else
@@ -1740,11 +1981,10 @@ function CastSorcery(name)
 		end
 		
 	elseif name=="Fireball" then
-	
 		local isHit=EvadeCalc("mob",64)
-		if isHit>=(enemy.stats[5]/6)*2 then
-			if isHit>=(enemy.stats[5]/3)*5 then
-				local Damage=DamageCalc("mob",(math.random(15,20)/10),32,4)
+		if isHit>0 then
+			if isHit>1 then
+				local Damage=DamageCalc("mob",(math.random(15,20)/10),48,4)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
 				else
@@ -1760,7 +2000,7 @@ function CastSorcery(name)
 					Hits((Damage),true,true,"SPL")
 				end
 			else
-				local Damage=DamageCalc("mob",1,32,4)
+				local Damage=DamageCalc("mob",1,48,4)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
 				else
@@ -1781,10 +2021,9 @@ function CastSorcery(name)
 		end
 		
 	elseif name=="Ice Sword" then
-	
 		local isHit=EvadeCalc("mob",64)
-		if isHit>=(enemy.stats[5]/6)*2 then
-			local Damage=DamageCalc("mob",(math.random(15,20)/10),32,2)
+		if isHit>0 then
+			local Damage=DamageCalc("mob",(math.random(15,20)/10),48,2)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,"SPL")
 			else
@@ -1803,11 +2042,10 @@ function CastSorcery(name)
 		Hits(("Slowed!"),false,true,"SPL")
 		
 	elseif name=="Poison Blade" then
-	
 		local isHit=EvadeCalc("mob",64)
-		if isHit>=(enemy.stats[5]/6)*2 then
-			if isHit>=(enemy.stats[5]/3)*5 then
-				local Damage=DamageCalc("mob",(math.random(15,20)/10),32,4)
+		if isHit>0 then
+			if isHit>1 then
+				local Damage=DamageCalc("mob",(math.random(15,20)/10),48,4)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
 				else
@@ -1819,7 +2057,7 @@ function CastSorcery(name)
 					Hits((Damage),true,true,"SPL")
 				end
 			else
-				local Damage=DamageCalc("mob",1,32,2)
+				local Damage=DamageCalc("mob",1,48,2)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
 				else
@@ -1834,6 +2072,7 @@ function CastSorcery(name)
 		else
 			Hits("MSS!",false,true,"SPL")
 		end
+		
 	end
 	UpdateStats()
 end
@@ -1852,21 +2091,21 @@ function DamageCalc(tar,crit,cmd,atkstat)
 	local Damage
 	if tar=="p1" then
 		Damage=(
-			((enemy.stats[2]*(math.random(5,15)/10))-p1.stats[3])
+			((enemy.stats[atkstat]*(math.random(15,20)/10))-p1.stats[3])
 		)
 		Damage=(
 			((Damage*cmd/16)*crit)
 		)
-		Damage=(Damage*0.4)
+		Damage=(Damage*0.5)
 		Damage=math.floor(Damage)
 	elseif tar=="mob" then
 		Damage=(
-			((p1.stats[atkstat]*(math.random(5,15)/10))-enemy.stats[3])
+			((p1.stats[atkstat]*(math.random(15,20)/10))-enemy.stats[3])
 		)
 		Damage=(
 			((Damage*cmd/16)*crit)
 		)
-		Damage=(Damage*0.4)
+		Damage=(Damage*0.5)
 		Damage=math.floor(Damage)
 	end
 	return Damage
@@ -1874,7 +2113,6 @@ end
 
 function EvadeCalc(tar,cmd)
 	local Chance
-	local MaxChance
 	if tar=="p1" then
 		Chance=(
 			((enemy.stats[5]*1.5)-p1.stats[5])
@@ -1897,21 +2135,37 @@ function EvadeCalc(tar,cmd)
 			Chance*((math.random((10+(p1.stats[5]*0.5)),(10+(p1.stats[5]*1.5))))/10)
 		)
 		Chance=Chance*1.5
-		MaxChance=(
-			((p1.stats[5]*1.5)-enemy.stats[5])
-		)
-		MaxChance=(
-			(MaxChance*cmd/16)
-		)
-		MaxChance=(
-			MaxChance*((10+(p1.stats[5]*1.5))/10)
-		)
-		MaxChance=MaxChance*1.5
-	--	print (Chance.."/"..MaxChance)
 	end
-	if tar=="mob" then
-		return Chance,MaxChance
+	if Chance>=(enemy.stats[5]/6)*2 then
+		if Chance>=(enemy.stats[5]/3)*5 then
+			return 2
+		else
+			return 1
+		end
 	else
-		return Chance
+		return 0
 	end
+end
+
+function MaxCalc()
+	local Chance
+	Chance=(
+		((p1.stats[5]*1.5)-enemy.stats[5])
+	)
+	Chance=(
+		(Chance*48/16)
+	)
+	Chance=(
+		Chance*(10+(p1.stats[5]*1.5)/10)
+	)
+	Chance=Chance*1.5
+	if Chance>=(enemy.stats[5]/6)*2 then
+		return 1
+	else
+		return 0
+	end
+end
+
+function InTrouble()
+	return inCombat
 end

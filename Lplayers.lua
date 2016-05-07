@@ -5,30 +5,31 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local heartnsheet = graphics.newImageSheet( "heartemptysprite.png", { width=25, height=25, numFrames=16 } )
+local energysheet = graphics.newImageSheet( "energysprite.png", { width=60, height=60, numFrames=4 } )
 local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height=25, numFrames=16 } )
 local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 } )
-local energysheet = graphics.newImageSheet( "energysprite.png", { width=60, height=60, numFrames=4 } )
 local xpsheet = graphics.newImageSheet( "xpbar.png", { width=392, height=40, numFrames=50 } )
 local b=require("Lmapbuilder")
-local gold=require("Lgold")
 local WD=require("Lprogress")
+local su=require("Lstartup")
+local gold=require("Lgold")
+local w=require("Lwindow")
 local c=require("Lchars")
 local a=require("Laudio")
 local i=require("Litems")
-local w=require("Lwindow")
 local ui=require("Lui")
-local su=require("Lstartup")
-local yCoord=856
-local xCoord=70
-local Map
-local check=119
-local player
+local DisplayCan=false
 local Cheat=false
-local scale=1.2
 local StrongForce
-local transp
+local yCoord=856
+local check=119
+local xCoord=70
+local scale=1.2
 local transp2
 local transp3
+local player
+local transp
+local Map
 local names={
 		"Nameless",
 		"Orphan",
@@ -75,10 +76,10 @@ function CreatePlayers(name)
 	player.gp=0
 	player.eqp={  }
 	player.inv={ {1,10} }
+	player.weight=5
 	--Stats
 	player.statnames=	{"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity",	"Intellect"}
 	player.eqs=			{0,			0,			0,			0,			0,				0}
---	player.nat=			{20,		20,			20,			20,			20,				20}
 	player.nat=			{2,			2,			2,			2,			2,				2}
 	player.bon=			{0,			0,			0,			0,			0,				0}
 	player.bst=			{0,			0,			0,			0,			0,				0}
@@ -93,13 +94,14 @@ function CreatePlayers(name)
 	player.pnts=7
 	--Spells
 	player.spells={
-		{"Fireball","Cast a firey ball of death and burn the enemy.",true,10,5},
-		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,5,20},
-		{"Slow","Reduces enemy's dexterity.",false,50,5},
-		{"Poison Blade","Inflicts poison.",false,15,20},
-		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,30,40},
-		{"Healing","Heals for 20% of maximum Hit Points.",false,60,5},
-		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,50,50},
+		{"Gouge","Place a deep wound on the enemy target.",true,9,13},
+		{"Fireball","Cast a firey ball of death and burn the enemy.",true,16,7},
+		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,5,13},
+		{"Slow","Reduces enemy's dexterity.",false,28,5},
+		{"Poison Blade","Inflicts poison.",false,16,19},
+		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,26,37},
+		{"Healing","Heals for 20% of maximum Hit Points.",false,58,4},
+		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,46,51},
 	}
 	--Secondary Stats
 	player.portcd=0
@@ -117,32 +119,13 @@ function CreatePlayers(name)
 	end
 end
 
-function PlayerLoc(right)
-	if right==true then
-		local size=b.GetData(0)
-		local curround=WD.Circle()
-		if curround%2==0 then
-			player.loc=size-(math.sqrt(size)+1)
-		else
-			player.loc=(math.sqrt(size)+2)
-		end
-	elseif right==false then
-		local size=b.GetData(0)
-		local curround=WD.Circle()
-		if curround%2==0 then
-			player.loc=(math.sqrt(size)+2)
-		else
-			player.loc=size-(math.sqrt(size)+1)
-		end
-	end
+function PlayerLoc(location,room)
+	player.loc=location
+	player.room=room
 end
 
 function GetPlayer()
 	return player
-end
-
-function MovePlayer(dist)
-	player.loc=player.loc+dist
 end
 
 function ShowStats()
@@ -189,6 +172,7 @@ function ShowStats()
 		LifeWindow.x=LifeDisplay.x
 		LifeWindow.y=LifeDisplay.y+5
 		
+		LifeSymbol:toFront()
 		LifeDisplay:toFront()
 		LifeDisplay:setTextColor( 255, 255, 255,transp)
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
@@ -249,6 +233,7 @@ function ShowStats()
 		ManaWindow.x=ManaDisplay.x
 		ManaWindow.y=ManaDisplay.y+5
 		
+		ManaSymbol:toFront()
 		ManaDisplay:toFront()
 		ManaDisplay:setTextColor( 255, 255, 255,transp3)
 		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
@@ -298,6 +283,7 @@ function ShowStats()
 		EnergyWindow.x=EnergyDisplay.x
 		EnergyWindow.y=EnergyDisplay.y+5
 		
+		EnergySymbol:toFront()
 		EnergyDisplay:toFront()
 		EnergyDisplay:setTextColor( 255, 255, 255,transp5)
 		EnergySymbol:setFillColor(transp5,transp5,transp5,transp5)
@@ -361,7 +347,7 @@ function ShowStats()
 end
 
 function openStats( event )
-	if event.phase=="ended" then
+	if event.phase=="ended" and DisplayCan==true then
 		ui.Pause(true)
 		w.ToggleInfo()
 	end
@@ -373,6 +359,10 @@ function LetsYodaIt()
 	else
 		StrongForce=false
 	end
+end
+
+function CalmDownCowboy(what)
+	DisplayCan=what
 end
 
 function ReduceHP(amount,cause)
@@ -451,6 +441,13 @@ function StatCheck()
 	end
 	if player.EP>player.MaxEP then
 		player.EP=player.MaxEP
+	end
+	player.weight=5
+	for i=1,table.maxn(player.inv) do
+		player.weight=player.weight+player.inv[i][2]
+	end
+	for i=1,table.maxn(player.eqp) do
+		player.weight=player.weight+2
 	end
 end
 
@@ -553,6 +550,8 @@ function LvlFanfare()
 end
 
 function OhCrap()
+	XPSymbol:toFront()
+	XPDisplay:toFront()
 	if XPSymbol.frame==50 and player.XP>player.MaxXP then
 		LvlUp()
 	elseif XPSymbol.frame>math.floor((player.XP/player.MaxXP)*50) then
@@ -612,6 +611,8 @@ function Load1(cls,chr)
 	player.x, player.y = display.contentWidth/2, display.contentHeight/2
 	player:setStrokeColor(50, 50, 255)
 	player.strokeWidth = 4
+	player.xScale=scale
+	player.yScale=player.xScale
 	
 	player.char=char
 	player.class=class
@@ -658,30 +659,25 @@ function FinishLoading()
 	player.clsnames={"Knight","Warrior","Thief","Viking","Sorceror","Scholar"}
 	player.eqs={0,0,0,0,0,0}
 	player.bon={0,0,0,0,0,0}
+	player.weight=5
 	player.portcd=0
 	player.stats={}
 	player.inv={}
 	player.eqp={}
 	player.spells={
-		{"Fireball","Cast a firey ball of death and burn the enemy.",true,10,5},
-		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,5,20},
-		{"Slow","Reduces enemy's dexterity.",false,50,5},
-		{"Poison Blade","Inflicts poison.",false,15,20},
-		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,30,40},
-		{"Healing","Heals for 20% of maximum Hit Points.",false,60,5},
-		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,50,50},
+		{"Gouge","Place a deep wound on the enemy target.",true,9,13},
+		{"Fireball","Cast a firey ball of death and burn the enemy.",true,16,7},
+		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,5,13},
+		{"Slow","Reduces enemy's dexterity.",false,28,5},
+		{"Poison Blade","Inflicts poison.",false,16,19},
+		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,26,37},
+		{"Healing","Heals for 20% of maximum Hit Points.",false,58,4},
+		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,46,51},
 	}
 	if (player) then
 		check=119
 		Runtime:addEventListener("enterFrame",ShowStats)
 		su.FrontNCenter()
-	end
-	local size=b.GetData(0)
-	local curround=WD.Circle()
-	if curround%2==0 then
-		player.loc=size-(math.sqrt(size)+1)
-	else
-		player.loc=(math.sqrt(size)+2)
 	end
 end
 

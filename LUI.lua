@@ -32,9 +32,13 @@ local mpdnprsnt
 local pwg
 
 function Background()
+	if (bkglevel) then
+		display.remove(bkglevel)
+		bkglevel=nil
+	end
 	bkglevel = display.newImage("bkgs/bkg_level.png", true)
 	bkglevel.x = display.contentCenterX
-	bkglevel.y = display.contentCenterY	
+	bkglevel.y = display.contentCenterY
 	bkglevel:toBack()
 	return bkglevel
 end
@@ -129,17 +133,19 @@ function Pause(mute)
 		portsprsnt.txt.text=(P1.portcd)
 		MovePause(true)
 		if isPaused==true then
+		--	print "!3"
 			isPaused=false
-	--		print "Game resumed."
+		--	print "Game resumed."
 			if mute~=true then
 				audio.Play(5)
 			end
 		elseif isPaused==false then
 			isPaused=true
-			m.ShowArrows("clean")
+		--	print "!1"
+			m.CleanArrows()
 			gold.ShowGCounter()
 			players.LetsYodaIt()
-	--		print "Game paused."
+		--	print "Game paused."
 			if mute~=true then
 				audio.Play(6)
 			end
@@ -157,12 +163,14 @@ function MovePause(val)
 		if not (PauseBtn) then
 			timer.performWithDelay(50,MovePause)
 		elseif pwg.y==0 and val~=true then
+		--	print "!4"
 			window.loc=0
 			window.ready=1
 			m.Visibility()
 			gold.ShowGCounter()
 			players.LetsYodaIt()
 		elseif pwg.y==-216 and val~=true then
+		--	print "!2"
 			window.loc=1
 			window.ready=1
 		else
@@ -225,12 +233,6 @@ function MapIndicators(val)
 		portsprsnt.txt.isVisible=false
 		pwg:insert(portsprsnt.txt)
 		
-		rportprsnt = display.newImageRect("rppresent.png",80,80)
-		rportprsnt.x, rportprsnt.y = portsprsnt.x, portsprsnt.y
-		rportprsnt.xScale,rportprsnt.yScale=0.8,0.8
-		rportprsnt.isVisible=false
-		pwg:insert(rportprsnt)
-		
 		hpdprsnt = display.newImageRect("hppresent.png",80,80)
 		hpdprsnt.x, hpdprsnt.y = portsprsnt.x+(80*0.8), portsprsnt.y
 		hpdprsnt.xScale,hpdprsnt.yScale=0.8,0.8
@@ -292,12 +294,6 @@ function MapIndicators(val)
 		keyprsnt.isVisible=true
 		keynprsnt.isVisible=false
 	end
-	if val=="RP" then
-		portsprsnt.isVisible=false
-		portsprsnt.txt.isVisible=false
-		portsnprsnt.isVisible=false
-		rportprsnt.isVisible=true
-	end
 	if val=="MP" then
 		mpdprsnt.isVisible=true
 		mpdnprsnt.isVisible=false
@@ -314,7 +310,6 @@ function MapIndicators(val)
 		portsprsnt.isVisible=true
 		portsprsnt.txt.isVisible=true
 		portsnprsnt.isVisible=false
-		rportprsnt.isVisible=false
 	end
 	if val=="MS" then
 		msprsnt.isVisible=true

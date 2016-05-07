@@ -13,6 +13,8 @@ local Score
 local GVersion
 local OKVers={
 		"GAMMA 1.0.1",
+		"GAMMA 1.0.2",
+		"GAMMA 1.1.0",
 	}
 local Default={
 		"Brownie S.",10000,

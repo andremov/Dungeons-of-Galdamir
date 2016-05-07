@@ -13,15 +13,16 @@ local b=require("Lmapbuilder")
 local currentmap
 local Round
 local HowRed=0
+local mapsT={}
 local mapsS={}
 local mapsM={}
 local mapsL={}
-local mapsH={}
 local tutorial={}
 local testin={}
+local mapsD={}
 local opt=display.newGroup()
 local TileID=0
-local SizeID=2
+local SizeID=3
 local CurSize
 local CurTile
 local Testing=false
@@ -30,16 +31,19 @@ function GetCMap(value)
 	Round=WD.Circle()
 	if Testing==false and value~=-1 then
 		if SizeID==1 then
-			currentmap=mapsS[1]
+			currentmap=mapsT[1]
 			return currentmap
 		elseif SizeID==2 then
-			currentmap=mapsM[1]
+			currentmap=mapsS[1]
 			return currentmap
 		elseif SizeID==3 then
-			currentmap=mapsL[1]
+			currentmap=mapsM[1]
 			return currentmap
 		elseif SizeID==4 then
-			currentmap=mapsH[1]
+			currentmap=mapsL[1]
+			return currentmap
+		elseif SizeID==5 then
+			currentmap=mapsD[1]
 			return currentmap
 		end
 	elseif value==-1 then
@@ -53,7 +57,7 @@ end
 
 function CallingZones()
 	maps.CallMapGroups()
-	mapsS,mapsM,mapsL,mapsH,tutorial,testin=maps.GetMapGroups()
+	mapsT,mapsS,mapsM,mapsL,tutorial,testin,mapsD=maps.GetMapGroups()
 end
 
 function Size(am)
@@ -85,24 +89,29 @@ function MapSizeMenu()
 		option.DisplayOptions()
 	end
 	
-	function SmallMap()
+	function TinyMap()
 		Size(1)
+		CurSize.text=("Current Map Size: Tiny")
+	end
+	
+	function SmallMap()
+		Size(2)
 		CurSize.text=("Current Map Size: Small")
 	end
 	
 	function MedMap()
-		Size(2)
+		Size(3)
 		CurSize.text=("Current Map Size: Medium")
 	end
 	
 	function LargeMap()
-		Size(3)
+		Size(4)
 		CurSize.text=("Current Map Size: Large")
 	end
 	
-	function HCMap()
-		Size(4)
-		CurSize.text=("Current Map Size: Hardcore")
+	function SecretMap()
+		Size(5)
+		CurSize.text=("Current Map Size: Secret")
 	end
 	
 	function DefaultTSet()
@@ -115,15 +124,35 @@ function MapSizeMenu()
 		CurTile.text=("Current Tileset: Notebook")
 	end
 	
+	function RealTSet()
+		SetTile(2)
+		CurTile.text=("Current Tileset: Realistic")
+	end
+	
 	function BWTSet()
 		SetTile(3)
 		CurTile.text=("Current Tileset: B&W")
 	end
 	
-	function RealTSet()
-		SetTile(2)
-		CurTile.text=("Current Tileset: Realistic")
+	function SecretTSet()
+		SetTile(4)
+		CurTile.text=("Current Tileset: Secret")
 	end
+	
+	
+	local TinyBtn = widget.newButton{
+		label="Tiny Map",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		fontSize=30,
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
+		onRelease = TinyMap
+	}
+	TinyBtn:setReferencePoint( display.CenterReferencePoint )
+	TinyBtn.x = display.contentWidth*0.5-160
+	TinyBtn.y = display.contentHeight*0.3
+	opt:insert(TinyBtn)
 	
 	local SmallBtn = widget.newButton{
 		label="Small Map",
@@ -135,8 +164,8 @@ function MapSizeMenu()
 		onRelease = SmallMap
 	}
 	SmallBtn:setReferencePoint( display.CenterReferencePoint )
-	SmallBtn.x = display.contentWidth*0.5-160
-	SmallBtn.y = display.contentHeight*0.3
+	SmallBtn.x = TinyBtn.x
+	SmallBtn.y = TinyBtn.y+100
 	opt:insert(SmallBtn)
 	
 	local MedBtn = widget.newButton{
@@ -149,7 +178,7 @@ function MapSizeMenu()
 		onRelease = MedMap
 	}
 	MedBtn:setReferencePoint( display.CenterReferencePoint )
-	MedBtn.x = SmallBtn.x
+	MedBtn.x = TinyBtn.x
 	MedBtn.y = SmallBtn.y+100
 	opt:insert(MedBtn)
 	
@@ -163,23 +192,9 @@ function MapSizeMenu()
 		onRelease = LargeMap
 	}
 	LargeBtn:setReferencePoint( display.CenterReferencePoint )
-	LargeBtn.x = SmallBtn.x
+	LargeBtn.x = TinyBtn.x
 	LargeBtn.y = MedBtn.y+100
 	opt:insert(LargeBtn)
-	
-	local HCBtn = widget.newButton{
-		label="Hardcore Map",
-		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
-		defaultFile="cbutton.png",
-		overFile="cbutton-over.png",
-		width=290, height=90,
-		onRelease = HCMap
-	}
-	HCBtn:setReferencePoint( display.CenterReferencePoint )
-	HCBtn.x = SmallBtn.x
-	HCBtn.y = LargeBtn.y+100
-	opt:insert(HCBtn)
 	
 	local DefaultTS = widget.newButton{
 		label="Default Tileset",
@@ -241,6 +256,7 @@ function MapSizeMenu()
 	title.x = display.contentWidth*0.5
 	title.y = 100
 	title:setTextColor(125,250,125)
+	title:addEventListener("tap",Secret)
 	opt:insert(title)
 	
 	local BackBtn = widget.newButton{
@@ -258,22 +274,27 @@ function MapSizeMenu()
 	opt:insert(BackBtn)
 	
 	if SizeID==1 then
-		CurSize = display.newText( ("Current Map Size: Small"), 0, 0, "MoolBoran", 75 )
+		CurSize = display.newText( ("Current Map Size: Tiny"), 0, 0, "MoolBoran", 75 )
 		CurSize.x=display.contentCenterX
 		CurSize.y= display.contentHeight-300
 		opt:insert(CurSize)
 	elseif SizeID==2 then
-		CurSize = display.newText( ("Current Map Size: Medium"), 0, 0, "MoolBoran", 75 )
+		CurSize = display.newText( ("Current Map Size: Small"), 0, 0, "MoolBoran", 75 )
 		CurSize.x=display.contentCenterX
 		CurSize.y= display.contentHeight-300
 		opt:insert(CurSize)
 	elseif SizeID==3 then
-		CurSize = display.newText( ("Current Map Size: Large"), 0, 0, "MoolBoran", 75 )
+		CurSize = display.newText( ("Current Map Size: Medium"), 0, 0, "MoolBoran", 75 )
 		CurSize.x=display.contentCenterX
 		CurSize.y= display.contentHeight-300
 		opt:insert(CurSize)
 	elseif SizeID==4 then
-		CurSize = display.newText( ("Current Map Size: Hardcore"), 0, 0, "MoolBoran", 75 )
+		CurSize = display.newText( ("Current Map Size: Large"), 0, 0, "MoolBoran", 75 )
+		CurSize.x=display.contentCenterX
+		CurSize.y= display.contentHeight-300
+		opt:insert(CurSize)
+	elseif SizeID==5 then
+		CurSize = display.newText( ("Current Map Size: Secret"), 0, 0, "MoolBoran", 75 )
 		CurSize.x=display.contentCenterX
 		CurSize.y= display.contentHeight-300
 		opt:insert(CurSize)
@@ -299,5 +320,18 @@ function MapSizeMenu()
 		CurTile.x=display.contentCenterX
 		CurTile.y=CurSize.y+80
 		opt:insert(CurTile)
+	elseif TileID==4 then
+		CurTile = display.newText( ("Current Tileset: Secret"), 0, 0, "MoolBoran", 75 )
+		CurTile.x=display.contentCenterX
+		CurTile.y=CurSize.y+80
+		opt:insert(CurTile)
+	end
+end
+
+function Secret( event )
+	if event.x<display.contentCenterX then
+		SecretMap()
+	else
+		SecretTSet()
 	end
 end

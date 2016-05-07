@@ -134,29 +134,6 @@ function Win()
 	sav.Save()
 end
 
-function Lrn2WinNub()
-	local P1=players.GetPlayer()
-	local size=builder.GetData(0)
-	Round=Round+1
-
-	FloorSign()
-	
---	print "Player went through a Red Portal."
---	print ("Floor: " ..Round)
-	q.WipeQuest()
-	if Round>HighCard then
-		HighCard=Round
-		local gpgain=Round*((math.sqrt(size)/5)*2)
-		if gpgain>(5*math.sqrt(size)) then
-			gpgain=(5*math.sqrt(size))
-		end
-		gp.CallAddCoins(gpgain)
-	end
-	su.Startup(false)
-	builder.Rebuild(false)
-	sav.Save()
-end
-
 function Circle()
 	return Round
 end
@@ -174,5 +151,6 @@ function SrsBsns()
 	builder.WipeMap()
 	m.ShowMenu()
 	m.ReadySetGo()
+	mov.CleanWindow()
 end
 

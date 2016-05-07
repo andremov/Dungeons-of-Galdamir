@@ -46,6 +46,7 @@ function ShowMenu()
 	titleLogo:setReferencePoint( display.CenterReferencePoint )
 	titleLogo.x = display.contentWidth * 0.5
 	titleLogo.y = 150
+	titleLogo:addEventListener("tap",SplashChange)
 	group:insert(titleLogo)
 	
 	PlayBtn = widget.newButton{
@@ -131,6 +132,15 @@ function ShowMenu()
 	a.Menu(true)
 end
 
+function SplashChange()
+	if (Splash) then
+		display.remove(Splash)
+		Splash=nil
+	end
+	Splash=s.GetSplash()
+	group:insert(Splash)
+end
+
 function onPlayBtnRelease()
 	if canGo==true then
 		for i=group.numChildren,1,-1 do
@@ -146,19 +156,20 @@ function ReadySetGo()
 	canGo=true
 end
 
-function onUpdateBtnRelease()
+function onUpdateBtnRelease( event )
+	print "!"
 	if canGo==true and event.phase=="ended" then
 		system.openURL( "tinyurl.com/dogcub3d" )
 	end
 end
 
-function openAd1()
+function openAd1( event )
 	if canGo==true and event.phase=="ended" then
 		system.openURL( "tinyurl.com/togcub3d" )
 	end
 end
 
-function openAd2()
+function openAd2( event )
 	if canGo==true and event.phase=="ended" then
 		system.openURL( "tinyurl.com/mogcub3d" )
 	end

@@ -23,6 +23,7 @@ local gold=require("Lgold")
 local audio=require("Laudio")
 local item=require("Litems")
 local inv=require("Lwindow")
+local mob=require("Lmobai")
 local widget = require "widget"
 local debris ={}
 local twinkles={}
@@ -63,16 +64,18 @@ function onChestCollision()
 	local bounds=builder.GetData(2)
 	local Chests=builder.GetData(5)
 	local Round=WD.Circle()
-	for i in pairs(Chests) do
-		if ((i)==(P1.loc)) then
-			bounds[i]=1
-			display.remove(Chests[i])
-			Chests[i]=nil
-			gold.CallCoins(Round)
-			audio.Play(1)
-			builder.ModMap(i)
-			Dropped=item.ItemDrop()
-			return Dropped
+	for r in pairs(Chests) do
+		for l in pairs(Chests[r]) do
+			if (l==P1.loc) and (r==P1.room) then
+				bounds[l]=1
+				display.remove(Chests[r][l])
+				Chests[r][l]=nil
+				gold.CallCoins(Round)
+				audio.Play(1)
+				builder.ModMap(l)
+				Dropped=item.ItemDrop()
+				return Dropped
+			end
 		end
 	end
 end
@@ -83,12 +86,11 @@ function onRockCollision()
 	local P1=player.GetPlayer()
 	local Rocks=builder.GetData(6)
 	local bounds=builder.GetData(2)
-	for i in pairs(Rocks) do
-		if ((i)==(P1.loc)) and bounds[i]~=1 then
-			bounds[i]=1
-			builder.ModMap(i)
-			local level=builder.GetData(3)
-			Rocks[i]:play()
+	for l in pairs(Rocks[P1.room]) do
+		if ((l)==(P1.loc)) and bounds[l]~=1 then
+			bounds[l]=1
+			builder.ModMap(l)
+			Rocks[P1.room][l]:play()
 			audio.Play(13)
 			--Small
 			local somuchdebris=math.random(10,15)
@@ -143,12 +145,14 @@ end
 
 function onKeyCollision()
 	local P1=player.GetPlayer()
+	local bounds=builder.GetData(2)
 	local Key=builder.TheGates("key")
 	if (Key) then
-		if ((Key.loc)==(P1.loc)) then
+		if (Key.loc==P1.loc) and ((Key.room)==(P1.room)) then
 	--		print "Got Key!"
 			audio.Play(2)
 			builder.ModMap(Key.loc)
+			bounds[Key.loc]=1
 			
 			builder.TheGates("open")
 			ui.MapIndicators("KEY")
@@ -174,7 +178,7 @@ function onKeyCollision()
 			lolname.y=(display.contentHeight/2)-120
 			gum:insert( lolname )
 			
-			local lolname2=display.newText( "The gate to the next floor is now open." ,0,0,"MoolBoran",55)
+			local lolname2=display.newText( "You hear a loud clang in the distance." ,0,0,"MoolBoran",55)
 			lolname2:setTextColor( 180, 180, 180)
 			lolname2.x=display.contentWidth/2
 			lolname2.y=(display.contentHeight/2)-50
@@ -202,14 +206,23 @@ function onLavaCollision()
 	local LavaBlocks=builder.GetData(4)
 	local inCombat=c.InTrouble()
 	local isPaused=ui.Paused()
+	local isLava=false
 	if inCombat==true or isPaused==true then
 	else
-		for i in pairs(LavaBlocks) do
-			if ((i)==(P1.loc)) and (P1.HP~=0)then
-				local damage=(math.floor(P1.MaxHP*0.02))
-				player.ReduceHP(damage,"Lava")
-				timer.performWithDelay(200,onLavaCollision)
+		for l in pairs(LavaBlocks[P1.room]) do
+			if ((l)==(P1.loc)) and (P1.HP~=0)then
+				isLava=true
 			end
+		end
+	end
+	if isLava==true then
+		local damage=(math.floor(P1.MaxHP*0.02))
+		player.ReduceHP(damage,"Lava")
+		lavatimer=timer.performWithDelay(200,onLavaCollision)
+	else
+		if (lavatimer) then
+			local stahp=timer.pause(lavatimer)
+			lavatimer=nil
 		end
 	end
 end
@@ -218,8 +231,8 @@ function onWaterCollision()
 	local P1=player.GetPlayer()
 	local WaterBlocks=builder.GetData(9)
 	local isWet=false
-	for i in pairs(WaterBlocks) do
-		if ((i)==(P1.loc)) and (P1.HP~=0)then
+	for l in pairs(WaterBlocks[P1.room]) do
+		if ((l)==(P1.loc)) and (P1.HP~=0)then
 			isWet=true
 		end
 	end
@@ -232,8 +245,8 @@ function LayOnHands()
 	local inCombat=c.InTrouble()
 	local isPaused=ui.Paused()
 	if inCombat==true or isPaused==true then
-	else
-		if (Heal==P1.loc) then
+	elseif (Heal) then
+		if (Heal.loc==P1.loc) and (Heal.room==P1.room) then
 			if P1.HP<P1.MaxHP then
 				twinkles[#twinkles+1]=display.newSprite( healthsheet, { name="twinkle", start=1, count=14, time=1000, loopCount=1 }  )
 				twinkles[#twinkles].x=P1.x+(math.random(-30,30))
@@ -260,8 +273,8 @@ function LayOnFeet()
 	local inCombat=c.InTrouble()
 	local isPaused=ui.Paused()
 	if inCombat==true or isPaused==true then
-	else
-		if (Energy==P1.loc) then
+	elseif (Energy) then
+		if (Energy.loc==P1.loc) and (Energy.room==P1.room) then
 			if P1.EP<P1.MaxEP then
 				twinkles[#twinkles+1]=display.newSprite( energysheet, { name="twinkle", start=1, count=14, time=1000, loopCount=1 }  )
 				twinkles[#twinkles].x=P1.x+(math.random(-30,30))
@@ -288,8 +301,8 @@ function LayOnHead()
 	local inCombat=c.InTrouble()
 	local isPaused=ui.Paused()
 	if inCombat==true or isPaused==true then
-	else
-		if (Mana==P1.loc) then
+	elseif (Mana) then
+		if (Mana.loc==P1.loc) and (Mana.room==P1.room) then
 			if P1.MP<P1.MaxMP then
 				twinkles[#twinkles+1]=display.newSprite( manasheet, { name="twinkle", start=1, count=14, time=1000, loopCount=1 }  )
 				twinkles[#twinkles].x=P1.x+(math.random(-30,30))
@@ -311,90 +324,290 @@ function LayOnHead()
 end
 
 function PortCheck()
-	local OP=builder.GetPortal(false)
-	local BP=builder.GetPortal(true)
-	local RP=builder.GetRedP()
+	local OP=builder.GetPortal(1)
+	local RP=builder.GetPortal(2)
+	local BP=builder.GetPortal(3)
+	local DP=builder.GetPortal(4)
 	local P1=players.GetPlayer()
-	if (OP) and (BP) then
-		if (P1) and (OP.loc==P1.loc) and P1.portcd==0 then
-			return "OP"
-		elseif (P1) and (BP.loc==P1.loc) and P1.portcd==0 then
-			return "BP"
-		elseif (P1) and (BP.loc~=P1.loc) and (OP.loc~=P1.loc) then
+	local info=false
+	if (OP) and (RP) then
+		if (P1) and (OP.loc==P1.loc) and (OP.room==P1.room) then
+			if P1.portcd==0 then
+				local check=mob.LocationCheck(RP.loc,RP.room)
+				if check==false then
+					info="OP"
+				else
+					info="OPB"
+				end
+			else
+				info="OPB"
+			end
+		elseif (P1) and (RP.loc==P1.loc) and (RP.room==P1.room) then
+			if P1.portcd==0 then
+				local check=mob.LocationCheck(OP.loc,OP.room)
+				if check==false then
+					info="RP"
+				else
+					info="RPB"
+				end
+			else
+				info="RPB"
+			end
+		elseif (P1) then
 			P1.portcd=P1.portcd-1
 			if P1.portcd<=0 then
 				P1.portcd=0
 			end
-			return false
 		end
-	elseif (P1) and (RP) and (RP.loc==P1.loc) then
-		return "RP"
 	else
 		P1.portcd=P1.portcd-1
 		if P1.portcd<=0 then
 			P1.portcd=0
 		end
-		return false
 	end
+	if (BP) and (DP) then
+		if (P1) and (BP.loc==P1.loc) and (BP.room==P1.room) then
+			if P1.portcd==0 then
+				local check=mob.LocationCheck(DP.loc,DP.room)
+				if check==false then
+					info="BP"
+				else
+					info="BPB"
+				end
+			else
+				info="BPB"
+			end
+		elseif (P1) and (DP.loc==P1.loc) and (DP.room==P1.room) then
+			if P1.portcd==0 then
+				local check=mob.LocationCheck(BP.loc,BP.room)
+				if check==false then
+					info="DP"
+				else
+					info="DPB"
+				end
+			else
+				info="DPB"
+			end
+		elseif (P1) then
+			P1.portcd=P1.portcd-1
+			if P1.portcd<=0 then
+				P1.portcd=0
+			end
+		end
+	else
+		P1.portcd=P1.portcd-1
+		if P1.portcd<=0 then
+			P1.portcd=0
+		end
+	end
+	return info
 end
 
 function Port()
-	local OP=builder.GetPortal(false)
-	local BP=builder.GetPortal(true)
-	local RP=builder.GetRedP()
+	local OP=builder.GetPortal(1)
+	local RP=builder.GetPortal(2)
+	local BP=builder.GetPortal(3)
+	local DP=builder.GetPortal(4)
 	local P1=players.GetPlayer()
-	if (RP) then
-		if (RP.loc==P1.loc) then
-			audio.Play(11)
-			function Closure()
-				mov.ShowArrows("clean")
-			end
-			timer.performWithDelay(10,Closure)
-			timer.performWithDelay(300,WD.Lrn2WinNub)
-		end
-	elseif (OP) and (BP) then
+	local map=builder.GetData(3)
+	local msize=builder.GetData(0)
+	local boundary=builder.GetData(1)
+	local walls=builder.GetData()
+	local manacost=math.floor(P1.weight/15)
+	if (OP) and (RP) then
 		if (P1) and (OP.loc==P1.loc) and P1.portcd==0 then
 			function OrangePort()
 				twinkles[#twinkles+1]=display.newSprite( tpsheet, { name="twinkle", start=1, count=16, time=300, loopCount=1 }  )
 				twinkles[#twinkles].x=P1.x
 				twinkles[#twinkles].y=P1.y
 				twinkles[#twinkles]:play()
-				local map=builder.GetData(3)
-				local xchange=OP.x-BP.x
-				local ychange=OP.y-BP.y
-				map.x=map.x+xchange
-				map.y=map.y+ychange
-				P1.loc=BP.loc
-				P1.portcd=12
-				timer.performWithDelay(100,mov.Visibility)
+				if P1.MP>=manacost then
+					P1.MP=P1.MP-manacost
+					local xchange=OP.x-RP.x
+					local ychange=OP.y-RP.y
+					map.x=map.x+xchange
+					map.y=map.y+ychange
+					P1.loc=RP.loc
+					P1.room=RP.room
+					P1.portcd=12
+					timer.performWithDelay(100,mov.Visibility)
+				else
+					local deficit=manacost-P1.MP
+					players.ReduceHP(deficit*2,"Portal")
+					P1.MP=0
+					local chosentile=math.random(1,msize)
+					if boundary[chosentile]==1 then
+						local xchange=walls[chosentile].x-RP.x
+						local ychange=walls[chosentile].y-RP.y
+						map.x=map.x+xchange
+						map.y=map.y+ychange
+						P1.loc=chosentile
+						P1.portcd=12
+						timer.performWithDelay(100,mov.Visibility)
+					else
+						local xchange=OP.x-RP.x
+						local ychange=OP.y-RP.y
+						map.x=map.x+xchange
+						map.y=map.y+ychange
+						P1.loc=RP.loc
+						P1.room=RP.room
+						P1.portcd=12
+						timer.performWithDelay(100,mov.Visibility)
+					end
+				end
 			end
 			audio.Play(11)
 			function Closure()
-				mov.ShowArrows("clean")
+				mov.CleanArrows()
 			end
 			timer.performWithDelay(10,Closure)
 			timer.performWithDelay(300,OrangePort)
-		elseif (P1) and (BP.loc==P1.loc) and P1.portcd==0 then
+		elseif (P1) and (RP.loc==P1.loc) and P1.portcd==0 then
+			function RedPort()
+				twinkles[#twinkles+1]=display.newSprite( tpsheet, { name="twinkle", start=1, count=16, time=300, loopCount=1 }  )
+				twinkles[#twinkles].x=P1.x
+				twinkles[#twinkles].y=P1.y
+				twinkles[#twinkles]:play()
+				if P1.MP>=manacost then
+					P1.MP=P1.MP-manacost
+					local xchange=RP.x-OP.x
+					local ychange=RP.y-OP.y
+					map.x=map.x+xchange
+					map.y=map.y+ychange
+					P1.loc=OP.loc
+					P1.room=OP.room
+					P1.portcd=12
+					timer.performWithDelay(100,mov.Visibility)
+				else
+					local deficit=manacost-P1.MP
+					players.ReduceHP(deficit*2,"Portal")
+					P1.MP=0
+					local chosentile=math.random(1,msize)
+					if boundary[chosentile]==1 then
+						local xchange=walls[chosentile].x-OP.x
+						local ychange=walls[chosentile].y-OP.y
+						map.x=map.x+xchange
+						map.y=map.y+ychange
+						P1.loc=chosentile
+						P1.portcd=12
+						timer.performWithDelay(100,mov.Visibility)
+					else
+						local map=builder.GetData(3)
+						local xchange=RP.x-OP.x
+						local ychange=RP.y-OP.y
+						map.x=map.x+xchange
+						map.y=map.y+ychange
+						P1.loc=OP.loc
+						P1.room=OP.room
+						P1.portcd=12
+						timer.performWithDelay(100,mov.Visibility)
+					end
+				end
+			end
+			audio.Play(11)
+			function Closure()
+				mov.CleanArrows()
+			end
+			timer.performWithDelay(10,Closure)
+			timer.performWithDelay(300,RedPort)
+		end
+	end
+	if (BP) and (DP) then
+		if (P1) and (BP.loc==P1.loc) and P1.portcd==0 then
 			function BluePort()
 				twinkles[#twinkles+1]=display.newSprite( tpsheet, { name="twinkle", start=1, count=16, time=300, loopCount=1 }  )
 				twinkles[#twinkles].x=P1.x
 				twinkles[#twinkles].y=P1.y
 				twinkles[#twinkles]:play()
-				local map=builder.GetData(3)
-				local xchange=BP.x-OP.x
-				local ychange=BP.y-OP.y
-				map.x=map.x+xchange
-				map.y=map.y+ychange
-				P1.loc=OP.loc
-				P1.portcd=12
-				timer.performWithDelay(100,mov.Visibility)
+				if P1.MP>=manacost then
+					P1.MP=P1.MP-manacost
+					local xchange=BP.x-DP.x
+					local ychange=BP.y-DP.y
+					map.x=map.x+xchange
+					map.y=map.y+ychange
+					P1.loc=DP.loc
+					P1.room=DP.room
+					P1.portcd=12
+					timer.performWithDelay(100,mov.Visibility)
+				else
+					local deficit=manacost-P1.MP
+					players.ReduceHP(deficit*2,"Portal")
+					P1.MP=0
+					local chosentile=math.random(1,msize)
+					if boundary[chosentile]==1 then
+						local xchange=walls[chosentile].x-DP.x
+						local ychange=walls[chosentile].y-DP.y
+						map.x=map.x+xchange
+						map.y=map.y+ychange
+						P1.loc=chosentile
+						P1.portcd=12
+						timer.performWithDelay(100,mov.Visibility)
+					else
+						local xchange=BP.x-DP.x
+						local ychange=BP.y-DP.y
+						map.x=map.x+xchange
+						map.y=map.y+ychange
+						P1.loc=DP.loc
+						P1.room=DP.room
+						P1.portcd=12
+						timer.performWithDelay(100,mov.Visibility)
+					end
+				end
 			end
 			audio.Play(11)
 			function Closure()
-				mov.ShowArrows("clean")
+				mov.CleanArrows()
 			end
 			timer.performWithDelay(10,Closure)
 			timer.performWithDelay(300,BluePort)
+		elseif (P1) and (DP.loc==P1.loc) and P1.portcd==0 then
+			function DarkPort()
+				twinkles[#twinkles+1]=display.newSprite( tpsheet, { name="twinkle", start=1, count=16, time=300, loopCount=1 }  )
+				twinkles[#twinkles].x=P1.x
+				twinkles[#twinkles].y=P1.y
+				twinkles[#twinkles]:play()
+				if P1.MP>=manacost then
+					P1.MP=P1.MP-manacost
+					local xchange=DP.x-BP.x
+					local ychange=DP.y-BP.y
+					map.x=map.x+xchange
+					map.y=map.y+ychange
+					P1.loc=BP.loc
+					P1.room=BP.room
+					P1.portcd=12
+					timer.performWithDelay(100,mov.Visibility)
+				else
+					local deficit=manacost-P1.MP
+					players.ReduceHP(deficit*2,"Portal")
+					P1.MP=0
+					local chosentile=math.random(1,msize)
+					if boundary[chosentile]==1 then
+						local xchange=walls[chosentile].x-BP.x
+						local ychange=walls[chosentile].y-BP.y
+						map.x=map.x+xchange
+						map.y=map.y+ychange
+						P1.loc=chosentile
+						P1.portcd=12
+						timer.performWithDelay(100,mov.Visibility)
+					else
+						local map=builder.GetData(3)
+						local xchange=DP.x-BP.x
+						local ychange=DP.y-BP.y
+						map.x=map.x+xchange
+						map.y=map.y+ychange
+						P1.loc=BP.loc
+						P1.room=BP.room
+						P1.portcd=12
+						timer.performWithDelay(100,mov.Visibility)
+					end
+				end
+			end
+			audio.Play(11)
+			function Closure()
+				mov.CleanArrows()
+			end
+			timer.performWithDelay(10,Closure)
+			timer.performWithDelay(300,DarkPort)
 		end
 	end
 end
@@ -402,9 +615,11 @@ end
 function ShopCheck()
 	local ShopGroup=builder.GetData(7)
 	local P1=players.GetPlayer()
-	for i in pairs(ShopGroup) do
-		if ((i)==(P1.loc)) then
-			return true
+	for r in pairs(ShopGroup) do
+		for l in pairs(ShopGroup[r]) do
+			if ((l)==(P1.loc)) and ((r)==(P1.room)) then
+				return true
+			end
 		end
 	end
 end

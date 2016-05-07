@@ -32,6 +32,51 @@ local gexui
 local isOpn
 local isUse
 local items
+local DeathMessages={
+	-- Lava
+	{
+		"Roasted by lava.",
+		"Swimming in lava.",
+		"Hyperthermia.",
+		"Skin melting.",
+		"Do I smell barbeque?",
+	},
+	-- Mob
+	{
+		"Fighting a mob.",
+		"Face smashed in.",
+		"Your insides are on the floor.",
+		"Pro-tip: Keep your extremities together.",
+		"Exsanguination.",
+		"Don't mess with the mobs.",
+		"Do not feed the mobs.",
+	},
+	-- Poison
+	{
+		"Well, now you know.",
+		"Smooth move.",
+		"Nice one, smartass.",
+		"That was poison.",
+		"You had so much potential...",
+	},
+	-- Portal
+	{
+		"Portal dismemberment.",
+		"I think your leg is over there.",
+		"Your blood didn't teleport...",
+		"Next time, keep your arms and legs in the portal at all times.",
+		"Not your best teleport.",
+		"Did you find the secret cow level?",
+	},
+	-- Energy
+	{
+		"Falling unconscious in a dungeon.",
+		"\"Don't mind the energy\", they said, \"It won't kill you.'\", they said.",
+		"Should've kept some energy drinks handy.",
+		"So is having energy a priority to you now?",
+		"Should've gotten a good night's sleep before adventuring.",
+	},
+}
 
 function Essentials()
 	p1=p.GetPlayer()
@@ -221,235 +266,32 @@ function ToggleInfo()
 		isOpn=true
 		ginf=display.newGroup()
 		info={}
+		pli={}
+		mini={}
 		
 		bkg=display.newImageRect("bkgs/pausebkg.png", 768, 800)
 		bkg.x,bkg.y = display.contentWidth/2, 400
-		ginf:insert( bkg )
 		
-		if p1.name=="Error" then
-			info[1]=display.newText(
-				(
-					"I AM ERROR."
-				),
-				display.contentCenterX/2,10,"MoolBoran",80
-			)
-			ginf:insert(info[1])
-		else
-			info[1]=display.newText(
-				(
-					p1.name
-				),
-				display.contentCenterX/2,10,"MoolBoran",80
-			)
-			ginf:insert(info[1])
-		end
-		local baseX=30
-		local baseY=90
-		local SpacingX=300
-		local SpacingY=50
-		
-		info[#info+1]=display.newText(
-			(
-				"HP: "..p1.HP.."/"..p1.MaxHP
-			),
-			baseX,baseY,"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		info[#info+1]=display.newText(
-			(
-				"MP: "..p1.MP.."/"..p1.MaxMP
-			),
-			baseX+SpacingX,baseY,"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		info[#info+1]=display.newText(
-			(
-				"EP: "..p1.EP.."/"..p1.MaxEP
-			),
-			baseX,baseY+SpacingY,"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		info[#info+1]=display.newText(
-			(
-				"Gold: "..p1.gp
-			),
-			baseX+SpacingX,baseY+SpacingY,"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		info[#info+1]=display.newText(
-			(
-				"Level: "..p1.lvl
-			),
-			baseX,baseY+(SpacingY*2),"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		info[#info+1]=display.newText(
-			(
-				"XP: "..p1.XP.."/"..p1.MaxXP
-			),
-			baseX+SpacingX,baseY+(SpacingY*2),"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		local flr=WD.Circle()
-		info[#info+1]=display.newText(
-			(
-				"Floor: "..flr
-			),
-			baseX,baseY+(SpacingY*3),"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		info[#info+1]=display.newText(
-			(
-				"Class: "..p1.clsnames[p1.class+1]
-			),
-			baseX+SpacingX,baseY+(SpacingY*3),"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		
-		info[#info+1]=display.newText(
-			(
-				"Statistics:"
-			),
-			10,350,"MoolBoran",70
-		)
-		ginf:insert(info[#info])
-		
-		for s=1,6 do
-			info[#info+1]=display.newText(
-				(
-					p1.statnames[s]
-				),
-				30,420+(45*(s-1)),"MoolBoran",60
-			)
-			ginf:insert(info[#info])
-		end
-		
-		info[#info+1]=display.newText(
-			(
-				"Stat Points: "..p1.pnts
-			),
-			30,690,"MoolBoran",60
-		)
-		ginf:insert(info[#info])
-		
-		for s=1,6 do
-			info[#info+1]=display.newText(
-				(
-					p1.nat[s]
-				),
-				info[#info-s].x+220,420+(45*(s-1)),"MoolBoran",60
-			)
-			ginf:insert(info[#info])
-		end
-		
-		for s=1,6 do
-			info[#info+1]=display.newText(
-				(
-				"+"..p1.eqs[s]
-				),
-				info[#info-s].x+100,420+(45*(s-1)),"MoolBoran",60
-			)
-			if p1.eqs[s]>0 then
-				info[#info]:setTextColor(50,200,50)
-			elseif p1.eqs[s]<0 then
-				info[#info]:setTextColor(200,50,50)
-			else
-				info[#info]:setTextColor(150,150,150)
-			end
-			ginf:insert(info[#info])
-		end
-		
-		for s=1,6 do
-			info[#info+1]=display.newText(
-				(
-				"+"..p1.bon[s]+p1.bst[s]
-				),
-				info[#info-s].x+60,420+(45*(s-1)),"MoolBoran",60
-			)
-			if p1.bon[s]>0 then
-				info[#info]:setTextColor(50,200,50)
-			elseif p1.bon[s]<0 then
-				info[#info]:setTextColor(200,50,50)
-			else
-				info[#info]:setTextColor(150,150,150)
-			end
-			ginf:insert(info[#info])
-		end
-		
-		for s=1,6 do
-			info[#info+1]=display.newText(
-				(
-					"= "..p1.stats[s]
-				),
-				info[#info-s].x+50,420+(45*(s-1)),"MoolBoran",60
-			)
-			if p1.stats[s]>p1.nat[s] then
-				info[#info]:setTextColor(50,200,50)
-			elseif p1.stats[s]<p1.nat[s] then
-				info[#info]:setTextColor(200,50,50)
-			else
-			end
-			ginf:insert(info[#info])
-		end
-		
-		if p1.name=="Magus" then
-			info[#info+1]=display.newImageRect("player/magus.png",120,120)
-			info[#info].x=display.contentWidth-120
-			info[#info].y=150
-			info[#info].xScale=1.5
-			info[#info].yScale=info[#info].xScale
-			ginf:insert(info[#info])
-		end
-		
-		if p1.pnts~=0 then
-			pli={}
-			mini={}
-			for n=1,6 do
-				--
-				if (p1.nat[n]+1)<=(p1.lvl*10) then
-					pli[n]=widget.newButton{
-						defaultFile="+.png",
-						overFile="+2.png",
-						width=20, height=20,
-						onRelease = More,
-					}
-					pli[n].xScale,pli[n].yScale=2.0,2.0
-					pli[n].x = info[17+n].x+45
-					pli[n].y = 450+((n-1)*45)
-					ginf:insert(pli[n])
-				end
-				--
-				if p1.nat[n]~=1 then
-					mini[n]=widget.newButton{
-						defaultFile="-.png",
-						overFile="-2.png",
-						width=20, height=20,
-						onRelease = Less,
-					}
-					mini[n].xScale,mini[n].yScale=2.0,2.0
-					mini[n].x = info[17+n].x-75
-					mini[n].y = 450+((n-1)*45)
-					ginf:insert(mini[n])
-				end
-			end
-		end
-		ginf:toFront()
-		
+		StatInfo()
 	elseif isOpn==true and (ginf) then
+		display.remove(bkg)
+		bkg=nil
 		isOpn=false
 		for i=table.maxn(info),1,-1 do
 			display.remove(info[i])
 			info[i]=nil
 		end
 		info=nil
+		for i=table.maxn(pli),1,-1 do
+			display.remove(pli[i])
+			pli[i]=nil
+		end
+		pli=nil
+		for i=table.maxn(mini),1,-1 do
+			display.remove(mini[i])
+			mini[i]=nil
+		end
+		mini=nil
 		for i=ginf.numChildren,1,-1 do
 			display.remove(ginf[i])
 			ginf[i]=nil
@@ -586,6 +428,349 @@ function ToggleExit()
 	end
 end
 
+function StatChange()
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+				p1.statnames[s]
+			),
+			0,0,"MoolBoran",60
+		)
+		info[#info].x=(display.contentWidth/4)+((display.contentWidth/2)*math.floor((s-1)%2))
+		info[#info].y=110+(220*math.floor((s-1)/2))
+		ginf:insert(info[#info])
+	end
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+				p1.nat[s]
+			),
+			0,0,"MoolBoran",60
+		)
+		info[#info].x=info[#info-6].x
+		info[#info].y=info[#info-6].y+80
+		ginf:insert(info[#info])
+	end
+	for s=1,6 do
+		if p1.pnts>0 and p1.nat[s]<p1.lvl*10 then
+			pli[#pli+1]= widget.newButton{
+				label="+",
+				labelColor = { default={255,255,255}, over={0,0,0} },
+				fontSize=40,
+				defaultFile="sbutton.png",
+				overFile="sbutton-over.png",
+				width=90, height=90,
+				onRelease = More
+			}
+			pli[#pli]:setReferencePoint( display.CenterReferencePoint )
+			pli[#pli].x = info[6+s].x+90
+			pli[#pli].y = info[6+s].y-10
+			ginf:insert(pli[#pli])
+		end
+	end
+	for s=1,6 do
+		if p1.nat[s]>1 then
+			mini[#mini+1]= widget.newButton{
+				label="-",
+				labelColor = { default={255,255,255}, over={0,0,0} },
+				fontSize=40,
+				defaultFile="sbutton.png",
+				overFile="sbutton-over.png",
+				width=90, height=90,
+				onRelease = Less
+			}
+			mini[#mini]:setReferencePoint( display.CenterReferencePoint )
+			mini[#mini].x = info[6+s].x-90
+			mini[#mini].y = info[6+s].y-10
+			ginf:insert(mini[#mini])
+		end
+	end
+	
+	swapInfoBtn= widget.newButton{
+		defaultFile="sbutton.png",
+		overFile="sbutton-over.png",
+		width=90, height=90,
+		onRelease = SwapInfo}
+	swapInfoBtn:setReferencePoint( display.CenterReferencePoint )
+	swapInfoBtn.x = display.contentWidth-60
+	swapInfoBtn.y = display.contentHeight-300
+	swapInfoBtn.state=true
+	ginf:insert( swapInfoBtn )
+	
+	swapInfoImg=display.newImageRect("plusminusinfo.png",70,70)
+	swapInfoImg.x=swapInfoBtn.x
+	swapInfoImg.y=swapInfoBtn.y
+	swapInfoImg.xScale=0.7
+	swapInfoImg.yScale=swapInfoImg.xScale
+	ginf:insert(swapInfoImg)
+	
+	info[#info+1]=display.newText(
+		(
+			"Stat Management"
+		),
+		display.contentCenterX/2,10,"MoolBoran",80
+	)
+	info[#info]:setTextColor(125,250,125)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"Stat Points: "..p1.pnts
+		),
+		0,700,"MoolBoran",60
+	)
+	info[#info].x=display.contentCenterX
+	ginf:insert(info[#info])
+	if p1.pnts==0 then
+		info[#info]:setTextColor(180,180,180)
+	end
+end
+
+function StatInfo()
+	local baseX=30
+	local baseY=90
+	local SpacingX=300
+	local SpacingY=50
+	if p1.name=="Error" then
+		info[1]=display.newText(
+			(
+				"I AM ERROR."
+			),
+			display.contentCenterX/2,10,"MoolBoran",80
+		)
+		ginf:insert(info[1])
+	else
+		info[1]=display.newText(
+			(
+				p1.name
+			),
+			display.contentCenterX/2,10,"MoolBoran",80
+		)
+		ginf:insert(info[1])
+	end
+	
+	info[#info+1]=display.newText(
+		(
+			"HP: "..p1.HP.."/"..p1.MaxHP
+		),
+		baseX,baseY,"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"MP: "..p1.MP.."/"..p1.MaxMP
+		),
+		baseX+SpacingX,baseY,"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"EP: "..p1.EP.."/"..p1.MaxEP
+		),
+		baseX,baseY+SpacingY,"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"Gold: "..p1.gp
+		),
+		baseX+SpacingX,baseY+SpacingY,"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"Level: "..p1.lvl
+		),
+		baseX,baseY+(SpacingY*2),"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"XP: "..p1.XP.."/"..p1.MaxXP
+		),
+		baseX+SpacingX,baseY+(SpacingY*2),"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	local flr=WD.Circle()
+	info[#info+1]=display.newText(
+		(
+			"Floor: "..flr
+		),
+		baseX,baseY+(SpacingY*3),"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"Class: "..p1.clsnames[p1.class+1]
+		),
+		baseX+SpacingX,baseY+(SpacingY*3),"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	
+	info[#info+1]=display.newText(
+		(
+			"Statistics:"
+		),
+		10,350,"MoolBoran",70
+	)
+	ginf:insert(info[#info])
+	
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+				p1.statnames[s]
+			),
+			30,420+(45*(s-1)),"MoolBoran",60
+		)
+		ginf:insert(info[#info])
+	end
+	
+	info[#info+1]=display.newText(
+		(
+			"Stat Points: "..p1.pnts
+		),
+		30,690,"MoolBoran",60
+	)
+	ginf:insert(info[#info])
+	
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+				p1.nat[s]
+			),
+			info[#info-s].x+160,420+(45*(s-1)),"MoolBoran",60
+		)
+		ginf:insert(info[#info])
+	end
+	
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+			"+"..p1.eqs[s]
+			),
+			info[#info-s].x+60,420+(45*(s-1)),"MoolBoran",60
+		)
+		if p1.eqs[s]>0 then
+			info[#info]:setTextColor(50,200,50)
+		elseif p1.eqs[s]<0 then
+			info[#info]:setTextColor(200,50,50)
+		else
+			info[#info]:setTextColor(150,150,150)
+		end
+		ginf:insert(info[#info])
+	end
+	
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+			"+"..p1.bon[s]+p1.bst[s]
+			),
+			info[#info-s].x+60,420+(45*(s-1)),"MoolBoran",60
+		)
+		if p1.bon[s]>0 then
+			info[#info]:setTextColor(50,200,50)
+		elseif p1.bon[s]<0 then
+			info[#info]:setTextColor(200,50,50)
+		else
+			info[#info]:setTextColor(150,150,150)
+		end
+		ginf:insert(info[#info])
+	end
+	
+	for s=1,6 do
+		info[#info+1]=display.newText(
+			(
+				"= "..p1.stats[s]
+			),
+			info[#info-s].x+50,420+(45*(s-1)),"MoolBoran",60
+		)
+		if p1.stats[s]>p1.nat[s] then
+			info[#info]:setTextColor(50,200,50)
+		elseif p1.stats[s]<p1.nat[s] then
+			info[#info]:setTextColor(200,50,50)
+		else
+		end
+		ginf:insert(info[#info])
+	end
+	
+	if p1.name=="Magus" then
+		info[#info+1]=display.newImageRect("player/magus.png",120,120)
+		info[#info].x=display.contentWidth-120
+		info[#info].y=150
+		info[#info].xScale=1.5
+		info[#info].yScale=info[#info].xScale
+		ginf:insert(info[#info])
+	end
+	
+	swapInfoBtn= widget.newButton{
+		defaultFile="sbutton.png",
+		overFile="sbutton-over.png",
+		width=90, height=90,
+		onRelease = SwapInfo}
+	swapInfoBtn:setReferencePoint( display.CenterReferencePoint )
+	swapInfoBtn.x = display.contentWidth-60
+	swapInfoBtn.y = display.contentHeight-300
+	swapInfoBtn.state=false
+	ginf:insert( swapInfoBtn )
+	
+	swapInfoImg=display.newImageRect("plusminus.png",70,70)
+	swapInfoImg.x=swapInfoBtn.x
+	swapInfoImg.y=swapInfoBtn.y
+	swapInfoImg.xScale=0.7
+	swapInfoImg.yScale=swapInfoImg.xScale
+	ginf:insert(swapInfoImg)
+	
+	ginf:toFront()
+end
+
+function SwapInfo()
+	if swapInfoBtn.state==false then
+		for i=table.maxn(info),1,-1 do
+			display.remove(info[i])
+			info[i]=nil
+		end
+		for i=table.maxn(mini),1,-1 do
+			display.remove(mini[i])
+			mini[i]=nil
+		end
+		for i=table.maxn(pli),1,-1 do
+			display.remove(pli[i])
+			pli[i]=nil
+		end
+		for i=ginf.numChildren,1,-1 do
+			display.remove(ginf[i])
+			ginf[i]=nil
+		end
+		StatChange()
+	else
+		for i=table.maxn(info),1,-1 do
+			display.remove(info[i])
+			info[i]=nil
+		end
+		for i=table.maxn(mini),1,-1 do
+			display.remove(mini[i])
+			mini[i]=nil
+		end
+		for i=table.maxn(pli),1,-1 do
+			display.remove(pli[i])
+			pli[i]=nil
+		end
+		for i=ginf.numChildren,1,-1 do
+			display.remove(ginf[i])
+			ginf[i]=nil
+		end
+		StatInfo()
+	end
+end
+
 function DoExit()
 	for i=gexui.numChildren,1,-1 do
 		display.remove(gexui[i])
@@ -643,28 +828,28 @@ function More( event )
 	local statnum
 	for i=1,6 do
 		if (pli[i]) then
-			if event.y+21>pli[i].y and event.y-21<pli[i].y then
+			if event.y+50>pli[i].y and event.y-50<pli[i].y and event.x+50>pli[i].x and event.x-50<pli[i].x then
 				statnum=i
 			end
 		end
 	end
 	p.Natural(statnum,1)
-	ToggleInfo()
-	ToggleInfo()
+	SwapInfo()
+	SwapInfo()
 end
 
 function Less( event )
 	local statnum
 	for i=1,6 do
 		if (mini[i]) then
-			if event.y+21>mini[i].y and event.y-21<mini[i].y then
+			if event.y+50>mini[i].y and event.y-50<mini[i].y and event.x+50>mini[i].x and event.x-50<mini[i].x then
 				statnum=i
 			end
 		end
 	end
 	p.Natural(statnum,-1)
-	ToggleInfo()
-	ToggleInfo()
+	SwapInfo()
+	SwapInfo()
 end
 
 function DeathMenu(cause)
@@ -689,13 +874,19 @@ function DeathMenu(cause)
 		Dthtxt:insert( Deathmsg2 )
 		
 		if cause=="Lava" then
-			Deathmsg2.text=("Swimming in lava.")
+			Deathmsg2.text=(DeathMessages[1][math.random(1,table.maxn(DeathMessages[1]))])
 		end
 		if cause=="Mob" then
-			Deathmsg2.text=("Fighting a mob.")
+			Deathmsg2.text=(DeathMessages[2][math.random(1,table.maxn(DeathMessages[1]))])
 		end
 		if cause=="Poison" then
-			Deathmsg2.text=("Poisoning self. Dumbass.")
+			Deathmsg2.text=(DeathMessages[3][math.random(1,table.maxn(DeathMessages[1]))])
+		end
+		if cause=="Portal" then
+			Deathmsg2.text=(DeathMessages[4][math.random(1,table.maxn(DeathMessages[1]))])
+		end
+		if cause=="Energy" then
+			Deathmsg2.text=(DeathMessages[5][math.random(1,table.maxn(DeathMessages[1]))])
 		end
 		
 		ToMenuBtn = widget.newButton{
@@ -767,7 +958,7 @@ function DeathMenu(cause)
 		
 		Runtime:removeEventListener("enterFrame", g.GoldDisplay)
 		b.WipeMap()
-		mov.ShowArrows("clean")
+		mov.CleanArrows()
 		a.Stopbkg()
 		s.WipeSave()
 		
@@ -855,7 +1046,7 @@ function UseMenu(id,slot)
 				elseif itemstats[4]==1 then
 					WD.FloorPort(true)
 				elseif itemstats[4]==2 then
-					s.Save()
+					s.Save(true)
 				end
 			end
 		end
