@@ -366,12 +366,12 @@ function CurrentChar()
 	curmenu:insert(currentchar)
 end
 
-function GetCharInfo(field)
-	if field==1 then
-		return charclass
-	end		
+function GetCharInfo(field)	
 	if field==0 then
 		return charname
+	end
+	if field==1 then
+		return charclass
 	end
 end
 

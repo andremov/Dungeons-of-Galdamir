@@ -190,7 +190,8 @@ function ToggleInfo()
 			(
 				"HP: "..p1.HP.."/"..p1.MaxHP.."\n"..
 				"Level: "..p1.lvl.."\n"..
-				"Gold: "..p1.gp.."\n"
+				"Gold: "..p1.gp.."\n"..
+				"Class: "..p1.clsnames[p1.class+1].."\n"
 			),
 			30,80,native.systemFont,40
 		)
@@ -266,7 +267,7 @@ function ToggleInfo()
 		end
 		
 		if p1.name=="Magus" then
-			info[#info+1]=display.newImageRect("player/Magus.png",120,120)
+			info[#info+1]=display.newImageRect("player/magus.png",120,120)
 			info[#info].x=display.contentWidth-120
 			info[#info].y=150
 			info[#info].xScale=1.5

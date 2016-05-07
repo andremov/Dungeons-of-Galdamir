@@ -28,8 +28,6 @@ local GPieces
 local Round
 local Dthtxt
 local floorcount
-local profbkg
-local proftransp
 
 function Essentials()
 	Round=1
@@ -49,12 +47,13 @@ function FloorSign()
 		end
 		floorcount=nil
 	elseif (floorcount) and proftransp~=0 then
-		proftransp=proftransp-(255/50)
+		proftransp=proftransp-(255/100)
 		if proftransp<20 then
 			proftransp=0
 		end
-		profbkg:setTextColor(proftransp,proftransp,proftransp,proftransp)
-		profbkg2:setTextColor(proftransp,proftransp,proftransp,proftransp)
+		profbkg:setFillColor(proftransp,proftransp,proftransp,proftransp)
+		profbkg2:setTextColor(0,0,0,proftransp)
+		floorcount:toFront()
 		timer.performWithDelay(20,FloorSign)
 	else
 		proftransp=255
@@ -62,17 +61,17 @@ function FloorSign()
 		profbkg=display.newImageRect("floorcount.png", 600, 250)
 		profbkg.xScale=0.5
 		profbkg.yScale=profbkg.xScale
-		profbkg:setTextColor(proftransp,proftransp,proftransp,proftransp)
-		profbkg.x, profbkg.y = display.contentCenterX, display.contentCenterY
+		profbkg:setFillColor(proftransp,proftransp,proftransp,proftransp)
+		profbkg.x, profbkg.y = display.contentCenterX, display.contentCenterY-200
 		
-		local profbkg2=display.newText( (Round), 0, 0, "Game Over", 100 )
-		profbkg2:setTextColor(proftransp,proftransp,proftransp,proftransp)
-		profbkg2.x, profbkg2.y = profbkg.x, profbkg.y+40
+		profbkg2=display.newText( (Round), 0, 0, "Game Over", 100 )
+		profbkg2:setTextColor(0,0,0,proftransp)
+		profbkg2.x, profbkg2.y = profbkg.x, profbkg.y+20
 		
 		floorcount:insert(profbkg)
 		floorcount:insert(profbkg2)
 		floorcount:toFront()
-		timer.performWithDelay(20,FloorSign)
+		timer.performWithDelay(4000,FloorSign)
 	end
 end
 
