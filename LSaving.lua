@@ -61,12 +61,31 @@ function Load()
 				m.Size(Sve[l+1])
 			
 			elseif (Sve[l])=="Player" then
-				p.LoadPlayer( Sve[l+1],Sve[l+2],
-					Sve[l+3],Sve[l+4],Sve[l+5],Sve[l+6],
-					Sve[l+7],Sve[l+8],Sve[l+9],Sve[l+10],
-					Sve[l+11],Sve[l+12],Sve[l+13],Sve[l+14],Sve[l+15]
+				-- Player Load 1 - Class & Char
+				p.Load1(Sve[l+1],Sve[l+2])
+				-- Player Load 2 - Natural Stats
+				p.Load2(
+					Sve[l+3],Sve[l+4],
+					Sve[l+5],Sve[l+6],
+					Sve[l+7],Sve[l+8]
 				)
-				
+				-- Player Load 3 - Boost Stats
+				p.Load3(
+					Sve[l+9],Sve[l+10],
+					Sve[l+11],Sve[l+12],
+					Sve[l+13],Sve[l+14]
+				)
+				-- Player Load 4 - Stat Points, Level, XP
+				p.Load4(
+					Sve[l+15],Sve[l+16],
+					Sve[l+17]
+				)
+				-- Player Load 5 - HP,MP,EP,Name,GP
+				p.Load5(
+					Sve[l+18],Sve[l+19],
+					Sve[l+20],Sve[l+21],
+					Sve[l+22]
+				)
 			elseif l>SplStrt and l<InvStrt then
 				p.LoadSpells(Sve[l])
 			elseif l==InvStrt then
@@ -81,13 +100,12 @@ function Load()
 				i.SilentQuip(Sve[l])
 			end
 		end
-		b.YouShallNowPass(false)
-		print "Save loaded successfully."
+	--	print "Save loaded successfully."
+		LoadMap()
+		b.Rebuild(false)
 	else
-		print "Save incompatible. Deleting..."
-		local fh, errStr = io.open( path, "w+" )
-		fh:write("")
-		io.close( fh )
+	--	print "Save incompatible. Deleting..."
+		WipeSave()
 	end
 end
 
@@ -133,9 +151,23 @@ function Save()
 	fh:write( "Size\n",Size,"\n")
 	
 	local P1=p.GetPlayer()
-	fh:write( "Player\n",P1.class,"\n",P1.char,"\n",P1.nat[1],
-	"\n",P1.nat[2],"\n",P1.nat[3],"\n",P1.nat[4],"\n",P1.nat[5],"\n",P1.nat[6],
-	"\n",P1.pnts,"\n",P1.lvl,"\n",P1.XP,"\n",P1.HP,"\n",P1.MP,"\n",P1.name,"\n",P1.gp,"\n")
+	fh:write("Player\n")
+	--
+	fh:write(P1.class,"\n",P1.char,"\n")
+	--
+	fh:write(P1.nat[1],"\n",P1.nat[2],"\n",P1.nat[3],
+		"\n",P1.nat[4],"\n",P1.nat[5],"\n",P1.nat[6],
+		"\n"
+	)
+	--
+	fh:write(P1.bst[1],"\n",P1.bst[2],"\n",P1.bst[3],
+		"\n",P1.bst[4],"\n",P1.bst[5],"\n",P1.bst[6],
+		"\n"
+	)
+	--
+	fh:write(P1.pnts,"\n",P1.lvl,"\n",P1.XP,"\n")
+	--
+	fh:write(P1.HP,"\n",P1.MP,"\n",P1.EP,"\n",P1.name,"\n",P1.gp,"\n")
 	
 	fh:write( "Spells\n")
 	for s=1,table.maxn(P1.spells) do
@@ -158,7 +190,8 @@ function Save()
 		end
 	end
 	io.close( fh )
-	print ("Progress saved on floor "..Round..".")
+--	print ("Progress saved on floor "..Round..".")
+	SaveMap()
 end
 
 function WipeSave()
@@ -166,4 +199,36 @@ function WipeSave()
 	local fh, errStr = io.open( path, "w+" )
 	fh:write("")
 	io.close( fh )
+	
+	local path = system.pathForFile(  "DoGMapSave.sav", system.DocumentsDirectory )
+	local fh, errStr = io.open( path, "w+" )
+	fh:write("")
+	io.close( fh )
+end
+
+function SaveMap()
+	local path = system.pathForFile(  "DoGMapSave.sav", system.DocumentsDirectory )
+	local fh, errStr = io.open( path, "w+" )
+	
+	local map=b.GetData(8)
+	fh:write( "Map\n")
+	for i=1,table.maxn(map) do
+		if (map[i]) then
+			fh:write( map[i],"\n")
+		end
+	end
+	io.close( fh )
+	local Round=WD.Circle()
+--	print ("Map saved on floor "..Round..".")
+end
+
+function LoadMap()
+	Map={}
+	local path = system.pathForFile(  "DoGMapSave.sav", system.DocumentsDirectory )
+	for line in io.lines( path ) do
+		Map[#Map+1]=line
+	end
+	
+	b.ReceiveMap(Map)
+--	print "Map loaded successfully."
 end

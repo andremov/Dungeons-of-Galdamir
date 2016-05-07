@@ -27,7 +27,7 @@ local DoLoad=false
 
 function Startup(val)
 	if val~=false then
-		print "GAME LOADING..."
+	--	print "Game loading..."
 		physics.start()
 		physics.setGravity(0,30)
 		DoStuff=true
@@ -128,15 +128,15 @@ function Operations(name)
 	players.CreatePlayers(name)
 	gp.Essentials()
 --	players.WhosYourDaddy()
-	builder.Gen()
+	builder.BuildMap()
 	com.Essentials()
 	itm.Essentials()
 	inv.Essentials()
 	
 	Runtime:addEventListener("enterFrame", col.removeOffscreenItems)
-	print "Game loaded successfully."
+--	print "Game loaded successfully."
 	Round=WD.Circle()
-	print ("Floor: "..Round)
+--	print ("Floor: "..Round)
 end
 
 function Operations2()

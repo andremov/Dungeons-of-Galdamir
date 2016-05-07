@@ -14,20 +14,19 @@ local GVersion
 local OKVers={
 		"BETA 1.9.0",
 	}
-local asd=(math.random(1,10))
 local Default={
-	"Brownie S.",10000,
-	"Go Q.",9001,
-	"T. Pastry",7500,
-	"Blue X.",5000,
-	"H. Dew",2500,
-	"D. \"Fox\" Leigh",1000,
-	"M. Person",500,
-	"Moorabi",250,
-	"Reese C.",100,
-	"E. Z. Mood",10
-
+		"Brownie S.",10000,
+		"Go Q.",9001,
+		"T. Pastry",7500,
+		"Blue X.",5000,
+		"H. Dew",2500,
+		"D. \"Fox\" Leigh",1000,
+		"M. Person",500,
+		"Moorabi",250,
+		"Reese C.",100,
+		"E. Z. Mood",10
 	}
+	
 function onBackBtn()
 	
 	if (Text) then
@@ -69,7 +68,7 @@ function Scoring(round,p1,size)
 		Score^(round)
 	)
 	Score=(
-		math.floor((Score*p1.lvl)*((p1.stats[1]+p1.stats[2]+p1.stats[3]+p1.stats[4]+p1.stats[5])/5))
+		math.floor((Score*p1.lvl)*((p1.stats[1]+p1.stats[2]+p1.stats[3]+p1.stats[4]+p1.stats[5]+p1.stats[6])/6))
 	)
 	isHigh(Score,p1.name)
 	return Score
@@ -90,7 +89,6 @@ function isHigh(val,name)
 		local overIt=false
 		for l=table.maxn(Sve),2,-2 do
 			if val>Sve[l] then
-				print (Sve[l])
 				overIt=l
 			end
 		end
@@ -98,24 +96,17 @@ function isHigh(val,name)
 			local fh, errStr = io.open( path, "r+" )
 			
 			fh:write( Sve[1], "\n" )
-			print (Sve[1])
 			for z=2,(overIt-2),2 do
 				fh:write( Sve[z], "\n" )
-				print (Sve[z])
 				fh:write( Sve[z+1], "\n" )
-				print (Sve[z+1])
 			end
 			
 			fh:write( name, "\n" )
-			print (name)
 			fh:write( val, "\n" )
-			print (val)
 			
 			for z=overIt-1,19,2 do
 				fh:write (Sve[z], "\n")
-				print (Sve[z])
 				fh:write( Sve[z+1], "\n" )
-				print (Sve[z+1])
 			end
 			
 			io.close( fh )
@@ -136,8 +127,8 @@ function HighScores()
 		label="Back",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = onBackBtn
 	}

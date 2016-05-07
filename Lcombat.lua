@@ -4,12 +4,13 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height=25, numFrames=16 } )
+local energysheet = graphics.newImageSheet( "energysprite.png", { width=60, height=60, numFrames=4 })
+local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height=25, numFrames=16 })
 local dexatt2 = graphics.newImageSheet( "enemy/dexatt2.png",{ width=32, height=33, numFrames=24 })
 local dexatt3 = graphics.newImageSheet( "enemy/dexatt3.png",{ width=32, height=33, numFrames=24 })
 local stadef2 = graphics.newImageSheet( "enemy/stadef2.png",{ width=55, height=32, numFrames=8 })
 local stadef3 = graphics.newImageSheet( "enemy/stadef3.png",{ width=55, height=32, numFrames=8 })
-local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 } )
+local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 })
 local statussheet = graphics.newImageSheet( "status.png", { width=88, height=40, numFrames=6 } )
 local player1 = graphics.newImageSheet( "player/0.png", { width=39, height=46, numFrames=25 } )
 local player2 = graphics.newImageSheet( "player/1.png", { width=24, height=33, numFrames=25 } )
@@ -21,25 +22,26 @@ local mgc2 = graphics.newImageSheet( "enemy/mage2.png",{ width=30, height=40, nu
 local mgc3 = graphics.newImageSheet( "enemy/mage3.png",{ width=30, height=40, numFrames=10 })
 local hpsheet = graphics.newImageSheet("hp.png",{ width=200, height=30, numFrames=67 })
 local mpsheet = graphics.newImageSheet("mp.png",{ width=200, height=30, numFrames=67 })
+local epsheet = graphics.newImageSheet("ep.png",{ width=200, height=30, numFrames=67 })
 local p1sprite={player1,player2,player3,player4,player5}
 local xCoord=display.contentWidth-250
 local dexatt={dexatt3,dexatt2}
 local stadef={stadef3,stadef2}
 local mgc={mgc3,mgc2}
 local yCoord=510
-local widget = require "widget"
-local physics = require "physics"
-local mov=require("Lmovement")
+local builder=require("Lmapbuilder")
 local players=require("Lplayers")
-local gp=require("Lgold")
+local physics = require "physics"
+local widget = require "widget"
+local mov=require("Lmovement")
+local WD=require("Lprogress")
+local audio=require("Laudio")
+local win=require("Lwindow")
 local item=require("Litems")
 local mob=require("Lmobai")
-local ui=require("Lui")
-local builder=require("Lmapbuilder")
-local WD=require("Lprogress")
-local win=require("Lwindow")
-local audio=require("Laudio")
 local q=require("Lquest")
+local gp=require("Lgold")
+local ui=require("Lui")
 local SBookDisplayed
 local statusdisplay
 local timersprite
@@ -60,6 +62,7 @@ local enemy
 local hits
 local gcm
 local gom
+local modif
 
 function Essentials()
 	SorcIniX=display.contentCenterX-(190+20)
@@ -77,18 +80,27 @@ end
 
 function Attacking(victim)
 	if inCombat==false then
-		DisplayCombat()
-		inCombat=true
 		enemy=victim
+		if (enemy) then
+			inCombat=true
+			modif=1
+			DisplayCombat()
+		else
+			print "!E"
+		end
 	end
 end
 
 function Attacked(victim)
 	if inCombat==false then
-		DisplayCombat()
-		inCombat=true
 		enemy=victim
-	--	MobsTurn()
+		if (enemy) then
+			inCombat=true
+			modif=0.1
+			DisplayCombat()
+		else
+			print "!E"
+		end
 	end
 end
 
@@ -114,15 +126,15 @@ function DisplayCombat()
 	gcm:insert(bkg)
 	
 	window2=display.newImage("window2.png",171,43)
-	window2.x=display.contentWidth-190
+	window2.x=display.contentWidth-192
 	window2.y=yCoord-120
 	window2.xScale=2.25
 	window2.yScale=window2.xScale
 	gcm:insert(window2)
 	
 	window1=display.newImage("window.png",171,65)
-	window1.x=190
-	window1.y=window2.y+24
+	window1.x=192
+	window1.y=window2.y+26
 	window1.xScale=window2.xScale
 	window1.yScale=window1.xScale
 	gcm:insert(window1)
@@ -132,7 +144,7 @@ function DisplayCombat()
 	CreateMobStats()
 	p1=players.GetPlayer()
 	
-	--Mob Display
+	--Sprites
 	P1Sprite(1)
 	MoveSprites()
 	
@@ -145,8 +157,9 @@ function DisplayCombat()
 	
 	HideActions()
 	
-	ptimer=timer.performWithDelay(1000+(1500*p1.SPD),ShowActions)
-	etimer=timer.performWithDelay(1001+(1500*enemy.SPD),MobsTurn)
+	ptimer=timer.performWithDelay((1000+(1500*p1.SPD)),ShowActions)
+	etimer=timer.performWithDelay((1001+(1500*enemy.SPD))*modif,MobsTurn)
+	modif=1
 end
 
 function HideActions()
@@ -191,6 +204,11 @@ function HideActions()
 	RunBtn.y = timersprite.y+44
 	gcm:insert( RunBtn )
 	
+	BackBtn=display.newImageRect("combataction3.png",342,86)
+	BackBtn.x = display.contentCenterX
+	BackBtn.y = display.contentHeight-150
+	gcm:insert( BackBtn )
+	
 	timersprite:toFront()
 end
 
@@ -223,21 +241,15 @@ function ShowActions()
 		BackBtn=nil
 	end
 	
-	function toAttack()
-		HideActions()
-		
-		PlayerAttacks()
-	end
-	
 	if not(AttackBtn)then
 		AttackBtn= widget.newButton{
 			label="Attack",
 			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=30,
+			fontSize=35,
 			defaultFile="combataction.png",
 			overFile="combataction2.png",
 			width=342, height=86,
-			onRelease = toAttack}
+			onRelease = AttackType}
 		AttackBtn:setReferencePoint( display.CenterReferencePoint )
 		AttackBtn.x = timersprite.x-172
 		AttackBtn.y = timersprite.y-44
@@ -252,7 +264,7 @@ function ShowActions()
 		MagicBtn= widget.newButton{
 			label="Sorcery",
 			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=30,
+			fontSize=35,
 			defaultFile="combataction.png",
 			overFile="combataction2.png",
 			width=342, height=86,
@@ -273,7 +285,7 @@ function ShowActions()
 		ItemBtn= widget.newButton{
 			label="Item",
 			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=30,
+			fontSize=35,
 			defaultFile="combataction.png",
 			overFile="combataction2.png",
 			width=342, height=86,
@@ -294,7 +306,7 @@ function ShowActions()
 		RunBtn= widget.newButton{
 			label="Retreat",
 			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=30,
+			fontSize=35,
 			defaultFile="combataction.png",
 			overFile="combataction2.png",
 			width=342, height=86,
@@ -303,6 +315,111 @@ function ShowActions()
 		RunBtn.x = MagicBtn.x
 		RunBtn.y = ItemBtn.y
 		gcm:insert( RunBtn )
+	end
+	
+	if not(BackBtn)then
+		BackBtn=display.newImageRect("combataction3.png",342,86)
+		BackBtn.x = display.contentCenterX
+		BackBtn.y = display.contentHeight-150
+		gcm:insert( BackBtn )
+	end
+	
+	timersprite:toFront()
+end
+
+function AttackType()
+	ShowSorcery(true)
+	
+	if (AttackBtn) then
+		display.remove(AttackBtn)
+		AttackBtn=nil
+	end
+	
+	if (MagicBtn) then
+		display.remove(MagicBtn)
+		MagicBtn=nil
+	end
+	
+	if (ItemBtn) then
+		display.remove(ItemBtn)
+		ItemBtn=nil
+	end
+	
+	if (RunBtn) then
+		display.remove(RunBtn)
+		RunBtn=nil
+	end
+	
+	if (BackBtn) then
+		display.remove(BackBtn)
+		BackBtn=nil
+	end
+	
+	function AttackMe()
+		HideActions()
+		
+		PlayerAttacks(0)
+	end
+	
+	if not(AttackBtn)then
+		AttackBtn= widget.newButton{
+			label="Melee Attack",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=35,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = AttackMe}
+		AttackBtn:setReferencePoint( display.CenterReferencePoint )
+		AttackBtn.x = timersprite.x-172
+		AttackBtn.y = timersprite.y-44
+		gcm:insert( AttackBtn )
+	end
+	
+	function AttackMa()
+		HideActions()
+		
+		PlayerAttacks(1)
+	end
+	
+	if not(MagicBtn)then
+		MagicBtn= widget.newButton{
+			label="Magic Attack",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=35,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = AttackMa}
+		MagicBtn:setReferencePoint( display.CenterReferencePoint )
+		MagicBtn.x = timersprite.x+172
+		MagicBtn.y = AttackBtn.y
+		gcm:insert( MagicBtn )
+	end
+	
+	ItemBtn=display.newImageRect("combataction3.png",342,86)
+	ItemBtn.x = AttackBtn.x
+	ItemBtn.y = timersprite.y+44
+	gcm:insert( ItemBtn )
+	
+	RunBtn=display.newImageRect("combataction3.png",342,86)
+	RunBtn.x = MagicBtn.x
+	RunBtn.y = timersprite.y+44
+	gcm:insert( RunBtn )
+	
+	if not(BackBtn)then
+		BackBtn=widget.newButton{
+			label="Close",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=30,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = ShowActions}
+		BackBtn:setReferencePoint( display.CenterReferencePoint )
+		BackBtn.x = display.contentCenterX
+		BackBtn.y = display.contentHeight-150
+		gcm:insert( BackBtn )
 	end
 	
 	timersprite:toFront()
@@ -733,7 +850,7 @@ function CreateMobStats()
 	UpdateStats()
 end
 
-function UpdateStats()
+function UpdateStats(Secret)
 	if not(Created)and(gcm)then
 	--[[ MOB ]]
 	-- Life
@@ -779,10 +896,10 @@ function UpdateStats()
 		LvlDisplay:toFront()
 		gcm:insert(LvlDisplay)
 		
-		classdisplay= display.newText( (""..enemy.classname), 0, 0, "Game Over", 75 )
+		classdisplay= display.newText( (enemy.classname), 0, 0, "MoolBoran", 55 )
 		classdisplay:setTextColor( 0, 0, 0)
 		classdisplay.x = statusdisplay.x+150
-		classdisplay.y = statusdisplay.y
+		classdisplay.y = statusdisplay.y+10
 		gcm:insert(classdisplay)
 		
 	--[[ PLAYER ]]
@@ -840,6 +957,32 @@ function UpdateStats()
 		ManaDisplay2:toFront()
 		gcm:insert(ManaDisplay2)
 		
+	--Energy
+		pEPcnt=p1.EP
+		epBar2=display.newSprite( epsheet, { name="epsheet", start=1, count=67, time=(1800) })
+		epBar2.yScale=1.25
+		epBar2.xScale=epBar2.yScale
+		epBar2.x = 140
+		epBar2.y = yCoord-55
+		epBar2:toFront()
+		gcm:insert(epBar2)
+		epBar2:setFrame(math.floor(( (pMPcnt/p1.MaxMP)*66 )+1))
+		
+		EnergySymbol2=display.newSprite( energysheet, { name="energy", start=1, count=4, time=(500) })
+		EnergySymbol2.yScale=0.9
+		EnergySymbol2.xScale=EnergySymbol2.yScale
+		EnergySymbol2.x = 260
+		EnergySymbol2.y = epBar2.y
+		EnergySymbol2:play()
+		EnergySymbol2:toFront()
+		gcm:insert(EnergySymbol2)
+		
+		EnergyDisplay2 = display.newText( (pEPcnt.."/"..p1.MaxEP), 0, 0, "Game Over", 75 )
+		EnergyDisplay2:setTextColor( 0, 0, 0)
+		EnergyDisplay2.x = EnergySymbol2.x-140
+		EnergyDisplay2.y = EnergySymbol2.y-5
+		EnergyDisplay2:toFront()
+		gcm:insert(EnergyDisplay2)	
 	end
 	
 	local done=true
@@ -849,6 +992,9 @@ function UpdateStats()
 	end
 	if p1.HP<0 then
 		p1.HP=0
+	end
+	if p1.EP<0 then
+		p1.EP=0
 	end
 	if enemy.HP<0 then
 		enemy.HP=0
@@ -928,6 +1074,43 @@ function UpdateStats()
 		end
 	end
 	
+	if pEPcnt-p1.EP==0 then
+	elseif pEPcnt-p1.EP>0 then
+		if pEPcnt-p1.EP>500 then
+			pEPcnt=pEPcnt-25
+			done=false
+		elseif pEPcnt-p1.EP>200 then
+			pEPcnt=pEPcnt-10
+			done=false
+		elseif pEPcnt-p1.EP>50 then
+			pEPcnt=pEPcnt-5
+			done=false
+		elseif pEPcnt-p1.EP>20 then
+			pEPcnt=pEPcnt-2
+			done=false
+		else
+			pEPcnt=pEPcnt-1
+			done=false
+		end
+	elseif pEPcnt-p1.EP<0 then
+		if pEPcnt-p1.EP<-500 then
+			pEPcnt=pEPcnt+25
+			done=false
+		elseif pEPcnt-p1.EP<-200 then
+			pEPcnt=pEPcnt+10
+			done=false
+		elseif pEPcnt-p1.EP<-50 then
+			pEPcnt=pEPcnt+5
+			done=false
+		elseif pEPcnt-p1.EP<-20 then
+			pEPcnt=pEPcnt+2
+			done=false
+		else
+			pEPcnt=pEPcnt+1
+			done=false
+		end
+	end
+	
 	if eHPcnt-enemy.HP==0 then
 	elseif eHPcnt-enemy.HP>500 then
 		eHPcnt=eHPcnt-25
@@ -947,17 +1130,24 @@ function UpdateStats()
 	end
 
 	ManaDisplay2.text=(pMPcnt.."/"..p1.MaxMP)
+	EnergyDisplay2.text=(pEPcnt.."/"..p1.MaxEP)
 	LifeDisplay2.text=(pHPcnt.."/"..p1.MaxHP)
 	LifeDisplay.text=(eHPcnt.."/"..enemy.MaxHP)
 	mpBar2:setFrame(math.floor(( (pMPcnt/p1.MaxMP)*66 )+1))
+	epBar2:setFrame(math.floor(( (pEPcnt/p1.MaxEP)*66 )+1))
 	hpBar2:setFrame(math.floor(( (pHPcnt/p1.MaxHP)*66 )+1))
 	hpBar:setFrame(math.floor(( (eHPcnt/enemy.MaxHP)*66 )+1))
-	if (done==true) and Created==true and (gcm) then
+	if (done==true) and Secret~=true and Created==true and (gcm) then
 		EndTurn()
 	elseif (done==true) and Created~=true and (gcm) then
 		Created=true
-	elseif (done~=true) and (Created==true) and (gcm) then
+	elseif (done~=true) and Secret~=true and (Created==true) and (gcm) then
 		timer.performWithDelay(25,UpdateStats)
+	elseif (done~=true) and Secret==true and (Created==true) and (gcm) then
+		function Update2()
+			UpdateStats(true)
+		end
+		timer.performWithDelay(25,Update2)
 	end
 end
 
@@ -975,13 +1165,33 @@ function RunAttempt()
 	end
 end
 
-function PlayerAttacks()
+function PlayerAttacks(atktype)
 	P1Sprite(2)
-	ShowSorcery(true)
+	local atkstat
+	local force
+	if atktype==0 then
+		atkstat=2
+		p1.EP=p1.EP-math.ceil(1.5*(p1.stats[atkstat]/5))
+		if p1.EP<0 then
+			p1.EP=0
+			force=8
+		else
+			force=16
+		end
+	elseif atktype==1 then
+		atkstat=4
+		p1.MP=p1.MP-math.ceil(1.5*(p1.stats[atkstat]/5))
+		if p1.MP<0 then
+			p1.MP=0
+			force=8
+		else
+			force=16
+		end
+	end
 	local isHit=EvadeCalc("mob",16)
 	if isHit>=(enemy.stats[5]/6)*2 then
 		if isHit>=(enemy.stats[5]/3)*5 then
-			local Damage=DamageCalc("mob",(math.random(15,20)/10),16)
+			local Damage=DamageCalc("mob",(math.random(15,20)/10),force,atkstat)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,false)
 				UpdateStats()
@@ -992,7 +1202,7 @@ function PlayerAttacks()
 				Hits((Damage),true,true,false)
 			end
 		else
-			local Damage=DamageCalc("mob",1,16)
+			local Damage=DamageCalc("mob",1,force,atkstat)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,false)
 				UpdateStats()
@@ -1029,7 +1239,15 @@ function EndTurn()
 			else
 				timer.performWithDelay(20,EndTurn)
 			end
+			if p1.EP~=p1.MaxEP then
+				p1.EP=p1.EP+(math.ceil((p1.stats[1])/5))
+			end
+			if p1.MP~=p1.MaxMP then
+				p1.MP=p1.MP+(math.ceil((p1.stats[1])/5))
+			end
+			UpdateStats(true)
 		end
+		
 		MobSprite()
 		P1Sprite()
 	elseif p1.HP<=0 then
@@ -1086,14 +1304,14 @@ function EndCombat(outcome)
 			OKBtn.y = display.contentHeight*0.61
 			gom:insert(OKBtn)
 			
-			local msg=display.newText("Mob defeated!",0,0, "Game Over", 190)
+			local msg=display.newText("Mob defeated!",0,0, "MoolBoran", 90)
 			msg.x = display.contentWidth/2
-			msg.y = 280
+			msg.y = 290
 			gom:insert(msg)
 			
-			local msg2=display.newText("You gained:",0,0, "Game Over", 100)
+			local msg2=display.newText("You gained:",0,0, "MoolBoran", 60)
 			msg2.x = display.contentWidth/4
-			msg2.y = msg.y+100
+			msg2.y = msg.y+110
 			gom:insert(msg2)
 			
 			local enemystats=((enemy.stats[2]+enemy.stats[1]+enemy.stats[5]+enemy.stats[5]+enemy.stats[3])/5)
@@ -1105,20 +1323,20 @@ function EndCombat(outcome)
 			end
 			if gold==0 then
 				players.GrantXP(xp)
-				local msg4=display.newText( ( xp ).." XP.",0,0, "Game Over", 100)
+				local msg4=display.newText( ( xp ).." XP.",0,0, "MoolBoran", 60)
 				msg4:setTextColor(255, 0, 255)
 				msg4.x = msg2.x+200
 				msg4.y = msg2.y
 				gom:insert(msg4)
 			elseif xp==0 then
-				local msg3=display.newText(gold.." gold.",0,0, "Game Over", 100)
+				local msg3=display.newText(gold.." gold.",0,0, "MoolBoran", 60)
 				msg3:setTextColor(255, 255, 0)
 				msg3.x = msg2.x+200
 				msg3.y = msg2.y
 				gom:insert(msg3)
 				gp.CallAddCoins(gold)
 			else
-				local msg3=display.newText(gold.." gold.",0,0, "Game Over", 100)
+				local msg3=display.newText(gold.." gold.",0,0, "MoolBoran", 60)
 				msg3:setTextColor(255, 255, 0)
 				msg3.x = msg2.x+200
 				msg3.y = msg2.y
@@ -1127,7 +1345,7 @@ function EndCombat(outcome)
 				
 				players.GrantXP( xp )
 				
-				local msg4=display.newText( ( xp ).." XP.",0,0, "Game Over", 100)
+				local msg4=display.newText( ( xp ).." XP.",0,0, "MoolBoran", 60)
 				msg4:setTextColor(255, 0, 255)
 				msg4.x = msg3.x
 				msg4.y = msg2.y+50
@@ -1141,9 +1359,9 @@ function EndCombat(outcome)
 			OMenu.x,OMenu.y = display.contentWidth*0.5, 450
 			gom:insert(OMenu)
 			
-			local msg=display.newText("Got away successfully!",0,0, "Game Over", 150)
+			local msg=display.newText("Got away successfully!",0,0, "MoolBoran", 85)
 			msg.x = display.contentWidth/2
-			msg.y = OMenu.y-80
+			msg.y = OMenu.y-60
 			gom:insert(msg)
 			
 			local chance=math.random(1,10)
@@ -1156,17 +1374,17 @@ function EndCombat(outcome)
 					players.ReduceHP(RunDmg,"Mob")
 				end
 				if RunDmg~=0 then
-					local msg2=display.newText(("The mob hit you for "),50,0, "Game Over", 100)
+					local msg2=display.newText(("The mob hit you for "),50,0, "MoolBoran", 60)
 					msg2.y = msg.y+80
 					gom:insert(msg2)
 					
 					RunDmg=tostring(RunDmg)
-					local msg3=display.newText((RunDmg),msg2.x+180+(#RunDmg*5),0, "Game Over", 100)
+					local msg3=display.newText((RunDmg),msg2.x+180+(#RunDmg*5),0, "MoolBoran", 60)
 					msg3:setTextColor(255,50,50)
 					msg3.y = msg2.y
 					gom:insert(msg3)
 					
-					local msg4=display.newText((" upon running."),msg3.x+30+(#msg3.text*5),0, "Game Over", 100)
+					local msg4=display.newText((" upon running."),msg3.x+30+(#msg3.text*5),0, "MoolBoran", 60)
 					msg4.y = msg2.y
 					gom:insert(msg4)
 				end
@@ -1410,9 +1628,9 @@ function ShowSorcery(comm)
 					function toCast()
 						CastSorcery(p1.spells[s][1])
 					end
-					Sorcery[#Sorcery+1]=display.newText( (p1.spells[s][1].."  "..p1.spells[s][4].." MP"), SorcIniX, (SorcIniY-((#Sorcery-1)*50)), "Viner Hand ITC", 40)
+					Sorcery[#Sorcery+1]=display.newText( (p1.spells[s][1].."  "..p1.spells[s][4].." MP".."  "..p1.spells[s][5].." EP"), SorcIniX, (SorcIniY-((#Sorcery-1)*50)), "Viner Hand ITC", 40)
 					Sorcery[#Sorcery]:setTextColor(50,50,50)
-					if (p1.spells[s][4])>p1.MP then
+					if (p1.spells[s][4])>p1.MP or (p1.spells[s][5])>p1.EP then
 						Sorcery[#Sorcery]:setTextColor(180,60,60)
 					else
 						Sorcery[#Sorcery]:addEventListener("tap",toCast)
@@ -1453,6 +1671,7 @@ function CastSorcery(name)
 	for s=1, table.maxn(p1.spells) do
 		if p1.spells[s][1]==name then
 			p1.MP=p1.MP-p1.spells[s][4]
+			p1.EP=p1.EP-p1.spells[s][5]
 		end
 	end
 	if name=="Cleave" then
@@ -1469,7 +1688,7 @@ function CastSorcery(name)
 		
 	elseif name=="Fire Sword" then
 	
-		local isHit=EvadeCalc("mob",32)
+		local isHit=EvadeCalc("mob",64)
 		if isHit>=(enemy.stats[5]/6)*2 then
 			local Damage=MagicCalc((math.random(15,20)/10),22)
 			if (Damage)<=0 then
@@ -1492,7 +1711,7 @@ function CastSorcery(name)
 		
 	elseif name=="Fireball" then
 	
-		local isHit=EvadeCalc("mob",32)
+		local isHit=EvadeCalc("mob",64)
 		if isHit>=(enemy.stats[5]/6)*2 then
 			if isHit>=(enemy.stats[5]/3)*5 then
 				local Damage=MagicCalc((math.random(15,20)/10),22)
@@ -1533,7 +1752,7 @@ function CastSorcery(name)
 		
 	elseif name=="Ice Sword" then
 	
-		local isHit=EvadeCalc("mob",32)
+		local isHit=EvadeCalc("mob",64)
 		if isHit>=(enemy.stats[5]/6)*2 then
 			local Damage=MagicCalc((math.random(15,20)/10),22)
 			if (Damage)<=0 then
@@ -1555,7 +1774,7 @@ function CastSorcery(name)
 		
 	elseif name=="Poison Blade" then
 	
-		local isHit=EvadeCalc("mob",32)
+		local isHit=EvadeCalc("mob",64)
 		if isHit>=(enemy.stats[5]/6)*2 then
 			if isHit>=(enemy.stats[5]/3)*5 then
 				local Damage=MagicCalc((math.random(15,20)/10),22)
@@ -1615,7 +1834,7 @@ function MagicCalc(crit,cmd)
 	return Damage
 end
 
-function DamageCalc(tar,crit,cmd)
+function DamageCalc(tar,crit,cmd,atkstat)
 	local Damage
 	if tar=="p1" then
 		Damage=(
@@ -1631,13 +1850,13 @@ function DamageCalc(tar,crit,cmd)
 		Damage=math.floor(Damage)
 	elseif tar=="mob" then
 		Damage=(
-			((p1.stats[2]*1.5)-enemy.stats[3])*5
+			((p1.stats[atkstat]*1.5)-enemy.stats[3])*5
 		)
 		Damage=(
 			((Damage*cmd/16)*crit)
 		)
 		Damage=(
-			Damage*((math.random((10+(p1.stats[2]*0.5)),(10+(p1.stats[2]*1.5))))/10)
+			Damage*((math.random((10+(p1.stats[atkstat]*0.5)),(10+(p1.stats[atkstat]*1.5))))/10)
 		)
 		Damage=(Damage*0.65)
 		Damage=math.floor(Damage)

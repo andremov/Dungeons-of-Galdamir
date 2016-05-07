@@ -56,7 +56,7 @@ end
 function Size(am)
 	SizeID=am
 	if am==0 then
-		b.YouShallNowPass()
+		b.Rebuild()
 	end
 end
 
@@ -131,8 +131,8 @@ function MapSizeMenu()
 		label="Small Map",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = SmallMap
 	}
@@ -145,8 +145,8 @@ function MapSizeMenu()
 		label="Medium Map",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = MedMap
 	}
@@ -159,8 +159,8 @@ function MapSizeMenu()
 		label="Large Map",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = LargeMap
 	}
@@ -173,8 +173,8 @@ function MapSizeMenu()
 		label="Hardcore Map",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = HCMap
 	}
@@ -187,8 +187,8 @@ function MapSizeMenu()
 		label="Default Tileset",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = DefaultTSet
 	}
@@ -201,8 +201,8 @@ function MapSizeMenu()
 		label="Notebook Tileset",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = NotebookTSet
 	}
@@ -215,8 +215,8 @@ function MapSizeMenu()
 		label="Realistic Tileset",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = RealTSet
 	}
@@ -229,8 +229,8 @@ function MapSizeMenu()
 		label="Black & White Tileset",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = BWTSet
 	}
@@ -243,8 +243,8 @@ function MapSizeMenu()
 		label="Back",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = onBackRelease
 	}

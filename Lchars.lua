@@ -90,8 +90,8 @@ function CharMenu()
 		label="Back",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = onBackRelease
 	}

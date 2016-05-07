@@ -6,6 +6,7 @@
 module(..., package.seeall)
 local healthsheet = graphics.newImageSheet( "twinkle1.png", { width=7, height=18, numFrames=14 } )
 local manasheet = graphics.newImageSheet( "twinkle2.png", { width=7, height=18, numFrames=14 } )
+local energysheet = graphics.newImageSheet( "twinkle3.png", { width=7, height=18, numFrames=14 } )
 local tpsheet = graphics.newImageSheet( "portsprite.png", { width=80, height=80, numFrames=16 } )
 local debrimages={"debrissmall1.png", "debrissmall2.png", "debrissmall3.png", "debrismed1.png", "debrismed2.png", "debrislarge1.png","golddebrissmall1.png", "golddebrissmall2.png", "golddebrissmall3.png"}
 local rockbreaksheet
@@ -70,6 +71,7 @@ function onChestCollision()
 				Chests[i]=nil
 				gold.CallCoins(Round)
 				audio.Play(1)
+				builder.ModMap(i)
 				Dropped=item.ItemDrop()
 				return Dropped
 			end
@@ -87,6 +89,7 @@ function onRockCollision()
 		if (Rocks[i]) then
 			if ((i)==(P1.loc)) and bounds[i]~=1 then
 				bounds[i]=1
+				builder.ModMap(i)
 				local level=builder.GetData(3)
 				Rocks[i]:play()
 				audio.Play(13)
@@ -147,8 +150,9 @@ function onKeyCollision()
 	local Key=builder.TheGates("key")
 	if (Key) then
 		if ((Key.loc)==(P1.loc)) then
-			print "Got Key!"
+	--		print "Got Key!"
 			audio.Play(2)
+			builder.ModMap(Key.loc)
 			
 			builder.TheGates("open")
 			ui.MapIndicators("KEY")
@@ -169,15 +173,15 @@ function onKeyCollision()
 				mov.ShowArrows()
 			end
 			
-			local lolname=display.newText( ("Key Get!") ,0,0,"Game Over",110)
+			local lolname=display.newText( ("Key Get!") ,0,0,"MoolBoran",90)
 			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-150
+			lolname.y=(display.contentHeight/2)-120
 			gum:insert( lolname )
 			
-			local lolname2=display.newText( "The gate to the next floor is now open." ,0,0,"Game Over",85)
+			local lolname2=display.newText( "The gate to the next floor is now open." ,0,0,"MoolBoran",55)
 			lolname2:setTextColor( 180, 180, 180)
 			lolname2.x=display.contentWidth/2
-			lolname2.y=(display.contentHeight/2)-80
+			lolname2.y=(display.contentHeight/2)-50
 			gum:insert( lolname2 )
 			
 			local backbtn= widget.newButton{
@@ -216,6 +220,20 @@ function onLavaCollision()
 	end
 end
 
+function onWaterCollision()
+	local P1=player.GetPlayer()
+	local WaterBlocks=builder.GetData(9)
+	local isWet=false
+	for i=1, table.maxn(WaterBlocks) do
+		if (WaterBlocks[i]) then
+			if ((i)==(P1.loc)) and (P1.HP~=0)then
+				isWet=true
+			end
+		end
+	end
+	return isWet
+end
+
 function LayOnHands()
 	local Heal=builder.GetPad(1)
 	local P1=player.GetPlayer()	
@@ -245,6 +263,34 @@ function LayOnHands()
 end
 
 function LayOnFeet()
+	local Energy=builder.GetPad(3)
+	local P1=player.GetPlayer()
+	local inCombat=c.InTrouble()
+	local isPaused=ui.Paused()
+	if inCombat==true or isPaused==true then
+	else
+		if (Energy==P1.loc) then
+			if P1.EP<P1.MaxEP then
+				twinkles[#twinkles+1]=display.newSprite( energysheet, { name="twinkle", start=1, count=14, time=1000, loopCount=1 }  )
+				twinkles[#twinkles].x=P1.x+(math.random(-30,30))
+				twinkles[#twinkles].y=P1.y+(math.random(-30,30))
+				twinkles[#twinkles].xScale=2.5
+				twinkles[#twinkles].yScale=2.5
+				twinkles[#twinkles]:play()
+			end
+			local heal=(math.ceil(P1.MaxEP*0.01))
+			players.AddEP(heal)
+			for i=1, table.maxn(twinkles) do
+				if (twinkles[i]) and (twinkles[i].frame)and (twinkles[i].frame>13) then
+					display.remove(twinkles[i])
+				end
+			end
+			timer.performWithDelay(100,LayOnFeet)
+		end
+	end
+end
+
+function LayOnHead()
 	local Mana=builder.GetPad(2)
 	local P1=player.GetPlayer()
 	local inCombat=c.InTrouble()
@@ -260,14 +306,14 @@ function LayOnFeet()
 				twinkles[#twinkles].yScale=2.5
 				twinkles[#twinkles]:play()
 			end
-			local heal=(math.floor(P1.MaxHP*0.01))
+			local heal=(math.ceil(P1.MaxMP*0.01))
 			players.AddMP(heal)
 			for i=1, table.maxn(twinkles) do
 				if (twinkles[i]) and (twinkles[i].frame)and (twinkles[i].frame>13) then
 					display.remove(twinkles[i])
 				end
 			end
-			timer.performWithDelay(100,LayOnFeet)
+			timer.performWithDelay(100,LayOnHead)
 		end
 	end
 end

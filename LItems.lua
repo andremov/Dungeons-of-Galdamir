@@ -89,15 +89,15 @@ function ItemDrop(boost)
 				mov.ShowArrows()
 			end
 			
-			local lolname=display.newText( ("Item Get!") ,0,0,"Game Over",110)
+			local lolname=display.newText( ("Item Get!") ,0,0,"MoolBoran",90)
 			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-150
+			lolname.y=(display.contentHeight/2)-120
 			gum:insert( lolname )
 			
-			local lolname2=display.newText( (ItemName) ,0,0,"Game Over",85)
-			lolname2:setTextColor( 180, 180, 180)
+			local lolname2=display.newText( (ItemName) ,0,0,"MoolBoran",55)
+			lolname2.y=(display.contentHeight/2)-50
 			lolname2.x=display.contentWidth/2
-			lolname2.y=(display.contentHeight/2)-80
+			lolname2:setTextColor( 180, 180, 180)
 			gum:insert( lolname2 )
 			
 			local backbtn= widget.newButton{
@@ -142,15 +142,15 @@ function ItemDrop(boost)
 				inv.ToggleBag()
 			end
 			
-			local lolname=display.newText( ("Item Get!") ,0,0,"Game Over",110)
+			local lolname=display.newText( ("Item Get!") ,0,0,"MoolBoran",90)
 			lolname.x=display.contentWidth/2
-			lolname.y=(display.contentHeight/2)-150
+			lolname.y=(display.contentHeight/2)-120
 			gum:insert( lolname )
 			
-			local lolname2=display.newText( (asdname) ,0,0,"Game Over",85)
+			local lolname2=display.newText( (asdname) ,0,0,"MoolBoran",55)
 			lolname2:setTextColor( 180, 180, 180)
 			lolname2.x=display.contentWidth/2
-			lolname2.y=(display.contentHeight/2)-80
+			lolname2.y=(display.contentHeight/2)-50
 			gum:insert( lolname2 )
 			
 			local backbtn= widget.newButton{
@@ -181,8 +181,8 @@ function ItemDrop(boost)
 			
 			local skrlrl=math.random(1,10)
 			if skrlrl>8 then
-				lolname2.text=(asdname.." + Blank Scroll")
-				inv.AddItem((itemlist[26]),itemlist[26][2])
+				lolname2.text=(asdname.." + "..itemlist[26][1])
+				inv.AddItem(26,itemlist[26][2])
 			end
 			
 			return true
@@ -2109,7 +2109,7 @@ function Essentials()
 		--
 		{"UpperScroll",true,1,10},
 		{"LowerScroll",true,2,10},
-		{"BlankScroll",true,1,20},
+		{"BlankScroll",true,nil,20},
 		--
 		{"WoodSword",false,1,10},
 		{"StoneSword",false,3,20},

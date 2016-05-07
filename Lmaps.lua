@@ -15,7 +15,7 @@ a-						b-boundary
 c-						d-break/wall
 e-						f-
 g-						h-healpad
-i-						j-manapad
+i-energypad				j-manapad
 k-keyblock				l-lava
 m-portal1				n-portal2
 ñ-portal3				o-wall
@@ -57,11 +57,11 @@ tut1={
 
 test1={
 	"b","b","b","b","b","b","b","b","b","b",
-	"b","z","x","x","x","x","x","x","x","b",
-	"b","x","m","x","x","x","x","l","x","b",
+	"b","z","x","x","x","x","x","q","u","b",
+	"b","x","m","x","x","x","x","l","q","b",
 	"b","x","x","x","x","x","x","x","x","b",
 	"b","x","x","x","h","j","x","x","x","b",
-	"b","x","x","x","u","s","x","x","x","b",
+	"b","x","x","x","i","s","x","x","x","b",
 	"b","x","x","x","x","x","x","x","x","b",
 	"b","x","w","x","x","x","x","n","x","b",
 	"b","x","x","x","x","x","x","x","z","b",

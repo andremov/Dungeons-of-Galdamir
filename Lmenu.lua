@@ -60,8 +60,8 @@ function ShowMenu()
 			label="Continue",
 			labelColor = { default={0,0,0}, over={255,255,255} },
 			fontSize=30,
-			defaultFile="button.png",
-			overFile="button-over.png",
+			defaultFile="button1.png",
+			overFile="button1-over.png",
 			width=308, height=80,
 			onRelease = onContBtnRelease
 		}
@@ -86,8 +86,8 @@ function ShowMenu()
 		label="New Game",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = onPlayBtnRelease
 	}
@@ -112,8 +112,8 @@ function ShowMenu()
 		label="Options",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = onOptnBtnRelease
 	}
@@ -125,8 +125,8 @@ function ShowMenu()
 		label="High Scores",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = onScreBtnRelease
 	}
@@ -140,10 +140,15 @@ function ShowMenu()
 	sign.x=(display.contentWidth-130)
 	sign.y=(display.contentHeight-90)
 	
-	VDisplay = display.newText(("Version:\n"..GVersion),0,0,labelFont, 30 )
+	VerDisplay = display.newText(("Version:"),0,0,"MoolBoran", 70 )
+	VerDisplay:setTextColor( 0, 0, 0)
+	VerDisplay.x=sign.x
+	VerDisplay.y=sign.y-30
+	
+	VDisplay = display.newText((GVersion),0,0,"MoolBoran", 50 )
 	VDisplay:setTextColor( 0, 0, 0)
-	VDisplay.x=sign.x
-	VDisplay.y=sign.y-25
+	VDisplay.x=VerDisplay.x
+	VDisplay.y=VerDisplay.y+40
 	
 	logo=display.newImageRect("Symbol3.png",206,206)
 	logo.xScale=0.75
@@ -187,6 +192,7 @@ function ShowMenu()
 	group:insert(ScreBtn)
 	group:insert(titleLogo)
 	group:insert(sign)
+	group:insert(VerDisplay)
 	group:insert(VDisplay)
 	group:insert(logo)
 end
@@ -211,8 +217,8 @@ function onPlayBtnRelease()
 				label="New Game",
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				fontSize=30,
-				defaultFile="button.png",
-				overFile="button-over.png",
+				defaultFile="button1.png",
+				overFile="button1-over.png",
 				width=308, height=80,
 				onRelease = GoPlay
 			}
@@ -225,8 +231,8 @@ function onPlayBtnRelease()
 				label="Cancel",
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				fontSize=30,
-				defaultFile="button.png",
-				overFile="button-over.png",
+				defaultFile="button1.png",
+				overFile="button1-over.png",
 				width=308, height=80,
 				onRelease = Stahp
 			}
@@ -244,7 +250,6 @@ function onPlayBtnRelease()
 end
 
 function GoPlay()
-	
 	for i=group.numChildren,1,-1 do
 		local child = group[i]
 		child.parent:remove( child )
@@ -264,8 +269,8 @@ function Stahp()
 		label="Continue",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = onContBtnRelease
 		
@@ -279,8 +284,8 @@ function Stahp()
 		label="New Game",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
+		defaultFile="button1.png",
+		overFile="button1-over.png",
 		width=308, height=80,
 		onRelease = onPlayBtnRelease
 	}
@@ -369,10 +374,10 @@ function isVersion(val)
 	if val==true then
 		if (VDisplay) then
 			if canGo==true then
-				VDisplay2 = display.newText(("Up to date."),0,0,labelFont, 40 )
+				VDisplay2 = display.newText(("Up to date."),0,0,"MoolBoran", 60 )
 				VDisplay2:setTextColor( 0, 150, 0)
 				VDisplay2.x=VDisplay.x
-				VDisplay2.y=VDisplay.y+75
+				VDisplay2.y=VDisplay.y+55
 				group:insert(VDisplay2)
 			else
 				function Closure1()
@@ -384,10 +389,10 @@ function isVersion(val)
 	elseif val==false then
 		if (VDisplay) then
 			if canGo==true then
-			VDisplay2 = display.newText(("Update available!"),0,0,labelFont, 28 )
+			VDisplay2 = display.newText(("Update available!"),0,0,"MoolBoran", 45 )
 			VDisplay2:setTextColor( 150, 0, 0)
 			VDisplay2.x=VDisplay.x
-			VDisplay2.y=VDisplay.y+70
+			VDisplay2.y=VDisplay.y+45
 			group:insert(VDisplay2)
 			sign:addEventListener("tap",onUpdateBtnRelease)
 			else
@@ -400,10 +405,10 @@ function isVersion(val)
 	elseif val==nil then
 		if (VDisplay) then
 			if canGo==true then
-				VDisplay2 = display.newText(("Update check failed."),0,0,labelFont, 25 )
+				VDisplay2 = display.newText(("Update check failed."),0,0,"MoolBoran", 45 )
 				VDisplay2:setTextColor( 150, 0, 0)
 				VDisplay2.x=VDisplay.x
-				VDisplay2.y=VDisplay.y+70
+				VDisplay2.y=VDisplay.y+50
 				group:insert(VDisplay2)
 			else
 				function Closure2()
@@ -428,6 +433,8 @@ function Keyboard()
 	}
 	keys={}
 	keys2={}
+	kbacks={}
+	kbacks2={}
 	kbrd=display.newGroup()
 	UpdateName()
 	
@@ -437,32 +444,44 @@ function Keyboard()
 	kbrd:insert( bkg )
 	
 	for i=1,table.maxn(letters)/2 do
-		keys[i]=display.newText( (letters[i]) ,0,0,native.systemFont,75)
+		keys[i]=display.newText( (letters[i]) ,0,0,"MoolBoran",110)
 		keys[i]:setTextColor( 0, 0, 0)
 		keys[i].x=80+(75*((i-1)%9))
-		keys[i].y=((display.contentHeight/2)-140)+(80*math.floor((i-1)/9))
+		keys[i].y=((display.contentHeight/2)-120)+(90*math.floor((i-1)/9))
 		kbrd:insert( keys[i] )
+		
+		kbacks[i]=display.newRect(0,0,70,70)
+		kbacks[i].x=keys[i].x
+		kbacks[i].y=keys[i].y-20
+		kbacks[i]:setFillColor(0,0,0,0)
+		kbrd:insert( kbacks[i] )
 		
 		function Input()
 			LetterChange(keys[i].text)
 		end
 		
-		keys[i]:addEventListener("tap",Input)
+		kbacks[i]:addEventListener("tap",Input)
 	end
 	
 	
 	for i=table.maxn(letters)/2+1,table.maxn(letters) do
-		keys2[i]=display.newText( (letters[i]) ,0,0,native.systemFont,75)
+		keys2[i]=display.newText( (letters[i]) ,0,0,"MoolBoran",110)
 		keys2[i]:setTextColor( 0, 0, 0)
 		keys2[i].x=80+(75*((i-1-table.maxn(letters)/2)%9))
-		keys2[i].y=((display.contentHeight/2)+140)+(80*math.floor((i-1-table.maxn(letters)/2)/9))
+		keys2[i].y=((display.contentHeight/2)+160)+(90*math.floor((i-1-table.maxn(letters)/2)/9))
 		kbrd:insert( keys2[i] )
+		
+		kbacks2[i]=display.newRect(0,0,70,70)
+		kbacks2[i].x=keys2[i].x
+		kbacks2[i].y=keys2[i].y-20
+		kbacks2[i]:setFillColor(0,0,0,0)
+		kbrd:insert( kbacks2[i] )
 		
 		function Input()
 			LetterChange(keys2[i].text)
 		end
 		
-		keys2[i]:addEventListener("tap",Input)
+		kbacks2[i]:addEventListener("tap",Input)
 	end
 	
 	function Backspace()
@@ -522,10 +541,10 @@ end
 
 function UpdateName()
 	if not(namedis) then
-		namedis=display.newText((""),0,0,native.systemFont,80)
+		namedis=display.newText((""),0,0,"MoolBoran",120)
 		namedis:setTextColor( 0, 0, 0)
 		namedis.x=display.contentWidth/2
-		namedis.y=250
+		namedis.y=280
 		kbrd:insert( namedis )
 	end
 	if (curname) then

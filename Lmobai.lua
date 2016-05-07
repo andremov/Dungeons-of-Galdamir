@@ -47,8 +47,9 @@ function DoTurns()
 	for i=1, table.maxn( mobs ) do
 		if (mobs[i]) then
 			if not(mobs[i].loc) then
-				display.remove(mobs[i])
-				mobs[i]=nil
+			--	display.remove(mobs[i])
+			--	mobs[i]=nil
+				print (i.." is a problem.")
 			else
 			col[i]=(math.floor(mobs[i].loc%(math.sqrt(size))))
 			row[i]=(math.floor(mobs[i].loc/(math.sqrt(size))))+1
@@ -96,8 +97,9 @@ function DoTurns()
 			for  g=1, table.maxn( mobs ) do
 				if (mobs[g]) then
 					if not (mobs[g].loc) then
-						display.remove(mobs[g])
-						mobs[g]=nil
+					--	display.remove(mobs[g])
+					--	mobs[g]=nil
+						print (g.." is a problem.")
 					else
 					if mobs[i].loc==(mobs[g].loc+(math.sqrt(size))) then
 						CanGoUp=false

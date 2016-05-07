@@ -34,9 +34,11 @@ function ShowArrows(value)
 	else
 		Key=coll.onKeyCollision()
 		Dropped=coll.onChestCollision()
+		Slowed=coll.onWaterCollision()
 		coll.onLavaCollision()
 		coll.onRockCollision()
 		coll.LayOnHands()
+		coll.LayOnHead()
 		coll.LayOnFeet()
 		
 		if Dropped==true or Key==true then
@@ -45,16 +47,14 @@ function ShowArrows(value)
 			display.remove(mdown)
 			display.remove(mright)
 			display.remove(inter)
-		elseif Toggle==0 then
+		elseif Toggle<=0 then
 			display.remove(mup)
 			display.remove(mleft)
 			display.remove(mdown)
 			display.remove(mright)
 			display.remove(inter)
-			if Toggle==0 then
-				Toggle=math.random(3,6)
-				mob.DoTurns()
-			end
+			Toggle=math.random(3,6)
+			mob.DoTurns()
 		else
 			Visibility()
 			Ports=coll.PortCheck()
@@ -290,6 +290,7 @@ function Visibility()
 	size=b.GetData(0)
 	size=math.sqrt(size)
 	
+	b.Show(p1.loc)
 	for c=1,5 do
 		if math.floor((p1.loc)/size)==math.floor((p1.loc-c)/size) then
 			if boundary[(p1.loc-c)]==1 then
@@ -511,6 +512,7 @@ function ShopInteract( event )
 		timer.performWithDelay(100,closure1)
 	end
 end
+
 function GoinDown( event )
 	if event.phase=="began" then
 		WD.FloorPort(false)
@@ -529,7 +531,11 @@ function moveplayerup( event )
 		P1=p.GetPlayer()
 		map.y=map.y+80
 		p.MovePlayer(-math.sqrt(size))
-		Toggle=Toggle-1
+		if Slowed==true then
+			Toggle=Toggle-2
+		else
+			Toggle=Toggle-1
+		end
 		ShowArrows()
 	end
 end
@@ -540,7 +546,11 @@ function moveplayerdown( event )
 		P1=p.GetPlayer()
 		map.y=map.y-80
 		p.MovePlayer(math.sqrt(size))
-		Toggle=Toggle-1
+		if Slowed==true then
+			Toggle=Toggle-2
+		else
+			Toggle=Toggle-1
+		end
 		ShowArrows()
 	end
 end	
@@ -551,7 +561,11 @@ function moveplayerleft( event )
 		P1=p.GetPlayer()
 		map.x=map.x+80
 		p.MovePlayer(-1)
-		Toggle=Toggle-1
+		if Slowed==true then
+			Toggle=Toggle-2
+		else
+			Toggle=Toggle-1
+		end
 		ShowArrows()
 	end
 end	
@@ -562,7 +576,11 @@ function moveplayerright( event )
 		P1=p.GetPlayer()
 		map.x=map.x-80
 		p.MovePlayer(1)
-		Toggle=Toggle-1
+		if Slowed==true then
+			Toggle=Toggle-2
+		else
+			Toggle=Toggle-1
+		end
 		ShowArrows()
 	end
 end
