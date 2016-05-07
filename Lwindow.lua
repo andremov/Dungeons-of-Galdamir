@@ -29,7 +29,6 @@ local isUse
 
 function Essentials()
 	p1=p.GetPlayer()
-	gum=display.newGroup()
 	xinvicial=75
 	yinvicial=156
 	xeqpicial=75
@@ -42,6 +41,23 @@ function Essentials()
 	isUse=false
 	isOpn=false
 	statchange={}
+end
+
+function CloseErrthang()
+	if not (gdm) then
+		if (gum) then
+			UseMenu()
+		end
+		if (ginf) then
+			ToggleInfo()
+		end
+		if (ginv) then
+			ToggleBag()
+		end
+		return true
+	else
+		return false
+	end
 end
 
 function ToggleBag()
@@ -190,7 +206,8 @@ function ToggleInfo()
 			(
 				"HP: "..p1.HP.."/"..p1.MaxHP.."\n"..
 				"Level: "..p1.lvl.."\n"..
-				"Gold: "..p1.gp.."\n"
+				"Gold: "..p1.gp.."\n"..
+				"Class: "..p1.clsnames[p1.class+1].."\n"
 			),
 			30,80,native.systemFont,40
 		)
@@ -266,7 +283,7 @@ function ToggleInfo()
 		end
 		
 		if p1.name=="Magus" then
-			info[#info+1]=display.newImageRect("player/Magus.png",120,120)
+			info[#info+1]=display.newImageRect("player/magus.png",120,120)
 			info[#info].x=display.contentWidth-120
 			info[#info].y=150
 			info[#info].xScale=1.5
@@ -604,6 +621,7 @@ function UseMenu(id,slot)
 			ToggleBag()
 		end
 		
+		gum=display.newGroup()
 		gum:toFront()
 		isUse=true
 		print ("Player wants to use item "..id..", in slot "..slot..".")
@@ -934,6 +952,7 @@ function UseMenu(id,slot)
 			local child = gum[i]
 			child.parent:remove( child )
 		end
+		gum=nil
 		ToggleBag()
 		ToggleBag()
 	end

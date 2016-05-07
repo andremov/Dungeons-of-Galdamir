@@ -69,7 +69,6 @@ function Scoring(round,p1,size)
 	Score=(
 		math.floor((Score*p1.lvl)*((p1.stats[1]+p1.stats[2]+p1.stats[3]+p1.stats[4]+p1.stats[5])/5))
 	)
-	print (Score)
 	isHigh(Score)
 	return Score
 end

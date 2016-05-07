@@ -167,6 +167,11 @@ function Pause(mute)
 				audio.Play(6)
 			end
 		end
+	elseif busy==true then
+		local success=inv.CloseErrthang()
+		if success==true then
+			Pause()
+		end
 	end
 end
 

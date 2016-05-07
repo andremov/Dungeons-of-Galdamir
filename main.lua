@@ -22,7 +22,7 @@ local loadtxt
 	function Go()
 		menu.ShowMenu()
 	--	startup.Startup()
-	--	bin.Test()
+	--	bin.Font()
 	end
 	
 	function FrontNCenter()
@@ -62,7 +62,7 @@ local loadtxt
 	
 	Runtime:addEventListener("enterFrame",FrontNCenter)
 	
-	timer.performWithDelay(2000, (ShowContinue) )
+	timer.performWithDelay(1000, (ShowContinue) )
 	
 	timer.performWithDelay(500,(Go))
 	

@@ -7,7 +7,7 @@ module(..., package.seeall)
 local m=require("Lmenu")
 --[[
 DUNGEONS OF GAL'DARAH
-CURRENT VERSION: BETA 1.8.0
+CURRENT VERSION: BETA 1.8.2
 
 Font1: Monotype Corsiva
 Font2: Game Over
@@ -23,16 +23,16 @@ For Logo:
 	5. Glow - 6,10,75
 ----------------------
 
-	Balance Mob Stats
-	Remove Mobs/Chests that are trapped.
-	Death Bug
-	XP increase
-	player stronger at start
+	Mob Bug
+	Combat Changes
+	Reduce Shop Prices
+	Scroll of Salvation = extra drop
+	Int Equipment
 	
 --]]
 
 local RSS
-local GVersion="BETA 1.8.0"
+local GVersion="BETA 1.8.2"
 
 function HowDoIVersion(val)
 	if val==true then

@@ -58,7 +58,7 @@ function onVikingRelease()
 	CurrentChar()
 end
 
-function onMageRelease()
+function onSorcerorRelease()
 	charclass=4
 	CurrentChar()
 end
@@ -287,30 +287,30 @@ function Classes()
 	Thief.y = Thief1.y
 	classmenu:insert(Thief)
 	
-	--Mage
-	local Magtxt=display.newText("Mage\n+MGC", 0, 0, "Game Over", 80)
-	Magtxt.x = (display.contentWidth/7)*4
-	Magtxt.y = display.contentHeight*0.5+80
-	classmenu:insert(Magtxt)
+	--Sorceror
+	local Sortxt=display.newText("Sorceror\n+MGC", 0, 0, "Game Over", 80)
+	Sortxt.x = (display.contentWidth/7)*4
+	Sortxt.y = display.contentHeight*0.5+80
+	classmenu:insert(Sortxt)
 	
-	local Mage1=display.newImageRect("chars/"..charname.."/4/char.png",65,65)
-	Mage1.x = Magtxt.x
-	Mage1.y = Magtxt.y-80
-	classmenu:insert(Mage1)
+	local Sorceror1=display.newImageRect("chars/"..charname.."/4/char.png",65,65)
+	Sorceror1.x = Sortxt.x
+	Sorceror1.y = Sortxt.y-80
+	classmenu:insert(Sorceror1)
 	
-	local Mage = widget.newButton{
+	local Sorceror = widget.newButton{
 		label="",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
 		defaultFile="charbutton.png",
 		overFile="charbutton-over.png",
 		width=80, height=80,
-		onRelease = onMageRelease
+		onRelease = onSorcerorRelease
 	}
-	Mage:setReferencePoint( display.CenterReferencePoint )
-	Mage.x = Mage1.x
-	Mage.y = Mage1.y
-	classmenu:insert(Mage)
+	Sorceror:setReferencePoint( display.CenterReferencePoint )
+	Sorceror.x = Sorceror1.x
+	Sorceror.y = Sorceror1.y
+	classmenu:insert(Sorceror)
 	
 	--Scholar
 	local Schtxt=display.newText("Scholar\n+INT", 0, 0, "Game Over", 80)
@@ -366,12 +366,12 @@ function CurrentChar()
 	curmenu:insert(currentchar)
 end
 
-function GetCharInfo(field)
-	if field==1 then
-		return charclass
-	end		
+function GetCharInfo(field)	
 	if field==0 then
 		return charname
+	end
+	if field==1 then
+		return charclass
 	end
 end
 

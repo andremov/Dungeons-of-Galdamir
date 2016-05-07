@@ -34,8 +34,8 @@ local names={
 	}
 	
 function CreatePlayers(name)
-	local char =c.GetCharInfo("char")
-	local class=c.GetCharInfo("class")
+	local char =c.GetCharInfo(0)
+	local class=c.GetCharInfo(1)
 
 	if not (char) then
 		char=0
@@ -54,7 +54,7 @@ function CreatePlayers(name)
 		player.name=names[math.random(1,table.maxn(names))]
 	elseif name=="Magus" or name=="MAGUS" or name=="magus" then
 		player.name="Magus"
-	elseif player.name=="Error"	or player.name=="error" or player.name=="ERROR" then
+	elseif name=="Error" or name=="error" or name=="ERROR" then
 		player.name="Error"
 	else
 		player.name=name
@@ -62,6 +62,7 @@ function CreatePlayers(name)
 	player.lvl=1
 	player.MaxXP=50
 	player.XP=0
+	player.clsnames={"Knight","Warrior","Thief","Viking","Sorceror","Scholar"}
 	player.char=char
 	player.class=class
 	player.life=0
@@ -85,12 +86,12 @@ function CreatePlayers(name)
 	--Spells
 	player.spells={
 		{"Fireball","Cast a firey ball of death and burn the enemy.",true,30},
-		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,20},
+		{"Cleave","Hits for twice maximum daSorceror. Can't be evaded.",false,20},
 		{"Slow","Reduces enemy's dexterity.",false,50},
 		{"Poison Blade","Inflicts poison.",false,50},
-		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,50},
+		{"Fire Sword","Hits for twice daSorceror and inflicts a burn.",false,50},
 		{"Healing","Heals for 20% of maximum Hit Points.",false,60},
-		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,120},
+		{"Ice Sword","Hits for twice daSorceror and reduces enemy's dexterity.",false,120},
 	}
 	--Secondary Stats
 	player.portcd=0
@@ -402,6 +403,28 @@ function LvlUp()
 	player.MaxMP=(player.lvl*15)+(player.stats[6]*10)
 	player.HP=player.MaxHP
 	player.MP=player.MaxMP
+	LvlFanfare()
+end
+
+function LvlFanfare()
+	if not (LvlWindow) then
+		transp10=255
+		LvlWindow=newImageRect("levelup.png",330,142)
+		LvlWindow.x=display.contentCenterX
+		LvlWindow.y=display.contentCenterY-100
+		LvlWindow:toFront()
+		LvlWindow:setFillColor( transp10, transp10, transp10, transp10)
+		timer.performWithDelay(10,LvlFanfare)
+	else
+		if transp10<20 then
+			transp10=0
+			display.remove(LvlWindow)
+			LvlWindow=nil
+		else
+			transp10=transp10-(255/100)
+		end
+		LvlWindow:setFillColor( transp10, transp10, transp10, transp10)
+	end
 end
 
 function OhCrap()
@@ -492,6 +515,7 @@ function LoadPlayer(cls,chr,stam,atk,dfnc,mgk,dxtrty,intlct,pnts,lv,xpnts,hitp,m
 	
 	player.stats={}
 	
+	player.clsnames={"Knight","Warrior","Thief","Viking","Sorceror","Scholar"}
 	player.char=char
 	player.class=class
 	player.inv={}
@@ -499,12 +523,12 @@ function LoadPlayer(cls,chr,stam,atk,dfnc,mgk,dxtrty,intlct,pnts,lv,xpnts,hitp,m
 	
 	player.spells={
 		{"Fireball","Cast a firey ball of death and burn the enemy.",true,30},
-		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,20},
+		{"Cleave","Hits for twice maximum daSorceror. Can't be evaded.",false,20},
 		{"Slow","Reduces enemy's dexterity.",false,50},
 		{"Poison Blade","Inflicts poison.",false,50},
-		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,50},
+		{"Fire Sword","Hits for twice daSorceror and inflicts a burn.",false,50},
 		{"Healing","Heals for 20% of maximum Hit Points.",false,60},
-		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,120},
+		{"Ice Sword","Hits for twice daSorceror and reduces enemy's dexterity.",false,120},
 	}
 	
 	StatCheck()

@@ -63,7 +63,7 @@ function Essentials()
 	SBookDisplayed=false
 	Sorcery={}
 	inCombat=false
-	SorcIniX=20
+	SorcIniX=display.contentCenterX-(190+20)
 	SorcIniY=display.contentHeight-120
 	outcomed=false
 end
@@ -106,16 +106,16 @@ function DisplayCombat()
 	bkg.y = 146
 	gcm:insert(bkg)
 	
-	window1=display.newImage("window.png",171,160)
-	window1.x=180
-	window1.y=yCoord
-	window1.xScale=2.0
+	window1=display.newImage("window.png",171,43)
+	window1.x=190
+	window1.y=yCoord-120
+	window1.xScale=2.25
 	window1.yScale=window1.xScale
 	gcm:insert(window1)
 	
-	window2=display.newImage("window2.png",171,160)
-	window2.x=display.contentWidth-180
-	window2.y=yCoord
+	window2=display.newImage("window2.png",171,43)
+	window2.x=display.contentWidth-window1.x
+	window2.y=window1.y
 	window2.xScale=window1.xScale
 	window2.yScale=window2.xScale
 	gcm:insert(window2)
@@ -131,10 +131,27 @@ function DisplayCombat()
 	
 	--Timers
 	timersprite=display.newSprite( timersheet, { name="timerid", start=1, count=25, loopCount=1, time=1000+(1500*p1.SPD)}  )
-	timersprite.x=display.contentWidth-60
-	timersprite.y=display.contentHeight-60
+	timersprite.x=display.contentCenterX
+	timersprite.y=display.contentCenterY+100
 	timersprite:play()
 	gcm:insert(timersprite)
+	
+	AttackBtn=display.newImageRect("combataction3.png",342,86)
+	AttackBtn.x=timersprite.x-172
+	AttackBtn.y=timersprite.y-44
+	gcm:insert( AttackBtn )
+	
+	MagicBtn=display.newImageRect("combataction3.png",342,86)
+	MagicBtn.x = timersprite.x+172
+	MagicBtn.y = AttackBtn.y
+	gcm:insert( MagicBtn )
+	
+	RunBtn=display.newImageRect("combataction3.png",342,86)
+	RunBtn.x = MagicBtn.x
+	RunBtn.y = timersprite.y+44
+	gcm:insert( RunBtn )
+	
+	timersprite:toFront()
 	
 	ptimer=timer.performWithDelay(1000+(1500*p1.SPD),ShowActions)
 	etimer=timer.performWithDelay(1001+(1500*enemy.SPD),MobsTurn)
@@ -144,46 +161,71 @@ function ShowActions()
 	ptimer=nil
 	local ep=timer.pause(etimer)
 	
+	if (AttackBtn) then
+		display.remove(AttackBtn)
+	end
+	
+	if (MagicBtn) then
+		display.remove(MagicBtn)
+	end
+	
+	if (RunBtn) then
+		display.remove(RunBtn)
+	end
+	
 	function toAttack()
 		display.remove(AttackBtn)
 		display.remove(MagicBtn)
 		display.remove(RunBtn)
+		
+		AttackBtn=display.newImageRect("combataction3.png",342,86)
+		AttackBtn.x=timersprite.x-172
+		AttackBtn.y=timersprite.y-44
+		gcm:insert( AttackBtn )
+		
+		MagicBtn=display.newImageRect("combataction3.png",342,86)
+		MagicBtn.x = timersprite.x+172
+		MagicBtn.y = AttackBtn.y
+		gcm:insert( MagicBtn )
+		
+		RunBtn=display.newImageRect("combataction3.png",342,86)
+		RunBtn.x = MagicBtn.x
+		RunBtn.y = timersprite.y+44
+		gcm:insert( RunBtn )
+		
+		timersprite:toFront()
 		
 		PlayerAttacks()
 	end
 	
 	AttackBtn= widget.newButton{
 		label="Attack",
-		labelColor = { default={255,255,255}, over={0,0,0} },
+		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="cbutton.png",
-		overFile="cbutton2.png",
-		width=252, height=55,
+		defaultFile="combataction.png",
+		overFile="combataction2.png",
+		width=342, height=86,
 		onRelease = toAttack}
 	AttackBtn:setReferencePoint( display.CenterReferencePoint )
-	AttackBtn.x = window1.x-30
-	AttackBtn.y = window1.y-20
+	AttackBtn.x = timersprite.x-172
+	AttackBtn.y = timersprite.y-44
 	gcm:insert( AttackBtn )
 	
-	function toSorcery()
-	--	display.remove(AttackBtn)
-	--	display.remove(MagicBtn)
-	--	display.remove(RunBtn)
-		
+	function toSorcery()		
 		ShowSorcery()
 	end
 	
 	MagicBtn= widget.newButton{
 		label="Sorcery",
-		labelColor = { default={255,255,255}, over={0,0,0} },
+		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="cbutton.png",
-		overFile="cbutton2.png",
-		width=252, height=55,
+		defaultFile="combataction.png",
+		overFile="combataction2.png",
+		width=342, height=86,
 		onRelease = toSorcery}
 	MagicBtn:setReferencePoint( display.CenterReferencePoint )
-	MagicBtn.x = AttackBtn.x
-	MagicBtn.y = AttackBtn.y+65
+	MagicBtn.x = timersprite.x+172
+	MagicBtn.y = AttackBtn.y
 	gcm:insert( MagicBtn )
 	
 	function toRun()
@@ -191,21 +233,40 @@ function ShowActions()
 		display.remove(MagicBtn)
 		display.remove(RunBtn)
 		
+		AttackBtn=display.newImageRect("combataction3.png",342,86)
+		AttackBtn.x=timersprite.x-172
+		AttackBtn.y=timersprite.y-44
+		gcm:insert( AttackBtn )
+		
+		MagicBtn=display.newImageRect("combataction3.png",342,86)
+		MagicBtn.x = timersprite.x+172
+		MagicBtn.y = AttackBtn.y
+		gcm:insert( MagicBtn )
+		
+		RunBtn=display.newImageRect("combataction3.png",342,86)
+		RunBtn.x = MagicBtn.x
+		RunBtn.y = timersprite.y+44
+		gcm:insert( RunBtn )
+		
+		timersprite:toFront()
+		
 		RunAttempt()
 	end
 	
 	RunBtn= widget.newButton{
 		label="Retreat",
-		labelColor = { default={255,255,255}, over={0,0,0} },
+		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
-		defaultFile="cbutton.png",
-		overFile="cbutton2.png",
-		width=252, height=55,
+		defaultFile="combataction.png",
+		overFile="combataction2.png",
+		width=342, height=86,
 		onRelease = toRun}
 	RunBtn:setReferencePoint( display.CenterReferencePoint )
-	RunBtn.x = AttackBtn.x
-	RunBtn.y = MagicBtn.y+65
+	RunBtn.x = MagicBtn.x
+	RunBtn.y = timersprite.y+44
 	gcm:insert( RunBtn )
+	
+	timersprite:toFront()
 end
 
 function MobsTurn()
@@ -640,6 +701,8 @@ function CreateMobStats()
 			enemy.class=i
 		end
 	end
+	enemy.classnames={"Gladiator","Berserker","Gladiator","Wizard","Berserker"}
+	enemy.classname=enemy.classnames[enemy.class]
 	MobSprite(1)
 	enemy.MaxHP=(100*enemy.lvl)+(enemy.stats[1]*10)
 	enemy.MaxMP=(enemy.lvl*15)+(enemy.stats[4]*10)
@@ -651,7 +714,8 @@ function CreateMobStats()
 end
 
 function UpdateStats()
-	if not(hpBar)then
+	if not(Created)then
+		Created=true
 		--Mob
 	-- Life
 		hpBar=display.newSprite( hpsheet, { name="hpsheet", start=1, count=67, time=(1800) })
@@ -682,20 +746,25 @@ function UpdateStats()
 
 	-- Level
 		
-		LvlDisplay = display.newText( ("Lv: "..enemy.lvl), 0, 0, "Game Over", 75 )
-		LvlDisplay:setTextColor( 0, 255, 0)
-		LvlDisplay.x = LifeDisplay.x-100
-		LvlDisplay.y = LifeDisplay.y+40
-		LvlDisplay:toFront()
-		gcm:insert(LvlDisplay)
-		
 		statusdisplay=display.newSprite( statussheet, { name="status", start=1, count=6, time=800 }  )
 		statusdisplay.yScale=0.75
 		statusdisplay.xScale=statusdisplay.yScale
-		statusdisplay.x = LvlDisplay.x+130
-		statusdisplay.y = LvlDisplay.y+5
+		statusdisplay.x = LifeDisplay.x-150
+		statusdisplay.y = LifeDisplay.y+40
 		gcm:insert(statusdisplay)
 		
+		LvlDisplay = display.newText( ("Lv: "..enemy.lvl), 0, 0, "Game Over", 75 )
+		LvlDisplay:setTextColor( 50, 255, 50)
+		LvlDisplay.x = LifeSymbol.x-80
+		LvlDisplay.y = LifeDisplay.y
+		LvlDisplay:toFront()
+		gcm:insert(LvlDisplay)
+		
+		classdisplay= display.newText( (""..enemy.classname), 0, 0, "Game Over", 75 )
+		classdisplay:setTextColor( 0, 0, 0)
+		classdisplay.x = statusdisplay.x+150
+		classdisplay.y = statusdisplay.y
+		gcm:insert(classdisplay)
 		--Player
 	-- Life
 		hpBar2=display.newSprite( hpsheet, { name="hpsheet", start=1, count=67, time=(1800) })
@@ -868,7 +937,7 @@ function EndCombat(outcome)
 		gcm[i]=nil
 	end
 	gcm=nil
-	hpBar=nil
+	Created=nil
 	
 	if outcomed==false then
 		
@@ -1036,8 +1105,8 @@ function GetHits()
 	return hits
 end
 
-function ShowSorcery(dumb)
-	if dumb==true then
+function ShowSorcery(comm)
+	if comm==true then
 		if SBookDisplayed==true then
 			function deletion()
 				display.remove(SorceryUI)
@@ -1079,7 +1148,7 @@ function ShowSorcery(dumb)
 			end
 			
 			SorceryUI=display.newImageRect("scrollui4.png", 460, 600)
-			SorceryUI.x, SorceryUI.y = 230, display.contentHeight+300
+			SorceryUI.x, SorceryUI.y = display.contentCenterX, display.contentHeight+300
 			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y-(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=finishSpells})
 			SBookDisplayed=true
 		elseif SBookDisplayed==true then
@@ -1102,6 +1171,24 @@ function CastSorcery(name)
 	display.remove(AttackBtn)
 	display.remove(MagicBtn)
 	display.remove(RunBtn)
+	
+	AttackBtn=display.newImageRect("combataction3.png",342,86)
+	AttackBtn.x=timersprite.x-172
+	AttackBtn.y=timersprite.y-44
+	gcm:insert( AttackBtn )
+	
+	MagicBtn=display.newImageRect("combataction3.png",342,86)
+	MagicBtn.x = timersprite.x+172
+	MagicBtn.y = AttackBtn.y
+	gcm:insert( MagicBtn )
+	
+	RunBtn=display.newImageRect("combataction3.png",342,86)
+	RunBtn.x = MagicBtn.x
+	RunBtn.y = timersprite.y+44
+	gcm:insert( RunBtn )
+	
+	timersprite:toFront()
+	
 	for s=1, table.maxn(p1.spells) do
 		if p1.spells[s][1]==name then
 			p1.MP=p1.MP-p1.spells[s][4]
