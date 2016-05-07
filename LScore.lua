@@ -8,6 +8,7 @@ local widget = require "widget"
 local audio = require("Laudio")
 local o = require("Loptions")
 local v = require("Lversion")
+local m = require("Lmenu")
 local ghs=display.newGroup()
 local Score
 local GVersion
@@ -120,6 +121,7 @@ end
 function HighScores()
 	--Displays high scores
 	
+	m.FindMe(5)
 	title=display.newText("High Scores",0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100

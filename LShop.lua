@@ -38,6 +38,7 @@ function DisplayShop(id,room)
 	curShop=Shops[room][id]
 	ShopID=id
 	page=1
+	menu.FindMe(7)
 	
 	window=display.newImageRect("shop.png", 768, 600)
 	window.x,window.y = display.contentWidth*0.5, 425
@@ -289,6 +290,7 @@ function PrevPage()
 end
 
 function CloseShop()
+	menu.FindMe(6)
 	atShop=false
 	for i=gsm.numChildren,1,-1 do
 		display.remove(gsm[i])

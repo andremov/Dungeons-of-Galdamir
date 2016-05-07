@@ -41,6 +41,7 @@ local item=require("Litems")
 local mob=require("Lmobai")
 local q=require("Lquest")
 local gp=require("Lgold")
+local m=require("Lmenu")
 local ui=require("Lui")
 local SBookDisplayed
 local statusdisplay
@@ -118,7 +119,7 @@ function DisplayCombat()
 	players.CalmDownCowboy(false)
 	gcm=display.newGroup()
 	hits={}
-	
+	m.FindMe(7)
 	local bkgdark=display.newImageRect("bkgs/bkg_level.png",768,1024)
 	bkgdark.x=display.contentCenterX
 	bkgdark.y=display.contentCenterY
@@ -988,7 +989,7 @@ function CreateMobStats()
 				if col>((math.sqrt(size)/zonas)*(zonas-z)) and col<=((math.sqrt(size)/zonas)*((zonas+1)-z)) and row>=((math.sqrt(size)/zonas)*(zonas-z)) then
 					enemy.lvl=(z+(zonas*(round-1)))
 				elseif row>((math.sqrt(size)/zonas)*(zonas-z)) and row<=((math.sqrt(size)/zonas)*((zonas+1)-z)) and col>=((math.sqrt(size)/zonas)*((zonas+1)-z)) then
-					enemy.lvl(z+(zonas*(round-1)))
+					enemy.lvl=(z+(zonas*(round-1)))
 				end
 			end
 		else
@@ -1484,6 +1485,7 @@ function EndTurn()
 end
 
 function EndCombat(outcome)
+	m.FindMe(6)
 	inCombat=false
 	gcm:insert(HitGroup)
 	for i=gcm.numChildren,1,-1 do

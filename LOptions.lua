@@ -27,7 +27,7 @@ local Large
 
 function DisplayOptions()
 	scr.CheckScore()
-	
+	menu.FindMe(2)
 	title=display.newText("Options",0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100

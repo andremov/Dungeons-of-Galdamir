@@ -20,6 +20,7 @@ local WD=require("Lprogress")
 local s=require("Lsplashes")
 local m=require("Lmovement")
 local sav=require("Lsaving")
+local menu=require("Lmenu")
 local Round
 local Loading
 local DoStuff
@@ -33,7 +34,7 @@ function Startup(val)
 		DoStuff=false
 	end
 	Loading=display.newGroup()
-	
+	menu.FindMe(8)
 	loadbkg = display.newImage("bkgs/bkg_leveldark.png", true)
 	loadbkg.x = display.contentWidth/2
 	loadbkg.y = display.contentHeight/2
@@ -116,11 +117,16 @@ function Continue( event )
 		Loading=nil
 		if DoStuff==true then
 			ui.UI(true)
-			ui.Pause(true)
-			inv.ToggleInfo()
+			if DoLoad==true then
+				DoLoad=false
+			else
+				ui.Pause(true)
+				inv.ToggleInfo()
+			end
 			players.CalmDownCowboy(true)
 			audio.Play(3)
 			audio.Play(10)
+			menu.FindMe(6)
 		elseif DoStuff==false then
 			m.Visibility()
 		end
@@ -141,7 +147,6 @@ function Operations(name)
 	ui.CleanSlate()
 	ui.UI(false)
 	if DoLoad==true then
-		DoLoad=false
 		timer.performWithDelay(100, (sav.Load) )
 	else
 		builder.BuildMap()

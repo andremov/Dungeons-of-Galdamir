@@ -13,7 +13,7 @@ local pmg
 
 function Display()
 	pmg=display.newGroup()
-	
+	m.FindMe(1)
 	title=display.newText("Save game",0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100
@@ -213,6 +213,7 @@ function onBackRelease()
 end
 
 function goSlot1()
+	m.FindMe(6)
 	local saved=sav.CheckSave(1)
 	if saved~=false then
 		for i=pmg.numChildren,1,-1 do
@@ -234,6 +235,7 @@ function goSlot1()
 end
 
 function goSlot2()
+	m.FindMe(6)
 	local saved=sav.CheckSave(2)
 	if saved~=false then
 		for i=pmg.numChildren,1,-1 do
@@ -255,6 +257,7 @@ function goSlot2()
 end
 
 function goSlot3()
+	m.FindMe(6)
 	local saved=sav.CheckSave(3)
 	if saved~=false then
 		for i=pmg.numChildren,1,-1 do

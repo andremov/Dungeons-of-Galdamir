@@ -22,6 +22,7 @@ local item=require("Litems")
 local sc=require("Lscore")
 local b=require("Lmapbuilder")
 local s=require("Lsaving")
+local m=require("Lmenu")
 local ginv
 local geqp
 local ginf
@@ -366,6 +367,7 @@ end
 
 function ToggleExit()
 	if isOpn==false then
+		m.FindMe(9)
 		isOpn=true
 		gexui=display.newGroup()
 		
@@ -419,6 +421,7 @@ function ToggleExit()
 		gexui:toFront()
 		
 	elseif isOpn==true and (gexui) then
+		m.FindMe(6)
 		isOpn=false
 		for i=gexui.numChildren,1,-1 do
 			display.remove(gexui[i])
@@ -772,16 +775,7 @@ function SwapInfo()
 end
 
 function DoExit()
-	for i=gexui.numChildren,1,-1 do
-		display.remove(gexui[i])
-		gexui[i]=nil
-	end
-	gexui=nil
-	isOpn=false
-	ui.Pause(true)
-	g.ShowGCounter()
-	p.LetsYodaIt()
-	WD.SrsBsns()
+	native.requestExit()
 end
 
 function MusicScroll( event )
@@ -858,7 +852,7 @@ function DeathMenu(cause)
 	if isOpn==false then
 		gdm=display.newGroup()
 		isOpn=true
-		
+		m.FindMe(9)
 		DMenu=display.newImageRect("deathmenu.png", 700, 500)
 		DMenu.x,DMenu.y = display.contentCenterX, 450
 		Dthtxt=display.newGroup()

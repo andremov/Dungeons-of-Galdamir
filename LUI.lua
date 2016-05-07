@@ -47,6 +47,14 @@ function Paused()
 	return isPaused
 end
 
+function ForcePause()
+	if isPaused==true then
+		inv.CloseErrthang()
+	else
+		Pause()
+	end
+end
+
 function UI(ready)
 	if ready==true then
 		PauseBtn = widget.newButton{

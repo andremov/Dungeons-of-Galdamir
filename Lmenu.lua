@@ -10,6 +10,9 @@ local a=require("Laudio")
 local v=require("Lversion")
 local p=require("Lplay")
 local o=require("Loptions")
+local sc=require("Lscore")
+local c=require("Lchars")
+local m=require("Lmaphandler")
 local group=display.newGroup()
 local GVersion
 local PlayBtn
@@ -34,6 +37,7 @@ function ShowMenu()
 		Runtime:addEventListener("enterFrame",FrontNCenter2)
 	end
 	
+	CurMenu=0
 	GVersion=v.HowDoIVersion(true)
 	canGo=false
 	--[[
@@ -130,6 +134,7 @@ function ShowMenu()
 	end
 	
 	a.Menu(true)
+	Runtime:addEventListener( "key", onKeyEvent )
 end
 
 function SplashChange()
@@ -237,4 +242,41 @@ function isVersion(val)
 			end
 		end
 	end
+end
+
+function FindMe(value)
+	CurMenu=value
+end
+
+function onKeyEvent( event )
+	local phase = event.phase
+	local keyName = event.keyName
+
+	if ( "back" == keyName and phase == "up" ) then
+		if CurMenu==0 then
+			native.requestExit()
+		elseif CurMenu==1 then
+			p.onBackRelease()
+		elseif CurMenu==2 then
+			o.onBackRelease()
+		elseif CurMenu==3 then
+			m.onBackRelease()
+		elseif CurMenu==4 then
+			c.onBackRelease()
+		elseif CurMenu==5 then
+			sc.onBackBtn()
+		elseif CurMenu==6 then
+			ui.ForcePause()
+			inv.ToggleExit()
+		elseif CurMenu==7 then
+			inv.ToggleExit()
+		elseif CurMenu==8 then
+		
+		elseif CurMenu==9 then
+			native.requestExit()
+		end
+		return true
+	end
+
+	return false
 end
