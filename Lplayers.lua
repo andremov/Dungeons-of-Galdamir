@@ -135,6 +135,7 @@ function PlayerLoc(right)
 			player.loc=size-(math.sqrt(size)+1)
 		end
 	end
+	player.room=1
 end
 
 function GetPlayer()

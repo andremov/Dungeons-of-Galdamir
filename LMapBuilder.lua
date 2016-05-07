@@ -65,13 +65,12 @@ local EP
 local MS
 local ShopCount
 -- Constants
-local TileIDsNum=false
-local Peaceful=false
+local TileIDsNum=true
+local Peaceful=true
 local didStair
 local xinicial
 local yinicial
-local espacioy
-local espaciox
+local espacio
 local mapsize
 local TSet
 
@@ -92,6 +91,8 @@ function Essentials()
 	ManaPad=false
 	Spawner=false
 	Level=display.newGroup()
+	Level.x=Level.x+xinicial
+	Level.y=Level.y+yinicial
 	dmobs=display.newGroup()
 	Destructibles={}
 	WaterBlocks={}
@@ -103,15 +104,78 @@ function Essentials()
 	Shops={}
 	walls={}
 	mobs={}
+	room={}
 	fog={}
+	if TileIDsNum==true then
+		num={}
+	end
+	local round=WD.Circle()
+--	rooms=math.floor(math.random(round/2,round))
+	rooms=2
+	if rooms<1 then
+		rooms=1
+	elseif rooms>25 then
+		rooms=25
+	end
+	curroom=1
+	roomid=1
+	layout={
+		1,0,0,0,0,
+		0,0,0,0,0,
+		0,0,0,0,0,
+		0,0,0,0,0,
+		0,0,0,0,0,
+	}
+	for i=2,rooms do
+		local posrooms={}
+		for r=1,table.maxn(layout)do
+			if layout[r]==1 then
+				if layout[r+1]==0 then
+					posrooms[#posrooms+1]=r+1
+				end
+				if layout[r+5]==0 then
+					posrooms[#posrooms+1]=r+5
+				end
+			end
+		end
+		local chosen=math.random(1,table.maxn(posrooms))
+		layout[posrooms[chosen]]=1
+	end
+	for r=1,table.maxn(layout) do
+		if layout[r]==1 then
+			room[r]={}
+			Destructibles[r]={}
+			WaterBlocks[r]={}
+			LavaBlocks[r]={}
+			boundary[r]={}
+			mbounds[r]={}
+			hidden[r]={}
+			Chests[r]={}
+			Shops[r]={}
+			walls[r]={}
+			mobs[r]={}
+			fog[r]={}
+			if TileIDsNum==true then
+				num[r]={}
+			end
+		else
+			room[r]=false
+		end
+	end
+	--[[
 	if (map2) and (map2[1]=="Map") then
 		table.remove(map2,1)
 		map2[#map2+1]="Map"
 	else
 		map2={}
-	end
+	end]]
 	Tiles()
 	bkg=ui.Background()
+	print (layout[1].." "..layout[2].." "..layout[3].." "..layout[4].." "..layout[5])
+	print (layout[6].." "..layout[7].." "..layout[8].." "..layout[9].." "..layout[10])
+	print (layout[11].." "..layout[12].." "..layout[13].." "..layout[14].." "..layout[15])
+	print (layout[16].." "..layout[17].." "..layout[18].." "..layout[19].." "..layout[20])
+	print (layout[21].." "..layout[22].." "..layout[23].." "..layout[24].." "..layout[25])
 end
 
 function BuildMap()
@@ -128,181 +192,202 @@ function BuildMap()
 	map=handler.GetCMap()
 	mapsize=table.maxn( map )
 	
-	BuildTile()
-	
-	BuildTile()
-	
-	BuildTile()
-	
-	BuildTile()
-	
-	BuildTile()
+	if room[curroom]~=false and curroom<table.maxn(layout)+1 then
+		BuildTile()
+		BuildTile()
+		BuildTile()
+		BuildTile()
+		BuildTile()
+	elseif curroom==table.maxn(layout)+1 then
+		count=mapsize+1
+	else
+		curroom=curroom+1
+	end
 	
 	if count<mapsize+1 then
 		timer.performWithDelay(0.2,BuildMap)
 	else
-		loadtxt.text=("Testing Map...")
-		loadtxt:toFront()
-		local CanBeDone=Pathfinding()
-		if CanBeDone==false then
-			loadtxt.text=("Map Failed.\n   Retrying...")
-			loadtxt:toFront()
-	--		print "Map failed."
-			timer.performWithDelay(500,Rebuild)
-		else
+		if curroom~=table.maxn(layout)+1  then
 			count=0
-	--		print "Map passed."
-			DisplayMap()
+			curroom=curroom+1
+			timer.performWithDelay(0.2,BuildMap)
+		else
+			loadtxt.text=("Testing Map...")
+			loadtxt:toFront()
+			local CanBeDone=Pathfinding()
+			if CanBeDone==false then
+		--		print "Map failed."
+				loadtxt.text=("Map Failed.\n   Retrying...")
+				loadtxt:toFront()
+				timer.performWithDelay(500,Rebuild)
+			else
+		--		print "Map passed."
+				count=0
+				curroom=1
+				DisplayMap()
+			end
 		end
 	end
 end
 
 function DisplayMap()
-	local map=handler.GetCMap()
-	mapsize=table.maxn( map )
-	
 	if (count==0)then
 	--	print "Starting Map Display..."
 	end
+	local map=handler.GetCMap()
+	mapsize=table.maxn( map )
+	xinicial=math.floor((curroom-1)%5)*(math.sqrt(mapsize)*espacio)
+	yinicial=math.floor((curroom-1)/5)*(math.sqrt(mapsize)*espacio)
 	
-	DisplayTile()
-	
-	DisplayTile()
-	
-	DisplayTile()
-	
-	DisplayTile()
-	
-	DisplayTile()
-	
-	if count==mapsize then
-		loadtxt.text=("Done.")
-		loadtxt:toFront()
+	if room[curroom]~=false and curroom<table.maxn(layout)+1 then
+		DisplayTile()
+		DisplayTile()
+		DisplayTile()
+		DisplayTile()
+		DisplayTile()
+	elseif curroom==table.maxn(layout)+1 then
+		count=mapsize
+	else
+		curroom=curroom+1
 	end
 	
 	if count~=mapsize then
 		timer.performWithDelay(0.2,DisplayMap)
 	else
-		mob.ReceiveMobs(mobs)
-		local check=su.ShowContinue()
-		display.remove(loadtxt)
-		loadtxt=nil
-		if check==false then
-			Level:insert( dmobs )
-			Level:toBack()
-			bkg:toBack()
-			if map2[#map2]=="Map" then
-			else
-				Extras()
-			end
-			q.CreateQuest()
-			
-			local CurRound=WD.Circle()
-			if (BluePortal==true) then
-				ui.MapIndicators("BP")
-			end
-			if (Spawner==true) then
-				ui.MapIndicators("MS")
-			end
-			if (ManaPad==true) then
-				ui.MapIndicators("MP")
-			end
-			if (HealPad==true) then
-				ui.MapIndicators("HP")
-			end
-			if (EnergyPad==true) then
-				ui.MapIndicators("EP")
-			end
-			if KeySpawned==false then
-				ui.MapIndicators("KEY")
-			end
-			if not(side)then
-				side=false
-			end
-			if side==true then
-				p.PlayerLoc(false)
-			--	m.Visibility()
-				if CurRound%2==0 then
-	--				print "Abnormal Progression, Even Floor"
-				else
-	--				print "Abnormal Progression, Odd Floor"
-					Level.x=Level.x-((math.sqrt(mapsize)-3)*espacio)
-					Level.y=Level.y-((math.sqrt(mapsize)-3)*espacio)
+		if curroom~=table.maxn(layout)+1  then
+			count=0
+			curroom=curroom+1
+			timer.performWithDelay(0.2,DisplayMap)
+		else
+			loadtxt.text=("Done.")
+			loadtxt:toFront()
+			mob.ReceiveMobs(mobs)
+			local check=su.ShowContinue()
+			display.remove(loadtxt)
+			loadtxt=nil
+			if check==false then
+				Level:insert( dmobs )
+				Level:toBack()
+				bkg:toBack()
+		--		if map2[#map2]=="Map" then
+		--		else
+					Extras()
+		--		end
+				q.CreateQuest()
+				local CurRound=WD.Circle()
+				if (BluePortal==true) then
+					ui.MapIndicators("BP")
 				end
-			elseif side==false then
-				p.PlayerLoc(true)
-			--	m.Visibility()
-				if CurRound%2==0 then
-	--				print "Normal Progression, Even Floor"
-					Level.x=Level.x-((math.sqrt(mapsize)-3)*espacio)
-					Level.y=Level.y-((math.sqrt(mapsize)-3)*espacio)
-				else
-	--				print "Normal Progression, Odd Floor"
+				if (Spawner==true) then
+					ui.MapIndicators("MS")
+				end
+				if (ManaPad==true) then
+					ui.MapIndicators("MP")
+				end
+				if (HealPad==true) then
+					ui.MapIndicators("HP")
+				end
+				if (EnergyPad==true) then
+					ui.MapIndicators("EP")
+				end
+				if KeySpawned==false then
+					ui.MapIndicators("KEY")
+				end
+				if not(side)then
+					side=false
+				end
+				if side==true then
+					p.PlayerLoc(false)
+				--	m.Visibility()
+					if CurRound%2==0 then
+					--	print "Abnormal Progression, Even Floor"
+					else
+					--	print "Abnormal Progression, Odd Floor"
+						Level.x=Level.x-((math.sqrt(mapsize)-3)*espacio)
+						Level.y=Level.y-((math.sqrt(mapsize)-3)*espacio)
+					end
+				elseif side==false then
+					p.PlayerLoc(true)
+				--	m.Visibility()
+					if CurRound%2==0 then
+					--	print "Normal Progression, Even Floor"
+						Level.x=Level.x-((math.sqrt(mapsize)-3)*espacio)
+						Level.y=Level.y-((math.sqrt(mapsize)-3)*espacio)
+					else
+					--	print "Normal Progression, Odd Floor"
+					end
 				end
 			end
+		--	print "Map Built."
 		end
-	--	print "Map Built."
 	end
 end
 
 function Extras()
-	
 --	print "Adding Sprinkles to Map..."
-	
-	for i=1, mapsize do
-		if i~=(math.sqrt(mapsize)+2) and map2[i]=="x" then
-		
-			if mbounds[i]==1 and KeySpawned==false then
-				local isKey=math.random(1,500)
-				if isKey>=490 then
-					mbounds[i]=0	
-					SmallKey=display.newImageRect( "tiles/"..TSet.."/smallkey.png", 80, 80)
-					SmallKey.x=xinicial+((((i-1)%math.sqrt(mapsize)))*espacio)
-					SmallKey.y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacio)
-					SmallKey.isVisible=false
-					SmallKey.loc=(i)
-					map2[i]="k"
-					SmallKey.xScale=scale
-					SmallKey.yScale=SmallKey.xScale
-					Level:insert( SmallKey )
-					KeySpawned=true
-				end
-			end
-			
-			if mbounds[i]==1 then
-				local isChest=math.random(1,100)
-				if isChest>=90 then
-					mbounds[i]=0	
-					Chests[i]=display.newImageRect( "tiles/"..TSet.."/treasure.png", 80, 80)
-					Chests[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espacio)
-					Chests[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacio)
-					Chests[i].isVisible=false
-					map2[i]="t"
-					Chests[i].xScale=scale
-					Chests[i].yScale=Chests[i].xScale
-					Level:insert( Chests[i] )
-				end
-			end
-			if Peaceful==false then
-				if mbounds[i]==1 then
-					local isMob=math.random(1,30)
-					if isMob>28 then
-						mobs[i]=display.newImageRect( "tiles/"..TSet.."/mob.png",80,80)
-						mobs[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espacio)
-						mobs[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacio)
-						mobs[i].isVisible=false
-						mobs[i].loc=(i)
-						map2[i]="-"
-						mobs[i].xScale=scale
-						mobs[i].yScale=mobs[i].xScale
-						dmobs:insert( mobs[i] )
+	for r=1,25 do
+		if layout[r]==1 then
+			local map=handler.GetCMap()
+			mapsize=table.maxn( map )
+			for i=1, mapsize do
+				if i~=(math.sqrt(mapsize)+2) and room[r][i]=="x" then
+				
+					if mbounds[r][i]==1 and KeySpawned==false then
+						local isKey=math.random(1,500)
+						if isKey>=490 then
+							mbounds[r][i]=0	
+							SmallKey=display.newImageRect( "tiles/"..TSet.."/smallkey.png", 80, 80)
+							SmallKey.x=xinicial+((((i-1)%math.sqrt(mapsize)))*espacio)
+							SmallKey.y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacio)
+							SmallKey.isVisible=false
+							SmallKey.loc=(i)
+							room[r][i]="k"
+							SmallKey.xScale=scale
+							SmallKey.yScale=SmallKey.xScale
+							Level:insert( SmallKey )
+							KeySpawned=true
+						end
 					end
+					
+					if mbounds[r][i]==1 then
+						local isChest=math.random(1,100)
+						if isChest>=90 then
+							mbounds[r][i]=0	
+							Chests[r][i]=display.newImageRect( "tiles/"..TSet.."/treasure.png", 80, 80)
+							Chests[r][i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espacio)
+							Chests[r][i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacio)
+							Chests[r][i].isVisible=false
+							room[r][i]="t"
+							Chests[r][i].xScale=scale
+							Chests[r][i].yScale=Chests[r][i].xScale
+							Level:insert( Chests[r][i] )
+							print (r)
+							print (i)
+						end
+					end
+					
+					if Peaceful==false then
+						if mbounds[r][i]==1 then
+							local isMob=math.random(1,30)
+							if isMob>28 then
+								mobs[r][i]=display.newImageRect( "tiles/"..TSet.."/mob.png",80,80)
+								mobs[r][i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espacio)
+								mobs[r][i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacio)
+								mobs[r][i].isVisible=false
+								mobs[r][i].loc=(i)
+								mobs[r][i].room=(r)
+								room[r][i]="-"
+								mobs[r][i].xScale=scale
+								mobs[r][i].yScale=mobs[r][i].xScale
+								dmobs:insert( mobs[r][i] )
+							end
+						end
+					end
+					
 				end
 			end
-			
 		end
-	end
-	
+	end		
 	if KeySpawned==false then
 		mbounds[finish]=1
 		boundary[finish]=1
@@ -324,259 +409,307 @@ function BuildTile()
 
 	count=count+1
 	if math.floor((count/mapsize)*100)<10 then
-		loadtxt.text=("Generating Map...\n".."             0"..math.floor((count/mapsize)*100).."%")
+		loadtxt.text=("Generating Room "..curroom.."...\n".."             0"..math.floor((count/mapsize)*100).."%")
 		loadtxt:toFront()
 	else
-		loadtxt.text=("Generating Map...\n".."              "..math.floor((count/mapsize)*100).."%")
+		loadtxt.text=("Generating Room "..curroom.."...\n".."              "..math.floor((count/mapsize)*100).."%")
 		loadtxt:toFront()
 	end
 	
-	if count~=mapsize+1 and not(map2[count]) then
+	if count~=mapsize+1 and not(room[curroom][count]) then
 	
 		if(map[count]=="b")then
-			boundary[count]=0
-			mbounds[count]=0
-			map2[count]="b"
+			boundary[curroom][count]=0
+			mbounds[curroom][count]=0
+			room[curroom][count]="b"
+		end
+		
+		if(map[count]=="1")then
+			if (room[curroom-5]) and room[curroom-5]~=false then
+				boundary[curroom][count]=1
+				mbounds[curroom][count]=1
+				room[curroom][count]="x"
+			else
+				boundary[curroom][count]=0
+				mbounds[curroom][count]=0
+				room[curroom][count]="b"
+			end
+		end
+		
+		if(map[count]=="2")then
+			if (room[curroom-1]) and room[curroom-1]~=false then
+				boundary[curroom][count]=1
+				mbounds[curroom][count]=1
+				room[curroom][count]="x"
+			else
+				boundary[curroom][count]=0
+				mbounds[curroom][count]=0
+				room[curroom][count]="b"
+			end
+		end
+		
+		if(map[count]=="3")then
+			if (room[curroom+1]) and room[curroom+1]~=false then
+				boundary[curroom][count]=1
+				mbounds[curroom][count]=1
+				room[curroom][count]="x"
+			else
+				boundary[curroom][count]=0
+				mbounds[curroom][count]=0
+				room[curroom][count]="b"
+			end
+		end
+		
+		if(map[count]=="4")then
+			if (room[curroom+5]) and room[curroom+5]~=false then
+				boundary[curroom][count]=1
+				mbounds[curroom][count]=1
+				room[curroom][count]="x"
+			else
+				boundary[curroom][count]=0
+				mbounds[curroom][count]=0
+				room[curroom][count]="b"
+			end
 		end
 		
 		if(map[count]=="d")then
 			local canitbreak=math.random(1,10)
 			if canitbreak>=7 then
-				boundary[count]=1
-				mbounds[count]=0
-				map2[count]="q"
+				boundary[curroom][count]=1
+				mbounds[curroom][count]=0
+				room[curroom][count]="q"
 			else
-				boundary[count]=0
-				mbounds[count]=0
-				map2[count]="o"
+				boundary[curroom][count]=0
+				mbounds[curroom][count]=0
+				room[curroom][count]="o"
 			end
 		end	
 		
 		if(map[count]=="h")then
-			mbounds[count]=1
-			boundary[count]=1
+			mbounds[curroom][count]=1
+			boundary[curroom][count]=1
 			if HealPad==false then
 				HealPad=true
-				map2[count]="h"
+				room[curroom][count]="h"
 			elseif HealPad==true then
-				map2[count]="x"
+				room[curroom][count]="x"
 			end
 		end
 		
 		if(map[count]=="i")then
-			mbounds[count]=1
-			boundary[count]=1
+			mbounds[curroom][count]=1
+			boundary[curroom][count]=1
 			if EnergyPad==false then
 				EnergyPad=true
-				map2[count]="i"
+				room[curroom][count]="i"
 			elseif EnergyPad==true then
-				map2[count]="x"
+				room[curroom][count]="x"
 			end
 		end
 		
 		if(map[count]=="j")then
-			mbounds[count]=1
-			boundary[count]=1
+			mbounds[curroom][count]=1
+			boundary[curroom][count]=1
 			if ManaPad==false then
 				ManaPad=true
-				map2[count]="j"
+				room[curroom][count]="j"
 			elseif ManaPad==true then
-				map2[count]="x"
+				room[curroom][count]="x"
 			end
 		end
 		
 		if(map[count]=="k")then
-			boundary[count]=1
+			boundary[curroom][count]=1
 			if KeySpawned==true then
-				mbounds[i]=1
-				map2[i]="x"
+				mbounds[curroom][count]=1
+				room[curroom][count]="x"
 			else
 				KeySpawned=true
-				map2[i]="k"
-				mbounds[i]=0
+				room[curroom][count]="k"
+				mbounds[curroom][count]=0
 			end
 		end
 
 		if(map[count]=="l")then
-			mbounds[count]=0
-			boundary[count]=1
-			map2[count]="l"
+			mbounds[curroom][count]=0
+			boundary[curroom][count]=1
+			room[curroom][count]="l"
 		end	
 		
 		if(map[count]=="m")then
-			boundary[count]=1
-			mbounds[count]=1
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=1
 			if(OrangePortal==false)then
 				OrangePortal=true
 				OPLoc=count
-				map2[count]="m"
+				room[curroom][count]="m"
 			elseif(OrangePortal==true)then
-				map2[count]="x"
+				room[curroom][count]="x"
 			end
 		end
 		
 		if(map[count]=="n")then
-			boundary[count]=1
-			mbounds[count]=1
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=1
 			if(BluePortal==false)then
 				BluePortal=true
 				BPLoc=count
-				map2[count]="n"
+				room[curroom][count]="n"
 			elseif(BluePortal==true)then
-				map2[count]="x"
+				room[curroom][count]="x"
 			end
 		end
 		
 		if(map[count]=="o")then
-			boundary[count]=0
-			mbounds[count]=0
-			map2[count]="o"
+			boundary[curroom][count]=0
+			mbounds[curroom][count]=0
+			room[curroom][count]="o"
 		end
 		
 		if(map[count]=="q")then
-			boundary[count]=1
-			mbounds[count]=0
-			map2[count]="q"
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=0
+			room[curroom][count]="q"
 		end	
 		
 		if(map[count]=="s")and(ShopCount~=(mapsize/10)*(mapsize/10))then
-			boundary[count]=1
-			mbounds[count]=1
-			map2[count]="s"
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=1
+			room[curroom][count]="s"
 			ShopCount=ShopCount+1
 		end
 		
 		if(map[count]=="t")then
-			mbounds[count]=1
-			boundary[count]=1
-			map2[count]="t"
+			mbounds[curroom][count]=1
+			boundary[curroom][count]=1
+			room[curroom][count]="t"
 		end
 	
 		if(map[count]=="u") then
-			boundary[count]=1
-			mbounds[count]=1
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=1
 			if Spawner==false then
 				Spawner=true
-				map2[count]="u"
+				room[curroom][count]="u"
 			elseif Spawner==true then
-				map2[count]="x"
+				room[curroom][count]="x"
 			end
 		end
 		
 		if(map[count]=="w")then
-			boundary[count]=1
-			mbounds[count]=0
-			map2[count]="w"
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=0
+			room[curroom][count]="w"
 		end
 		
 		if(map[count]=="x")then
-			mbounds[count]=1
-			boundary[count]=1
-			map2[count]="x"
+			mbounds[curroom][count]=1
+			boundary[curroom][count]=1
+			room[curroom][count]="x"
 		end
 		
 		if(map[count]=="z")then
-			mbounds[count]=0
-			boundary[count]=1
-			map2[count]="z"
+			mbounds[curroom][count]=0
+			boundary[curroom][count]=1
+			room[curroom][count]="z"
 		end
 		
 	elseif count~=mapsize+1 then
 		
-		if(map2[count]=="b")then
-			boundary[count]=0
-			mbounds[count]=0
+		if(room[curroom][count]=="b")then
+			boundary[curroom][count]=0
+			mbounds[curroom][count]=0
 		end
 		
-		if(map2[count]=="h")then
-			mbounds[count]=1
-			boundary[count]=1
+		if(room[curroom][count]=="h")then
+			mbounds[curroom][count]=1
+			boundary[curroom][count]=1
 			HealPad=true
 		end
 		
-		if(map2[count]=="i")then
-			mbounds[count]=1
-			boundary[count]=1
+		if(room[curroom][count]=="i")then
+			mbounds[curroom][count]=1
+			boundary[curroom][count]=1
 			EnergyPad=true
 		end
 		
-		if(map2[count]=="j")then
-			mbounds[count]=1
-			boundary[count]=1
+		if(room[curroom][count]=="j")then
+			mbounds[curroom][count]=1
+			boundary[curroom][count]=1
 			ManaPad=true
 		end
 		
-		if(map2[count]=="k")then
-			boundary[count]=1
-			mbounds[i]=0
+		if(room[curroom][count]=="k")then
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=0
 			KeySpawned=true
 		end
 
-		if(map2[count]=="l")then
-			mbounds[count]=0
-			boundary[count]=1
+		if(room[curroom][count]=="l")then
+			mbounds[curroom][count]=0
+			boundary[curroom][count]=1
 		end	
 		
-		if(map2[count]=="m")then
-			boundary[count]=1
-			mbounds[count]=1
+		if(room[curroom][count]=="m")then
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=1
 			OrangePortal=true
 		end
 		
-		if(map2[count]=="n")then
-			boundary[count]=1
-			mbounds[count]=1
+		if(room[curroom][count]=="n")then
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=1
 			BluePortal=true
-			map2[count]="n"
+			room[curroom][count]="n"
 		end
 	
-		if(map2[count]=="ñ")then
-			boundary[count]=1
-			mbounds[count]=1
+		if(room[curroom][count]=="ñ")then
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=1
 			RedPortal=true
-			map2[count]="ñ"
+			room[curroom][count]="ñ"
 		end
 		
-		if(map2[count]=="o")then
-			boundary[count]=0
-			mbounds[count]=0
+		if(room[curroom][count]=="o")then
+			boundary[curroom][count]=0
+			mbounds[curroom][count]=0
 		end
 		
-		if(map2[count]=="q")then
-			boundary[count]=1
-			mbounds[count]=0
+		if(room[curroom][count]=="q")then
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=0
 		end
 		
-		if(map2[count]=="s")then
-			boundary[count]=1
-			mbounds[count]=1
+		if(room[curroom][count]=="s")then
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=1
 			ShopCount=ShopCount+1
 		end
 		
-		if(map2[count]=="t")then
-			boundary[count]=1
-			mbounds[count]=1
+		if(room[curroom][count]=="t")then
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=1
 		end
 	
-		if(map2[count]=="u") then
-			boundary[count]=1
-			mbounds[count]=1
+		if(room[curroom][count]=="u") then
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=1
 			Spawner=true
 		end
 		
-		if(map2[count]=="w")then
-			boundary[count]=1
-			mbounds[count]=0
+		if(room[curroom][count]=="w")then
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=0
 		end
 		
-		if(map2[count]=="x")then
-			mbounds[count]=1
-			boundary[count]=1
+		if(room[curroom][count]=="x")then
+			mbounds[curroom][count]=1
+			boundary[curroom][count]=1
 		end
 		
-		if(map2[count]=="z")then
-			mbounds[count]=0
-			boundary[count]=1
+		if(room[curroom][count]=="z")then
+			mbounds[curroom][count]=0
+			boundary[curroom][count]=1
 		end
 		
 	end
@@ -592,35 +725,35 @@ function RandomizeTile()
 	--	print "Starting Map Randomization..."
 	end
 	
-	if count~=mapsize+1 and not(map2[count]) then
-		if (map[count]=="r") then
+	if count~=mapsize+1 and not(room[curroom][count]) then
+		if (map[curroom][count]=="r") then
 			if i~=(math.sqrt(mapsize)+2) then
 				local TileRoll=math.random(1, 100)
 			
 				if (TileRoll>=1) and (TileRoll<10) then
-					boundary[count]=1
-					mbounds[count]=1
+					boundary[curroom][count]=1
+					mbounds[curroom][count]=1
 					local port=math.random(200,205)
 					if OrangePortal==false and (port==200) then
-						map2[count]="m"
+						room[curroom][count]="m"
 						OrangePortal=true
 						OPLoc=count
 					elseif HealPad==false and (port==201) then
-						map2[count]="h"
+						room[curroom][count]="h"
 						HealPad=true
 					elseif ManaPad==false and (port==202) then
-						map2[count]="j"
+						room[curroom][count]="j"
 						ManaPad=true
 					elseif Spawner==false and (port==203) then
-						map2[count]="u"
+						room[curroom][count]="u"
 						Spawner=true
 					elseif EnergyPad==false and (port==204) then
-						map2[count]="i"
+						room[curroom][count]="i"
 						EnergyPad=true
 					elseif (port==205) and (ShopCount~=((math.sqrt(mapsize))/10)*((math.sqrt(mapsize))/10)) then
 						local TimeIsMoney=true
 						for i=1,mapsize do
-							if map2[i]=="s" then
+							if room[curroom][i]=="s" then
 								local SZoneX=math.floor(i%(math.sqrt(mapsize)))
 								local SZoneY=math.floor(i/(math.sqrt(mapsize)))+1
 								local SZone=1
@@ -646,10 +779,10 @@ function RandomizeTile()
 						end
 						
 						if TimeIsMoney==true then
-							map2[count]="s"
+							room[curroom][count]="s"
 							ShopCount=ShopCount+1
 						else
-							map2[count]="x"
+							room[curroom][count]="x"
 						end
 					elseif OrangePortal==true and BluePortal==false then
 						local ThinkinWithPortals=true
@@ -681,46 +814,46 @@ function RandomizeTile()
 							ThinkinWithPortals=false
 						end
 						if ThinkinWithPortals==true then
-							map2[count]="n"
+							room[curroom][count]="n"
 							BluePortal=true
 							BPLoc=count
 						else
-							map2[count]="x"
+							room[curroom][count]="x"
 						end
 					else
-						map2[count]="x"
+						room[curroom][count]="x"
 					end
 				end
 			
 				if (TileRoll>=10) and (TileRoll<15) then
-					boundary[count]=1
-					mbounds[count]=0
-					map2[count]="l"
+					boundary[curroom][count]=1
+					mbounds[curroom][count]=0
+					room[curroom][count]="l"
 				end
 
 				if (TileRoll>=15) and (TileRoll<20) then
-					boundary[count]=1
-					mbounds[count]=0
-					map2[count]="w"
+					boundary[curroom][count]=1
+					mbounds[curroom][count]=0
+					room[curroom][count]="w"
 				end
 				
 				if (TileRoll>=20) and (TileRoll<50)then
 					local canitbreak=math.random(1,10)
 					if canitbreak>=8 then
-						boundary[count]=1
-						mbounds[count]=0
-						map2[count]="q"
+						boundary[curroom][count]=1
+						mbounds[curroom][count]=0
+						room[curroom][count]="q"
 					else
-						boundary[count]=0
-						mbounds[count]=0
-						map2[count]="o"
+						boundary[curroom][count]=0
+						mbounds[curroom][count]=0
+						room[curroom][count]="o"
 					end
 				end
 				
 				if (TileRoll>=50) then
-					boundary[count]=1
-					mbounds[count]=1
-					map2[count]="x"
+					boundary[curroom][count]=1
+					mbounds[curroom][count]=1
+					room[curroom][count]="x"
 				end
 			end
 		end
@@ -732,19 +865,19 @@ function RandomizeTile()
 		if OrangePortal==true and (OPLoc) then
 			if boundary[OPLoc+1]==0 and boundary[OPLoc-1]==0 and boundary[OPLoc-sz]==0 and boundary[OPLoc+sz]==0 then
 				OrangePortal=false
-				map2[OPLoc]="o"
+				room[curroom][OPLoc]="o"
 				OPLoc=nil
 			end
 		end
 		if BluePortal==true and (BPLoc) then
 			if boundary[BPLoc+1]==0 and boundary[BPLoc-1]==0 and boundary[BPLoc-sz]==0 and boundary[BPLoc+sz]==0 then
 				BluePortal=false
-				map2[BPLoc]="o"
+				room[curroom][BPLoc]="o"
 				BPLoc=nil
 			end
 		end
 		if (OPLoc) and OrangePortal==true and BluePortal==false then
-			map2[OPLoc]="x"
+			room[curroom][OPLoc]="x"
 			OrangePortal=false
 			OPLoc=nil
 		end
@@ -754,19 +887,16 @@ end
 function DisplayTile()
 	count=count+1
 	if math.floor((count/mapsize)*100)<10 then
-		loadtxt.text=("Displaying Map...\n".."            0"..math.floor((count/mapsize)*100).."%")
+		loadtxt.text=("Displaying Room "..curroom.."...\n".."            0"..math.floor((count/mapsize)*100).."%")
 		loadtxt:toFront()
 	else
-		loadtxt.text=("Displaying Map...\n".."             "..math.floor((count/mapsize)*100).."%")
+		loadtxt.text=("Displaying Room "..curroom.."...\n".."             "..math.floor((count/mapsize)*100).."%")
 		loadtxt:toFront()
-	end
-	if TileIDsNum==true then
-		num={}
 	end
 	
 	if count~=mapsize+1 then
 	
-		if(map2[count]=="b")then
+		if(room[curroom][count]=="b")then
 			local roll=math.random(1,18)
 			if roll<=9 then
 				roll=1
@@ -775,152 +905,158 @@ function DisplayTile()
 			elseif roll<=18 then
 				roll=3
 			end
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/wall"..(roll)..".png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/wall"..(roll)..".png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 		end
 		
-		if(map2[count]=="h")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+		if(room[curroom][count]=="h")then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 			
-			HP=walls[count]
+			HP=walls[curroom][count]
 			HP=display.newSprite( HealPadsheet, { name="HP", start=1, count=30, time=2000 }  )
 			HP.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			HP.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			HP.isVisible=false
 			HP.loc=(count)
+			HP.room=(curroom)
 			HP.xScale=scale
 			HP.yScale=HP.xScale
 			Level:insert( HP )
 		end
 		
-		if(map2[count]=="i")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+		if(room[curroom][count]=="i")then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 			
-			EP=walls[count]
+			EP=walls[curroom][count]
 			EP=display.newSprite( EnergyPadsheet, { name="EP", start=1, count=30, time=2000 }  )
 			EP.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			EP.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			EP.isVisible=false
 			EP.loc=(count)
+			EP.room=(curroom)
 			EP.xScale=scale
 			EP.yScale=EP.xScale
 			Level:insert( EP )
 		end
 		
-		if(map2[count]=="j")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+		if(room[curroom][count]=="j")then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 			
-			MP=walls[count]
+			MP=walls[curroom][count]
 			MP=display.newSprite( ManaPadsheet, { name="MP", start=1, count=30, time=2000 }  )
 			MP.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			MP.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			MP.isVisible=false
 			MP.loc=(count)
+			MP.room=(curroom)
 			MP.xScale=scale
 			MP.yScale=MP.xScale
 			Level:insert( MP )
 		end
 		
-		if(map2[count]=="k")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+		if(room[curroom][count]=="k")then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 			
 			SmallKey=display.newImageRect( "tiles/"..TSet.."/smallkey.png", 80, 80)
 			SmallKey.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			SmallKey.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			SmallKey.isVisible=false
 			SmallKey.loc=(count)
+			SmallKey.room=(curroom)
 			SmallKey.xScale=scale
 			SmallKey.yScale=SmallKey.xScale
 			Level:insert( SmallKey )
 		end
 		
-		if(map2[count]=="l")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+		if(room[curroom][count]=="l")then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 			
-			LavaBlocks[count]=walls[count]
-			LavaBlocks[count]=display.newSprite( lavasheet, { name="lava", start=1, count=20, time=4000 }  )
-			LavaBlocks[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			LavaBlocks[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			LavaBlocks[count].isVisible=false
-			LavaBlocks[count].xScale=scale
-			LavaBlocks[count].yScale=LavaBlocks[count].xScale
-			Level:insert( LavaBlocks[count] )
+			LavaBlocks[curroom][count]=walls[curroom][count]
+			LavaBlocks[curroom][count]=display.newSprite( lavasheet, { name="lava", start=1, count=20, time=4000 }  )
+			LavaBlocks[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			LavaBlocks[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			LavaBlocks[curroom][count].isVisible=false
+			LavaBlocks[curroom][count].xScale=scale
+			LavaBlocks[curroom][count].yScale=LavaBlocks[curroom][count].xScale
+			Level:insert( LavaBlocks[curroom][count] )
 		end	
 		
-		if(map2[count]=="m")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+		if(room[curroom][count]=="m")then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 			
 			OP=display.newSprite( portalsheet, { name="portal", start=1, count=20, time=1750 }  )
 			OP.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			OP.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			OP.isVisible=false
 			OP.loc=(count)
+			OP.room=(curroom)
 			OP.xScale=scale
 			OP.yScale=OP.xScale
 			Level:insert( OP )
 		end
 		
-		if(map2[count]=="n")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+		if(room[curroom][count]=="n")then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 			
 			BP=display.newSprite( portalbacksheet, { name="portalback", start=1, count=20, time=1750 }  )
 			BP.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			BP.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			BP.isVisible=false
 			BP.loc=(count)
+			BP.room=(curroom)
 			BP.xScale=scale
 			BP.yScale=BP.xScale
 			Level:insert( BP )
 		end
 		
-		if(map2[count]=="o")then
+		if(room[curroom][count]=="o")then
 			local roll=math.random(1,18)
 			if roll<=9 then
 				roll=1
@@ -929,142 +1065,143 @@ function DisplayTile()
 			elseif roll<=18 then
 				roll=3
 			end
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/wall"..(roll)..".png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/wall"..(roll)..".png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 		end
 		
-		if(map2[count]=="q")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert(  walls[count] )
+		if(room[curroom][count]=="q")then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert(  walls[curroom][count] )
 			
-			Destructibles[count]=display.newSprite(rockbreaksheet,{name="rock",start=1,count=14,time=400,loopCount=1})
-			Destructibles[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			Destructibles[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			Destructibles[count].isVisible=false
-			Destructibles[count].exist=true
-			Destructibles[count].xScale=scale
-			Destructibles[count].yScale=Destructibles[count].xScale
-			Level:insert( Destructibles[count] )
+			Destructibles[curroom][count]=display.newSprite(rockbreaksheet,{name="rock",start=1,count=14,time=400,loopCount=1})
+			Destructibles[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			Destructibles[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			Destructibles[curroom][count].isVisible=false
+			Destructibles[curroom][count].exist=true
+			Destructibles[curroom][count].xScale=scale
+			Destructibles[curroom][count].yScale=Destructibles[curroom][count].xScale
+			Level:insert( Destructibles[curroom][count] )
 		end
 		
-		if(map2[count]=="s")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+		if(room[curroom][count]=="s")then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 			
-			Shops[count]=display.newImageRect( "tiles/"..TSet.."/shop.png", 80, 80)
-			Shops[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			Shops[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			Shops[count].isVisible=false
-			Shops[count].xScale=scale
-			Shops[count].yScale=Shops[count].xScale
-			Level:insert(Shops[count])
+			Shops[curroom][count]=display.newImageRect( "tiles/"..TSet.."/shop.png", 80, 80)
+			Shops[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			Shops[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			Shops[curroom][count].isVisible=false
+			Shops[curroom][count].xScale=scale
+			Shops[curroom][count].yScale=Shops[curroom][count].xScale
+			Level:insert(Shops[curroom][count])
 		end
 		
-		if(map2[count]=="t")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+		if(room[curroom][count]=="t")then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 			
-			Chests[count]=walls[count]
-			Chests[count]=display.newImageRect( "tiles/"..TSet.."/treasure.png", 80, 80)
-			Chests[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			Chests[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			Chests[count].isVisible=false
-			Chests[count].xScale=scale
-			Chests[count].yScale=Chests[count].xScale
-			Level:insert( Chests[count] )
+			Chests[curroom][count]=walls[curroom][count]
+			Chests[curroom][count]=display.newImageRect( "tiles/"..TSet.."/treasure.png", 80, 80)
+			Chests[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			Chests[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			Chests[curroom][count].isVisible=false
+			Chests[curroom][count].xScale=scale
+			Chests[curroom][count].yScale=Chests[curroom][count].xScale
+			Level:insert( Chests[curroom][count] )
 		end
 		
-		if(map2[count]=="u") then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+		if(room[curroom][count]=="u") then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 			
 			MS=display.newSprite( spawnersheet, { name="mobspawner", start=1, count=20, time=1750 }  )
 			MS.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			MS.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			MS.isVisible=false
 			MS.loc=(count)
+			MS.room=(curroom)
 			MS.xScale=scale
 			MS.yScale=MS.xScale
 			Level:insert( MS )
 		end
 		
-		if(map2[count]=="w")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+		if(room[curroom][count]=="w")then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 			
-			WaterBlocks[count]=walls[count]
-			WaterBlocks[count]=display.newSprite( watersheet, { name="water", start=1, count=30, time=3000 }  )
-			WaterBlocks[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			WaterBlocks[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			WaterBlocks[count].isVisible=false
-			WaterBlocks[count].xScale=scale
-			WaterBlocks[count].yScale=WaterBlocks[count].xScale
-			Level:insert( WaterBlocks[count] )
+			WaterBlocks[curroom][count]=walls[curroom][count]
+			WaterBlocks[curroom][count]=display.newSprite( watersheet, { name="water", start=1, count=30, time=3000 }  )
+			WaterBlocks[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			WaterBlocks[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			WaterBlocks[curroom][count].isVisible=false
+			WaterBlocks[curroom][count].xScale=scale
+			WaterBlocks[curroom][count].yScale=WaterBlocks[curroom][count].xScale
+			Level:insert( WaterBlocks[curroom][count] )
 		end
 		
-		if(map2[count]=="x")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			walls[count].isVisible=false
-			walls[count].xScale=scale
-			walls[count].yScale=walls[count].xScale
-			Level:insert( walls[count] )
+		if(room[curroom][count]=="x")then
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			walls[curroom][count].isVisible=false
+			walls[curroom][count].xScale=scale
+			walls[curroom][count].yScale=walls[curroom][count].xScale
+			Level:insert( walls[curroom][count] )
 		end	
 		
-		if(map2[count]=="z")then
+		if(room[curroom][count]=="z")then
 			local curround=WD.Circle()
 			if didStair==false then
-				walls[count]=walls[count]
-				walls[count]=display.newImageRect( "tiles/"..TSet.."/stairup.png", 80, 80)
-				walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-				walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-				walls[count].isVisible=false
-				walls[count].xScale=scale
-				walls[count].yScale=walls[count].xScale
-				Level:insert( walls[count] )
+				walls[curroom][count]=walls[curroom][count]
+				walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/stairup.png", 80, 80)
+				walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+				walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+				walls[curroom][count].isVisible=false
+				walls[curroom][count].xScale=scale
+				walls[curroom][count].yScale=walls[curroom][count].xScale
+				Level:insert( walls[curroom][count] )
 				didStair=true
 				if curround%2==0  then
 					finish=(count)
 				end
 			elseif didStair==true then
-				walls[count]=display.newImageRect( "tiles/"..TSet.."/stairdown.png", 80, 80)
-				walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-				walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-				walls[count].isVisible=false
-				walls[count].xScale=scale
-				walls[count].yScale=walls[count].xScale
-				Level:insert( walls[count] )
+				walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/stairdown.png", 80, 80)
+				walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+				walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+				walls[curroom][count].isVisible=false
+				walls[curroom][count].xScale=scale
+				walls[curroom][count].yScale=walls[curroom][count].xScale
+				Level:insert( walls[curroom][count] )
 				didStair=false
 				if curround%2~=0  then
 					finish=(count)
@@ -1072,13 +1209,13 @@ function DisplayTile()
 			end
 		end
 		
-		fog[count]=display.newImageRect( "tiles/"..TSet.."/fog.png", 80, 80)
-		fog[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-		fog[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-		fog[count].isVisible=false
-		fog[count].xScale=scale
-		fog[count].yScale=fog[count].xScale
-		Level:insert( fog[count] )
+		fog[curroom][count]=display.newImageRect( "tiles/"..TSet.."/fog.png", 80, 80)
+		fog[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+		fog[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+		fog[curroom][count].isVisible=false
+		fog[curroom][count].xScale=scale
+		fog[curroom][count].yScale=fog[curroom][count].xScale
+		Level:insert( fog[curroom][count] )
 		
 		if TileIDsNum==true then
 			local NZoneX=math.floor(count%(math.sqrt(mapsize)))
@@ -1091,10 +1228,11 @@ function DisplayTile()
 				NZone=NZone+2
 			end
 			
-			num[count]=display.newText( (NZone.."-"..count),0,0,"MoolBoran",40 )
-			num[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
-			num[count].y=yinicial+10+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
-			Level:insert( num[count] )
+			num[curroom][count]=display.newText( (curroom.."\n   "..NZone.."-"..count),0,0,"MoolBoran",40 )
+			num[curroom][count]:setTextColor(70,255,70)
+			num[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
+			num[curroom][count].y=yinicial+10+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
+			Level:insert( num[curroom][count] )
 		end
 		
 	end
@@ -1155,95 +1293,89 @@ function Tiles()
 end
 
 function Show(IDs)
+	local p1=p.GetPlayer()
+	roomid=p1.room
 	for i in pairs(hidden) do
-		hidden[i]=nil
-		fog[i].isVisible=true
-		fog[i]:toFront()
+		hidden[roomid][i]=nil
+		fog[roomid][i].isVisible=true
+		fog[roomid][i]:toFront()
 		for m in pairs(mobs)do
-			if (mobs[m].loc==i) then
-	--			print ("HIDING "..mobs[m].loc)
+			if (mobs[m].loc==i) and mobs[m].room==roomid then
 				mobs[m].isVisible=false
 			end
 		end
-		if (LavaBlocks[i]) then
-			LavaBlocks[i]:pause()
+		if (LavaBlocks[roomid][i]) then
+			LavaBlocks[roomid][i]:pause()
 		end
-		if (WaterBlocks[i]) then
-			WaterBlocks[i]:pause()
+		if (WaterBlocks[roomid][i]) then
+			WaterBlocks[roomid][i]:pause()
 		end
-		if (OrangePortal==true) and (OP.loc==i) then
+		if (OrangePortal==true) and (OP.loc==i) and (OP.room==roomid) then
 			OP:pause()
 		end
-		if (BluePortal==true) and (BP.loc==i) then
+		if (BluePortal==true) and (BP.loc==i) and (BP.room==roomid) then
 			BP:pause()
 		end
-		if (RedPortal==true) and (RP.loc==i) then
-			RP:pause()
-		end
-		if (Spawner==true) and (MS.loc==i) then
+		if (Spawner==true) and (MS.loc==i) and (MS.room==roomid) then
 			MS:pause()
 		end
-		if (ManaPad==true) and (MP.loc==i) then
+		if (ManaPad==true) and (MP.loc==i) and (MP.room==roomid) then
 			MP:pause()
 		end
-		if (HealPad==true) and (HP.loc==i) then
+		if (HealPad==true) and (HP.loc==i) and (HP.room==roomid) then
 			HP:pause()
 		end
-		if (EnergyPad==true) and (EP.loc==i) then
+		if (EnergyPad==true) and (EP.loc==i) and (EP.room==roomid) then
 			EP:pause()
 		end
 	end
 	for i in pairs(IDs) do
-		if (fog[i]) then
-			fog[i].isVisible=false
-			hidden[i]=true
+		if (fog[roomid][i]) then
+			fog[roomid][i].isVisible=false
+			hidden[roomid][i]=true
 		end
-		if (walls[i]) then
-			walls[i].isVisible=true
+		if (walls[roomid][i]) then
+			walls[roomid][i].isVisible=true
 		end
-		if (Destructibles[i]) then
-			Destructibles[i].isVisible=true
+		if (Destructibles[roomid][i]) then
+			Destructibles[roomid][i].isVisible=true
 		end
-		if (Shops[i]) then
-			Shops[i].isVisible=true
+		if (Shops[roomid][i]) then
+			Shops[roomid][i].isVisible=true
 		end
-		if (LavaBlocks[i]) then
-			LavaBlocks[i].isVisible=true
-			LavaBlocks[i]:play()
+		if (LavaBlocks[roomid][i]) then
+			LavaBlocks[roomid][i].isVisible=true
+			LavaBlocks[roomid][i]:play()
 		end
-		if (WaterBlocks[i]) then
-			WaterBlocks[i].isVisible=true
-			WaterBlocks[i]:play()
+		if (WaterBlocks[roomid][i]) then
+			WaterBlocks[roomid][i].isVisible=true
+			WaterBlocks[roomid][i]:play()
 		end
-		if (OrangePortal==true) and (OP.loc==i) then
+		if (OrangePortal==true) and (OP.loc==i) and (BP.room==roomid) then
 			OP.isVisible=true
 			OP:play()
 		end
-		if (BluePortal==true) and (BP.loc==i) then
+		if (BluePortal==true) and (BP.loc==i) and (BP.room==roomid) then
 			BP.isVisible=true
 			BP:play()
 		end
-		if (RedPortal==true) and (RP.loc==i) then
-			RP.isVisible=true
-			RP:play()
-		end
-		if (Spawner==true) and (MS.loc==i) then
+		if (Spawner==true) and (MS.loc==i) and (MS.room==roomid) then
 			MS.isVisible=true
 			MS:play()
 		end
-		if (ManaPad==true) and (MP.loc==i) then
+		if (ManaPad==true) and (MP.loc==i) and (MP.room==roomid) then
 			MP.isVisible=true
 			MP:play()
 		end
-		if (HealPad==true) and (HP.loc==i) then
+		if (HealPad==true) and (HP.loc==i) and (HP.room==roomid) then
 			HP.isVisible=true
 			HP:play()
 		end
-		if (EnergyPad==true) and (EP.loc==i) then
+		if (EnergyPad==true) and (EP.loc==i) and (EP.room==roomid) then
 			EP.isVisible=true
 			EP:play()
 		end
-		if (KeySpawned==true) and (SmallKey) and (SmallKey.loc==i) then
+		if (KeySpawned==true) and (SmallKey) and (SmallKey.loc==i) and (SmallKey.room==roomid) then
 			SmallKey.isVisible=true
 		end
 		for m=1,table.maxn(mobs)do
@@ -1251,11 +1383,14 @@ function Show(IDs)
 				mobs[m].isVisible=true
 			end
 		end
-		if (Chests[i]) then
-			Chests[i].isVisible=true
+		if (Chests[roomid][i]) then
+			Chests[roomid][i].isVisible=true
 		end
 		if (finish==i) and (Gate) then
 			Gate.isVisible=true
+		end
+		if (num[roomid][i]) then
+			num[roomid][i]:toFront()
 		end
 	end
 	local canArr=wdow.OpenWindow()
@@ -1321,16 +1456,16 @@ function Pathfinding(start,finish)
 			if done[i]==false then
 				local col=math.floor((i-1)%math.sqrt(mapsize))
 				local row=math.floor((i-1)/math.sqrt(mapsize))
-				if boundary[i+math.sqrt(mapsize)]==1 then
+				if boundary[1][i+math.sqrt(mapsize)]==1 then
 					postiles[#postiles+1]=i+math.sqrt(mapsize)
 				end
-				if boundary[i+1]==1 then
+				if boundary[1][i+1]==1 then
 					postiles[#postiles+1]=i+1
 				end
-				if boundary[i-math.sqrt(mapsize)]==1 then
+				if boundary[1][i-math.sqrt(mapsize)]==1 then
 					postiles[#postiles+1]=i-math.sqrt(mapsize)
 				end
-				if boundary[i-1]==1 then
+				if boundary[1][i-1]==1 then
 					postiles[#postiles+1]=i-1
 				end
 				--Overwrite check
@@ -1480,30 +1615,32 @@ function GetPad(int)
 end
 
 function GetData(val)
+	local p1=p.GetPlayer()
+	roomid=p1.room
 	if val==0 then
 		return mapsize
 	elseif val==1 then
-		return boundary
+		return boundary[roomid]
 	elseif val==2 then
-		return mbounds
+		return mbounds[roomid]
 	elseif val==3 then
 		return Level
 	elseif val==4 then
-		return LavaBlocks
+		return LavaBlocks[roomid]
 	elseif val==5 then
-		return Chests
+		return Chests[roomid]
 	elseif val==6 then
-		return Destructibles
+		return Destructibles[roomid]
 	elseif val==7 then
-		return Shops
+		return Shops[roomid]
 	elseif val==8 then
-		return map2
+		return room[roomid]
 	elseif val==9 then
-		return WaterBlocks
+		return WaterBlocks[roomid]
 	elseif val==10 then
-		return fog
+		return fog[roomid]
 	else
-		return walls
+		return walls[roomid]
 	end
 end
 
@@ -1540,7 +1677,9 @@ function GetPortal(Blue)
 end
 
 function ModMap(id)
-	map2[id]="x"
+	local p1=p.GetPlayer()
+	roomid=p1.room
+	room[roomid][id]="x"
 end
 
 function ReceiveMap(value)

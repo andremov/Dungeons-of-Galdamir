@@ -130,12 +130,14 @@ function Pause(mute)
 		MovePause(true)
 		if isPaused==true then
 			isPaused=false
+	--		print "!2"
 	--		print "Game resumed."
 			if mute~=true then
 				audio.Play(5)
 			end
 		elseif isPaused==false then
 			isPaused=true
+	--		print "!3"
 			m.ShowArrows("clean")
 			gold.ShowGCounter()
 			players.LetsYodaIt()
@@ -157,12 +159,14 @@ function MovePause(val)
 		if not (PauseBtn) then
 			timer.performWithDelay(50,MovePause)
 		elseif pwg.y==0 and val~=true then
+	--		print "!1"
 			window.loc=0
 			window.ready=1
 			m.Visibility()
 			gold.ShowGCounter()
 			players.LetsYodaIt()
 		elseif pwg.y==-216 and val~=true then
+	--		print "!4"
 			window.loc=1
 			window.ready=1
 		else

@@ -22,7 +22,7 @@ local scale=1.2
 local espacio=80*scale
 local yinicial=display.contentHeight/2
 local xinicial=display.contentWidth/2
-local Toggle=math.random(3,6)
+local Toggle=math.random(5,10)
 
 function ShowArrows(value)
 	if value=="clean" then
@@ -53,7 +53,7 @@ function ShowArrows(value)
 			display.remove(mdown)
 			display.remove(mright)
 			display.remove(inter)
-			Toggle=math.random(3,6)
+			Toggle=math.random(5,10)
 			mob.DoTurns()
 		else
 			Ports=coll.PortCheck()
@@ -68,6 +68,8 @@ function ShowArrows(value)
 			col=((p1.loc)%math.sqrt(size))
 			row=(math.floor((p1.loc)/math.sqrt(size)))
 			
+			print ("ROOM: "..p1.room.." LOC: "..p1.loc)
+			
 			display.remove(mup)
 			display.remove(mleft)
 			display.remove(mdown)
@@ -75,7 +77,7 @@ function ShowArrows(value)
 			display.remove(inter)
 			
 			mobs=mob.GetMobGroup()
-			
+			--[[
 			--Boundary Checks
 			if (row+1)==2 then
 				CanAttackUp=false
@@ -96,7 +98,7 @@ function ShowArrows(value)
 				CanAttackRight=false
 				CanMoveRight=false
 			end
-			
+			--]]
 			--Wall Collision Checks
 			if boundary[p1.loc-math.sqrt(size)]==0 then
 				CanAttackUp=false

@@ -63,16 +63,18 @@ function onChestCollision()
 	local bounds=builder.GetData(2)
 	local Chests=builder.GetData(5)
 	local Round=WD.Circle()
-	for i in pairs(Chests) do
-		if ((i)==(P1.loc)) then
-			bounds[i]=1
-			display.remove(Chests[i])
-			Chests[i]=nil
-			gold.CallCoins(Round)
-			audio.Play(1)
-			builder.ModMap(i)
-			Dropped=item.ItemDrop()
-			return Dropped
+	for r in pairs(Chests) do
+		for l in pairs(Chests[r]) do
+			if (l==P1.loc) and (r==P1.room) then
+				bounds[r][l]=1
+				display.remove(Chests[r][l])
+				Chests[r][l]=nil
+				gold.CallCoins(Round)
+				audio.Play(1)
+				builder.ModMap(l)
+				Dropped=item.ItemDrop()
+				return Dropped
+			end
 		end
 	end
 end
