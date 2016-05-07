@@ -19,6 +19,8 @@ local mdown
 local mleft
 local inter
 local cwin
+local mtext
+local mwindow
 local scale=1.2
 local espacio=80*scale
 local yinicial=display.contentHeight/2
@@ -36,12 +38,28 @@ function ShowArrows()
 	coll.LayOnHands()
 	coll.LayOnHead()
 	coll.LayOnFeet()
+	if (mtext) then
+		display.remove(mtext)
+		mtext=nil
+		display.remove(mwindow)
+		mwindow=nil
+	end
 	
 	if Dropped==true or Key==true then
 	elseif Toggle<=0 then
+		mtext=display.newText("Doing mob turns...",0,0,"MoolBoran",70)
+		mtext.x=display.contentCenterX
+		mtext.y=display.contentHeight*.2
+		
+		mwindow=display.newRect (0,0,#mtext.text*22,60)
+		mwindow:setFillColor( 0, 0, 0, 122)
+		mwindow.x=mtext.x
+		mwindow.y=mtext.y-15
+		
 		Toggle=math.random(5,10)
-		mob.DoTurns()
+		timer.performWithDelay(200,mob.DoTurns)
 	else
+	--	print ("ROOM: "..p1.room.." LOC: "..p1.loc)
 		RoomChange=false
 		boundary=b.GetData(1,0)
 		msize=b.GetData(0)
@@ -52,8 +70,6 @@ function ShowArrows()
 		mobs=mob.GetMobGroup()
 		Ports=coll.PortCheck()
 		Shop=coll.ShopCheck()
-		
-		print ("ROOM: "..p1.room.." LOC: "..p1.loc)
 		
 		if not(cwin) then
 			local halfX=display.contentCenterX
@@ -123,70 +139,58 @@ function ShowArrows()
 		end
 		
 		--Mob Collision Checks
-		for i=1, table.maxn(mobs) do
-			if (mobs[i]) then
-				if (mobs[i].loc==p1.loc-size) then
-					mup=display.newImageRect("interact12.png",80,80)
-					mup.x=xinicial
-					mup.y=yinicial-espacio
-					mup.xScale=scale
-					mup.yScale=mup.xScale
-					mup:toFront()
-					CanMoveUp=false
-					CanAttackUp=true
-				end
-			end		
-		end
-
-		for i=1, table.maxn(mobs) do
-			if (mobs[i]) then
-				if (mobs[i].loc==p1.loc+size) then
-					mdown=display.newImageRect("interact12.png",80,80)
-					mdown.x=xinicial
-					mdown.y=yinicial+espacio
-					mdown.xScale=scale
-					mdown.yScale=mdown.xScale
-					mdown:toFront()
-					CanMoveDown=false
-					CanAttackDown=true
-				end
-			end
+		local tryup=mob.LocationCheck(p1.loc-size,p1.room)
+		if tryup==true then
+			CanAttackUp=true
+			CanMoveUp=false
+			mup=display.newImageRect("interact1.png",80,80)
+			mup.x=xinicial
+			mup.y=yinicial-espacio
+			mup.xScale=scale
+			mup.yScale=mup.xScale
+			mup:toFront()
 		end
 		
-		for i=1, table.maxn(mobs) do
-			if (mobs[i]) then
-				if (mobs[i].loc==p1.loc-1) then
-					mleft=display.newImageRect("interact12.png",80,80)
-					mleft.x=xinicial-espacio
-					mleft.y=yinicial
-					mleft.xScale=scale
-					mleft.yScale=mleft.xScale
-					mleft:toFront()
-					CanMoveLeft=false
-					CanAttackLeft=true
-				end
-			end
+		local trydown=mob.LocationCheck(p1.loc+size,p1.room)
+		if trydown==true then
+			CanAttackDown=true
+			CanMoveDown=false
+			mdown=display.newImageRect("interact1.png",80,80)
+			mdown.x=xinicial
+			mdown.y=yinicial+espacio
+			mdown.xScale=scale
+			mdown.yScale=mdown.xScale
+			mdown:toFront()
 		end
 		
-		for i=1, table.maxn(mobs) do
-			if (mobs[i]) then
-				if (mobs[i].loc==p1.loc+1) then
-					mright=display.newImageRect("interact12.png",80,80)
-					mright.x=xinicial+espacio
-					mright.y=yinicial
-					mright.xScale=scale
-					mright.yScale=mright.xScale
-					mright:toFront()
-					CanMoveRight=false
-					CanAttackRight=true
-				end
-			end
+		local tryright=mob.LocationCheck(p1.loc+1,p1.room)
+		if tryright==true then
+			CanAttackRight=true
+			CanMoveRight=false
+			mright=display.newImageRect("interact1.png",80,80)
+			mright.x=xinicial+espacio
+			mright.y=yinicial
+			mright.xScale=scale
+			mright.yScale=mright.xScale
+			mright:toFront()
+		end
+		
+		local tryleft=mob.LocationCheck(p1.loc-1,p1.room)
+		if tryleft==true then
+			CanAttackLeft=true
+			CanMoveLeft=false
+			mleft=display.newImageRect("interact1.png",80,80)
+			mleft.x=xinicial-espacio
+			mleft.y=yinicial
+			mleft.xScale=scale
+			mleft.yScale=mleft.xScale
+			mleft:toFront()
 		end
 		
 		--Movement Arrow Creation
 		
 		if Shop==true then
-			inter=display.newImageRect("interact52.png",80,80)
+			inter=display.newImageRect("interact2.png",80,80)
 			inter.x=xinicial
 			inter.y=yinicial
 			inter.xScale=scale
@@ -196,73 +200,94 @@ function ShowArrows()
 		end
 		
 		if Ports~=false then
-			if Ports=="BP" and p1.portcd==0 then
-				inter=display.newImageRect("interact32.png",80,80)
+			if Ports=="OP" then
+				inter=display.newImageRect("interact4.png",80,80)
 				inter.x=xinicial
 				inter.y=yinicial
 				inter.xScale=scale
 				inter.yScale=inter.xScale
 				inter:toFront()
 				inter:addEventListener( "touch",PortInteract)
-			elseif Ports=="OP" and p1.portcd==0 then
-				inter=display.newImageRect("interact42.png",80,80)
+			elseif Ports=="OPB" then
+				inter=display.newImageRect("interact4B.png",80,80)
+				inter.x=xinicial
+				inter.y=yinicial
+				inter.xScale=scale
+				inter.yScale=inter.xScale
+				inter:toFront()
+			elseif Ports=="BP"  then
+				inter=display.newImageRect("interact6.png",80,80)
 				inter.x=xinicial
 				inter.y=yinicial
 				inter.xScale=scale
 				inter.yScale=inter.xScale
 				inter:toFront()
 				inter:addEventListener( "touch",PortInteract)
+			elseif Ports=="BPB" then
+				inter=display.newImageRect("interact6B.png",80,80)
+				inter.x=xinicial
+				inter.y=yinicial
+				inter.xScale=scale
+				inter.yScale=inter.xScale
+				inter:toFront()
+			elseif Ports=="RP" then
+				inter=display.newImageRect("interact5.png",80,80)
+				inter.x=xinicial
+				inter.y=yinicial
+				inter.xScale=scale
+				inter.yScale=inter.xScale
+				inter:toFront()
+				inter:addEventListener( "touch",PortInteract)
+			elseif Ports=="RPB" then
+				inter=display.newImageRect("interact5B.png",80,80)
+				inter.x=xinicial
+				inter.y=yinicial
+				inter.xScale=scale
+				inter.yScale=inter.xScale
+				inter:toFront()
+			elseif Ports=="DP"  then
+				inter=display.newImageRect("interact7.png",80,80)
+				inter.x=xinicial
+				inter.y=yinicial
+				inter.xScale=scale
+				inter.yScale=inter.xScale
+				inter:toFront()
+				inter:addEventListener( "touch",PortInteract)
+			elseif Ports=="DPB" then
+				inter=display.newImageRect("interact7B.png",80,80)
+				inter.x=xinicial
+				inter.y=yinicial
+				inter.xScale=scale
+				inter.yScale=inter.xScale
+				inter:toFront()
 			end
 		end
 		
 		local finish,finishroom=b.GetData(11)
 		local entrance,entranceroom=b.GetData(12)
 		local CurRound=WD.Circle()
-		if p1.loc==entrance and p1.room==entranceroom then
-			if CurRound==1 then
-			else
-				if CurRound%2==0 then
-					inter=display.newImageRect("interact22.png",80,80)
-					inter.x=xinicial
-					inter.y=yinicial
-					inter.xScale=scale
-					inter.yScale=inter.xScale
-					inter:toFront()
-					inter:addEventListener( "touch",GoinUp)
-				else
-					inter=display.newImageRect("interact22.png",80,80)
-					inter.x=xinicial
-					inter.y=yinicial
-					inter.xScale=scale
-					inter.yScale=inter.xScale
-					inter:toFront()
-					inter:addEventListener( "touch",GoinDown)
-				end
-			end
+		if p1.loc==entrance and p1.room==entranceroom and CurRound>1 then
+			inter=display.newImageRect("interact3.png",80,80)
+			inter.x=xinicial
+			inter.y=yinicial
+			inter.xScale=scale
+			inter.yScale=inter.xScale
+			inter:toFront()
+			inter:addEventListener( "touch",GoinDown)
 		end
 		
 		if p1.loc==finish and p1.room==finishroom then
-			if CurRound%2==0 then
-				inter=display.newImageRect("interact22.png",80,80)
-				inter.x=xinicial
-				inter.y=yinicial
-				inter.xScale=scale
-				inter.yScale=inter.xScale
-				inter:toFront()
-				inter:addEventListener( "touch",GoinDown)
-			else
-				inter=display.newImageRect("interact22.png",80,80)
-				inter.x=xinicial
-				inter.y=yinicial
-				inter.xScale=scale
-				inter.yScale=inter.xScale
-				inter:toFront()
-				inter:addEventListener( "touch",GoinUp)
-			end
+			inter=display.newImageRect("interact3.png",80,80)
+			inter.x=xinicial
+			inter.y=yinicial
+			inter.xScale=scale
+			inter.yScale=inter.xScale
+			inter:toFront()
+			inter:addEventListener( "touch",GoinUp)
 		end
 		
 		if CanMoveUp==true then
-			mup=display.newImageRect("moveu2.png",80,80)
+			mup=display.newImageRect("moveu.png",80,80)
 			mup.x=xinicial
 			mup.y=yinicial-espacio
 			mup.xScale=scale
@@ -271,7 +296,7 @@ function ShowArrows()
 		end
 
 		if CanMoveDown==true then
-			mdown=display.newImageRect("moved2.png",80,80)
+			mdown=display.newImageRect("moved.png",80,80)
 			mdown.x=xinicial
 			mdown.y=yinicial+espacio
 			mdown.xScale=scale
@@ -280,7 +305,7 @@ function ShowArrows()
 		end
 		
 		if CanMoveLeft==true then
-			mleft=display.newImageRect("movel2.png",80,80)
+			mleft=display.newImageRect("movel.png",80,80)
 			mleft.x=xinicial-espacio
 			mleft.y=yinicial
 			mleft.xScale=scale
@@ -289,7 +314,7 @@ function ShowArrows()
 		end
 		
 		if CanMoveRight==true then
-			mright=display.newImageRect("mover2.png",80,80)
+			mright=display.newImageRect("mover.png",80,80)
 			mright.x=xinicial+espacio
 			mright.y=yinicial
 			mright.xScale=scale
@@ -334,7 +359,8 @@ function Visibility()
 	size=math.sqrt(msize)
 	
 	--Player's Place
-	Seen[(p1.loc)]=p1.room
+	Seen[p1.room]={}
+	Seen[p1.room][p1.loc]=1
 	
 	--Surrounding tiles
 	for x=1,3,2 do
@@ -353,10 +379,10 @@ function Visibility()
 			end
 			if boundary[room][space]==0 and xBounds==false then
 				--Player can't walk here
-				Seen[space]=room
+						Seen[room][space]=1
 			elseif boundary[room][spaceY]==1 and boundary[room][spaceX]==1 and xBounds==false then
 				--Player can walk, check near walls
-				Seen[space]=room
+						Seen[room][space]=1
 			else
 				
 				if (row+1)==1 then
@@ -366,7 +392,10 @@ function Visibility()
 						space=(col+(x-2)+(size*(size-1)))
 						room=p1.room-5
 						if (boundary[room]) then
-							Seen[space]=room
+							if not (Seen[room]) then
+								Seen[room]={}
+							end
+							Seen[room][space]=1
 						end
 					end
 				end
@@ -378,7 +407,10 @@ function Visibility()
 						space=(col+(x-2))
 						room=p1.room+5
 						if (boundary[room]) then
-							Seen[space]=room
+							if not (Seen[room]) then
+								Seen[room]={}
+							end
+							Seen[room][space]=1
 						end
 					end
 				end
@@ -390,7 +422,10 @@ function Visibility()
 						space=p1.loc+(size-1)+((y-2)*size)
 						room=p1.room-1
 						if (boundary[room]) then
-							Seen[space]=room
+							if not (Seen[room]) then
+								Seen[room]={}
+							end
+							Seen[room][space]=1
 						end
 					end
 				end
@@ -402,7 +437,10 @@ function Visibility()
 						space=p1.loc-(size-1)+((y-2)*size)
 						room=p1.room+1
 						if (boundary[room]) then
-							Seen[space]=room
+							if not (Seen[room]) then
+								Seen[room]={}
+							end
+							Seen[room][space]=1
 						end
 					end
 				end
@@ -419,14 +457,14 @@ function Visibility()
 			room=p1.room
 			if boundary[room][space]==1 and Tiles[#Tiles]~=false then
 				if mbounds[room][space]==0 then
-					Seen[space]=room
+					Seen[room][space]=1
 					Tiles[#Tiles+1]=false
 				else
-					Seen[space]=room
+					Seen[room][space]=1
 					Tiles[#Tiles+1]=true
 				end
 			elseif Tiles[#Tiles]==true and boundary[room][space]==0 then
-				Seen[space]=room
+				Seen[room][space]=1
 				Tiles[#Tiles+1]=false
 			else
 				Tiles[#Tiles+1]=false
@@ -437,16 +475,19 @@ function Visibility()
 			room=p1.room-1
 			space=p1.loc+(size-c)
 			if (boundary[room]) then
+				if not (Seen[room]) then
+					Seen[room]={}
+				end
 				if boundary[room][space]==1 and Tiles[#Tiles]~=false then
 					if mbounds[room][space]==0 then
-						Seen[space]=room
+						Seen[room][space]=1
 						Tiles[#Tiles+1]=false
 					else
-						Seen[space]=room
+						Seen[room][space]=1
 						Tiles[#Tiles+1]=true
 					end
 				elseif Tiles[#Tiles]==true and boundary[room][space]==0 then
-					Seen[space]=room
+					Seen[room][space]=1
 					Tiles[#Tiles+1]=false
 				else
 					Tiles[#Tiles+1]=false
@@ -471,14 +512,14 @@ function Visibility()
 			room=p1.room
 			if boundary[room][space]==1 and Tiles[#Tiles]~=false then
 				if mbounds[room][space]==0 then
-					Seen[space]=room
+					Seen[room][space]=1
 					Tiles[#Tiles+1]=false
 				else
-					Seen[space]=room
+					Seen[room][space]=1
 					Tiles[#Tiles+1]=true
 				end
 			elseif Tiles[#Tiles]==true and boundary[room][space]==0 then
-				Seen[space]=room
+				Seen[room][space]=1
 				Tiles[#Tiles+1]=false
 			else
 				Tiles[#Tiles+1]=false
@@ -489,16 +530,19 @@ function Visibility()
 			space=p1.loc-(size-c)
 			room=p1.room+1
 			if (boundary[room]) then
+				if not (Seen[room]) then
+					Seen[room]={}
+				end
 				if boundary[room][space]==1 and Tiles[#Tiles]~=false then
 					if mbounds[room][space]==0 then
-						Seen[space]=room
+						Seen[room][space]=1
 						Tiles[#Tiles+1]=false
 					else
-						Seen[space]=room
+						Seen[room][space]=1
 						Tiles[#Tiles+1]=true
 					end
 				elseif Tiles[#Tiles]==true and boundary[room][space]==0 then
-					Seen[space]=room
+					Seen[room][space]=1
 					Tiles[#Tiles+1]=false
 				else
 					Tiles[#Tiles+1]=false
@@ -531,16 +575,19 @@ function Visibility()
 				room=p1.room
 			end
 			if (boundary[room]) then
+				if not (Seen[room]) then
+					Seen[room]={}
+				end
 				if boundary[room][space]==1 and Tiles[#Tiles]~=false then
 					if mbounds[room][space]==0 then
-						Seen[space]=room
+						Seen[room][space]=1
 						Tiles[#Tiles+1]=false
 					else
-						Seen[space]=room
+						Seen[room][space]=1
 						Tiles[#Tiles+1]=true
 					end
 				elseif Tiles[#Tiles]==true and boundary[room][space]==0 then
-					Seen[space]=room
+					Seen[room][space]=1
 					Tiles[#Tiles+1]=false
 				else
 					Tiles[#Tiles+1]=false
@@ -573,16 +620,19 @@ function Visibility()
 				room=p1.room
 			end
 			if (boundary[room]) then
+				if not (Seen[room]) then
+					Seen[room]={}
+				end
 				if boundary[room][space]==1 and Tiles[#Tiles]~=false then
 					if mbounds[room][space]==0 then
-						Seen[space]=room
+						Seen[room][space]=1
 						Tiles[#Tiles+1]=false
 					else
-						Seen[space]=room
+						Seen[room][space]=1
 						Tiles[#Tiles+1]=true
 					end
 				elseif Tiles[#Tiles]==true and boundary[room][space]==0 then
-					Seen[space]=room
+					Seen[room][space]=1
 					Tiles[#Tiles+1]=false
 				else
 					Tiles[#Tiles+1]=false
@@ -698,20 +748,19 @@ function Up()
 	if CanAttackUp==true then
 		CleanArrows()
 		--
-		for i=1, table.maxn(mobs) do
-			if (mobs[i]) then
-				if mobs[i].loc==(p1.loc-size) then
-					function closure()
-						c.Attacking(mobs[i])
-					end
-					timer.performWithDelay(50,closure)
+		for i in pairs(mobs[p1.room]) do
+			if mobs[p1.room][i].loc==(p1.loc-size) then
+				function closure()
+					c.Attacking(mobs[p1.room][i])
 				end
+				timer.performWithDelay(50,closure)
 			end
 		end
 	elseif CanMoveUp==true then
 		map=b.GetData(3)
 		P1=p.GetPlayer()
 		map.y=map.y+espacio
+		local energycost=math.floor(P1.weight/30)
 		if RoomChange=="U" then
 			P1.room=P1.room-5
 			P1.loc=col+(size*(size-1))
@@ -720,8 +769,16 @@ function Up()
 		end
 		if Slowed==true then
 			Toggle=Toggle-3
+			energycost=energycost*1.5
 		else
 			Toggle=Toggle-1
+		end
+		if P1.EP>=energycost then
+			P1.EP=P1.EP-energycost
+		else
+			local deficit=energycost-P1.EP
+			p.ReduceHP(math.floor(deficit/2),"Energy")
+			P1.EP=0
 		end
 		Visibility()
 	end
@@ -731,20 +788,19 @@ function Down()
 	if CanAttackDown==true then
 		CleanArrows()
 		--
-		for i=1, table.maxn(mobs) do
-			if (mobs[i]) then
-				if mobs[i].loc==(p1.loc+size) then
-					function closure()
-						c.Attacking(mobs[i])
-					end
-					timer.performWithDelay(50,closure)
+		for i in pairs(mobs[p1.room]) do
+			if mobs[p1.room][i].loc==(p1.loc+size) then
+				function closure()
+					c.Attacking(mobs[p1.room][i])
 				end
+				timer.performWithDelay(50,closure)
 			end
 		end
 	elseif CanMoveDown==true then
 		map=b.GetData(3)
 		P1=p.GetPlayer()
 		map.y=map.y-espacio
+		local energycost=math.floor(P1.weight/30)
 		if RoomChange=="D" then
 			P1.room=P1.room+5
 			P1.loc=(col)
@@ -753,8 +809,16 @@ function Down()
 		end
 		if Slowed==true then
 			Toggle=Toggle-3
+			energycost=energycost*1.5
 		else
 			Toggle=Toggle-1
+		end
+		if P1.EP>=energycost then
+			P1.EP=P1.EP-energycost
+		else
+			local deficit=energycost-P1.EP
+			p.ReduceHP(math.floor(deficit/2),"Energy")
+			P1.EP=0
 		end
 		Visibility()
 	end
@@ -764,20 +828,19 @@ function Left()
 	if CanAttackLeft==true then
 		CleanArrows()
 		--
-		for i=1, table.maxn(mobs) do
-			if (mobs[i]) then
-				if mobs[i].loc==(p1.loc-1) then
-					function closure()
-						c.Attacking(mobs[i])
-					end
-					timer.performWithDelay(50,closure)
+		for i in pairs(mobs[p1.room]) do
+			if mobs[p1.room][i].loc==(p1.loc-1) then
+				function closure()
+					c.Attacking(mobs[p1.room][i])
 				end
+				timer.performWithDelay(50,closure)
 			end
 		end
 	elseif CanMoveLeft==true then
 		map=b.GetData(3)
 		P1=p.GetPlayer()
 		map.x=map.x+espacio
+		local energycost=math.floor(P1.weight/30)
 		if RoomChange=="L" then
 			P1.room=P1.room-1
 			P1.loc=p1.loc+(size-1)
@@ -786,8 +849,16 @@ function Left()
 		end
 		if Slowed==true then
 			Toggle=Toggle-3
+			energycost=energycost*1.5
 		else
 			Toggle=Toggle-1
+		end
+		if P1.EP>=energycost then
+			P1.EP=P1.EP-energycost
+		else
+			local deficit=energycost-P1.EP
+			p.ReduceHP(math.floor(deficit/2),"Energy")
+			P1.EP=0
 		end
 		Visibility()
 	end
@@ -797,20 +868,19 @@ function Right()
 	if CanAttackRight==true then
 		CleanArrows()
 		--
-		for i=1, table.maxn(mobs) do
-			if (mobs[i]) then
-				if mobs[i].loc==(p1.loc+1) then
-					function closure()
-						c.Attacking(mobs[i])
-					end
-					timer.performWithDelay(50,closure)
+		for i in pairs(mobs[p1.room]) do
+			if mobs[p1.room][i].loc==(p1.loc+1) then
+				function closure()
+					c.Attacking(mobs[p1.room][i])
 				end
+				timer.performWithDelay(50,closure)
 			end
 		end
 	elseif CanMoveRight==true then
 		map=b.GetData(3)
 		P1=p.GetPlayer()
 		map.x=map.x-espacio
+		local energycost=math.floor(P1.weight/30)
 		if RoomChange=="R" then
 			P1.room=P1.room+1
 			P1.loc=p1.loc-(size-1)
@@ -819,8 +889,16 @@ function Right()
 		end
 		if Slowed==true then
 			Toggle=Toggle-3
+			energycost=math.ceil(energycost*1.5)
 		else
 			Toggle=Toggle-1
+		end
+		if P1.EP>=energycost then
+			P1.EP=P1.EP-energycost
+		else
+			local deficit=energycost-P1.EP
+			p.ReduceHP(math.floor(deficit/2),"Energy")
+			P1.EP=0
 		end
 		Visibility()
 	end

@@ -15,7 +15,7 @@ local S={
 	"Random maps!",
 	"Sooner than ever!",
 	"Gamma!",
-	"Equipment!",
+	"Working Equipment!",
 	"Working Inventory!",
 	"Mob Racial Diversity!",
 	"Item Drop Restrictions!",
@@ -64,6 +64,13 @@ local S={
 	"Optimization!",
 	"Overhauls!",
 	"Now more greek!",
+	"Splashes perfectly measured to fit!",
+	"Weight!",
+	"Now with more death!",
+	"Lazy-compatible combat!",
+	"Rooms!",
+	"Blocked portals!",
+	"Ceci n'est pas un splash!",
 }
 local T={
 	{"Change your class for a different","stat bonus."},
@@ -96,7 +103,7 @@ local T={
 function GetSplash()
 	local chooser=math.random(1,table.maxn(S))
 	Splash=S[chooser]
-	Splashtxt = display.newEmbossedText((Splash),0,0,"MoolBoran", 80 )
+	Splashtxt = display.newEmbossedText((Splash),0,0,"MoolBoran", 75 )
 	Splashtxt.x=display.contentCenterX
 	Splashtxt.y=310
 	Splashtxt:setTextColor( 255, 255, 0)

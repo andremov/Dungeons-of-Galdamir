@@ -17,15 +17,15 @@ local test={}
 4-lower opening
 a-start					b-boundary
 c-						d-break/wall
-e-						f-
+e-mobspawner			f-
 g-						h-healpad
 i-energypad				j-manapad
 k-keyblock				l-lava
-m-portal1				n-portal2
-ñ						o-wall
+m-orange				n-blue
+ñ-red					o-wall
 p-						q-alwaysbreakable
 r-random				s-shop
-t-						u-mobspawner
+t-						u-darkblue
 v-						w-water
 x-walkable				y-
 z-finish	
@@ -51,14 +51,14 @@ tut1={
 	
 test1={
 	"b","b","b","b","1","1","b","b","b","b",
-	"b","a","x","x","x","b","x","x","x","b",
-	"b","x","x","x","x","o","x","x","x","b",
-	"b","x","x","x","x","o","x","x","x","b",
-	"2","x","x","x","x","o","x","x","x","3",
-	"2","x","x","x","x","o","x","x","x","3",
-	"b","x","x","x","x","o","x","x","x","b",
-	"b","x","x","x","x","o","x","x","x","b",
-	"b","x","x","x","x","o","x","x","z","b",
+	"b","a","x","x","x","x","x","x","x","b",
+	"b","x","x","x","x","x","x","x","x","b",
+	"b","x","x","x","x","x","x","x","x","b",
+	"2","x","x","x","x","x","x","x","x","3",
+	"2","x","x","x","x","x","x","x","x","3",
+	"b","x","x","x","x","x","x","x","x","b",
+	"b","x","x","x","x","x","x","x","x","b",
+	"b","x","x","x","x","x","x","x","z","b",
 	"b","b","b","b","4","4","b","b","b","b",
 	}
 --[[
@@ -75,9 +75,18 @@ test1={
 	"b","b","b","b","4","4","b","b","b","b",
 	}
 --]]
+
 map1H={
+	"b","b","1","b","b",
+	"b","a","r","r","b",
+	"2","r","r","r","3",
+	"b","r","r","z","b",
+	"b","b","4","b","b",
+	}
+	
+map1T={
 	"b","b","b","b","1","1","b","b","b","b",
-	"b","z","r","r","r","r","r","r","r","b",
+	"b","a","r","r","r","r","r","r","r","b",
 	"b","r","r","r","r","r","r","r","r","b",
 	"b","r","r","r","r","r","r","r","r","b",
 	"2","r","r","r","r","r","r","r","r","3",
@@ -90,7 +99,7 @@ map1H={
 	
 map1S={
 	"b","b","b","b","b","b","b","b","b","1","1","b","b","b","b","b","b","b","b","b",
-	"b","z","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
+	"b","a","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
 	"b","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
 	"b","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
 	"b","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
@@ -113,7 +122,7 @@ map1S={
 
 map1M={
 	"b","b","b","b","b","b","b","b","b","b","b","b","b","b","1","1","b","b","b","b","b","b","b","b","b","b","b","b","b","b",
-	"b","z","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
+	"b","a","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
 	"b","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
 	"b","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
 	"b","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
@@ -146,7 +155,7 @@ map1M={
 
 map1L={
 	"b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","1","1","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b",
-	"b","z","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
+	"b","a","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
 	"b","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
 	"b","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
 	"b","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","r","b",
@@ -188,15 +197,16 @@ map1L={
 	}
 
 function CallMapGroups()
+	mapsT={map1T}
 	mapsS={map1S}
 	mapsM={map1M}
 	mapsL={map1L}
-	mapsH={map1H}
 	tutorial={tut1}
 	test={test1}
+	mapsH={map1H}
 end
 
 function GetMapGroups()
-	return mapsS,mapsM,mapsL,mapsH,tutorial,test
+	return mapsT,mapsS,mapsM,mapsL,tutorial,test,mapsH
 end
 

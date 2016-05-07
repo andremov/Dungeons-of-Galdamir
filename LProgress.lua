@@ -174,5 +174,6 @@ function SrsBsns()
 	builder.WipeMap()
 	m.ShowMenu()
 	m.ReadySetGo()
+	mov.CleanWindow()
 end
 

@@ -46,6 +46,7 @@ function ShowMenu()
 	titleLogo:setReferencePoint( display.CenterReferencePoint )
 	titleLogo.x = display.contentWidth * 0.5
 	titleLogo.y = 150
+	titleLogo:addEventListener("tap",SplashChange)
 	group:insert(titleLogo)
 	
 	PlayBtn = widget.newButton{
@@ -129,6 +130,15 @@ function ShowMenu()
 	end
 	
 	a.Menu(true)
+end
+
+function SplashChange()
+	if (Splash) then
+		display.remove(Splash)
+		Splash=nil
+	end
+	Splash=s.GetSplash()
+	group:insert(Splash)
 end
 
 function onPlayBtnRelease()

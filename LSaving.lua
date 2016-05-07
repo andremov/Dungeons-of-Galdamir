@@ -4,25 +4,24 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local p=require("Lplayers")
-local gp=require("Lgold")
-local v=require("Lversion")
-local i=require("Lwindow")
-local WD=require("Lprogress")
-local m=require("Lmaphandler")
-local it=require("Litems")
-local su=require("Lstartup")
 local b=require("Lmapbuilder")
-local Sve
+local m=require("Lmaphandler")
+local WD=require("Lprogress")
+local su=require("Lstartup")
+local v=require("Lversion")
+local p=require("Lplayers")
+local i=require("Lwindow")
+local it=require("Litems")
+local gp=require("Lgold")
+local canMap=false
+local saveSlot
+local InvStrt
+local EqpStrt
 local SplStrt
 local SplEnd
-local InvStrt
-local saveSlot
-local EqpStrt
+local Sve
 local OKVers={
-		"GAMMA 1.0.0",
-		"GAMMA 1.0.1",
-		"GAMMA 1.0.2",
+		"GAMMA 1.1.0",
 	}
 
 function Load()
@@ -105,8 +104,6 @@ function Load()
 		end
 	--	print "Save loaded successfully."
 		LoadMap()
-		b.Rebuild(false)
-		su.ShowContinue()
 	else
 	--	print "Save incompatible. Deleting..."
 		WipeSave()
@@ -147,7 +144,6 @@ function CheckSave(slot)
 		end
 	else
 		WipeSave(slot)
-		
 		return false
 	end
 end
@@ -206,7 +202,7 @@ function Save()
 	end
 	io.close( fh )
 --	print ("Progress saved on floor "..Round..".")
-	SaveMap()
+	canMap=true
 end
 
 function WipeSave(slot)
@@ -234,28 +230,61 @@ function WipeSave(slot)
 end
 
 function SaveMap()
-	local path = system.pathForFile(  "DoGMapSave"..saveSlot..".sav", system.DocumentsDirectory )
-	local fh, errStr = io.open( path, "w+" )
-	
-	local map=b.GetData(8)
-	fh:write( "Map\n")
-	for i=1,table.maxn(map) do
-		if (map[i]) then
-			fh:write( map[i],"\n")
+	if canMap==true then
+		canMap=false
+		local path = system.pathForFile(  "DoGMapSave"..saveSlot..".sav", system.DocumentsDirectory )
+		local fh, errStr = io.open( path, "w+" )
+		
+		local map=b.GetData(8,0)
+		fh:write( "Map\n")
+		for r in pairs(map) do
+			fh:write("--\n")
+			fh:write(r.."\n")
+			if type(map[r])~="boolean" then
+				for i in pairs(map[r]) do
+					fh:write( map[r][i],"\n")
+				end
+			else
+			end
+			fh:write("--\n")
 		end
+		io.close( fh )
+		local Round=WD.Circle()
+	--	print ("Map saved on floor "..Round..".")
 	end
-	io.close( fh )
-	local Round=WD.Circle()
---	print ("Map saved on floor "..Round..".")
 end
 
 function LoadMap()
-	Map={}
+	local firststop={}
+	local Map={}
+	local var={}
 	local path = system.pathForFile(  "DoGMapSave"..saveSlot..".sav", system.DocumentsDirectory )
 	for line in io.lines( path ) do
-		Map[#Map+1]=line
+		firststop[#firststop+1]=line
 	end
-	
+	for i=1,table.maxn(firststop) do
+		if firststop[i]=="--" then
+			if (var[#var]) then
+				var[#var].endloc=i-1
+			end
+			if i~=table.maxn(firststop) then
+				var[#var+1]={}
+				var[#var].roomnum=firststop[i+1]
+				var[#var].startloc=i+2
+				Map[firststop[i+1]]={}
+			end
+		end
+	end
+	for v=1,table.maxn(var) do
+		for l=var[v].startloc,var[v].endloc do
+			Map[var[v].roomnum][l+1-var[v].startloc]=firststop[l]
+		end
+	end
+	for r in pairs(Map) do
+		if Map[r][1]==nil then
+			Map[r]=false
+		end
+	end
 	b.ReceiveMap(Map)
 --	print "Map loaded successfully."
 end

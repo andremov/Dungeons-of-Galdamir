@@ -32,6 +32,51 @@ local gexui
 local isOpn
 local isUse
 local items
+local DeathMessages={
+	-- Lava
+	{
+		"Roasted by lava.",
+		"Swimming in lava.",
+		"Hyperthermia.",
+		"Skin melting.",
+		"Do I smell barbeque?",
+	},
+	-- Mob
+	{
+		"Fighting a mob.",
+		"Face smashed in.",
+		"Your insides are on the floor.",
+		"Pro-tip: Keep your extremities together.",
+		"Exsanguination.",
+		"Don't mess with the mobs.",
+		"Do not feed the mobs.",
+	},
+	-- Poison
+	{
+		"Well, now you know.",
+		"Smooth move.",
+		"Nice one, smartass.",
+		"That was poison.",
+		"You had so much potential...",
+	},
+	-- Portal
+	{
+		"Portal dismemberment.",
+		"I think your leg is over there.",
+		"Your blood didn't teleport...",
+		"Next time, keep your arms and legs in the portal at all times.",
+		"Not your best teleport.",
+		"Did you find the secret cow level?",
+	},
+	-- Energy
+	{
+		"Falling unconscious in a dungeon.",
+		"\"Don't mind the energy\", they said, \"It won't kill you.'\", they said.",
+		"Should've kept some energy drinks handy.",
+		"So is having energy a priority to you now?",
+		"Should've gotten a good night's sleep before adventuring.",
+	},
+}
 
 function Essentials()
 	p1=p.GetPlayer()
@@ -407,7 +452,7 @@ function StatChange()
 		ginf:insert(info[#info])
 	end
 	for s=1,6 do
-		if p1.pnts[s]>0 and p1.nat[s]<p1.lvl*10 then
+		if p1.pnts>0 and p1.nat[s]<p1.lvl*10 then
 			pli[#pli+1]= widget.newButton{
 				label="+",
 				labelColor = { default={255,255,255}, over={0,0,0} },
@@ -829,13 +874,19 @@ function DeathMenu(cause)
 		Dthtxt:insert( Deathmsg2 )
 		
 		if cause=="Lava" then
-			Deathmsg2.text=("Swimming in lava.")
+			Deathmsg2.text=(DeathMessages[1][math.random(1,table.maxn(DeathMessages[1]))])
 		end
 		if cause=="Mob" then
-			Deathmsg2.text=("Fighting a mob.")
+			Deathmsg2.text=(DeathMessages[2][math.random(1,table.maxn(DeathMessages[1]))])
 		end
 		if cause=="Poison" then
-			Deathmsg2.text=("Poisoning self. Dumbass.")
+			Deathmsg2.text=(DeathMessages[3][math.random(1,table.maxn(DeathMessages[1]))])
+		end
+		if cause=="Portal" then
+			Deathmsg2.text=(DeathMessages[4][math.random(1,table.maxn(DeathMessages[1]))])
+		end
+		if cause=="Energy" then
+			Deathmsg2.text=(DeathMessages[5][math.random(1,table.maxn(DeathMessages[1]))])
 		end
 		
 		ToMenuBtn = widget.newButton{

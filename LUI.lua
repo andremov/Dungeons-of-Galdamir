@@ -32,9 +32,13 @@ local mpdnprsnt
 local pwg
 
 function Background()
+	if (bkglevel) then
+		display.remove(bkglevel)
+		bkglevel=nil
+	end
 	bkglevel = display.newImage("bkgs/bkg_level.png", true)
 	bkglevel.x = display.contentCenterX
-	bkglevel.y = display.contentCenterY	
+	bkglevel.y = display.contentCenterY
 	bkglevel:toBack()
 	return bkglevel
 end

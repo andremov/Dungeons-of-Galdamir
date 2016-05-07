@@ -75,6 +75,7 @@ function CreatePlayers(name)
 	player.gp=0
 	player.eqp={  }
 	player.inv={ {1,10} }
+	player.weight=5
 	--Stats
 	player.statnames=	{"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity",	"Intellect"}
 	player.eqs=			{0,			0,			0,			0,			0,				0}
@@ -117,25 +118,9 @@ function CreatePlayers(name)
 	end
 end
 
-function PlayerLoc(right)
-	if right==true then
-		local size=b.GetData(0)
-		local curround=WD.Circle()
-		if curround%2==0 then
-			player.loc=size-(math.sqrt(size)+1)
-		else
-			player.loc=(math.sqrt(size)+2)
-		end
-	elseif right==false then
-		local size=b.GetData(0)
-		local curround=WD.Circle()
-		if curround%2==0 then
-			player.loc=(math.sqrt(size)+2)
-		else
-			player.loc=size-(math.sqrt(size)+1)
-		end
-	end
-	player.room=1
+function PlayerLoc(location,room)
+	player.loc=location
+	player.room=room
 end
 
 function GetPlayer()
@@ -449,6 +434,13 @@ function StatCheck()
 	if player.EP>player.MaxEP then
 		player.EP=player.MaxEP
 	end
+	player.weight=5
+	for i=1,table.maxn(player.inv) do
+		player.weight=player.weight+player.inv[i][2]
+	end
+	for i=1,table.maxn(player.eqp) do
+		player.weight=player.weight+2
+	end
 end
 
 function WhosYourDaddy()
@@ -609,6 +601,8 @@ function Load1(cls,chr)
 	player.x, player.y = display.contentWidth/2, display.contentHeight/2
 	player:setStrokeColor(50, 50, 255)
 	player.strokeWidth = 4
+	player.xScale=scale
+	player.yScale=player.xScale
 	
 	player.char=char
 	player.class=class
@@ -655,6 +649,7 @@ function FinishLoading()
 	player.clsnames={"Knight","Warrior","Thief","Viking","Sorceror","Scholar"}
 	player.eqs={0,0,0,0,0,0}
 	player.bon={0,0,0,0,0,0}
+	player.weight=5
 	player.portcd=0
 	player.stats={}
 	player.inv={}
@@ -673,13 +668,6 @@ function FinishLoading()
 		check=119
 		Runtime:addEventListener("enterFrame",ShowStats)
 		su.FrontNCenter()
-	end
-	local size=b.GetData(0)
-	local curround=WD.Circle()
-	if curround%2==0 then
-		player.loc=size-(math.sqrt(size)+1)
-	else
-		player.loc=(math.sqrt(size)+2)
 	end
 end
 

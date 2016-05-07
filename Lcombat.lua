@@ -46,6 +46,7 @@ local SBookDisplayed
 local statusdisplay
 local timersprite
 local BleedLimit
+local AutoAttack
 local Spellbook
 local SorceryUI
 local BurnLimit
@@ -73,6 +74,7 @@ function Essentials()
 	outcomed=false
 	yinvicial=180
 	xinvicial=75
+	AutoAttack=0
 	espaciox=64
 	espacioy=64
 	Sorcery={}
@@ -88,6 +90,7 @@ function Attacking(victim)
 			DisplayCombat()
 		else
 			print "!E"
+			timer.performWithDelay(20,mov.Visibility)
 		end
 	end
 end
@@ -101,6 +104,7 @@ function Attacked(victim)
 			DisplayCombat()
 		else
 			print "!E"
+			timer.performWithDelay(20,mov.Visibility)
 		end
 	end
 end
@@ -233,154 +237,157 @@ function ShowActions()
 		isRecover=false
 	end
 	
-	if (AttackBtn) then
-		display.remove(AttackBtn)
-		AttackBtn=nil
-	end
-	
-	if (MagicBtn) then
-		display.remove(MagicBtn)
-		MagicBtn=nil
-	end
-	
-	if (ItemBtn) then
-		display.remove(ItemBtn)
-		ItemBtn=nil
-	end
-	
-	if (GuardBtn) then
-		display.remove(GuardBtn)
-		GuardBtn=nil
-	end
-	
-	if (RecoverBtn) then
-		display.remove(RecoverBtn)
-		RecoverBtn=nil
-	end
-	
-	if (BackBtn) then
-		display.remove(BackBtn)
-		BackBtn=nil
-	end
-	
-	if not(AttackBtn)then
-		AttackBtn= widget.newButton{
-			label="Attack",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = AttackType}
-		AttackBtn:setReferencePoint( display.CenterReferencePoint )
-		AttackBtn.x = timersprite.x-172
-		AttackBtn.y = timersprite.y-44
-		gcm:insert( AttackBtn )
-	end
-	
-	function toSorcery()		
-		ShowSorcery()
-	end
-	
-	if not(MagicBtn)then
-		MagicBtn= widget.newButton{
-			label="Spellbook",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = toSorcery}
-		MagicBtn:setReferencePoint( display.CenterReferencePoint )
-		MagicBtn.x = timersprite.x+172
-		MagicBtn.y = AttackBtn.y
-		gcm:insert( MagicBtn )
-	end
-	
-	function toItems()
-		HideActions()
+	if AutoAttack==0 then
+		if (AttackBtn) then
+			display.remove(AttackBtn)
+			AttackBtn=nil
+		end
 		
-		ShowBag()
-	end
-	
-	if not(ItemBtn)then
-		ItemBtn= widget.newButton{
-			label="Inventory",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = toItems}
-		ItemBtn:setReferencePoint( display.CenterReferencePoint )
-		ItemBtn.x = MagicBtn.x
-		ItemBtn.y = timersprite.y+44
-		gcm:insert( ItemBtn )
-	end
-	
-	function toDefend()
-		HideActions()
+		if (MagicBtn) then
+			display.remove(MagicBtn)
+			MagicBtn=nil
+		end
 		
-		Guard()
-	end
-	
-	if not(GuardBtn)then
-		GuardBtn= widget.newButton{
-			label="Guard",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = toDefend}
-		GuardBtn:setReferencePoint( display.CenterReferencePoint )
-		GuardBtn.x = AttackBtn.x
-		GuardBtn.y = ItemBtn.y
-		gcm:insert( GuardBtn )
-	end
-	
-	function toRecover()
-		HideActions()
+		if (ItemBtn) then
+			display.remove(ItemBtn)
+			ItemBtn=nil
+		end
 		
-		Recover()
-	end
-	
-	if not(RecoverBtn)then
-		RecoverBtn= widget.newButton{
-			label="Recover",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = toRecover}
-		RecoverBtn:setReferencePoint( display.CenterReferencePoint )
-		RecoverBtn.x = AttackBtn.x
-		RecoverBtn.y = ItemBtn.y+88
-		gcm:insert( RecoverBtn )
-	end
-	
-	function toRun()
-		HideActions()
+		if (GuardBtn) then
+			display.remove(GuardBtn)
+			GuardBtn=nil
+		end
 		
-		RunAttempt()
+		if (RecoverBtn) then
+			display.remove(RecoverBtn)
+			RecoverBtn=nil
+		end
+		
+		if (BackBtn) then
+			display.remove(BackBtn)
+			BackBtn=nil
+		end
+		
+		if not(AttackBtn)then
+			AttackBtn= widget.newButton{
+				label="Attack",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="combataction.png",
+				overFile="combataction2.png",
+				width=342, height=86,
+				onRelease = AttackType}
+			AttackBtn:setReferencePoint( display.CenterReferencePoint )
+			AttackBtn.x = timersprite.x-172
+			AttackBtn.y = timersprite.y-44
+			gcm:insert( AttackBtn )
+		end
+		
+		function toSorcery()		
+			ShowSorcery()
+		end
+		
+		if not(MagicBtn)then
+			MagicBtn= widget.newButton{
+				label="Spellbook",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="combataction.png",
+				overFile="combataction2.png",
+				width=342, height=86,
+				onRelease = toSorcery}
+			MagicBtn:setReferencePoint( display.CenterReferencePoint )
+			MagicBtn.x = timersprite.x+172
+			MagicBtn.y = AttackBtn.y
+			gcm:insert( MagicBtn )
+		end
+		
+		function toItems()
+			HideActions()
+			
+			ShowBag()
+		end
+		
+		if not(ItemBtn)then
+			ItemBtn= widget.newButton{
+				label="Inventory",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="combataction.png",
+				overFile="combataction2.png",
+				width=342, height=86,
+				onRelease = toItems}
+			ItemBtn:setReferencePoint( display.CenterReferencePoint )
+			ItemBtn.x = MagicBtn.x
+			ItemBtn.y = timersprite.y+44
+			gcm:insert( ItemBtn )
+		end
+		
+		function toDefend()
+			HideActions()
+			
+			Guard()
+		end
+		
+		if not(GuardBtn)then
+			GuardBtn= widget.newButton{
+				label="Guard",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="combataction.png",
+				overFile="combataction2.png",
+				width=342, height=86,
+				onRelease = toDefend}
+			GuardBtn:setReferencePoint( display.CenterReferencePoint )
+			GuardBtn.x = AttackBtn.x
+			GuardBtn.y = ItemBtn.y
+			gcm:insert( GuardBtn )
+		end
+		
+		function toRecover()
+			HideActions()
+			
+			Recover()
+		end
+		
+		if not(RecoverBtn)then
+			RecoverBtn= widget.newButton{
+				label="Recover",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="combataction.png",
+				overFile="combataction2.png",
+				width=342, height=86,
+				onRelease = toRecover}
+			RecoverBtn:setReferencePoint( display.CenterReferencePoint )
+			RecoverBtn.x = AttackBtn.x
+			RecoverBtn.y = ItemBtn.y+88
+			gcm:insert( RecoverBtn )
+		end
+		
+		function toRun()
+			HideActions()
+			
+			RunAttempt()
+		end
+		
+		if not(BackBtn)then
+			BackBtn= widget.newButton{
+				label="Retreat",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=35,
+				defaultFile="combataction.png",
+				overFile="combataction2.png",
+				width=342, height=86,
+				onRelease = toRun}
+			BackBtn:setReferencePoint( display.CenterReferencePoint )
+			BackBtn.x = MagicBtn.x
+			BackBtn.y = RecoverBtn.y
+			gcm:insert( BackBtn )
+		end
+	else
+		PlayerAttacks(AutoAttack-1)
 	end
-	
-	if not(BackBtn)then
-		BackBtn= widget.newButton{
-			label="Retreat",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=35,
-			defaultFile="combataction.png",
-			overFile="combataction2.png",
-			width=342, height=86,
-			onRelease = toRun}
-		BackBtn:setReferencePoint( display.CenterReferencePoint )
-		BackBtn.x = MagicBtn.x
-		BackBtn.y = RecoverBtn.y
-		gcm:insert( BackBtn )
-	end
-	
 	timersprite:toFront()
 end
 
@@ -487,15 +494,62 @@ function AttackType()
 		gcm:insert( MagicBtn )
 	end
 	
-	ItemBtn=display.newImageRect("combataction3.png",342,86)
-	ItemBtn.x = AttackBtn.x
-	ItemBtn.y = timersprite.y+44
-	gcm:insert( ItemBtn )
+	if not(MagicBtn)then
+		MagicBtn= widget.newButton{
+			label="Magic Attack",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=35,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = AttackMa}
+		MagicBtn:setReferencePoint( display.CenterReferencePoint )
+		MagicBtn.x = timersprite.x+172
+		MagicBtn.y = AttackBtn.y
+		gcm:insert( MagicBtn )
+	end
 	
-	GuardBtn=display.newImageRect("combataction3.png",342,86)
-	GuardBtn.x = MagicBtn.x
-	GuardBtn.y = timersprite.y+44
-	gcm:insert( GuardBtn )
+	function AutoAttackMe()
+		HideActions()
+		TurnOnAuto(1)
+		PlayerAttacks(0)
+	end
+	
+	if not(GuardBtn)then
+		GuardBtn= widget.newButton{
+			label="Auto Melee Attack",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=35,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = AutoAttackMe}
+		GuardBtn:setReferencePoint( display.CenterReferencePoint )
+		GuardBtn.x = AttackBtn.x
+		GuardBtn.y = timersprite.y+44
+		gcm:insert( GuardBtn )
+	end
+	
+	function AutoAttackMa()
+		HideActions()
+		TurnOnAuto(2)
+		PlayerAttacks(1)
+	end
+	
+	if not(ItemBtn)then
+		ItemBtn= widget.newButton{
+			label="Auto Magic Attack",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=35,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = AutoAttackMa}
+		ItemBtn:setReferencePoint( display.CenterReferencePoint )
+		ItemBtn.x = MagicBtn.x
+		ItemBtn.y = timersprite.y+44
+		gcm:insert( ItemBtn )
+	end
 	
 	RecoverBtn=display.newImageRect("combataction3.png",342,86)
 	RecoverBtn.x = AttackBtn.x
@@ -520,6 +574,28 @@ function AttackType()
 	timersprite:toFront()
 end
 
+function TurnOnAuto(auto)
+	NoAutoBtn= widget.newButton{
+		label="Turn Off Auto Attack",
+		labelColor = { default={0,0,0}, over={255,255,255} },
+		fontSize=35,
+		defaultFile="combataction.png",
+		overFile="combataction2.png",
+		width=342, height=86,
+		onRelease = TurnOffAuto}
+	NoAutoBtn:setReferencePoint( display.CenterReferencePoint )
+	NoAutoBtn.x = display.contentCenterX
+	NoAutoBtn.y = display.contentHeight-50
+	gcm:insert( NoAutoBtn )
+	AutoAttack=auto
+end
+
+function TurnOffAuto()
+	display.remove(NoAutoBtn)
+	NoAutoBtn=nil
+	AutoAttack=0
+end
+
 function MobsTurn()
 	local pp=timer.pause(ptimer)
 	timersprite:pause()
@@ -528,8 +604,13 @@ function MobsTurn()
 	
 	local isHit=EvadeCalc("p1",16)
 	if isHit>=(p1.stats[5]/6)*2 then
+		local Damage
 		if isHit>=(p1.stats[5]/3)*5 then
-			local Damage=DamageCalc("p1",(math.random(15,20)/10),16)
+			if enemy.stats[2]>enemy.stats[4]then
+				Damage=DamageCalc("p1",(math.random(15,20)/10),16,2)
+			else
+				Damage=DamageCalc("p1",(math.random(15,20)/10),16,4)
+			end
 			if (Damage)<=0 then
 				Hits("BLK!",false,false,false)
 			else
@@ -538,7 +619,11 @@ function MobsTurn()
 				Hits((Damage),true,false,false)
 			end
 		else
-			local Damage=DamageCalc("p1",1,16)
+			if enemy.stats[2]>enemy.stats[4]then
+				Damage=DamageCalc("p1",1,16,2)
+			else
+				Damage=DamageCalc("p1",1,16,4)
+			end
 			if (Damage)<=0 then
 				Hits("BLK!",false,false,false)
 			else
@@ -910,6 +995,17 @@ function CreateMobStats()
 				end
 			end
 		end
+		if enemy.room~=1 then
+			local roomx=math.floor((enemy.room-1)%5)
+			local roomy=math.floor((enemy.room-1)/5)
+			local maxroom
+			if roomx>roomy then
+				maxroom=roomx
+			else
+				maxroom=roomy
+			end
+			enemy.lvl=enemy.lvl+(zonas*maxroom)
+		end
 	end
 	if not (enemy.stats) then
 		enemy.stats={}
@@ -1269,7 +1365,11 @@ function RunAttempt()
 end
 
 function PlayerAttacks(atktype)
-	P1Sprite(2)
+	if atktype==0 then
+		P1Sprite(2)
+	elseif atktype==1 then
+		P1Sprite(4)
+	end
 	local atkstat
 	local force
 	if atktype==0 then
@@ -1972,7 +2072,7 @@ function DamageCalc(tar,crit,cmd,atkstat)
 	local Damage
 	if tar=="p1" then
 		Damage=(
-			((enemy.stats[2]*(math.random(15,20)/10))-p1.stats[3])
+			((enemy.stats[atkstat]*(math.random(15,20)/10))-p1.stats[3])
 		)
 		Damage=(
 			((Damage*cmd/16)*crit)

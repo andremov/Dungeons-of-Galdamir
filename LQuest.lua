@@ -328,7 +328,6 @@ function QuestComplete()
 	end
 end
 
-
 function BlueCoins()
 	if AmCoins>0 then
 		coins[#coins+1]=display.newSprite( coinsheet, { name="coin", start=1, count=8, time=500,}  )

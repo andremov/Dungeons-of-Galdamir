@@ -94,32 +94,28 @@ function DoTurns()
 			end
 			
 			--Other Mob Collision Checks
-			for  g in pairs( mobs[p1.room] ) do
-				if not (mobs[p1.room][g].loc) then
-				--	display.remove(mobs[g])
-				--	mobs[g]=nil
-					print (g.." is a problem.")
-				else
-					if mobs[i].loc==(mobs[p1.room][g].loc+(math.sqrt(size))) then
-						CanGoUp=false
-					end
-					
-					if mobs[i].loc==(mobs[p1.room][g].loc-(math.sqrt(size))) then
-						CanGoDown=false
-					end
-					
-					if mobs[i].loc==(mobs[p1.room][g].loc+1) then
-						CanGoLeft=false
-					end
-					
-					if mobs[i].loc==(mobs[p1.room][g].loc-1) then
-						CanGoRight=false
-					end
-				end
+			local tryup=LocationCheck(mobs[p1.room][i].loc-size,p1.room)
+			if tryup==true then
+				CanGoUp=false
+			end
+			
+			local trydown=LocationCheck(mobs[p1.room][i].loc+size,p1.room)
+			if trydown==true then
+				CanGoDown=false
+			end
+			
+			local tryright=LocationCheck(mobs[p1.room][i].loc+1,p1.room)
+			if tryright==true then
+				CanGoRight=false
+			end
+			
+			local tryleft=LocationCheck(mobs[p1.room][i].loc-1,p1.room)
+			if tryleft==true then
+				CanGoLeft=false
 			end
 		
 			--Attacking Checks
-			if 	mobs[p1.room][i].loc==p1.loc+1 or 
+			if mobs[p1.room][i].loc==p1.loc+1 or 
 				mobs[p1.room][i].loc==p1.loc-1 or 
 				mobs[p1.room][i].loc==p1.loc-(math.sqrt(size)) or 
 				mobs[p1.room][i].loc==p1.loc+(math.sqrt(size)) and 
@@ -149,7 +145,7 @@ function DoTurns()
 			--	Before movement, player is in attack range
 				MoveLeft(i)
 				function closure()
-					c.Attacked(mobs[i])
+					c.Attacked(mobs[p1.room][i])
 				end
 				timer.performWithDelay(100,closure)
 				CanMove[i]=false
@@ -160,7 +156,7 @@ function DoTurns()
 			--	Before movement, player is in attack range
 				MoveUp(i)
 				function closure()
-					c.Attacked(mobs[i])
+					c.Attacked(mobs[p1.room][i])
 				end
 				timer.performWithDelay(100,closure)
 				CanMove[i]=false
@@ -171,7 +167,7 @@ function DoTurns()
 			--	Before movement, player is in attack range
 				MoveDown(i)
 				function closure()
-					c.Attacked(mobs[i])
+					c.Attacked(mobs[p1.room][i])
 				end
 				timer.performWithDelay(100,closure)
 				CanMove[i]=false
@@ -181,14 +177,14 @@ function DoTurns()
 			if CanMove[i]==true then
 				Decision(i)
 			end	
-				
+			
 			if mobs[p1.room][i].loc==p1.loc+1 or 
 				mobs[p1.room][i].loc==p1.loc-1 or 
 				mobs[p1.room][i].loc==p1.loc-(math.sqrt(size)) or 
 				mobs[p1.room][i].loc==p1.loc+(math.sqrt(size)) then
 				--	After movement, mob is in contact with player.
 				function closure()
-					c.Attacked(mobs[i])
+					c.Attacked(mobs[p1.room][i])
 				end
 				timer.performWithDelay(100,closure)
 				DidSomething=true
@@ -197,7 +193,7 @@ function DoTurns()
 	end
 	MobSpawn()
 	if DidSomething==false then
-		timer.performWithDelay(20,mov.Visibility)
+		timer.performWithDelay(200,mov.Visibility)
 	end
 end
 
@@ -222,7 +218,7 @@ function MobSpawn()
 		end
 		
 		if CanSpawn==true and SpawnCD==0 then
-	--		LifeOverDeath(MS.loc,MS.room)
+			LifeOverDeath(MS.loc,MS.room)
 			SpawnCD=math.random(10,15)
 		end
 		
@@ -238,13 +234,12 @@ function ReceiveMobs(data)
 end
 
 function MobDied(data)
-	if mobs==nil then
-		mobs=builder.GetMobGroup(false)
-	end
-	for i in pairs(mobs) do
-		if data==mobs[i] then
-			display.remove(mobs[i])
-			mobs[i]=nil
+	for r in pairs(mobs) do
+		for t in pairs(mobs) do
+			if data==mobs[r][t] then
+				display.remove(mobs[r][t])
+				mobs[r][t]=nil
+			end
 		end
 	end
 end
@@ -348,7 +343,7 @@ end
 function MoveRight(i)
 	if CanMove[i]==true then
 		CanMove[i]=false
-		mobs[p1.room][i].x=mobs[i].x+espacio
+		mobs[p1.room][i].x=mobs[p1.room][i].x+espacio
 		mobs[p1.room][i].loc=(mobs[p1.room][i].loc+1)
 		if (map[mobs[p1.room][i].loc])and(map[mobs[p1.room][i].loc].isVisible)and(fog[mobs[p1.room][i].loc].isVisible)then
 			if map[mobs[p1.room][i].loc].isVisible==false or fog[mobs[p1.room][i].loc].isVisible==true then
@@ -366,16 +361,27 @@ end
 
 function WipeMobs()
 	if (mobs) then
-		for r=table.maxn(mobs),1,-1 do
-			for i=table.maxn(mobs[r]),1,-1 do
-				local child = mobs[r][i]
-				if (child) then
-					display.remove(child)
-					child=nil
+		for r = table.maxn(mobs),1,-1 do
+			if (mobs[r]) then
+				for i = table.maxn(mobs[r]),1,-1 do
+					if (mobs[r][i]) then
+						display.remove(mobs[r][i])
+						mobs[r][i]=nil
+					end
 				end
+				mobs[r]=nil
 			end
 		end
 		mobs=nil
 	end
 end
-	
+
+function LocationCheck(loc2check,room2check)
+	local foundIt=false
+	for t in pairs(mobs[room2check]) do
+		if loc2check==mobs[room2check][t].loc then
+			foundIt=true
+		end
+	end
+	return foundIt
+end

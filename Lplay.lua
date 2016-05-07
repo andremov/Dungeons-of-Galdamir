@@ -209,7 +209,7 @@ function onBackRelease()
 	end
 	pmg=nil
 	m.ShowMenu()
-	timer.performWithDelay(100,menu.ReadySetGo)
+	timer.performWithDelay(100,m.ReadySetGo)
 end
 
 function goSlot1()
@@ -234,7 +234,7 @@ function goSlot1()
 end
 
 function goSlot2()
-	local saved=sav.CheckSave(1)
+	local saved=sav.CheckSave(2)
 	if saved~=false then
 		for i=pmg.numChildren,1,-1 do
 			local child = pmg[i]
@@ -255,7 +255,7 @@ function goSlot2()
 end
 
 function goSlot3()
-	local saved=sav.CheckSave(1)
+	local saved=sav.CheckSave(3)
 	if saved~=false then
 		for i=pmg.numChildren,1,-1 do
 			local child = pmg[i]

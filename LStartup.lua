@@ -26,8 +26,8 @@ local DoStuff
 local DoLoad=false
 
 function Startup(val)
-	if val~=false then
 	--	print "Game loading..."
+	if val~=false then
 		DoStuff=true
 	elseif val==false then
 		DoStuff=false
@@ -67,12 +67,13 @@ function Startup(val)
 	
 	if DoStuff==true then
 		if val==true then
+			DoLoad=true
 			function WrapIt()
 				Operations()
 			end
 			timer.performWithDelay(1000, (WrapIt) )
-			DoLoad=true
 		else
+			DoLoad=false
 			function WrapIt()
 				Operations(val)
 			end
@@ -82,30 +83,22 @@ function Startup(val)
 end
 
 function ShowContinue()
-	ui.UI(false)
-	if DoLoad==true then
-		DoLoad=false
-		timer.performWithDelay(100, (sav.Load) )
-		return true
-	else
-		Runtime:addEventListener( "touch", Continue )
-		
-		display.remove( loadtxt )
-		loadtxt=nil
-		display.remove( load1 )
-		load1=nil
-		display.remove( load2 )
-		load2=nil
-		display.remove( load3 )
-		load3=nil
-		
-		contxt = display.newText("Tap to continue", 0,0,"MoolBoran",60)
-		contxt:setTextColor(70,255,70)
-		contxt.x = display.contentCenterX
-		contxt.y = display.contentHeight*.75
-		Loading:insert( contxt )
-		return false
-	end
+	Runtime:addEventListener( "touch", Continue )
+	
+	display.remove( loadtxt )
+	loadtxt=nil
+	display.remove( load1 )
+	load1=nil
+	display.remove( load2 )
+	load2=nil
+	display.remove( load3 )
+	load3=nil
+	
+	contxt = display.newText("Tap to continue", 0,0,"MoolBoran",60)
+	contxt:setTextColor(70,255,70)
+	contxt.x = display.contentCenterX
+	contxt.y = display.contentHeight*.75
+	Loading:insert( contxt )
 end
 	
 function Continue( event )
@@ -140,11 +133,18 @@ function Operations(name)
 	handler.CallingZones()
 	players.CreatePlayers(name)
 	gp.Essentials()
---	players.WhosYourDaddy()
-	builder.BuildMap()
 	com.Essentials()
 	itm.Essentials()
 	inv.Essentials()
+--	players.WhosYourDaddy()
+	ui.CleanSlate()
+	ui.UI(false)
+	if DoLoad==true then
+		DoLoad=false
+		timer.performWithDelay(100, (sav.Load) )
+	else
+		builder.BuildMap()
+	end
 	
 	Runtime:addEventListener("enterFrame", col.removeOffscreenItems)
 --	print "Game loaded successfully."
