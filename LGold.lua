@@ -8,8 +8,8 @@ local coinsheet = graphics.newImageSheet( "coinsprite.png", { width=32, height=3
 local gpsheet = graphics.newImageSheet( "gp.png", { width=40, height=40, numFrames=12 } )
 local players = require("Lplayers")
 local physics = require "physics"
-local ui=require("LUI")
-local builder=require("LMapBuilder")
+local ui=require("Lui")
+local builder=require("Lmapbuilder")
 local DisplayS=2.0
 local Displayx=45
 local Displayy=30

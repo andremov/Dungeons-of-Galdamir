@@ -4,10 +4,10 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local builder=require("LMapBuilder")
-local handler=require("LMapHandler")
+local builder=require("Lmapbuilder")
+local handler=require("Lmaphandler")
 local p=require("Lplayers")
-local ui=require("LUI")
+local ui=require("Lui")
 local c=require("Lcombat")
 local mov=require("Lmovement")
 local isDead

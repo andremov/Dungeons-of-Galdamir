@@ -5,14 +5,14 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local widget = require "widget"
-local su=require("LStartup")
-local a=require("LAudio")
-local option=require("LOptions")
-local s=require("LSplashes")
-local v=require("LVersion")
+local su=require("Lstartup")
+local a=require("Laudio")
+local option=require("Loptions")
+local s=require("Lsplashes")
+local v=require("Lversion")
 local t=require("Ltutorial")
-local sav=require("LSaving")
-local scr=require("LScore")
+local sav=require("Lsaving")
+local scr=require("Lscore")
 local group=display.newGroup()
 local GVersion
 local PlayBtn
@@ -26,6 +26,170 @@ local Splash
 local OffScreen
 local canGo
 local saved
+
+function ShowMenu()
+	function FrontNCenter2()
+		OffScreen:toFront()
+	end
+	if not (OffScreen) then
+		OffScreen = display.newImage("bkgs/bkg_leveldark2.png", 1536,2048)
+		OffScreen.x = display.contentWidth/2
+		OffScreen.y = display.contentHeight/2
+		Runtime:addEventListener("enterFrame",FrontNCenter2)
+	end
+	
+	GVersion=v.HowDoIVersion(true)
+	canGo=false
+	
+	local background = display.newImageRect( "bkgs/background.png", display.contentWidth, display.contentHeight )
+	background:setReferencePoint( display.TopLeftReferencePoint )
+	background.x, background.y = 0, 0
+	
+	local titleLogo = display.newImageRect( "titleB.png", 477, 254 )
+	titleLogo:setReferencePoint( display.CenterReferencePoint )
+	titleLogo.x = display.contentWidth * 0.5
+	titleLogo.y = 100
+	titleLogo.xScale=0.75
+	titleLogo.yScale=titleLogo.xScale
+	
+	saved=sav.CheckSave()
+	scr.CheckScore()
+	
+	if saved==true then
+		ContBtn = widget.newButton{
+			label="Continue",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=30,
+			defaultFile="button.png",
+			overFile="button-over.png",
+			width=308, height=80,
+			onRelease = onContBtnRelease
+		}
+		ContBtn:setReferencePoint( display.CenterReferencePoint )
+		ContBtn.x = display.contentWidth*0.5
+		ContBtn.y = 312
+	elseif saved==false then
+		ContBtn = widget.newButton{
+			label="Continue",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=30,
+			defaultFile="inactive.png",
+			overFile="inactive-over.png",
+			width=308, height=80,
+		}
+		ContBtn:setReferencePoint( display.CenterReferencePoint )
+		ContBtn.x = display.contentWidth*0.5
+		ContBtn.y = 312
+	end
+	
+	PlayBtn = widget.newButton{
+		label="New Game",
+		labelColor = { default={0,0,0}, over={255,255,255} },
+		fontSize=30,
+		defaultFile="button.png",
+		overFile="button-over.png",
+		width=308, height=80,
+		onRelease = onPlayBtnRelease
+	}
+	PlayBtn:setReferencePoint( display.CenterReferencePoint )
+	PlayBtn.x = display.contentWidth*0.5
+	PlayBtn.y = ContBtn.y+100
+	
+	TutBtn = widget.newButton{
+		label="TBA",
+		labelColor = { default={0,0,0}, over={255,255,255} },
+		fontSize=30,
+		defaultFile="inactive.png",
+		overFile="inactive-over.png",
+		width=308, height=80,
+		--onRelease = onTutBtnRelease
+	}
+	TutBtn:setReferencePoint( display.CenterReferencePoint )
+	TutBtn.x = display.contentWidth*0.5
+	TutBtn.y = PlayBtn.y+100
+	
+	OptnBtn = widget.newButton{
+		label="Options",
+		labelColor = { default={0,0,0}, over={255,255,255} },
+		fontSize=30,
+		defaultFile="button.png",
+		overFile="button-over.png",
+		width=308, height=80,
+		onRelease = onOptnBtnRelease
+	}
+	OptnBtn:setReferencePoint( display.CenterReferencePoint )
+	OptnBtn.x = display.contentWidth*0.5
+	OptnBtn.y = TutBtn.y+100
+	
+	ScreBtn = widget.newButton{
+		label="High Scores",
+		labelColor = { default={0,0,0}, over={255,255,255} },
+		fontSize=30,
+		defaultFile="button.png",
+		overFile="button-over.png",
+		width=308, height=80,
+		onRelease = onScreBtnRelease
+	}
+	ScreBtn:setReferencePoint( display.CenterReferencePoint )
+	ScreBtn.x = display.contentWidth*0.5
+	ScreBtn.y = OptnBtn.y+100
+	
+	sign=display.newImageRect("sign.png", 95, 70)
+	sign.xScale=2.3
+	sign.yScale=2.3
+	sign.x=(display.contentWidth-130)
+	sign.y=(display.contentHeight-90)
+	
+	VDisplay = display.newText(("Version:\n"..GVersion),0,0,labelFont, 30 )
+	VDisplay:setTextColor( 0, 0, 0)
+	VDisplay.x=sign.x
+	VDisplay.y=sign.y-25
+	
+	logo=display.newImageRect("Symbol3.png",206,206)
+	logo.xScale=0.75
+	logo.yScale=logo.xScale
+	logo.x=100
+	logo.y=display.contentHeight-130
+	
+	ad1=display.newImageRect("ad1.png",57,57)
+	ad1.x=logo.x+160
+	ad1.y=logo.y+30
+	ad1.xScale=2.0
+	ad1.yScale=ad1.xScale
+	ad1:addEventListener("tap",openAd1)
+	
+	ad2=display.newImageRect("ad2.png",57,57)
+	ad2.x=ad1.x+(70*ad1.xScale)
+	ad2.y=ad1.y
+	ad2.xScale=ad1.xScale
+	ad2.yScale=ad1.xScale
+	ad2:addEventListener("tap",openAd2)
+	
+	Splash=s.GetSplash()
+	
+	Sounds=a.sfx()
+	
+	if Sounds==true or Sounds==false then
+	else
+		a.LoadSounds()
+	end
+	
+	a.Menu(true)
+	
+	group:insert(background)
+	group:insert(ad2)
+	group:insert(ad1)
+	group:insert(ContBtn)
+	group:insert(Splash)
+	group:insert(PlayBtn)
+	group:insert(TutBtn)
+	group:insert(OptnBtn)
+	group:insert(ScreBtn)
+	group:insert(titleLogo)
+	group:insert(sign)
+	group:insert(VDisplay)
+	group:insert(logo)
+end
 
 function ReadySetGo()
 	canGo=true
@@ -87,10 +251,7 @@ function GoPlay()
 	end
 	timer.performWithDelay(100,Keyboard)
 	VDisplay=nil
-	local path = system.pathForFile(  "DoGSave.sav", system.DocumentsDirectory )
-	local fh, errStr = io.open( path, "w+" )
-	fh:write("")
-	io.close( fh )
+	sav.WipeSave()
 end
 
 function Stahp()
@@ -201,163 +362,6 @@ function onScreBtnRelease()
 	end
 end
 
-function ShowMenu()
-	function FrontNCenter2()
-		OffScreen:toFront()
-	end
-	if not (OffScreen) then
-		OffScreen = display.newImage("bkgs/bkg_leveldark2.png", 1536,2048)
-		OffScreen.x = display.contentWidth/2
-		OffScreen.y = display.contentHeight/2
-		Runtime:addEventListener("enterFrame",FrontNCenter2)
-	end
-	GVersion=v.HowDoIVersion(true)
-	canGo=false
-	
-	local background = display.newImageRect( "bkgs/background.png", display.contentWidth, display.contentHeight )
-	background:setReferencePoint( display.TopLeftReferencePoint )
-	background.x, background.y = 0, 0
-	
-	local titleLogo = display.newImageRect( "titleB.png", 477, 254 )
-	titleLogo:setReferencePoint( display.CenterReferencePoint )
-	titleLogo.x = display.contentWidth * 0.5
-	titleLogo.y = 100
-	titleLogo.xScale=0.75
-	titleLogo.yScale=titleLogo.xScale
-	saved=sav.CheckSave()
-	scr.CheckScore()
-	if saved==true then
-		ContBtn = widget.newButton{
-			label="Continue",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=30,
-			defaultFile="button.png",
-			overFile="button-over.png",
-			width=308, height=80,
-			onRelease = onContBtnRelease
-			
-		}
-		ContBtn:setReferencePoint( display.CenterReferencePoint )
-		ContBtn.x = display.contentWidth*0.5
-		ContBtn.y = 312
-	elseif saved==false then
-		ContBtn = widget.newButton{
-			label="Continue",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=30,
-			defaultFile="inactive.png",
-			overFile="inactive-over.png",
-			width=308, height=80,
-		}
-		ContBtn:setReferencePoint( display.CenterReferencePoint )
-		ContBtn.x = display.contentWidth*0.5
-		ContBtn.y = 312
-	end
-	
-	PlayBtn = widget.newButton{
-		label="New Game",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
-		width=308, height=80,
-		onRelease = onPlayBtnRelease
-	}
-	PlayBtn:setReferencePoint( display.CenterReferencePoint )
-	PlayBtn.x = display.contentWidth*0.5
-	PlayBtn.y = ContBtn.y+100
-	
-	TutBtn = widget.newButton{
-		label="TBA",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="inactive.png",
-		overFile="inactive-over.png",
-		width=308, height=80,
-		--onRelease = onTutBtnRelease
-	}
-	TutBtn:setReferencePoint( display.CenterReferencePoint )
-	TutBtn.x = display.contentWidth*0.5
-	TutBtn.y = PlayBtn.y+100
-	
-	OptnBtn = widget.newButton{
-		label="Options",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
-		width=308, height=80,
-		onRelease = onOptnBtnRelease
-	}
-	OptnBtn:setReferencePoint( display.CenterReferencePoint )
-	OptnBtn.x = display.contentWidth*0.5
-	OptnBtn.y = TutBtn.y+100
-	
-	ScreBtn = widget.newButton{
-		label="High Scores",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="button.png",
-		overFile="button-over.png",
-		width=308, height=80,
-		onRelease = onScreBtnRelease
-	}
-	ScreBtn:setReferencePoint( display.CenterReferencePoint )
-	ScreBtn.x = display.contentWidth*0.5
-	ScreBtn.y = OptnBtn.y+100
-	
-	sign=display.newImageRect("sign.png", 95, 70)
-	sign.xScale=2.3
-	sign.yScale=2.3
-	sign.x=(display.contentWidth-130)
-	sign.y=(display.contentHeight-90)
-	
-	VDisplay = display.newText(("Version:\n"..GVersion),0,0,labelFont, 30 )
-	VDisplay:setTextColor( 0, 0, 0)
-	VDisplay.x=sign.x
-	VDisplay.y=sign.y-25
-	
-	logo=display.newImageRect("Symbol.png",160,260)
-	logo.x=80
-	logo.y=display.contentHeight-130
-	
-	ad1=display.newImageRect("ad1.png",57,57)
-	ad1.x=logo.x+160
-	ad1.y=logo.y+30
-	ad1.xScale=2.0
-	ad1.yScale=ad1.xScale
-	ad1:addEventListener("tap",openAd1)
-	
-	ad2=display.newImageRect("ad2.png",57,57)
-	ad2.x=ad1.x+(70*ad1.xScale)
-	ad2.y=ad1.y
-	ad2.xScale=ad1.xScale
-	ad2.yScale=ad1.xScale
-	ad2:addEventListener("tap",openAd2)
-	
-	Splash=s.GetSplash()
-	
-	Sounds=a.sfx()
-	if Sounds==true or Sounds==false then
-	else
-		a.LoadSounds()
-	end
-	a.Menu(true)
-	group:insert(background)
-	group:insert(ad2)
-	group:insert(ad1)
-	group:insert(ContBtn)
-	group:insert(Splash)
-	group:insert(PlayBtn)
-	group:insert(TutBtn)
-	group:insert(OptnBtn)
-	group:insert(ScreBtn)
-	group:insert(titleLogo)
-	group:insert(sign)
-	group:insert(VDisplay)
-	group:insert(logo)
-end
-
 function isVersion(val)
 	if (VDisplay2) then
 		display.remove(VDisplay2)
@@ -465,29 +469,35 @@ function Keyboard()
 		LetterChange(true)
 	end
 	
-	keys[#keys+1] = widget.newButton{
-		defaultFile="del1.png",
-		overFile="del2.png",
-		width=85, height=85,
+	DelBtn = widget.newButton{
+		label="Backspace",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		fontSize=30,
+		defaultFile="cbutton.png",
+		overFile="cbutton2.png",
+		width=252, height=55,
 		onRelease = Backspace
 	}
-	keys[#keys]:setReferencePoint( display.CenterReferencePoint )
-	keys[#keys].x = 80+(75*((table.maxn(letters)/2)%9))
-	keys[#keys].y = ((display.contentHeight/2)-140)+(80*math.floor((table.maxn(letters)/2)/9))
-	kbrd:insert( keys[#keys] )
+	DelBtn:setReferencePoint( display.CenterReferencePoint )
+	DelBtn.x = display.contentCenterX
+	DelBtn.y = display.contentHeight-40
+	kbrd:insert( DelBtn )
 	
-	keys2[#keys2+1] = widget.newButton{
-		defaultFile="end1.png",
-		overFile="end2.png",
-		width=85, height=85,
+	EndBtn = widget.newButton{
+		label="Continue",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		fontSize=30,
+		defaultFile="cbutton.png",
+		overFile="cbutton2.png",
+		width=252, height=55,
 		onRelease = End
 	}
-	keys2[#keys2]:setReferencePoint( display.CenterReferencePoint )
-	keys2[#keys2].x = 80+(75*((table.maxn(letters)+1)%9))
-	keys2[#keys2].y = ((display.contentHeight/2)+40)+(85*math.floor((table.maxn(letters)-18)/9))
-	kbrd:insert( keys2[#keys2] )
+	EndBtn:setReferencePoint( display.CenterReferencePoint )
+	EndBtn.x = display.contentWidth-130
+	EndBtn.y = display.contentHeight-40
+	kbrd:insert( EndBtn )
 	
-	keys2[#keys2+1] = widget.newButton{
+	BackBtn = widget.newButton{
 		label="Back",
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
@@ -496,10 +506,10 @@ function Keyboard()
 		width=252, height=55,
 		onRelease = Back2Menu
 	}
-	keys2[#keys2]:setReferencePoint( display.CenterReferencePoint )
-	keys2[#keys2].x = 130
-	keys2[#keys2].y = display.contentHeight-40
-	kbrd:insert( keys2[#keys2] )
+	BackBtn:setReferencePoint( display.CenterReferencePoint )
+	BackBtn.x = 130
+	BackBtn.y = display.contentHeight-40
+	kbrd:insert( BackBtn )
 end
 
 function Back2Menu()

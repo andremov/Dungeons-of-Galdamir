@@ -4,22 +4,22 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local builder=require("LMapBuilder")
+local builder=require("Lmapbuilder")
 local players=require("Lplayers")
 local m=require("Lmenu")
 local mob=require("Lmobai")
-local handler=require("LMapHandler")
+local handler=require("Lmaphandler")
 local mov=require("Lmovement")
-local col=require("LTileEvents")
-local audio=require("LAudio")
-local gp=require("LGold")
+local col=require("Ltileevents")
+local audio=require("Laudio")
+local gp=require("Lgold")
 local inv=require("Lwindow")
-local ui=require("LUI")
+local ui=require("Lui")
 local com=require("Lcombat")
-local sav=require("LSaving")
-local shp=require("LShop")
-local q=require("LQuest")
-local su=require("LStartup")
+local sav=require("Lsaving")
+local shp=require("Lshop")
+local q=require("Lquest")
+local su=require("Lstartup")
 local RoundTax=5
 local HighCard
 local Level

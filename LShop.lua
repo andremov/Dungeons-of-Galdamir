@@ -11,16 +11,16 @@ local MPot3sheet = graphics.newImageSheet( "items/ManaPotion3.png", { width=64, 
 local EPot2sheet = graphics.newImageSheet( "items/EnergyPotion2.png", { width=64, height=64, numFrames=16 })
 local EPot3sheet = graphics.newImageSheet( "items/EnergyPotion3.png", { width=64, height=64, numFrames=16 })
 local widget = require "widget"
-local ui=require("LUI")
-local b=require("LMapBuilder")
+local ui=require("Lui")
+local b=require("Lmapbuilder")
 local mov=require("Lmovement")
-local WD=require("LProgress")
-local it=require("LItems")
-local gp=require("LGold")
+local WD=require("Lprogress")
+local it=require("Litems")
+local gp=require("Lgold")
 local p=require("Lplayers")
 local inv=require("Lwindow")
-local a=require("LAudio")
-local sav=require("LSaving")
+local a=require("Laudio")
+local sav=require("Lsaving")
 local gsm
 local BoughtTxt
 local atShop=false

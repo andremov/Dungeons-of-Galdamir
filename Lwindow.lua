@@ -11,17 +11,17 @@ local MPot3sheet = graphics.newImageSheet( "items/ManaPotion3.png", { width=64, 
 local EPot2sheet = graphics.newImageSheet( "items/EnergyPotion2.png", { width=64, height=64, numFrames=16 })
 local EPot3sheet = graphics.newImageSheet( "items/EnergyPotion3.png", { width=64, height=64, numFrames=16 })
 local widget = require "widget"
-local audio=require("LAudio")
-local g=require("LGold")
+local audio=require("Laudio")
+local g=require("Lgold")
 local c=require("Lcombat")
 local mov=require("Lmovement")
 local p=require("Lplayers")
-local WD=require("LProgress")
-local ui=require("LUI")
-local item=require("LItems")
-local sc=require("LScore")
-local b=require("LMapBuilder")
-local s=require("LSaving")
+local WD=require("Lprogress")
+local ui=require("Lui")
+local item=require("Litems")
+local sc=require("Lscore")
+local b=require("Lmapbuilder")
+local s=require("Lsaving")
 local ginv
 local geqp
 local ginf
@@ -76,6 +76,8 @@ function ToggleBag()
 		ginv:insert( invinterface )
 		isOpn=true
 		
+		InvCheck()
+		
 		for i=1,table.maxn(p1.inv) do
 			if (p1.inv[i])~=nil then
 				local itmnme=item.ReturnInfo(p1.inv[i][1],0)
@@ -92,12 +94,12 @@ function ToggleBag()
 				elseif p1.inv[i][1]==8 then
 					items[#items+1]=display.newSprite( MPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
 					items[#items]:play()
-				elseif curShop.item[s][1]==10 then
-					item[s]=display.newSprite( EPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					item[s]:play()
-				elseif curShop.item[s][1]==11 then
-					item[s]=display.newSprite( EPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
-					item[s]:play()
+				elseif p1.inv[i][1]==10 then
+					item[i]=display.newSprite( EPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
+					item[i]:play()
+				elseif p1.inv[i][1]==11 then
+					item[i]=display.newSprite( EPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
+					item[i]:play()
 				else
 					items[#items+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
 				end
@@ -1028,5 +1030,21 @@ function InvFull()
 		return true
 	else
 		return false
+	end
+end
+
+function InvCheck()
+	for a=table.maxn(p1.inv),1,-1 do
+		for b=table.maxn(p1.inv),1,-1 do
+			if (p1.inv[a])and(p1.inv[b]) and a~=b then
+				if p1.inv[a][1]==p1.inv[b][1] then
+					local stack=item.ReturnInfo(p1.inv[a][1],3)
+					if stack==true then
+						p1.inv[a][2]=p1.inv[a][2]+p1.inv[b][2]
+						table.remove(p1.inv,b)
+					end
+				end
+			end
+		end
 	end
 end

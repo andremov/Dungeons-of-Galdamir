@@ -5,21 +5,21 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local p=require("Lplayers")
-local gp=require("LGold")
-local v=require("LVersion")
+local gp=require("Lgold")
+local v=require("Lversion")
 local i=require("Lwindow")
-local WD=require("LProgress")
-local m=require("LMapHandler")
-local it=require("LItems")
-local su=require("LStartup")
-local b=require("LMapBuilder")
+local WD=require("Lprogress")
+local m=require("Lmaphandler")
+local it=require("Litems")
+local su=require("Lstartup")
+local b=require("Lmapbuilder")
 local Sve
 local SplStrt
 local SplEnd
 local InvStrt
 local EqpStrt
 local OKVers={
-		"BETA 1.8.0",
+		"BETA 1.9.0",
 	}
 
 function Load()
@@ -108,9 +108,7 @@ function CheckSave()
 			if okSave==true then
 				return true
 			else
-				local fh, errStr = io.open( path, "w+" )
-				fh:write("")
-				io.close( fh )
+				WipeSave()
 				return false
 			end
 		else
@@ -161,4 +159,11 @@ function Save()
 	end
 	io.close( fh )
 	print ("Progress saved on floor "..Round..".")
+end
+
+function WipeSave()
+	local path = system.pathForFile(  "DoGSave.sav", system.DocumentsDirectory )
+	local fh, errStr = io.open( path, "w+" )
+	fh:write("")
+	io.close( fh )
 end

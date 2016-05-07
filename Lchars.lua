@@ -4,77 +4,59 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local o=require("LOptions")
-local a=require("LAudio")
 local widget = require "widget"
+local o=require("Loptions")
+local a=require("Laudio")
 local charname
 local charclass
 local charmenu
+local btns
+local imgs
+local btns2
+local imgs2
+local info
+local info2
 local classmenu
 local currentchar
 local curmenu
+local Classes={"Viking","Warrior","Knight","Sorceror","Thief","Scholar"}
+local Stats={"STA","ATT","DEF","MGC","DEX","INT"}
+local Chars={"Luneth","Arc","Refia","Ingus"}
 
-function onLunRelease()
-	charname=0
-	Classes()
-	CurrentChar()
+function CharChoose( event )
+	for i=1,table.maxn(Chars) do
+		local x=display.contentWidth*(0.2*i)
+		if event.x>x-40 and event.x<x+40 then
+			charname=i-1
+			ClassMenu()
+			CurrentChar()
+		end
+	end
 end
 
-function onArcRelease()
-	charname=1
-	Classes()
-	CurrentChar()
-end
-
-function onRefRelease()
-	charname=2
-	Classes()
-	CurrentChar()
-end
-
-function onIngRelease()
-	charname=3
-	Classes()	
-	CurrentChar()
-end
-
-function onKnightRelease()
-	charclass=0
-	CurrentChar()
-end
-
-function onWarriorRelease()
-	charclass=1
-	CurrentChar()
-end
-
-function onThiefRelease()
-	charclass=2
-	CurrentChar()
-end
-
-function onVikingRelease()
-	charclass=3
-	CurrentChar()
-end
-
-function onSorcerorRelease()
-	charclass=4
-	CurrentChar()
-end
-
-function onScholarRelease()
-	charclass=5
-	CurrentChar()
+function ClassChoose( event )
+	for i=1,table.maxn(Classes) do
+		local x=(display.contentWidth/7)*i
+		if event.x>x-40 and event.x<x+40 then
+			charclass=i-1
+			CurrentChar()
+		end
+	end
 end
 
 function CharMenu()
 	if (charclass) then
-		Classes()
-	CurrentChar()
+		ClassMenu()
+		CurrentChar()
 	end
 	if not (charmenu) then
 		charmenu=display.newGroup()
+	end
+	if not (imgs) then
+		imgs={}
+	end
+	if not (btns) then
+		btns={}
 	end
 	for i=charmenu.numChildren,1,-1 do
 		local child = charmenu[i]
@@ -86,83 +68,25 @@ function CharMenu()
 	background.x, background.y = 0, 0
 	charmenu:insert(background)
 	
-	local Luneth1=display.newImageRect("chars/0/char.png",65,65)
-	Luneth1.x = display.contentWidth*0.2
-	Luneth1.y = display.contentHeight*0.3
-	charmenu:insert(Luneth1)
+	for i=1,table.maxn(Chars) do
+		imgs[i]=display.newImageRect("chars/"..(i-1).."/char.png",65,65)
+		imgs[i].x = display.contentWidth*(0.2*i)
+		imgs[i].y = display.contentHeight*0.3
+		charmenu:insert(imgs[i])
 	
-	local Luneth = widget.newButton{
-		label="",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="charbutton.png",
-		overFile="charbutton-over.png",
-		width=80, height=80,
-		onRelease = onLunRelease
-	}
-	Luneth:setReferencePoint( display.CenterReferencePoint )
-	Luneth.x = display.contentWidth*0.2
-	Luneth.y = display.contentHeight*0.3
-	charmenu:insert(Luneth)
+		btns[i] = widget.newButton{
+			defaultFile="charbutton.png",
+			overFile="charbutton-over.png",
+			width=80, height=80,
+			onRelease = CharChoose
+		}
+		btns[i]:setReferencePoint( display.CenterReferencePoint )
+		btns[i].x = display.contentWidth*(0.2*i)
+		btns[i].y = display.contentHeight*0.3
+		charmenu:insert(btns[i])
+	end
 	
-	local Refia1=display.newImageRect("chars/2/char.png",65,65)
-	Refia1.x = display.contentWidth*0.4
-	Refia1.y = display.contentHeight*0.3
-	charmenu:insert(Refia1)
-	
-	local Refia = widget.newButton{
-		label="",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="charbutton.png",
-		overFile="charbutton-over.png",
-		width=80, height=80,
-		onRelease = onRefRelease
-	}
-	Refia:setReferencePoint( display.CenterReferencePoint )
-	Refia.x = display.contentWidth*0.4
-	Refia.y = display.contentHeight*0.3
-	charmenu:insert(Refia)
-	
-	local Arc1=display.newImageRect("chars/1/char.png",65,65)
-	Arc1.x = display.contentWidth*0.6
-	Arc1.y = display.contentHeight*0.3
-	charmenu:insert(Arc1)
-	
-	local Arc = widget.newButton{
-		label="",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="charbutton.png",
-		overFile="charbutton-over.png",
-		width=80, height=80,
-		onRelease = onArcRelease
-	}
-	Arc:setReferencePoint( display.CenterReferencePoint )
-	Arc.x = display.contentWidth*0.6
-	Arc.y = display.contentHeight*0.3
-	charmenu:insert(Arc)
-	
-	local Ingus1=display.newImageRect("chars/3/char.png",65,65)
-	Ingus1.x = display.contentWidth*0.8
-	Ingus1.y = display.contentHeight*0.3
-	charmenu:insert(Ingus1)
-	
-	local Ingus = widget.newButton{
-		label="",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="charbutton.png",
-		overFile="charbutton-over.png",
-		width=80, height=80,
-		onRelease = onIngRelease
-	}
-	Ingus:setReferencePoint( display.CenterReferencePoint )
-	Ingus.x = display.contentWidth*0.8
-	Ingus.y = display.contentHeight*0.3
-	charmenu:insert(Ingus)
-	
-	local Back = widget.newButton{
+	Back = widget.newButton{
 		label="Back",
 		labelColor = { default={0,0,0}, over={255,255,255} },
 		fontSize=30,
@@ -175,10 +99,9 @@ function CharMenu()
 	Back.x = display.contentWidth*0.5
 	Back.y = display.contentHeight-120
 	charmenu:insert(Back)
-
 end
 
-function Classes()
+function ClassMenu()
 	if not (classmenu) then
 		classmenu=display.newGroup()
 	end
@@ -186,157 +109,46 @@ function Classes()
 		local child = classmenu[i]
 		child.parent:remove( child )
 	end
+	if not (imgs2) then
+		imgs2={}
+	end
+	if not (btns2) then
+		btns2={}
+	end
+	if not (info) then
+		info={}
+	end
+	if not (info2) then
+		info2={}
+	end
 	
-	--Viking
-	local Viktxt=display.newText("Viking\n+STA", 0, 0, "Game Over", 80)
-	Viktxt.x = (display.contentWidth/7)*1
-	Viktxt.y = display.contentHeight*0.4+80
-	classmenu:insert(Viktxt)
+	for i=1,table.maxn(Classes) do
+		info[i]=display.newText((Classes[i]), 0, 0, "MoolBoran", 40)
+		info[i].x = (display.contentWidth/7)*i
+		info[i].y = display.contentHeight*0.4+80
+		charmenu:insert(info[i])
+		
+		info2[i]=display.newText(("+"..Stats[i]), 0, 0, "MoolBoran", 40)
+		info2[i].x = info[i].x
+		info2[i].y = info[i].y+42
+		charmenu:insert(info2[i])
+		
+		imgs2[i]=display.newImageRect("chars/"..charname.."/"..(i-1).."/char.png",65,65)
+		imgs2[i].x = info[i].x
+		imgs2[i].y = info[i].y-80
+		charmenu:insert(imgs2[i])
 	
-	local Viking1=display.newImageRect("chars/"..charname.."/3/char.png",65,65)
-	Viking1.x = Viktxt.x
-	Viking1.y = Viktxt.y-80
-	classmenu:insert(Viking1)
-	
-	local Viking = widget.newButton{
-		label="",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="charbutton.png",
-		overFile="charbutton-over.png",
-		width=80, height=80,
-		onRelease = onVikingRelease
-	}
-	Viking:setReferencePoint( display.CenterReferencePoint )
-	Viking.x = Viking1.x
-	Viking.y = Viking1.y
-	classmenu:insert(Viking)
-	
-	--Warrior
-	local Wartxt=display.newText("Warrior\n+ATT", 0, 0, "Game Over", 80)
-	Wartxt.x = (display.contentWidth/7)*2
-	Wartxt.y = display.contentHeight*0.4+80
-	classmenu:insert(Wartxt)
-	
-	local Warrior1=display.newImageRect("chars/"..charname.."/1/char.png",65,65)
-	Warrior1.x = Wartxt.x
-	Warrior1.y = Wartxt.y-80
-	classmenu:insert(Warrior1)
-	
-	local Warrior = widget.newButton{
-		label="",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="charbutton.png",
-		overFile="charbutton-over.png",
-		width=80, height=80,
-		onRelease = onWarriorRelease
-	}
-	Warrior:setReferencePoint( display.CenterReferencePoint )
-	Warrior.x = Warrior1.x
-	Warrior.y = Warrior1.y
-	classmenu:insert(Warrior)
-	
-	--Knight
-	local Knitxt=display.newText("Knight\n+DEF", 0, 0, "Game Over", 80)
-	Knitxt.x = (display.contentWidth/7)*3
-	Knitxt.y = display.contentHeight*0.4+80
-	classmenu:insert(Knitxt)
-	
-	local Knight1=display.newImageRect("chars/"..charname.."/0/char.png",65,65)
-	Knight1.x = Knitxt.x
-	Knight1.y = Knitxt.y-80
-	classmenu:insert(Knight1)
-	
-	local Knight = widget.newButton{
-		label="",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="charbutton.png",
-		overFile="charbutton-over.png",
-		width=80, height=80,
-		onRelease = onKnightRelease
-	}
-	Knight:setReferencePoint( display.CenterReferencePoint )
-	Knight.x = Knight1.x
-	Knight.y = Knight1.y
-	classmenu:insert(Knight)
-	
-	--Thief
-	local Thitxt=display.newText("Thief\n+DEX", 0, 0, "Game Over", 80)
-	Thitxt.x = (display.contentWidth/7)*5
-	Thitxt.y = display.contentHeight*0.4+80
-	classmenu:insert(Thitxt)
-	
-	local Thief1=display.newImageRect("chars/"..charname.."/2/char.png",65,65)
-	Thief1.x = Thitxt.x
-	Thief1.y = Thitxt.y-80
-	classmenu:insert(Thief1)
-	
-	local Thief = widget.newButton{
-		label="",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="charbutton.png",
-		overFile="charbutton-over.png",
-		width=80, height=80,
-		onRelease = onThiefRelease
-	}
-	Thief:setReferencePoint( display.CenterReferencePoint )
-	Thief.x = Thief1.x
-	Thief.y = Thief1.y
-	classmenu:insert(Thief)
-	
-	--Sorceror
-	local Sortxt=display.newText("Sorceror\n+MGC", 0, 0, "Game Over", 80)
-	Sortxt.x = (display.contentWidth/7)*4
-	Sortxt.y = display.contentHeight*0.4+80
-	classmenu:insert(Sortxt)
-	
-	local Sorceror1=display.newImageRect("chars/"..charname.."/4/char.png",65,65)
-	Sorceror1.x = Sortxt.x
-	Sorceror1.y = Sortxt.y-80
-	classmenu:insert(Sorceror1)
-	
-	local Sorceror = widget.newButton{
-		label="",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="charbutton.png",
-		overFile="charbutton-over.png",
-		width=80, height=80,
-		onRelease = onSorcerorRelease
-	}
-	Sorceror:setReferencePoint( display.CenterReferencePoint )
-	Sorceror.x = Sorceror1.x
-	Sorceror.y = Sorceror1.y
-	classmenu:insert(Sorceror)
-	
-	--Scholar
-	local Schtxt=display.newText("Scholar\n+INT", 0, 0, "Game Over", 80)
-	Schtxt.x = (display.contentWidth/7)*6
-	Schtxt.y = display.contentHeight*0.4+80
-	classmenu:insert(Schtxt)
-	
-	local Scholar1=display.newImageRect("chars/"..charname.."/5/char.png",65,65)
-	Scholar1.x = Schtxt.x
-	Scholar1.y = Schtxt.y-80
-	classmenu:insert(Scholar1)
-	
-	local Scholar = widget.newButton{
-		label="",
-		labelColor = { default={0,0,0}, over={255,255,255} },
-		fontSize=30,
-		defaultFile="charbutton.png",
-		overFile="charbutton-over.png",
-		width=80, height=80,
-		onRelease = onScholarRelease
-	}
-	Scholar:setReferencePoint( display.CenterReferencePoint )
-	Scholar.x = Scholar1.x
-	Scholar.y = Scholar1.y
-	classmenu:insert(Scholar)
-	
+		btns2[i] = widget.newButton{
+			defaultFile="charbutton.png",
+			overFile="charbutton-over.png",
+			width=80, height=80,
+			onRelease = ClassChoose
+		}
+		btns2[i]:setReferencePoint( display.CenterReferencePoint )
+		btns2[i].x = info[i].x
+		btns2[i].y = imgs2[i].y
+		charmenu:insert(btns2[i])
+	end
 end
 
 function CurrentChar()
@@ -354,9 +166,9 @@ function CurrentChar()
 		charclass=0
 	end
 	
-	local char=display.newText("Current Character:", 0, 0, "Game Over", 100)
-	char.x = display.contentWidth*0.5
-	char.y = display.contentHeight*0.5+60
+	char=display.newText("Current Character:", 0, 0, "MoolBoran", 70)
+	char.x = display.contentCenterX
+	char.y = display.contentCenterY+100
 	curmenu:insert(char)
 	
 	currentchar=display.newImageRect( "chars/"..charname.."/"..charclass.."/char.png", 76 ,76)
@@ -364,6 +176,16 @@ function CurrentChar()
 	currentchar:setStrokeColor(50, 50, 255)
 	currentchar.x, currentchar.y = char.x,char.y+80
 	curmenu:insert(currentchar)
+	
+	curinfo=display.newText((Classes[charclass+1]), 0, 0, "MoolBoran", 40)
+	curinfo.x = currentchar.x
+	curinfo.y = currentchar.y+80
+	curmenu:insert(curinfo)
+	
+	curinfo2=display.newText(("+"..Stats[charclass+1]), 0, 0, "MoolBoran", 40)
+	curinfo2.x = curinfo.x
+	curinfo2.y = curinfo.y+45
+	curmenu:insert(curinfo2)
 end
 
 function GetCharInfo(field)	

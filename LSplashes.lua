@@ -45,6 +45,9 @@ local S={
 	"Mana!",
 	"Smooth!",
 	"Content Heavy!",
+	"Techniques!",
+	"Energy!",
+	"Limited Shops!",
 }
 
 function GetSplash()

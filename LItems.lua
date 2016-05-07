@@ -8,10 +8,10 @@ local widget = require "widget"
 local inv=require("Lwindow")
 local p=require("Lplayers")
 local mov=require("Lmovement")
-local WD=require("LProgress")
-local b=require("LMapBuilder")
-local q=require("LQuest")
-local ui=require("LUI")
+local WD=require("Lprogress")
+local b=require("Lmapbuilder")
+local q=require("Lquest")
+local ui=require("Lui")
 local itemlist
 local equips
 local items
@@ -179,6 +179,12 @@ function ItemDrop(boost)
 			bagbtn.y = (display.contentHeight/2)+30
 			gum:insert( bagbtn )
 			
+			local skrlrl=math.random(1,10)
+			if skrlrl>8 then
+				lolname2.text=(asdname.." + Blank Scroll")
+				inv.AddItem((itemlist[26]),itemlist[26][2])
+			end
+			
 			return true
 		end
 	end
@@ -214,21 +220,26 @@ end
 
 function ReturnInfo(id,wachuwah)
 	if wachuwah==0 then
+		--Name
 		wahewah=(itemlist[id][1])
 		return wahewah
 	elseif wachuwah==1 then
+		--Spell Name
 		local diff=table.maxn(items)
 		wahewah=(scrolls[id-diff][2])
 		return wahewah
 	elseif wachuwah==2 then
+		-- Stat Number
 		local diff=table.maxn(items)+table.maxn(scrolls)
 		wahewah=(gems[id-diff][2])
 		return wahewah
 	elseif wachuwah==3 then
+		-- Can Stack
 		wahewah=(itemlist[id][2])
 		return wahewah
 	elseif wachuwah==4 then
 		if id<=table.maxn(items) then
+			-- All item info
 			wahewah=0
 			name=(items[id][1])
 			itemuse=(items[id][2])
@@ -236,6 +247,7 @@ function ReturnInfo(id,wachuwah)
 			stat2=(items[id][4])
 			return wahewah,name,itemuse,stat1,stat2
 		elseif id<=table.maxn(items)+table.maxn(scrolls) then
+			-- All scroll info
 			local diff=table.maxn(items)
 			wahewah=3
 			name=(scrolls[id-diff][1])
@@ -243,6 +255,7 @@ function ReturnInfo(id,wachuwah)
 			stat1=(scrolls[id-diff][3])
 			return wahewah,name,itemuse,stat1
 		elseif id<=table.maxn(items)+table.maxn(scrolls)+table.maxn(gems) then
+			-- All gem info
 			local diff=table.maxn(items)+table.maxn(scrolls)
 			wahewah=4
 			name=(gems[id-diff][1])
@@ -250,15 +263,15 @@ function ReturnInfo(id,wachuwah)
 			stat2=(gems[id-diff][3])
 			return wahewah,name,stat1,stat2
 		elseif id<=table.maxn(items)+table.maxn(scrolls)+table.maxn(gems)+table.maxn(special) then
+			-- All special info
 			local diff=table.maxn(items)+table.maxn(scrolls)+table.maxn(gems)
-			print (id)
-			print (id-diff)
 			wahewah=2
 			name=(special[id-diff][1])
 			stat1=(special[id-diff][2])
 			stat2=(special[id-diff][3])
 			return wahewah,name,stat1,stat2
 		else
+			-- All equips info
 			local diff=table.maxn(items)+table.maxn(scrolls)+table.maxn(gems)+table.maxn(special)
 			wahewah=1
 			name=(equips[id-diff][1])

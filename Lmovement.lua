@@ -4,14 +4,14 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local b=require("LMapBuilder")
+local b=require("Lmapbuilder")
 local p=require("Lplayers")
-local WD=require("LProgress")
-local ui=require("LUI")
-local coll=require("LTileEvents")
+local WD=require("Lprogress")
+local ui=require("Lui")
+local coll=require("Ltileevents")
 local mob=require("Lmobai")
 local c=require("Lcombat")
-local sho=require("LShop")
+local sho=require("Lshop")
 local mobs
 local mright
 local mup

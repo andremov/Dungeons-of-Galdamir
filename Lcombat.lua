@@ -4,103 +4,102 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
+local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height=25, numFrames=16 } )
+local dexatt2 = graphics.newImageSheet( "enemy/dexatt2.png",{ width=32, height=33, numFrames=24 })
+local dexatt3 = graphics.newImageSheet( "enemy/dexatt3.png",{ width=32, height=33, numFrames=24 })
+local stadef2 = graphics.newImageSheet( "enemy/stadef2.png",{ width=55, height=32, numFrames=8 })
+local stadef3 = graphics.newImageSheet( "enemy/stadef3.png",{ width=55, height=32, numFrames=8 })
+local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 } )
+local statussheet = graphics.newImageSheet( "status.png", { width=88, height=40, numFrames=6 } )
 local player1 = graphics.newImageSheet( "player/0.png", { width=39, height=46, numFrames=25 } )
 local player2 = graphics.newImageSheet( "player/1.png", { width=24, height=33, numFrames=25 } )
 local player3 = graphics.newImageSheet( "player/2.png", { width=30, height=49, numFrames=25 } )
 local player4 = graphics.newImageSheet( "player/3.png", { width=33, height=53, numFrames=35 } )
 local player5 = graphics.newImageSheet( "player/4.png", { width=32, height=32, numFrames=80 } )
-local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height=25, numFrames=16 } )
-local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 } )
-local statussheet = graphics.newImageSheet( "status.png", { width=88, height=40, numFrames=6 } )
-local dexatt2 = graphics.newImageSheet( "enemy/dexatt2.png",{ width=32, height=33, numFrames=24 })
-local dexatt3 = graphics.newImageSheet( "enemy/dexatt3.png",{ width=32, height=33, numFrames=24 })
-local stadef2 = graphics.newImageSheet( "enemy/stadef2.png",{ width=55, height=32, numFrames=8 })
-local stadef3 = graphics.newImageSheet( "enemy/stadef3.png",{ width=55, height=32, numFrames=8 })
+local timersheet = graphics.newImageSheet( "timer.png",{ width=100, height=100, numFrames=25 })
 local mgc2 = graphics.newImageSheet( "enemy/mage2.png",{ width=30, height=40, numFrames=10 })
 local mgc3 = graphics.newImageSheet( "enemy/mage3.png",{ width=30, height=40, numFrames=10 })
+local hpsheet = graphics.newImageSheet("hp.png",{ width=200, height=30, numFrames=67 })
+local mpsheet = graphics.newImageSheet("mp.png",{ width=200, height=30, numFrames=67 })
+local p1sprite={player1,player2,player3,player4,player5}
+local xCoord=display.contentWidth-250
 local dexatt={dexatt3,dexatt2}
 local stadef={stadef3,stadef2}
 local mgc={mgc3,mgc2}
-local p1sprite={player1,player2,player3,player4,player5}
-local hpsheet = graphics.newImageSheet("hp.png",{ width=200, height=30, numFrames=67 })
-local mpsheet = graphics.newImageSheet("mp.png",{ width=200, height=30, numFrames=67 })
-local timersheet = graphics.newImageSheet( "timer.png",{ width=100, height=100, numFrames=25 })
-local mov=require("Lmovement")
-local players=require("Lplayers")
-local gp=require("LGold")
-local item=require("LItems")
-local mob=require("Lmobai")
-local ui=require("LUI")
-local builder=require("LMapBuilder")
-local WD=require("LProgress")
-local win=require("Lwindow")
-local audio=require("LAudio")
+local yCoord=510
 local widget = require "widget"
 local physics = require "physics"
-local q=require("LQuest")
-local yCoord=510
-local xCoord=display.contentWidth-250
+local mov=require("Lmovement")
+local players=require("Lplayers")
+local gp=require("Lgold")
+local item=require("Litems")
+local mob=require("Lmobai")
+local ui=require("Lui")
+local builder=require("Lmapbuilder")
+local WD=require("Lprogress")
+local win=require("Lwindow")
+local audio=require("Laudio")
+local q=require("Lquest")
+local SBookDisplayed
+local statusdisplay
+local timersprite
+local Spellbook
+local SorceryUI
+local BurnLimit
+local HitGroup
 local inCombat
-local gcm
-local gom
+local outcomed
+local SorcIniX
+local SorcIniY
+local Sorcery
+local ptimer
+local etimer
 local CMenu
 local OMenu
 local enemy
-local HitGroup
 local hits
-local enemy
-local Spellbook
-local ptimer
-local etimer
-local Sorcery
-local SorcIniX
-local SorcIniY
-local SBookDisplayed
-local BurnLimit
-local statusdisplay
-local SorceryUI
-local outcomed
-local timersprite
+local gcm
+local gom
 
 function Essentials()
-	SBookDisplayed=false
-	Sorcery={}
-	inCombat=false
 	SorcIniX=display.contentCenterX-(190+20)
 	SorcIniY=display.contentHeight-120
+	SBookDisplayed=false
+	inCombat=false
 	outcomed=false
-	inv=false
-	xinvicial=75
 	yinvicial=156
+	xinvicial=75
 	espaciox=64
 	espacioy=64
+	Sorcery={}
+	inv=false
 end
 
 function Attacking(victim)
 	if inCombat==false then
+		DisplayCombat()
 		inCombat=true
 		enemy=victim
-		DisplayCombat()
 	end
 end
 
 function Attacked(victim)
 	if inCombat==false then
+		DisplayCombat()
 		inCombat=true
 		enemy=victim
-		DisplayCombat()
 	--	MobsTurn()
 	end
 end
 
 function DisplayCombat()
+	Runtime:removeEventListener("enterFrame", players.ShowStats)
+	Runtime:removeEventListener("enterFrame", gp.GoldDisplay)
+	Runtime:addEventListener("enterFrame", NoMansLand)
+	HitGroup=display.newGroup()
+	mov.ShowArrows("clean")
 	gcm=display.newGroup()
 	hits={}
-	mov.ShowArrows("clean")
-	HitGroup=display.newGroup()
-	Runtime:removeEventListener("enterFrame", gp.GoldDisplay)
-	Runtime:removeEventListener("enterFrame", players.ShowStats)
-	Runtime:addEventListener("enterFrame", NoMansLand)
 	
 	local bkgdark=display.newImageRect("bkgs/bkg_level.png",768,1024)
 	bkgdark.x=display.contentCenterX
@@ -168,6 +167,10 @@ function HideActions()
 		display.remove(RunBtn)
 	end
 	
+	if (BackBtn) then
+		display.remove(BackBtn)
+	end
+	
 	AttackBtn=display.newImageRect("combataction3.png",342,86)
 	AttackBtn.x=timersprite.x-172
 	AttackBtn.y=timersprite.y-44
@@ -213,6 +216,11 @@ function ShowActions()
 	if (RunBtn) then
 		display.remove(RunBtn)
 		RunBtn=nil
+	end
+	
+	if (BackBtn) then
+		display.remove(BackBtn)
+		BackBtn=nil
 	end
 	
 	function toAttack()
@@ -301,46 +309,45 @@ function ShowActions()
 end
 
 function MobsTurn()
-	etimer=nil
-	timersprite:pause()
 	local pp=timer.pause(ptimer)
+	timersprite:pause()
 	MobSprite(2)
+	etimer=nil
+	
 	local isHit=EvadeCalc("p1",16)
 	if isHit>=(p1.stats[5]/6)*2 then
 		if isHit>=(p1.stats[5]/3)*5 then
 			local Damage=DamageCalc("p1",(math.random(15,20)/10),16)
 			if (Damage)<=0 then
 				Hits("BLK!",false,false,false)
-				UpdateStats()
 			else
 				players.ReduceHP(Damage,"Mob")
 				P1Sprite(3)
 				Hits((Damage),true,false,false)
-				UpdateStats()
 			end
 		else
 			local Damage=DamageCalc("p1",1,16)
 			if (Damage)<=0 then
 				Hits("BLK!",false,false,false)
-				UpdateStats()
 			else
 				players.ReduceHP(Damage,"Mob")
 				P1Sprite(3)
 				Hits((Damage),false,false,false)
-				UpdateStats()
 			end
 		end
 	else
 		Hits("MSS!",false,false,false)
-		UpdateStats()
 	end
+	MobStatuses()
+end
+
+function MobStatuses()
 	if enemy.status=="BRN" then
 		if BurnLimit>0 then
 			local Burn=(math.floor(enemy.MaxHP*.05))
 			enemy.HP=enemy.HP-Burn
 			BurnLimit=BurnLimit-1
 			Hits((Burn),false,true,"BRN")
-			UpdateStats()
 		elseif BurnLimit<=0 then
 			if BurnLimit<0 then
 				BurnLimit=0
@@ -356,9 +363,9 @@ function MobsTurn()
 			local Poison=(math.floor(enemy.MaxHP*.02))
 			enemy.HP=enemy.HP-Poison
 			Hits((Poison),false,true,"PSN")
-			UpdateStats()
 		end
 	end
+	UpdateStats()
 end
 
 function MoveSprites()
@@ -1301,7 +1308,10 @@ function ShowBag(action)
 			print "Inventory is empty."
 		end
 		
-		closeInvBtn=widget.newButton{
+		display.remove(BackBtn)
+		BackBtn=nil
+		
+		BackBtn=widget.newButton{
 			label="Close",
 			labelColor = { default={0,0,0}, over={255,255,255} },
 			fontSize=30,
@@ -1309,14 +1319,14 @@ function ShowBag(action)
 			overFile="combataction2.png",
 			width=342, height=86,
 			onRelease = toItems}
-		closeInvBtn:setReferencePoint( display.CenterReferencePoint )
-		closeInvBtn.x = display.contentCenterX
-		closeInvBtn.y = display.contentHeight-150
-		gcm:insert( closeInvBtn )
+		BackBtn:setReferencePoint( display.CenterReferencePoint )
+		BackBtn.x = display.contentCenterX
+		BackBtn.y = display.contentHeight-150
+		gcm:insert( BackBtn )
 	elseif inv==true or action==true then
 		inv=false
-		display.remove(closeInvBtn)
-		closeInvBtn=nil
+		display.remove(BackBtn)
+		BackBtn=nil
 		for i=table.maxn(items),1,-1 do
 			display.remove(items[i])
 			items[i]=nil
@@ -1373,6 +1383,7 @@ function UseItem(id,slot)
 	end
 	UpdateStats()
 end
+
 function ShowSorcery(comm)
 	if comm==true then
 		if SBookDisplayed==true then

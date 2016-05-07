@@ -9,14 +9,14 @@ local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=6
 local heartnsheet = graphics.newImageSheet( "heartemptysprite.png", { width=25, height=25, numFrames=16 } )
 local heartssheet = graphics.newImageSheet( "heartsilversprite.png", { width=25, height=25, numFrames=16 } )
 local xpsheet = graphics.newImageSheet( "xpbar.png", { width=392, height=40, numFrames=50 } )
-local b=require("LMapBuilder")
-local gold=require("LGold")
-local WD=require("LProgress")
+local b=require("Lmapbuilder")
+local gold=require("Lgold")
+local WD=require("Lprogress")
 local c=require("Lchars")
-local a=require("LAudio")
-local i=require("LItems")
+local a=require("Laudio")
+local i=require("Litems")
 local w=require("Lwindow")
-local su=require("LStartup")
+local su=require("Lstartup")
 local yCoord=856
 local xCoord=70
 local Map
@@ -62,7 +62,7 @@ function CreatePlayers(name)
 	player.lvl=1
 	player.MaxXP=50
 	player.XP=0
-	player.clsnames={"Knight","Warrior","Thief","Viking","Sorceror","Scholar"}
+	player.clsnames={"Viking","Warrior","Knight","Sorceror","Thief","Scholar"}
 	player.char=char
 	player.class=class
 	player.life=0
@@ -312,17 +312,17 @@ end
 
 function StatCheck()
 	if player.class==0 then
-		player.bon[6]=math.floor(player.nat[3]/6)
-		player.bon[1]=math.floor(player.nat[3]/6)
+		player.bon[3]=math.floor(player.nat[1]/3)
 	elseif player.class==1 then
 		player.bon[5]=math.floor(player.nat[2]/3)
 	elseif player.class==2 then
+		player.bon[6]=math.floor(player.nat[3]/6)
+		player.bon[1]=math.floor(player.nat[3]/6)
+	elseif player.class==3 then
+		player.bon[5]=math.floor(player.nat[4]/3)
+	elseif player.class==4 then
 		player.bon[2]=math.floor(player.nat[5]/6)
 		player.bon[4]=math.floor(player.nat[5]/6)
-	elseif player.class==3 then
-		player.bon[3]=math.floor(player.nat[1]/3)
-	elseif player.class==4 then
-		player.bon[5]=math.floor(player.nat[4]/3)
 	elseif player.class==5 then
 		player.bon[3]=math.floor(player.nat[6]/3)
 	end

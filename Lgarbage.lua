@@ -8,7 +8,7 @@ function Font()
 	
 	for i,fontname in ipairs(fonts) do
 		count = count+1
-		j, k = string.find(fontname, "hooge")
+		j, k = string.find(fontname, "Mool")
 		if (j ~= nil) then
 			found_count = found_count + 1
 			print("found font: \""..fontname.."\"")

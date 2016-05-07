@@ -7,9 +7,10 @@ module(..., package.seeall)
 local gearsheet = graphics.newImageSheet( "gearsprite.png", { width=50, height=50, numFrames=30 })
 local widget = require "widget"
 local menu=require("Lmenu")
-local audio=require("LAudio")
-local map=require("LMapHandler")
+local audio=require("Laudio")
+local map=require("Lmaphandler")
 local char=require("Lchars")
+local sav=require("Lsaving")
 local optionz=display.newGroup()
 local SMute
 local SUnmute
@@ -135,11 +136,8 @@ function DisplayOptions()
 	Size.y = Char.y-90
 	optionz:insert(Size)
 	
-	function WipeSave()
-		local path = system.pathForFile(  "DoGSave.sav", system.DocumentsDirectory )
-		local fh, errStr = io.open( path, "w+" )
-		fh:write("")
-		io.close( fh )
+	function SaveDel()
+		sav.WipeSave()
 		display.remove(Save)
 		local Savetxt=display.newText("Save deleted!",0,0,"Game Over",100)
 		Savetxt.x = Size.x
@@ -154,13 +152,13 @@ function DisplayOptions()
 		local contents = fh:read( "*a" )
 		if (contents) and contents~="" and contents~=" " then
 			Save = widget.newButton{
-			label="Delete Save",
-			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=30,
-			defaultFile="button.png",
-			overFile="button-over.png",
-			width=308, height=80,
-			onRelease = WipeSave
+				label="Delete Save",
+				labelColor = { default={0,0,0}, over={255,255,255} },
+				fontSize=30,
+				defaultFile="button.png",
+				overFile="button-over.png",
+				width=308, height=80,
+				onRelease = SaveDel
 			}
 			Save:setReferencePoint( display.CenterReferencePoint )
 			Save.x = Size.x
@@ -170,10 +168,20 @@ function DisplayOptions()
 	io.close( fh )
 	end
 	
-	AudioOnOff()
+	--AudioOnOff()
+	
+	scroll=display.newImageRect("scroll.png",600,50)
+	scroll.x=display.contentCenterX
+	scroll.y=display.contentCenterY-160
+	optionz:insert(scroll)
+	
+	scrollind=display.newImageRect("scrollind.png",15,50)
+	scrollind.x=display.contentCenterX+290
+	scrollind.y=display.contentHeight/2-160
+	optionz:insert(scrollind)
 	
 end
-
+--[[
 function AudioOnOff()
 	Sound=audio.sfx()
 	Music=audio.muse()
@@ -249,3 +257,4 @@ function MusicOn()
 	MUnmute:addEventListener("tap",MusicOff)
 	MMute:removeEventListener("tap",MusicOn)
 end
+]]

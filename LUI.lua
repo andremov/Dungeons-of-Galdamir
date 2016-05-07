@@ -6,15 +6,15 @@
 module(..., package.seeall)
 local players=require("Lplayers")
 local inv=require("Lwindow")
-local audio=require("LAudio")
-local gold=require("LGold")
-local col=require("LTileEvents")
-local WD=require("LProgress")
-local builder=require("LMapBuilder")
+local audio=require("Laudio")
+local gold=require("Lgold")
+local col=require("Ltileevents")
+local WD=require("Lprogress")
+local builder=require("Lmapbuilder")
 local c=require("Lcombat")
 local mob=require("Lmobai")
 local widget = require "widget"
-local shp=require("LShop")
+local shp=require("Lshop")
 local m=require("Lmovement")
 local isPaused
 local Map
@@ -221,7 +221,7 @@ function Exit()
 			lolname3.y=lolname2.y+50
 			gexui:insert(lolname3)
 			
-			local backbtn= widget.newButton{
+			AcceptBtn= widget.newButton{
 				label="Yes",
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
@@ -229,12 +229,12 @@ function Exit()
 				overFile="cbutton2.png",
 				width=200, height=55,
 				onRelease = DoExit}
-			backbtn:setReferencePoint( display.CenterReferencePoint )
-			backbtn.x = (display.contentWidth/2)-130
-			backbtn.y = (display.contentHeight/2)+30
-			gexui:insert( backbtn )
+			AcceptBtn:setReferencePoint( display.CenterReferencePoint )
+			AcceptBtn.x = (display.contentWidth/2)-130
+			AcceptBtn.y = (display.contentHeight/2)+30
+			gexui:insert( AcceptBtn )
 			
-			local dropbtn= widget.newButton{
+			BackBtn= widget.newButton{
 				label="No",
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				fontSize=30,
@@ -242,10 +242,10 @@ function Exit()
 				overFile="cbutton2.png",
 				width=200, height=55,
 				onRelease = Exit}
-			dropbtn:setReferencePoint( display.CenterReferencePoint )
-			dropbtn.x = (display.contentWidth/2)+130
-			dropbtn.y = (display.contentHeight/2)+30
-			gexui:insert( dropbtn )
+			BackBtn:setReferencePoint( display.CenterReferencePoint )
+			BackBtn.x = (display.contentWidth/2)+130
+			BackBtn.y = (display.contentHeight/2)+30
+			gexui:insert( BackBtn )
 			
 			gexui:toFront()
 			

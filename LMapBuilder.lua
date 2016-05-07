@@ -4,17 +4,17 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local col=require("LTileEvents")
-local ui=require("LUI")
-local su=require("LStartup")
-local handler=require("LMapHandler")
+local col=require("Ltileevents")
+local ui=require("Lui")
+local su=require("Lstartup")
+local handler=require("Lmaphandler")
 local wdow=require("Lwindow")
 local mob=require("Lmobai")
 local m=require("Lmovement")
-local WD=require("LProgress")
+local WD=require("Lprogress")
 local bin=require("Lgarbage")
 local p=require("Lplayers")
-local q=require("LQuest")
+local q=require("Lquest")
 local rockbreaksheet
 local portalsheet
 local portalredsheet

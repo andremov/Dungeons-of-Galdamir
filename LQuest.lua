@@ -5,9 +5,9 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local coinsheet = graphics.newImageSheet( "bluecoinsprite.png", { width=32, height=32, numFrames=8 } )
-local b=require("LMapBuilder")
-local gp=require("LGold")
-local WD=require("LProgress")
+local b=require("Lmapbuilder")
+local gp=require("Lgold")
+local WD=require("Lprogress")
 local mob=require("Lmobai")
 local HasQuest
 local gqm
