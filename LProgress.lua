@@ -265,10 +265,14 @@ function Lrn2WinNub()
 
 	FloorSign(true)
 	
-	print "Player went through a Red Portal."
+	--print "Player went through a Red Portal."
 	print ("Floor: " ..Round)
 	q.WipeQuest()
-	gp.CallAddCoins(Round*RoundTax)
+	local gpgain=Round*((math.sqrt(size)/5)*2)
+	if gpgain>(10*math.sqrt(size)) then
+		gpgain=(10*math.sqrt(size))
+	end
+	gp.CallAddCoins(gpgain)
 	builder.YouShallNowPass(true)
 	sav.Save()
 end

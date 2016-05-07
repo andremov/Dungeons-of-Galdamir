@@ -24,7 +24,12 @@ r-random				s-
 t-						u-mobspawner
 v-						w-water
 x-walkable				y-
-z-start/finish			--]]
+z-start/finish			
+H = 10x10
+S = 20x20
+M = 30x30
+L = 40x40
+--]]
 	
 tut1={
 	"b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b",

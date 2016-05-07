@@ -59,6 +59,8 @@ local MS
 local TSet
 local map2
 local side
+local count
+local loadtxt
 
 function Essentials()
 	espaciox=80
@@ -90,196 +92,215 @@ function Essentials()
 end
 
 function Gen()
-	Essentials()
-	
+	if not(count)then
+		Essentials()
+	end
 	map=handler.GetCMap()
 	mapsize=table.maxn( map )
+	if not(count)then
+		print "Starting Map Generation..."
+		count=0
+	end
+	if not(loadtxt)then
+		loadtxt=display.newText(("Loading text."),0,0,"Game Over",120)
+		loadtxt.x=display.contentCenterX
+		loadtxt.y=display.contentCenterY
+	end
 	
-	print "Starting Map Generation..."
+	count=count+1
+	loadtxt.text=("Generating Map...\n".."               "..math.floor((count/mapsize)*100).."%")
+	loadtxt:toFront()
 	
-	for i=1, mapsize do
-	
-		if(map[i]=="r")then
-			boundary[i]=1
-			mbounds[i]=1
-			map2[i]="r"
+	if count~=mapsize+1 then
+		
+		if(map[count]=="r")then
+			boundary[count]=1
+			mbounds[count]=1
+			map2[count]="r"
 		end	
 		
-		if(map[i]=="s")then
-			boundary[i]=1
-			mbounds[i]=1
-			map2[i]="s"
+		if(map[count]=="s")then
+			boundary[count]=1
+			mbounds[count]=1
+			map2[count]="s"
 		end
 		
-		if(map[i]=="o")then
-			boundary[i]=0
-			mbounds[i]=0
-			map2[i]="o"
+		if(map[count]=="o")then
+			boundary[count]=0
+			mbounds[count]=0
+			map2[count]="o"
 		end
 		
-		if(map[i]=="q")then
-			boundary[i]=1
-			mbounds[i]=0
-			map2[i]="q"
+		if(map[count]=="q")then
+			boundary[count]=1
+			mbounds[count]=0
+			map2[count]="q"
 		end	
 		
-		if(map[i]=="d")then
+		if(map[count]=="d")then
 			local canitbreak=math.random(1,10)
 			if canitbreak>=7 then
-				boundary[i]=1
-				mbounds[i]=0
-				map2[i]="q"
+				boundary[count]=1
+				mbounds[count]=0
+				map2[count]="q"
 			else
-				boundary[i]=0
-				mbounds[i]=0
-				map2[i]="o"
+				boundary[count]=0
+				mbounds[count]=0
+				map2[count]="o"
 			end
 		end	
 		
-		if(map[i]=="b")then
-			boundary[i]=0
-			mbounds[i]=0
-			map2[i]="b"
+		if(map[count]=="b")then
+			boundary[count]=0
+			mbounds[count]=0
+			map2[count]="b"
 		end
 		
-		if(map[i]=="w")then
-			boundary[i]=0
-			mbounds[i]=0
-			map2[i]="w"
+		if(map[count]=="w")then
+			boundary[count]=0
+			mbounds[count]=0
+			map2[count]="w"
 		end
 		
-		if(map[i]=="m")then
-			boundary[i]=1
-			mbounds[i]=1
+		if(map[count]=="m")then
+			boundary[count]=1
+			mbounds[count]=1
 			if(OrangePortal==false)then
 				OrangePortal=true
-				map2[i]="m"
+				map2[count]="m"
 			elseif(OrangePortal==true)then
-				map2[i]="x"
+				map2[count]="x"
 			end
 		end
 		
-		if(map[i]=="n")then
-			boundary[i]=1
-			mbounds[i]=1
+		if(map[count]=="n")then
+			boundary[count]=1
+			mbounds[count]=1
 			if(BluePortal==false)then
 				BluePortal=true
-				map2[i]="n"
+				map2[count]="n"
 			elseif(BluePortal==true)then
-				map2[i]="x"
+				map2[count]="x"
 			end
 		end
 	
-		if(map[i]=="ñ")then
-			boundary[i]=1
-			mbounds[i]=1
+		if(map[count]=="ñ")then
+			boundary[count]=1
+			mbounds[count]=1
 			if(RedPortal==false)then
 				RedPortal=true
-				map2[i]="ñ"
+				map2[count]="ñ"
 			elseif(RedPortal==true)then
-				map2[i]="x"
+				map2[count]="x"
 			end
 		end
 	
-		if(map[i]=="u") then
-			boundary[i]=1
-			mbounds[i]=1
+		if(map[count]=="u") then
+			boundary[count]=1
+			mbounds[count]=1
 			if Spawner==false then
 				Spawner=true
-				map2[i]="u"
+				map2[count]="u"
 			elseif Spawner==true then
-				map2[i]="x"
+				map2[count]="x"
 			end
 		end
 		
-		if(map[i]=="z")then	
-			mbounds[i]=0
-			boundary[i]=1
-			map2[i]="z"
+		if(map[count]=="z")then
+			mbounds[count]=0
+			boundary[count]=1
+			map2[count]="z"
 		end
 
-		if(map[i]=="l")then
-			mbounds[i]=0
-			boundary[i]=1
-			map2[i]="l"
+		if(map[count]=="l")then
+			mbounds[count]=0
+			boundary[count]=1
+			map2[count]="l"
 		end	
 		
-		if(map[i]=="h")then
-			mbounds[i]=1
-			boundary[i]=1
+		if(map[count]=="h")then
+			mbounds[count]=1
+			boundary[count]=1
 			if HealPad==false then
 				HealPad=true
-				map2[i]="h"
+				map2[count]="h"
 			elseif HealPad==true then
-				map2[i]="x"
+				map2[count]="x"
 			end
 		end
 		
-		if(map[i]=="j")then
-			mbounds[i]=1
-			boundary[i]=1
+		if(map[count]=="j")then
+			mbounds[count]=1
+			boundary[count]=1
 			if ManaPad==false then
 				ManaPad=true
-				map2[i]="j"
+				map2[count]="j"
 			elseif ManaPad==true then
-				map2[i]="x"
+				map2[count]="x"
 			end
 		end
 		
-		if(map[i]=="x")then
-			mbounds[i]=1
-			boundary[i]=1
-			map2[i]="x"
+		if(map[count]=="x")then
+			mbounds[count]=1
+			boundary[count]=1
+			map2[count]="x"
 		end
+		
 	end
 	
 	RandomMap()
 	
-	mbounds[(math.sqrt(mapsize))+2]=1
-	boundary[(math.sqrt(mapsize))+2]=1
-	
-	local CanBeDone=bin.animate(boundary)
-	if CanBeDone==false then
-		print "Map failed."
-		timer.performWithDelay(20,YouShallNowPass)
+	if count~=mapsize+1 then
+		timer.performWithDelay(10,Gen)
 	else
-		print "Map passed."
-		DisplayMap()
+		loadtxt.text=("Testing Map...")
+		loadtxt:toFront()
+		local CanBeDone=bin.animate(boundary)
+		if CanBeDone==false then
+			loadtxt.text=("Map Failed.\n   Retrying.")
+			loadtxt:toFront()
+			print "Map failed."
+			timer.performWithDelay(500,YouShallNowPass)
+		else
+			count=0
+			print "Map passed."
+			DisplayMap()
+		end
 	end
-	
 end
 
 function RandomMap()
 	local map=handler.GetCMap()
 	mapsize=table.maxn( map )
-	local OPLoc=nil
 	
-	print "Starting Map Randomization..."
+	if count==1 then
+		print "Starting Map Randomization..."
+	end
 	
-	for i=1, mapsize do
-		if (map[i]=="r") then
+	if count~=mapsize+1 then
+		if (map[count]=="r") then
 			if i~=(math.sqrt(mapsize)+2) then
 				local TileRoll=math.random(1, 100)
 			
 				if (TileRoll>=1) and (TileRoll<10) then
-					boundary[i]=1
-					mbounds[i]=1
+					boundary[count]=1
+					mbounds[count]=1
 					local port=math.random(200,204)
 					if (port==200) and OrangePortal==false then
-						map2[i]="m"
+						map2[count]="m"
 						OrangePortal=true
-						OPLoc=i
+						OPLoc=count
 					elseif (port==201) and HealPad==false then
-						map2[i]="h"
+						map2[count]="h"
 						HealPad=true
 					elseif ManaPad==false and (port==202) then
-						map2[i]="j"
+						map2[count]="j"
 						ManaPad=true
 					elseif Spawner==false and (port==203) then
-						map2[i]="u"
+						map2[count]="u"
 						Spawner=true
 					elseif (port==204) then
-						map2[i]="s"
+						map2[count]="s"
 					elseif OrangePortal==true and BluePortal==false then
 						local ThinkinWithPortals=true
 						local OZoneX=math.floor(OPLoc%(math.sqrt(mapsize)))
@@ -291,8 +312,8 @@ function RandomMap()
 						if( OZoneY>(math.sqrt(mapsize))/2 )then
 							OZone=OZone+2
 						end
-						local BZoneX=math.floor(i%(math.sqrt(mapsize)))
-						local BZoneY=math.floor(i/(math.sqrt(mapsize)))+1
+						local BZoneX=math.floor(count%(math.sqrt(mapsize)))
+						local BZoneY=math.floor(count/(math.sqrt(mapsize)))+1
 						local BZone=1
 						if( BZoneX>(math.sqrt(mapsize))/2 )then
 							BZone=BZone+1
@@ -310,45 +331,45 @@ function RandomMap()
 							ThinkinWithPortals=false
 						end
 						if ThinkinWithPortals==true then
-							map2[i]="n"
+							map2[count]="n"
 							BluePortal=true
 						else
-							map2[i]="x"
+							map2[count]="x"
 						end
 					else
-						map2[i]="x"
+						map2[count]="x"
 					end
 				end
 			
 				if (TileRoll>=10) and (TileRoll<15) then
-					boundary[i]=1
-					mbounds[i]=0
-					map2[i]="l"
+					boundary[count]=1
+					mbounds[count]=0
+					map2[count]="l"
 				end
 
 				if (TileRoll>=15) and (TileRoll<20) then
-					boundary[i]=0
-					mbounds[i]=0
-					map2[i]="w"
+					boundary[count]=0
+					mbounds[count]=0
+					map2[count]="w"
 				end
 				
 				if (TileRoll>=20) and (TileRoll<50)then
 					local canitbreak=math.random(1,10)
 					if canitbreak>=8 then
-						boundary[i]=1
-						mbounds[i]=0
-						map2[i]="q"
+						boundary[count]=1
+						mbounds[count]=0
+						map2[count]="q"
 					else
-						boundary[i]=0
-						mbounds[i]=0
-						map2[i]="o"
+						boundary[count]=0
+						mbounds[count]=0
+						map2[count]="o"
 					end
 				end
 				
 				if (TileRoll>=50) then
-					boundary[i]=1
-					mbounds[i]=1
-					map2[i]="x"
+					boundary[count]=1
+					mbounds[count]=1
+					map2[count]="x"
 				end
 			end
 		end
@@ -368,6 +389,7 @@ function Extras()
 	
 	for i=1, mapsize do
 		if i~=(math.sqrt(mapsize)+2) then
+		
 			if mbounds[i]==1 and KeySpawned==false then
 				local isKey=math.random(1,500)
 				if isKey>=490 then
@@ -428,13 +450,17 @@ function DisplayMap()
 	local map=handler.GetCMap()
 	mapsize=table.maxn( map )
 	
-	ui.UI()
+	if (count==0)then
+		print "Starting Map Display..."
+	end
 	
-	print "Starting Map Display..."
+	count=count+1
+	loadtxt.text=("Displaying Map...\n".."               "..math.floor((count/mapsize)*100).."%")
+	loadtxt:toFront()
 	
-	for i=1, mapsize do
-	
-		if(map2[i]=="o")then
+	if count~=mapsize+1 then
+		
+		if(map2[count]=="o")then
 			local roll=math.random(1,18)
 			if roll<=9 then
 				roll=1
@@ -443,29 +469,29 @@ function DisplayMap()
 			elseif roll<=18 then
 				roll=3
 			end
-			walls[i]=display.newImageRect( "tiles/"..TSet.."/wall"..(roll)..".png", 80, 80)
-			walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			walls[i].isVisible=false
-			Level:insert( walls[i] )
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/wall"..(roll)..".png", 80, 80)
+			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			walls[count].isVisible=false
+			Level:insert( walls[count] )
 		end
 		
-		if(map2[i]=="q")then
-			walls[i]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			walls[i].isVisible=false
-			Level:insert(  walls[i] )
+		if(map2[count]=="q")then
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			walls[count].isVisible=false
+			Level:insert(  walls[count] )
 			
-			Destructibles[i]=display.newSprite(rockbreaksheet,{name="rock",start=1,count=14,time=400,loopCount=1})
-			Destructibles[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			Destructibles[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			Destructibles[i].isVisible=false
-			Destructibles[i].exist=true
-			Level:insert( Destructibles[i] )
+			Destructibles[count]=display.newSprite(rockbreaksheet,{name="rock",start=1,count=14,time=400,loopCount=1})
+			Destructibles[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			Destructibles[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			Destructibles[count].isVisible=false
+			Destructibles[count].exist=true
+			Level:insert( Destructibles[count] )
 		end
 		
-		if(map2[i]=="b")then
+		if(map2[count]=="b")then
 			local roll=math.random(1,18)
 			if roll<=9 then
 				roll=1
@@ -474,248 +500,254 @@ function DisplayMap()
 			elseif roll<=18 then
 				roll=3
 			end
-			walls[i]=display.newImageRect( "tiles/"..TSet.."/wall"..(roll)..".png", 80, 80)
-			walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			walls[i].isVisible=false
-			Level:insert( walls[i] )
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/wall"..(roll)..".png", 80, 80)
+			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			walls[count].isVisible=false
+			Level:insert( walls[count] )
 		end
 		
-		if(map2[i]=="w")then
-			walls[i]=display.newSprite( watersheet, { name="water", start=1, count=30, time=3000 }  )
-			walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			walls[i].isVisible=false
-			walls[i]:play()
-			Level:insert( walls[i] )
+		if(map2[count]=="w")then
+			walls[count]=display.newSprite( watersheet, { name="water", start=1, count=30, time=3000 }  )
+			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			walls[count].isVisible=false
+			walls[count]:play()
+			Level:insert( walls[count] )
 		end
 		
-		if(map2[i]=="m")then
-			walls[i]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			walls[i].isVisible=false
-			Level:insert( walls[i] )
+		if(map2[count]=="m")then
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			walls[count].isVisible=false
+			Level:insert( walls[count] )
 			
 			OP=display.newSprite( portalsheet, { name="portal", start=1, count=20, time=1750 }  )
-			OP.x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			OP.y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
+			OP.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			OP.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			OP.isVisible=false
 			OP:play()
-			OP.loc=(i)
+			OP.loc=(count)
 			Level:insert( OP )
 		end
 		
-		if(map2[i]=="n")then
-			walls[i]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			walls[i].isVisible=false
-			Level:insert( walls[i] )
+		if(map2[count]=="n")then
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			walls[count].isVisible=false
+			Level:insert( walls[count] )
 			
 			BP=display.newSprite( portalbacksheet, { name="portalback", start=1, count=20, time=1750 }  )
-			BP.x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			BP.y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
+			BP.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			BP.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			BP.isVisible=false
 			BP:play()
-			BP.loc=(i)
+			BP.loc=(count)
 			Level:insert( BP )
 		end
 	
-		if(map2[i]=="ñ")then
-			walls[i]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			walls[i].isVisible=false
-			Level:insert( walls[i] )
+		if(map2[count]=="ñ")then
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			walls[count].isVisible=false
+			Level:insert( walls[count] )
 			
 			RP=display.newSprite( portalredsheet, { name="portalred", start=1, count=20, time=1750 }  )
-			RP.x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			RP.y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
+			RP.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			RP.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			RP.isVisible=false
 			RP:play()
-			RP.loc=(i)
+			RP.loc=(count)
 			Level:insert( RP )
 		end
 	
-		if(map2[i]=="u") then
-			walls[i]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			walls[i].isVisible=false
-			Level:insert( walls[i] )
+		if(map2[count]=="u") then
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			walls[count].isVisible=false
+			Level:insert( walls[count] )
 			
 			MS=display.newSprite( spawnersheet, { name="mobspawner", start=1, count=20, time=1750 }  )
-			MS.x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			MS.y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
+			MS.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			MS.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			MS.isVisible=false
 			MS:play()
-			MS.loc=(i)
+			MS.loc=(count)
 			Level:insert( MS )
 		end
 		
-		if(map2[i]=="z")then
+		if(map2[count]=="z")then
 			local curround=WD.Circle()
 			if curround%2==0 then
 				if didStair==false then
-					finish=walls[i]
+					finish=walls[count]
 					finish=display.newImageRect( "tiles/"..TSet.."/stairup.png", 80, 80)
-					finish.x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-					finish.y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
+					finish.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+					finish.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 					finish.isVisible=false
-					finish.loc=(i)
+					finish.loc=(count)
 					Level:insert( finish )
 					didStair=true
 				elseif didStair==true then
-					walls[i]=display.newImageRect( "tiles/"..TSet.."/stairdown.png", 80, 80)
-					walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-					walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-					walls[i].isVisible=false
-					Level:insert( walls[i] )
+					walls[count]=display.newImageRect( "tiles/"..TSet.."/stairdown.png", 80, 80)
+					walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+					walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+					walls[count].isVisible=false
+					Level:insert( walls[count] )
 					didStair=false
 				end
 			else
 				if didStair==true then
-					finish=walls[i]
+					finish=walls[count]
 					finish=display.newImageRect( "tiles/"..TSet.."/stairup.png", 80, 80)
-					finish.x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-					finish.y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
+					finish.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+					finish.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 					finish.isVisible=false
-					finish.loc=(i)
+					finish.loc=(count)
 					Level:insert( finish )
 					didStair=false
 				elseif didStair==false then
-					walls[i]=display.newImageRect( "tiles/"..TSet.."/stairdown.png", 80, 80)
-					walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-					walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-					walls[i].isVisible=false
-					Level:insert( walls[i] )
+					walls[count]=display.newImageRect( "tiles/"..TSet.."/stairdown.png", 80, 80)
+					walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+					walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+					walls[count].isVisible=false
+					Level:insert( walls[count] )
 					didStair=true
 				end
 			end
 		end
 
-		if(map2[i]=="l")then
-			LavaBlocks[i]=walls[i]
-			LavaBlocks[i]=display.newSprite( lavasheet, { name="lava", start=1, count=20, time=4000 }  )
-			LavaBlocks[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			LavaBlocks[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			LavaBlocks[i].isVisible=false
-			LavaBlocks[i]:play()
-			Level:insert( LavaBlocks[i] )
+		if(map2[count]=="l")then
+			LavaBlocks[count]=walls[count]
+			LavaBlocks[count]=display.newSprite( lavasheet, { name="lava", start=1, count=20, time=4000 }  )
+			LavaBlocks[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			LavaBlocks[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			LavaBlocks[count].isVisible=false
+			LavaBlocks[count]:play()
+			Level:insert( LavaBlocks[count] )
 		end	
 		
-		if(map2[i]=="h")then
-			walls[i]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			walls[i].isVisible=false
-			Level:insert( walls[i] )
+		if(map2[count]=="h")then
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			walls[count].isVisible=false
+			Level:insert( walls[count] )
 			
-			HP=walls[i]
+			HP=walls[count]
 			HP=display.newSprite( HealPadsheet, { name="HP", start=1, count=30, time=2000 }  )
-			HP.x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			HP.y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
+			HP.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			HP.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			HP.isVisible=false
-			HP.loc=(i)
+			HP.loc=(count)
 			HP:play()
 			Level:insert( HP )
 		end
 		
-		if(map2[i]=="j")then
-			walls[i]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			walls[i].isVisible=false
-			Level:insert( walls[i] )
+		if(map2[count]=="j")then
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			walls[count].isVisible=false
+			Level:insert( walls[count] )
 			
-			MP=walls[i]
+			MP=walls[count]
 			MP=display.newSprite( ManaPadsheet, { name="MP", start=1, count=30, time=2000 }  )
-			MP.x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			MP.y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
+			MP.x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			MP.y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			MP.isVisible=false
-			MP.loc=(i)
+			MP.loc=(count)
 			MP:play()
 			Level:insert( MP )
 		end
 		
-		if(map2[i]=="s")then
-			walls[i]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			walls[i].isVisible=false
-			Level:insert( walls[i] )
+		if(map2[count]=="s")then
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			walls[count].isVisible=false
+			Level:insert( walls[count] )
 			
-			Shops[i]=display.newImageRect( "tiles/"..TSet.."/shop.png", 80, 80)
-			Shops[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			Shops[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			Shops[i].isVisible=false
-			Level:insert(Shops[i])
+			Shops[count]=display.newImageRect( "tiles/"..TSet.."/shop.png", 80, 80)
+			Shops[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			Shops[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			Shops[count].isVisible=false
+			Level:insert(Shops[count])
 		end
 		
-		if(map2[i]=="x")then
-			walls[i]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
-			walls[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-			walls[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-			walls[i].isVisible=false
-			Level:insert( walls[i] )
+		if(map2[count]=="x")then
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
+			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
+			walls[count].isVisible=false
+			Level:insert( walls[count] )
 		end	
 		
 	end
 	
-	
-	Level:insert( dmobs )
-	Level:toBack()
-	bkg:toBack()
-	su.Continue()
-	Extras()
-	mob.ReceiveMobs(mobs)
-	q.CreateQuest()
-	
-	local CurRound=WD.Circle()
-	if (RedPortal==true) then
-		ui.MapIndicators("RP")
-	end
-	if (BluePortal==true) then
-		ui.MapIndicators("BP")
-	end
-	if (Spawner==true) then
-		ui.MapIndicators("MS")
-	end
-	if (ManaPad==true) then
-		ui.MapIndicators("MP")
-	end
-	if (HealPad==true) then
-		ui.MapIndicators("HP")
-	end
-	if KeySpawned==false then
-		ui.MapIndicators("KEY")
-	end
-	if not(side)then
-		side=false
-	end
-	if side==true then
-		p.PlayerLoc(false)
-		if CurRound%2==0 then
-			print "Abnormal Progression, Even Floor"
-		else
-			print "Abnormal Progression, Odd Floor"
-			Level.x=Level.x-((math.sqrt(mapsize)-3)*80)
-			Level.y=Level.y-((math.sqrt(mapsize)-3)*80)
+	if count~=mapsize then
+		timer.performWithDelay(50,DisplayMap)
+	else
+		ui.UI()
+		Level:insert( dmobs )
+		Level:toBack()
+		bkg:toBack()
+		su.Continue()
+		Extras()
+		mob.ReceiveMobs(mobs)
+		q.CreateQuest()
+		
+		display.remove(loadtxt)
+		loadtxt=nil
+			
+		local CurRound=WD.Circle()
+		if (RedPortal==true) then
+			ui.MapIndicators("RP")
 		end
-	elseif side==false then
-		p.PlayerLoc(true)
-		if CurRound%2==0 then
-			print "Normal Progression, Even Floor"
-			Level.x=Level.x-((math.sqrt(mapsize)-3)*80)
-			Level.y=Level.y-((math.sqrt(mapsize)-3)*80)
-		else
-			print "Normal Progression, Odd Floor"
+		if (BluePortal==true) then
+			ui.MapIndicators("BP")
 		end
+		if (Spawner==true) then
+			ui.MapIndicators("MS")
+		end
+		if (ManaPad==true) then
+			ui.MapIndicators("MP")
+		end
+		if (HealPad==true) then
+			ui.MapIndicators("HP")
+		end
+		if KeySpawned==false then
+			ui.MapIndicators("KEY")
+		end
+		if not(side)then
+			side=false
+		end
+		if side==true then
+			p.PlayerLoc(false)
+			if CurRound%2==0 then
+				print "Abnormal Progression, Even Floor"
+			else
+				print "Abnormal Progression, Odd Floor"
+				Level.x=Level.x-((math.sqrt(mapsize)-3)*80)
+				Level.y=Level.y-((math.sqrt(mapsize)-3)*80)
+			end
+		elseif side==false then
+			p.PlayerLoc(true)
+			if CurRound%2==0 then
+				print "Normal Progression, Even Floor"
+				Level.x=Level.x-((math.sqrt(mapsize)-3)*80)
+				Level.y=Level.y-((math.sqrt(mapsize)-3)*80)
+			else
+				print "Normal Progression, Odd Floor"
+			end
+		end
+		m.ShowArrows()
+		print "Map Built."
 	end
-	m.ShowArrows()
-	print "Map Built."
-	
 end
 
 function Tiles()
@@ -836,6 +868,7 @@ function YouShallNowPass(val)
 	if Level.numChildren==0 and table.maxn(boundary)==0 then
 		boundary=nil
 		Level=nil
+		count=nil
 		Gen()
 	end
 	bkg:toBack()

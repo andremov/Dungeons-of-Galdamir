@@ -56,13 +56,15 @@ function CreateQuest()
 						mobcount=mobcount+1
 					end
 				end
-				CurKills=0
-				NumKills=math.random(1,math.floor(mobcount/3))
-				QText=display.newText(("Defeat "..NumKills.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+15,native.systemfont,30)
-				QText:setTextColor( 0, 0, 0)
-				gqm:insert(QText)
-				if NumKills==0 then
-					WipeQuest()
+				if mobcount~=0 then
+					CurKills=0
+					NumKills=math.random(1,math.floor(mobcount/3))
+					QText=display.newText(("Defeat "..NumKills.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+15,native.systemfont,30)
+					QText:setTextColor( 0, 0, 0)
+					gqm:insert(QText)
+					if NumKills==0 then
+						WipeQuest()
+					end
 				end
 			end
 			if QuestType==2 then
@@ -83,18 +85,20 @@ function CreateQuest()
 						mobcount=mobcount+1
 					end
 				end
-				CurKills=0
-				NumKills=math.random(1,math.floor(mobcount/3))
-				local size=b.GetData(0)
-				local zonas=((math.sqrt(size))/10)
-				local round=WD.Circle()
-				MobLvl=(math.random(1,zonas)+(zonas*(round-1)))
-				
-				QText=display.newText(("Defeat "..NumKills.." level "..MobLvl.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+15,native.systemfont,30)
-				QText:setTextColor( 0, 0, 0)
-				gqm:insert(QText)
-				if NumKills==0 then
-					WipeQuest()
+				if mobcount~=0 then
+					CurKills=0
+					NumKills=math.random(1,math.floor(mobcount/3))
+					local size=b.GetData(0)
+					local zonas=((math.sqrt(size))/10)
+					local round=WD.Circle()
+					MobLvl=(math.random(1,zonas)+(zonas*(round-1)))
+					
+					QText=display.newText(("Defeat "..NumKills.." level "..MobLvl.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+15,native.systemfont,30)
+					QText:setTextColor( 0, 0, 0)
+					gqm:insert(QText)
+					if NumKills==0 then
+						WipeQuest()
+					end
 				end
 			end
 		end

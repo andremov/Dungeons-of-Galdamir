@@ -16,6 +16,7 @@ local c=require("Lchars")
 local a=require("LAudio")
 local i=require("LItems")
 local w=require("Lwindow")
+local su=require("LStartup")
 local yCoord=856
 local xCoord=70
 local Map
@@ -112,6 +113,7 @@ function CreatePlayers(name)
 	--
 	if (player) then
 		Runtime:addEventListener("enterFrame",ShowStats)
+		su.FrontNCenter()
 	end
 end
 

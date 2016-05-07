@@ -58,12 +58,6 @@ function Startup(val)
 	loadtxt.y = load1.y
 	Loading:insert( loadtxt )
 	
-	function FrontNCenter()
-		Loading:toFront()
-	end
-	
-	Runtime:addEventListener("enterFrame",FrontNCenter)
-	
 	function ShowContinue()
 		loadbkg:addEventListener( "touch", Continue )
 		Loading:remove( loadtxt )
@@ -120,4 +114,8 @@ function Operations(name)
 	print "Game loaded successfully."
 	Round=WD.Circle()
 	print ("Floor: "..Round)
+end
+
+function FrontNCenter()
+	Loading:toFront()
 end

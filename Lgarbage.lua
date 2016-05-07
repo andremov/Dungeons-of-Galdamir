@@ -46,6 +46,7 @@ function CalcMoves(level)
 	local tempH = math.abs(startX-targetX) + math.abs(startY-targetY)
 	openlist[1] = {x = startX, y = startY, g = 0, h = tempH, f = 0 + tempH ,par = 1}
 	local board={}
+	
 	for i = 1, table.maxn(level) do
 		board[i] = {}
 		for j = 1, table.maxn(level) do
@@ -59,6 +60,7 @@ function CalcMoves(level)
 	end
 	
 	while listk > 0 do
+		print "Working?"
      	local lowestF = openlist[listk].f
 	  	curSquareIndex = listk
 		for k = listk, 1, -1 do
@@ -198,6 +200,7 @@ function CalcPath(closedlist)
 	if closedlist==nil then
         return nil
 	end
+	
 	local path={}
 	local pathIndex={}
 	local last=table.getn(closedlist)
@@ -212,12 +215,14 @@ function CalcPath(closedlist)
 	for n=table.getn(pathIndex),1,-1 do
 	table.insert(path,{x=closedlist[pathIndex[n] ].x, y=closedlist[pathIndex[n] ].y})
 	end
+	print "Done?"
 	closedlist=nil
 	return path
 end
 
 function animate(level)
 	path = CalcPath(CalcMoves(level))
+	print "Done?"
 	if path==nil then
 		return false
 	else
