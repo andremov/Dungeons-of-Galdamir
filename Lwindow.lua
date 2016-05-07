@@ -196,10 +196,13 @@ function ToggleInfo()
 		)
 		ginf:insert(info[2])
 		
+		local flr=WD.Circle()
+		
 		info[3]=display.newText(
 			(
 				"MP: "..p1.MP.."/"..p1.MaxMP.."\n"..
-				"XP: "..p1.XP.."/"..p1.MaxXP.."\n"
+				"XP: "..p1.XP.."/"..p1.MaxXP.."\n"..
+				"Floor: "..flr.."\n"
 			),
 			info[2].x+200,80,native.systemFont,40
 		)
@@ -468,7 +471,7 @@ function AddItem(id,stacks,amount)
 		p1.inv[(#p1.inv+1)]={}
 		p1.inv[(#p1.inv)][1]=id
 		p1.inv[(#p1.inv)][2]=amount
-		print ("Player now has "..inv[1][2].." of "..itmnme..".")
+		print ("Player now has "..p1.inv[1][2].." of "..itmnme..".")
 	else
 		for i=1, table.maxn(p1.inv) do
 			if ItemAdded==false then
@@ -543,7 +546,6 @@ function UseMenu(id,slot)
 		end
 		
 		function StatBoost()
-			
 			isUse=false
 			local watevah=item.ReturnInfo(id,2)
 			p.StatBoost(watevah)
@@ -554,7 +556,7 @@ function UseMenu(id,slot)
 			if amount==1 then
 				table.remove( inv, slot )
 			elseif amount~=1 then
-				inv[(slot*2)+2]=amount-1
+				p1.inv[slot][2]=p1.inv[slot][2]-1
 			end
 			ToggleBag()
 			ToggleBag()
@@ -563,7 +565,7 @@ function UseMenu(id,slot)
 		function EquippedIt()
 			
 			for i=1,table.maxn(p1.eqp) do
-				if p1.eqp[i][2]==itemstats[3] then
+				if (p1.eqp[i]) and (p1.eqp[i][1]) and (p1.eqp[i][2]) and (p1.eqp[i][2]==itemstats[3]) then
 					p1.inv[#p1.inv+1]={}
 					p1.inv[#p1.inv][1]=p1.eqp[i][1]
 					p1.inv[#p1.inv][2]=1

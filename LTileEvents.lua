@@ -6,6 +6,7 @@
 module(..., package.seeall)
 local healthsheet = graphics.newImageSheet( "healthtwinkle.png", { width=7, height=18, numFrames=14 } )
 local manasheet = graphics.newImageSheet( "manatwinkle.png", { width=7, height=18, numFrames=14 } )
+local tpsheet = graphics.newImageSheet( "portsprite.png", { width=80, height=80, numFrames=16 } )
 local debrimages={"debrissmall1.png", "debrissmall2.png", "debrissmall3.png", "debrismed1.png", "debrismed2.png", "debrislarge1.png","golddebrissmall1.png", "golddebrissmall2.png", "golddebrissmall3.png"}
 local rockbreaksheet
 local physics = require "physics"
@@ -234,10 +235,8 @@ function LayOnHands()
 			local heal=(math.floor(P1.MaxHP*0.01))
 			players.AddHP(heal)
 			for i=1, table.maxn(twinkles) do
-				if (twinkles[i]) then
-					if twinkles[i].frame==14 then
-						display.remove(twinkles[i])
-					end
+				if (twinkles[i]) and (twinkles[i].frame)and (twinkles[i].frame>13) then
+					display.remove(twinkles[i])
 				end
 			end
 			timer.performWithDelay(100,LayOnHands)
@@ -264,10 +263,8 @@ function LayOnFeet()
 			local heal=(math.floor(P1.MaxHP*0.01))
 			players.AddMP(heal)
 			for i=1, table.maxn(twinkles) do
-				if (twinkles[i]) then
-					if twinkles[i].frame==14 then
-						display.remove(twinkles[i])
-					end
+				if (twinkles[i]) and (twinkles[i].frame)and (twinkles[i].frame>13) then
+					display.remove(twinkles[i])
 				end
 			end
 			timer.performWithDelay(100,LayOnFeet)
@@ -320,6 +317,10 @@ function Port()
 	elseif (OP) and (BP) then
 		if (P1) and (OP.loc==P1.loc) and P1.portcd==0 then
 			function OrangePort()
+				twinkles[#twinkles+1]=display.newSprite( tpsheet, { name="twinkle", start=1, count=16, time=300, loopCount=1 }  )
+				twinkles[#twinkles].x=P1.x
+				twinkles[#twinkles].y=P1.y
+				twinkles[#twinkles]:play()
 				local map=builder.GetData(3)
 				local xchange=OP.x-BP.x
 				local ychange=OP.y-BP.y
@@ -337,6 +338,10 @@ function Port()
 			timer.performWithDelay(300,OrangePort)
 		elseif (P1) and (BP.loc==P1.loc) and P1.portcd==0 then
 			function BluePort()
+				twinkles[#twinkles+1]=display.newSprite( tpsheet, { name="twinkle", start=1, count=16, time=300, loopCount=1 }  )
+				twinkles[#twinkles].x=P1.x
+				twinkles[#twinkles].y=P1.y
+				twinkles[#twinkles]:play()
 				local map=builder.GetData(3)
 				local xchange=BP.x-OP.x
 				local ychange=BP.y-OP.y

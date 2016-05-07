@@ -21,6 +21,7 @@ local shp=require("LShop")
 local q=require("LQuest")
 local su=require("LStartup")
 local RoundTax=5
+local HighCard
 local Level
 local Life
 local GPieces
@@ -28,182 +29,50 @@ local Round
 local Dthtxt
 local floorcount
 local profbkg
+local proftransp
 
 function Essentials()
 	Round=1
+	HighCard=1
 end
 
 function RoundChange(val)
 	Round=val
+	HighCard=val
 end
 
-function FloorSign(normal)
-	if normal==true then
-		if Round%2==0 then
-			if (floorcount) then
-				for i=floorcount.numChildren,1,-1 do
-					local child = floorcount[i]
-					child.parent:remove( child )
-				end
-				floorcount=nil
-			end
-			floorcount=display.newGroup()
-			profbkg=display.newImageRect("scrollui2.png", 314, 116)
-			profbkg.x, profbkg.y = display.contentWidth+157, display.contentHeight/2
-			
-			local profbkg2=display.newImageRect("floorcount.png", 254, 34)
-			profbkg2.x, profbkg2.y = profbkg.x, profbkg.y-20
-			
-			local profbkg3=display.newText( (Round), 0, 0, "Game Over", 100 )
-			profbkg3.x, profbkg3.y = profbkg2.x, profbkg2.y+30
-			
-			floorcount:insert(profbkg)
-			floorcount:insert(profbkg2)
-			floorcount:insert(profbkg3)
-			floorcount:toFront()
-			function Closure3()
-				for i=floorcount.numChildren,1,-1 do
-					local child = floorcount[i]
-					child.parent:remove( child )
-				end
-				floorcount=nil
-			end
-			function Closure2()
-				if (floorcount) then
-					transition.to(floorcount, {time=600, x=floorcount.x+310,transition = easing.inExpo,onComplete=Closure3})
-				end
-			end
-			function Closure1()
-				timer.performWithDelay(1500,Closure2)
-			end
-			if (floorcount) then
-				transition.to(floorcount, {time=600, x=floorcount.x-310,transition = easing.inExpo,onComplete=Closure1})
-			end
-		else
-			if (floorcount) then
-				for i=floorcount.numChildren,1,-1 do
-					local child = floorcount[i]
-					child.parent:remove( child )
-				end
-				floorcount=nil
-			end
-			floorcount=display.newGroup()
-			profbkg=display.newImageRect("scrollui2.png", 314, 116)
-			profbkg.x, profbkg.y = -157, display.contentHeight/2
-			profbkg.rotation=180
-			
-			local profbkg2=display.newImageRect("floorcount.png", 254, 34)
-			profbkg2.x, profbkg2.y = profbkg.x, profbkg.y-20
-			
-			local profbkg3=display.newText( (Round), 0, 0, "Game Over", 100 )
-			profbkg3.x, profbkg3.y = profbkg2.x, profbkg2.y+30
-			
-			floorcount:insert(profbkg)
-			floorcount:insert(profbkg2)
-			floorcount:insert(profbkg3)
-			floorcount:toFront()
-			function Closure3()
-				for i=floorcount.numChildren,1,-1 do
-					local child = floorcount[i]
-					child.parent:remove( child )
-				end
-				floorcount=nil
-			end
-			function Closure2()
-				if (floorcount) then
-					transition.to(floorcount, {time=600, x=floorcount.x-310,transition = easing.inExpo,onComplete=Closure3})
-				end
-			end
-			function Closure1()
-				timer.performWithDelay(1500,Closure2)
-			end
-			if (floorcount) then
-				transition.to(floorcount, {time=600, x=floorcount.x+310,transition = easing.inExpo,onComplete=Closure1})
-			end
+function FloorSign()
+	if (floorcount) and proftransp==0 then
+		for i=floorcount.numChildren,1,-1 do
+			local child = floorcount[i]
+			child.parent:remove( child )
 		end
+		floorcount=nil
+	elseif (floorcount) and proftransp~=0 then
+		proftransp=proftransp-(255/50)
+		if proftransp<20 then
+			proftransp=0
+		end
+		profbkg:setTextColor(proftransp,proftransp,proftransp,proftransp)
+		profbkg2:setTextColor(proftransp,proftransp,proftransp,proftransp)
+		timer.performWithDelay(20,FloorSign)
 	else
-		if Round%2==0 then
-			if (floorcount) then
-				for i=floorcount.numChildren,1,-1 do
-					local child = floorcount[i]
-					child.parent:remove( child )
-				end
-				floorcount=nil
-			end
-			floorcount=display.newGroup()
-			profbkg=display.newImageRect("scrollui2.png", 314, 116)
-			profbkg.x, profbkg.y = display.contentWidth+157, display.contentHeight/2
-			
-			local profbkg2=display.newImageRect("floorcount.png", 254, 34)
-			profbkg2.x, profbkg2.y = profbkg.x, profbkg.y-20
-			
-			local profbkg3=display.newText( (Round), 0, 0, "Game Over", 100 )
-			profbkg3.x, profbkg3.y = profbkg2.x, profbkg2.y+30
-			
-			floorcount:insert(profbkg)
-			floorcount:insert(profbkg2)
-			floorcount:insert(profbkg3)
-			floorcount:toFront()
-			function Closure3()
-				for i=floorcount.numChildren,1,-1 do
-					local child = floorcount[i]
-					child.parent:remove( child )
-				end
-				floorcount=nil
-			end
-			function Closure2()
-				if (floorcount) then
-					transition.to(floorcount, {time=600, x=floorcount.x+310,transition = easing.inExpo,onComplete=Closure3})
-				end
-			end
-			function Closure1()
-				timer.performWithDelay(1500,Closure2)
-			end
-			if (floorcount) then
-				transition.to(floorcount, {time=600, x=floorcount.x-310,transition = easing.inExpo,onComplete=Closure1})
-			end
-		else
-			if (floorcount) then
-				for i=floorcount.numChildren,1,-1 do
-					local child = floorcount[i]
-					child.parent:remove( child )
-				end
-				floorcount=nil
-			end
-			floorcount=display.newGroup()
-			profbkg=display.newImageRect("scrollui2.png", 314, 116)
-			profbkg.x, profbkg.y = -157, display.contentHeight/2
-			profbkg.rotation=180
-			
-			local profbkg2=display.newImageRect("floorcount.png", 254, 34)
-			profbkg2.x, profbkg2.y = profbkg.x, profbkg.y-20
-			
-			local profbkg3=display.newText( (Round), 0, 0, "Game Over", 100 )
-			profbkg3.x, profbkg3.y = profbkg2.x, profbkg2.y+30
-			
-			floorcount:insert(profbkg)
-			floorcount:insert(profbkg2)
-			floorcount:insert(profbkg3)
-			floorcount:toFront()
-			function Closure3()
-				for i=floorcount.numChildren,1,-1 do
-					local child = floorcount[i]
-					child.parent:remove( child )
-				end
-				floorcount=nil
-			end
-			function Closure2()
-				if (floorcount) then
-					transition.to(floorcount, {time=600, x=floorcount.x-310,transition = easing.inExpo,onComplete=Closure3})
-				end
-			end
-			function Closure1()
-				timer.performWithDelay(1500,Closure2)
-			end
-			if (floorcount) then
-				transition.to(floorcount, {time=600, x=floorcount.x+310,transition = easing.inExpo,onComplete=Closure1})
-			end
-		end
+		proftransp=255
+		floorcount=display.newGroup()
+		profbkg=display.newImageRect("floorcount.png", 600, 250)
+		profbkg.xScale=0.5
+		profbkg.yScale=profbkg.xScale
+		profbkg:setTextColor(proftransp,proftransp,proftransp,proftransp)
+		profbkg.x, profbkg.y = display.contentCenterX, display.contentCenterY
+		
+		local profbkg2=display.newText( (Round), 0, 0, "Game Over", 100 )
+		profbkg2:setTextColor(proftransp,proftransp,proftransp,proftransp)
+		profbkg2.x, profbkg2.y = profbkg.x, profbkg.y+40
+		
+		floorcount:insert(profbkg)
+		floorcount:insert(profbkg2)
+		floorcount:toFront()
+		timer.performWithDelay(20,FloorSign)
 	end
 end
 
@@ -212,16 +81,19 @@ function FloorPort(up)
 		local P1=players.GetPlayer()
 		local size=builder.GetLevel(0)
 		Round=Round+1
-
-		FloorSign(true)
+		
+		FloorSign()
 		
 		print ("Floor: " ..Round)
 		q.WipeQuest()
-		local gpgain=Round*((math.sqrt(size)/5)*2)
-		if gpgain>(10*math.sqrt(size)) then
-			gpgain=(10*math.sqrt(size))
+		if Round>HighCard then
+			HighCard=Round
+			local gpgain=Round*((math.sqrt(size)/5)*2)
+			if gpgain>(10*math.sqrt(size)) then
+				gpgain=(10*math.sqrt(size))
+			end
+			gp.CallAddCoins(gpgain)
 		end
-		gp.CallAddCoins(gpgain)
 		if Round%(math.ceil(5/(math.sqrt(size)/5)))==0 then
 			shp.DisplayShop()
 		end
@@ -248,16 +120,19 @@ function Win()
 	local size=builder.GetData(0)
 	Round=Round+1
 
-	FloorSign(true)
+	FloorSign()
 
 	--print "Player won."
 	print ("Floor: " ..Round)
 	q.WipeQuest()
-	local gpgain=Round*((math.sqrt(size)/5)*2)
-	if gpgain>(10*math.sqrt(size)) then
-		gpgain=(10*math.sqrt(size))
+	if Round>HighCard then
+		HighCard=Round
+		local gpgain=Round*((math.sqrt(size)/5)*2)
+		if gpgain>(10*math.sqrt(size)) then
+			gpgain=(10*math.sqrt(size))
+		end
+		gp.CallAddCoins(gpgain)
 	end
-	gp.CallAddCoins(gpgain)
 	su.Startup(false)
 	builder.YouShallNowPass(false)
 	sav.Save()
@@ -267,16 +142,19 @@ function Lrn2WinNub()
 	local P1=players.GetPlayer()
 	Round=Round+1
 
-	FloorSign(true)
+	FloorSign()
 	
 	--print "Player went through a Red Portal."
 	print ("Floor: " ..Round)
 	q.WipeQuest()
-	local gpgain=Round*((math.sqrt(size)/5)*2)
-	if gpgain>(10*math.sqrt(size)) then
-		gpgain=(10*math.sqrt(size))
+	if Round>HighCard then
+		HighCard=Round
+		local gpgain=Round*((math.sqrt(size)/5)*2)
+		if gpgain>(10*math.sqrt(size)) then
+			gpgain=(10*math.sqrt(size))
+		end
+		gp.CallAddCoins(gpgain)
 	end
-	gp.CallAddCoins(gpgain)
 	su.Startup(false)
 	builder.YouShallNowPass(true)
 	sav.Save()

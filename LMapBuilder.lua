@@ -62,6 +62,7 @@ local map2
 local side
 local count
 local loadtxt
+local Peaceful=false
 
 function Essentials()
 	espaciox=80
@@ -378,7 +379,8 @@ function RandomMap()
 		end
 	end
 	
-	if OrangePortal==true and BluePortal==false and RedPortal==false then
+	if count~=mapsize+1 then
+	elseif OrangePortal==true and BluePortal==false and RedPortal==false then
 		map2[OPLoc]="ñ"
 		RedPortal=true
 		OrangePortal=false
@@ -418,16 +420,17 @@ function Extras()
 					Level:insert( Chests[i] )
 				end
 			end
-			
-			if mbounds[i]==1 then
-				local isMob=math.random(1,30)
-				if isMob>28 then
-					mobs[i]=display.newImageRect( "tiles/"..TSet.."/mob.png",80,80)
-					mobs[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
-					mobs[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
-					mobs[i].isVisible=false
-					mobs[i].loc=(i)
-					dmobs:insert( mobs[i] )
+			if Peaceful==false then
+				if mbounds[i]==1 then
+					local isMob=math.random(1,30)
+					if isMob>28 then
+						mobs[i]=display.newImageRect( "tiles/"..TSet.."/mob.png",80,80)
+						mobs[i].x=xinicial+((((i-1)%math.sqrt(mapsize)))*espaciox)
+						mobs[i].y=yinicial+(math.floor((i-1)/math.sqrt(mapsize))*espacioy)
+						mobs[i].isVisible=false
+						mobs[i].loc=(i)
+						dmobs:insert( mobs[i] )
+					end
 				end
 			end
 			
@@ -695,60 +698,59 @@ function DisplayMap()
 	if count~=mapsize then
 		timer.performWithDelay(5,DisplayMap)
 	else
-		ui.UI()
-		Level:insert( dmobs )
-		Level:toBack()
-		bkg:toBack()
-		Extras()
 		mob.ReceiveMobs(mobs)
-		q.CreateQuest()
-		
+		local check=su.Continue()
 		display.remove(loadtxt)
 		loadtxt=nil
-		
-		local CurRound=WD.Circle()
-		if (RedPortal==true) then
-			ui.MapIndicators("RP")
-		end
-		if (BluePortal==true) then
-			ui.MapIndicators("BP")
-		end
-		if (Spawner==true) then
-			ui.MapIndicators("MS")
-		end
-		if (ManaPad==true) then
-			ui.MapIndicators("MP")
-		end
-		if (HealPad==true) then
-			ui.MapIndicators("HP")
-		end
-		if KeySpawned==false then
-			ui.MapIndicators("KEY")
-		end
-		if not(side)then
-			side=false
-		end
-		if side==true then
-			p.PlayerLoc(false)
-			if CurRound%2==0 then
-				print "Abnormal Progression, Even Floor"
-			else
-				print "Abnormal Progression, Odd Floor"
-				Level.x=Level.x-((math.sqrt(mapsize)-3)*80)
-				Level.y=Level.y-((math.sqrt(mapsize)-3)*80)
+		if check==false then
+			Level:insert( dmobs )
+			Level:toBack()
+			bkg:toBack()
+			Extras()
+			q.CreateQuest()
+			
+			local CurRound=WD.Circle()
+			if (RedPortal==true) then
+				ui.MapIndicators("RP")
 			end
-		elseif side==false then
-			p.PlayerLoc(true)
-			if CurRound%2==0 then
-				print "Normal Progression, Even Floor"
-				Level.x=Level.x-((math.sqrt(mapsize)-3)*80)
-				Level.y=Level.y-((math.sqrt(mapsize)-3)*80)
-			else
-				print "Normal Progression, Odd Floor"
+			if (BluePortal==true) then
+				ui.MapIndicators("BP")
+			end
+			if (Spawner==true) then
+				ui.MapIndicators("MS")
+			end
+			if (ManaPad==true) then
+				ui.MapIndicators("MP")
+			end
+			if (HealPad==true) then
+				ui.MapIndicators("HP")
+			end
+			if KeySpawned==false then
+				ui.MapIndicators("KEY")
+			end
+			if not(side)then
+				side=false
+			end
+			if side==true then
+				p.PlayerLoc(false)
+				if CurRound%2==0 then
+					print "Abnormal Progression, Even Floor"
+				else
+					print "Abnormal Progression, Odd Floor"
+					Level.x=Level.x-((math.sqrt(mapsize)-3)*80)
+					Level.y=Level.y-((math.sqrt(mapsize)-3)*80)
+				end
+			elseif side==false then
+				p.PlayerLoc(true)
+				if CurRound%2==0 then
+					print "Normal Progression, Even Floor"
+					Level.x=Level.x-((math.sqrt(mapsize)-3)*80)
+					Level.y=Level.y-((math.sqrt(mapsize)-3)*80)
+				else
+					print "Normal Progression, Odd Floor"
+				end
 			end
 		end
-		m.ShowArrows()
-		su.Continue()
 		print "Map Built."
 	end
 end
@@ -856,15 +858,11 @@ function YouShallNowPass(val)
 	if (val==true) or (val==false) then
 		side=val
 	end
-	WipeMap()
-	if (Gate) then
-		display.remove(Gate)
-		Gate=nil
-	end
 	for i=table.maxn(boundary),1,-1 do
 		boundary[i]=nil
 	end
-	if Level.numChildren==0 and table.maxn(boundary)==0 then
+	WipeMap()
+	if not(Level)and not(boundary)and not(count) then
 		Gen()
 	end
 	bkg:toBack()

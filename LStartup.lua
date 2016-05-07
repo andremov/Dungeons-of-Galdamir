@@ -23,6 +23,7 @@ local sav=require("LSaving")
 local Round
 local Loading
 local DoStuff
+local DoLoad=false
 
 function Startup(val)
 	if val~=false then
@@ -79,7 +80,7 @@ function Startup(val)
 				Operations()
 			end
 			timer.performWithDelay(1000, (WrapIt) )
-			timer.performWithDelay(1010, (sav.Load) )
+			DoLoad=true
 		else
 			function WrapIt()
 				Operations(val)
@@ -91,22 +92,32 @@ end
 
 	
 function Continue()
-	if DoStuff==true then
-		Runtime:addEventListener("enterFrame", gp.GoldDisplay)
-		Runtime:removeEventListener("enterFrame",FrontNCenter)
-	end
-	for i=Loading.numChildren,1,-1 do
-		if (Loading[i]) then
-			display.remove(Loading[i])
-			Loading[i]=nil
+	if DoLoad==true then
+		DoLoad=false
+		timer.performWithDelay(100, (sav.Load) )
+		return true
+	else
+		if DoStuff==true then
+			Runtime:addEventListener("enterFrame", gp.GoldDisplay)
 		end
-	end
-	Loading=nil
-	if DoStuff==true then
-		ui.Pause(true)
-		inv.ToggleInfo()
-		audio.Play(3)
-		audio.Play(10)
+		for i=Loading.numChildren,1,-1 do
+			if (Loading[i]) then
+				display.remove(Loading[i])
+				Loading[i]=nil
+			end
+		end
+		Loading=nil
+		ui.UI()
+		if DoStuff==true then
+			ui.Pause(true)
+			inv.ToggleInfo()
+			audio.Play(3)
+			audio.Play(10)
+		end
+		if DoStuff==false then
+			m.ShowArrows()
+		end
+		return false
 	end
 end
 	
@@ -126,6 +137,11 @@ function Operations(name)
 	print "Game loaded successfully."
 	Round=WD.Circle()
 	print ("Floor: "..Round)
+end
+
+function Operations2()
+	gp.Essentials()
+	inv.Essentials()
 end
 
 function FrontNCenter()

@@ -212,7 +212,7 @@ function MobsTurn()
 	etimer=nil
 	timersprite:pause()
 	local pp=timer.pause(ptimer)
-	
+	MobSprite(2)
 	local isHit=EvadeCalc("p1",16)
 	if isHit>=(p1.stats[5]/6)*2 then
 		if isHit>=(p1.stats[5]/3)*5 then
@@ -221,6 +221,7 @@ function MobsTurn()
 				Hits("BLK!",false,false,false)
 			else
 				players.ReduceHP(Damage,"Mob")
+				P1Sprite(3)
 				Hits((Damage),true,false,false)
 				UpdateStats()
 			end
@@ -230,6 +231,7 @@ function MobsTurn()
 				Hits("BLK!",false,false,false)
 			else
 				players.ReduceHP(Damage,"Mob")
+				P1Sprite(3)
 				Hits((Damage),false,false,false)
 				UpdateStats()
 			end
@@ -291,15 +293,15 @@ function MoveSprites()
 			movcd=0
 		end
 		--Enemy
-		if (esprite.y==120) then
+		if (esprite.y==70) then
 			esprite.y=esprite.y+1
-		elseif (esprite.y==240) then
+		elseif (esprite.y==180) then
 			esprite.y=esprite.y-1
 		elseif movcd==0 then
 			if psprite.y+10>esprite.y and psprite.y-10<esprite.y then
 				movcd=math.random(100,350)
-				movetar=math.random(211,289)
-				movptar=math.random(211,289)
+				movetar=math.random(71,179)
+				movptar=math.random(71,179)
 			elseif psprite.y>esprite.y then
 				esprite.y=esprite.y+1
 			elseif psprite.y<esprite.y then
@@ -314,15 +316,15 @@ function MoveSprites()
 		end
 		
 		--Player
-		if (psprite.y==120) then
+		if (psprite.y==70) then
 			psprite.y=psprite.y+1
-		elseif (psprite.y==240) then
+		elseif (psprite.y==180) then
 			psprite.y=psprite.y-1
 		elseif movcd==0 then
 			if psprite.y+10>esprite.y and psprite.y-10<esprite.y then
 				movcd=math.random(20,50)
-				movetar=math.random(211,289)
-				movptar=math.random(211,289)
+				movetar=math.random(71,179)
+				movptar=math.random(71,179)
 			elseif psprite.y<esprite.y then
 				psprite.y=psprite.y+1
 			elseif psprite.y>esprite.y then
@@ -344,212 +346,223 @@ function MoveSprites()
 end
 
 function MobSprite(value)
-	if (value)==(1) then--Create
-		enemy.num=math.random(1,2)
-		if (enemy.class==1) or (enemy.class==3) then
-			--Sta/Def
-			eseqs={
-				{name="walk", start=1, count=4, time=1000},
-				{name="hit", start=5, count=3, loopCount=1, time=1000},
-				{name="hurt", start=8, count=1, time=1000}
-			}
-			esprite=display.newSprite( stadef[enemy.num], eseqs  )
-			esprite:setSequence( "walk" )
-			esprite.x=(display.contentWidth/2)+50
-			esprite.y=250
-			esprite.xScale=4.0
-			esprite.yScale=esprite.xScale
-			esprite:play()
-			gcm:insert(esprite)
-		elseif (enemy.class==2) or (enemy.class==5)then
-			--Att/Dex
-			eseqs={
-				{name="walk", start=1, count=4, time=1000},
-				{name="hit", start=9, count=4, loopCount=1, time=1000},
-				{name="hurt", start=8, count=1, time=1000},
-				{name="hitalt", start=17, count=3, loopCount=1, time=1000}
-			}
-			esprite=display.newSprite( dexatt[enemy.num], eseqs  )
-			esprite:setSequence( "walk" )
-			esprite.x=(display.contentWidth/2)+50
-			esprite.y=250
-			esprite.xScale=3.5
-			esprite.yScale=esprite.xScale
-			esprite:play()
-			gcm:insert(esprite)
-		elseif (enemy.class)==(4) then
-			--MGC
-			eseqs={
-				{name="walk", start=1, count=4, time=1000},
-				{name="hit", start=6, count=3, loopCount=1, time=1000},
-				{name="hurt", start=5, count=1, time=1000}
-			}
-			esprite=display.newSprite( mgc[enemy.num], eseqs  )
-			esprite:setSequence( "walk" )
-			esprite.x=(display.contentWidth/2)+50
-			esprite.y=250
-			esprite.xScale=4.0
-			esprite.yScale=esprite.xScale
-			esprite:play()
-			gcm:insert(esprite)
+	if inCombat==true then
+		if (value)==(1) then--Create
+			enemy.num=math.random(1,2)
+			if (enemy.class==1) or (enemy.class==3) then
+				--Sta/Def
+				eseqs={
+					{name="walk", start=1, count=4, time=1000},
+					{name="hit", start=5, count=3, loopCount=1, time=1000},
+					{name="hurt", start=8, count=1, time=1000}
+				}
+				esprite=display.newSprite( stadef[enemy.num], eseqs  )
+				esprite:setSequence( "walk" )
+				esprite.x=(display.contentWidth/2)+50
+				esprite.y=170
+				esprite.xScale=4.0
+				esprite.yScale=esprite.xScale
+				esprite:play()
+				gcm:insert(esprite)
+			elseif (enemy.class==2) or (enemy.class==5)then
+				--Att/Dex
+				eseqs={
+					{name="walk", start=1, count=4, time=1000},
+					{name="hit", start=9, count=4, loopCount=1, time=1000},
+					{name="hurt", start=8, count=1, time=1000},
+					{name="hitalt", start=17, count=3, loopCount=1, time=1000}
+				}
+				esprite=display.newSprite( dexatt[enemy.num], eseqs  )
+				esprite:setSequence( "walk" )
+				esprite.x=(display.contentWidth/2)+50
+				esprite.y=170
+				esprite.xScale=3.5
+				esprite.yScale=esprite.xScale
+				esprite:play()
+				gcm:insert(esprite)
+			elseif (enemy.class)==(4) then
+				--MGC
+				eseqs={
+					{name="walk", start=1, count=4, time=1000},
+					{name="hit", start=6, count=3, loopCount=1, time=1000},
+					{name="hurt", start=5, count=1, time=1000}
+				}
+				esprite=display.newSprite( mgc[enemy.num], eseqs  )
+				esprite:setSequence( "walk" )
+				esprite.x=(display.contentWidth/2)+50
+				esprite.y=170
+				esprite.xScale=4.0
+				esprite.yScale=esprite.xScale
+				esprite:play()
+				gcm:insert(esprite)
+			end
 		end
-	end
-	if (value)==(2) then--Change to Hit
-		if (enemy.class==1) or (enemy.class==3) then
-			--Sta/Def
-			esprite:setSequence( "hit" )
-			esprite:play()
-		elseif (enemy.class==2) or (enemy.class==5)then
-			--Att/Dex
-			local roll=math.random(1,2)
-			if roll==1 then
+		if (value)==(2) then--Change to Hit
+			if (enemy.class==1) or (enemy.class==3) then
+				--Sta/Def
 				esprite:setSequence( "hit" )
 				esprite:play()
-			elseif roll==2 then
-				esprite:setSequence( "hitalt" )
+			elseif (enemy.class==2) or (enemy.class==5)then
+				--Att/Dex
+				local roll=math.random(1,2)
+				if roll==1 then
+					esprite:setSequence( "hit" )
+					esprite:play()
+				elseif roll==2 then
+					esprite:setSequence( "hitalt" )
+					esprite:play()
+				end
+			elseif (enemy.class)==(4) then
+				--MGC
+				esprite:setSequence( "hit" )
 				esprite:play()
 			end
-		elseif (enemy.class)==(4) then
-			--MGC
-			esprite:setSequence( "hit" )
-			esprite:play()
 		end
-	end
-	if (value)==(3) then--Change to Hurt
-		if (enemy.class==1) or (enemy.class==3) then
-			--Sta/Def
-			esprite:setSequence( "hurt" )
-			esprite:play()
-		elseif (enemy.class==2) or (enemy.class==5)then
-			--Att/Dex
-			esprite:setSequence( "hurt" )
-			esprite:play()
-		elseif (enemy.class)==(4) then
-			--MGC
-			esprite:setSequence( "hurt" )
-			esprite:play()
-		end
-	end
-	if (value~=1)and(value~=2)and(value~=3)and(value~=4) then--Go Default
-		if esprite.sequence~="walk" then
-			if (esprite.frame==esprite.numFrames)then
-				esprite:setSequence( "walk" )
+		if (value)==(3) then--Change to Hurt
+			if (enemy.class==1) or (enemy.class==3) then
+				--Sta/Def
+				esprite:setSequence( "hurt" )
 				esprite:play()
-			else
-				timer.performWithDelay(20,MobSprite)
+			elseif (enemy.class==2) or (enemy.class==5)then
+				--Att/Dex
+				esprite:setSequence( "hurt" )
+				esprite:play()
+			elseif (enemy.class)==(4) then
+				--MGC
+				esprite:setSequence( "hurt" )
+				esprite:play()
+			end
+		end
+		if (value~=1)and(value~=2)and(value~=3)and(value~=4)then--Go Default
+			if (esprite)and(esprite.sequence~="walk")then
+				if (esprite.frame==esprite.numFrames)then
+					esprite:setSequence( "walk" )
+					esprite:play()
+				else
+					timer.performWithDelay(20,MobSprite)
+				end
 			end
 		end
 	end
 end
 
 function P1Sprite(value)
-	if (value)==(1) then--Create
-		if p1.name=="Magus" then
-			pseqs={
-				{name="walk", start=1, count=3, time=1000},
-				{name="hit1", start=17, count=8, loopCount=1, time=1000},
-				{name="hit2", start=33, count=8, loopCount=1, time=1000},
-				{name="hit3", start=49, count=16, loopCount=1, time=1000},
-				{name="cast", start=65, count=7, time=1000},
-				{name="hurt", start=4, count=1, time=1000}
-			}
-			psprite=display.newSprite( p1sprite[5], pseqs  )
-			psprite:setSequence( "walk" )
-			psprite.x=(display.contentWidth/2)-50
-			psprite.y=250
-			psprite.xScale=3.0
-			psprite.yScale=psprite.xScale
-			psprite:play()
-			gcm:insert(psprite)
-		elseif (p1.char==0) then
-			pseqs={
-				{name="walk", start=1, count=4, time=1000},
-				{name="hit1", start=6, count=3, loopCount=1, time=1000},
-				{name="hit2", start=11, count=4, loopCount=1, time=1000},
-				{name="hit3", start=16, count=5, loopCount=1, time=1000},
-				{name="cast", start=21, count=2, time=1000},
-				{name="hurt", start=5, count=1, time=1000}
-			}
-			psprite=display.newSprite( p1sprite[1], pseqs  )
-			psprite:setSequence( "walk" )
-			psprite.x=(display.contentWidth/2)-50
-			psprite.y=250
-			psprite.xScale=4.0
-			psprite.yScale=psprite.xScale
-			psprite:play()
-			gcm:insert(psprite)
-		elseif (p1.char==1) then
-			pseqs={
-				{name="walk", start=1, count=2, time=1000},
-				{name="hit1", start=6, count=3, loopCount=1, time=1000},
-				{name="hit2", start=11, count=3, loopCount=1, time=1000},
-				{name="hit3", start=16, count=5, loopCount=1, time=1000},
-				{name="cast", start=21, count=2, time=1000},
-				{name="hurt", start=3, count=1, time=1000}
-			}
-			psprite=display.newSprite( p1sprite[2], pseqs  )
-			psprite:setSequence( "walk" )
-			psprite.x=(display.contentWidth/2)-50
-			psprite.y=250
-			psprite.xScale=4.0
-			psprite.yScale=psprite.xScale
-			psprite:play()
-			gcm:insert(psprite)
-		elseif (p1.char)==(2) then
-			pseqs={
-				{name="walk", start=1, count=4, time=1000},
-				{name="hit1", start=6, count=2, loopCount=1, time=1000},
-				{name="hit2", start=11, count=3, loopCount=1, time=1000},
-				{name="hit3", start=16, count=2, loopCount=1, time=1000},
-				{name="cast", start=21, count=2, time=1000},
-				{name="hurt", start=5, count=1, time=1000}
-			}
-			psprite=display.newSprite( p1sprite[3], pseqs  )
-			psprite:setSequence( "walk" )
-			psprite.x=(display.contentWidth/2)-50
-			psprite.y=250
-			psprite.xScale=4.0
-			psprite.yScale=psprite.xScale
-			psprite:play()
-			gcm:insert(psprite)
-		elseif (p1.char)==(3) then
-			pseqs={
-				{name="walk", start=1, count=2, time=600},
-				{name="cast", start=8, count=2, time=600},
-				{name="hit1", start=15, count=3, loopCount=1, time=400},
-				{name="hit2", start=22, count=4, loopCount=1, time=600},
-				{name="hit3", start=29, count=7, loopCount=1, time=1000},
-				{name="hurt", start=3, count=1, time=800}
-			}
-			psprite=display.newSprite( p1sprite[4], pseqs  )
-			psprite:setSequence( "walk" )
-			psprite.x=(display.contentWidth/2)-50
-			psprite.y=250
-			psprite.xScale=4.0
-			psprite.yScale=psprite.xScale
-			psprite:play()
-			gcm:insert(psprite)
+	if inCombat==true then
+		if (value)==(1) then--Create
+			if p1.name=="Magus" then
+				pseqs={
+					{name="walk", start=1, count=3, time=1000},
+					{name="hit1", start=17, count=8, loopCount=1, time=1000},
+					{name="hit2", start=33, count=8, loopCount=1, time=1000},
+					{name="hit3", start=49, count=16, loopCount=1, time=1000},
+					{name="cast", start=65, count=7, time=1000},
+					{name="hurt", start=4, count=1, time=1000}
+				}
+				psprite=display.newSprite( p1sprite[5], pseqs  )
+				psprite:setSequence( "walk" )
+				psprite.x=(display.contentWidth/2)-50
+				psprite.y=170
+				psprite.xScale=3.0
+				psprite.yScale=psprite.xScale
+				psprite:play()
+				gcm:insert(psprite)
+			elseif (p1.char==0) then
+				pseqs={
+					{name="walk", start=1, count=4, time=1000},
+					{name="hit1", start=6, count=3, loopCount=1, time=1000},
+					{name="hit2", start=11, count=4, loopCount=1, time=1000},
+					{name="hit3", start=16, count=5, loopCount=1, time=1000},
+					{name="cast", start=21, count=2, time=1000},
+					{name="hurt", start=5, count=1, time=1000}
+				}
+				psprite=display.newSprite( p1sprite[1], pseqs  )
+				psprite:setSequence( "walk" )
+				psprite.x=(display.contentWidth/2)-50
+				psprite.y=170
+				psprite.xScale=4.0
+				psprite.yScale=psprite.xScale
+				psprite:play()
+				gcm:insert(psprite)
+			elseif (p1.char==1) then
+				pseqs={
+					{name="walk", start=1, count=2, time=1000},
+					{name="hit1", start=6, count=3, loopCount=1, time=1000},
+					{name="hit2", start=11, count=3, loopCount=1, time=1000},
+					{name="hit3", start=16, count=5, loopCount=1, time=1000},
+					{name="cast", start=21, count=2, time=1000},
+					{name="hurt", start=3, count=1, time=1000}
+				}
+				psprite=display.newSprite( p1sprite[2], pseqs  )
+				psprite:setSequence( "walk" )
+				psprite.x=(display.contentWidth/2)-50
+				psprite.y=170
+				psprite.xScale=4.0
+				psprite.yScale=psprite.xScale
+				psprite:play()
+				gcm:insert(psprite)
+			elseif (p1.char)==(2) then
+				pseqs={
+					{name="walk", start=1, count=4, time=1000},
+					{name="hit1", start=6, count=2, loopCount=1, time=1000},
+					{name="hit2", start=11, count=3, loopCount=1, time=1000},
+					{name="hit3", start=16, count=2, loopCount=1, time=1000},
+					{name="cast", start=21, count=2, time=1000},
+					{name="hurt", start=5, count=1, time=1000}
+				}
+				psprite=display.newSprite( p1sprite[3], pseqs  )
+				psprite:setSequence( "walk" )
+				psprite.x=(display.contentWidth/2)-50
+				psprite.y=170
+				psprite.xScale=4.0
+				psprite.yScale=psprite.xScale
+				psprite:play()
+				gcm:insert(psprite)
+			elseif (p1.char)==(3) then
+				pseqs={
+					{name="walk", start=1, count=2, time=600},
+					{name="cast", start=8, count=2, time=600},
+					{name="hit1", start=15, count=3, loopCount=1, time=400},
+					{name="hit2", start=22, count=4, loopCount=1, time=600},
+					{name="hit3", start=29, count=7, loopCount=1, time=1000},
+					{name="hurt", start=3, count=1, time=800}
+				}
+				psprite=display.newSprite( p1sprite[4], pseqs  )
+				psprite:setSequence( "walk" )
+				psprite.x=(display.contentWidth/2)-50
+				psprite.y=170
+				psprite.xScale=4.0
+				psprite.yScale=psprite.xScale
+				psprite:play()
+				gcm:insert(psprite)
+			end
 		end
-	end
-	if (value)==(2) then--Change to Hit
-		esprite:setSequence( "hit" )
-		esprite:play()
-	end
-	if (value)==(3) then--Change to Hurt
-		esprite:setSequence( "hurt" )
-		esprite:play()
-	end
-	if (value)==(4) then--Set to Casting
-		psprite:setSequence( "cast" )
-		psprite:play()
-	end
-	if (value~=1)and(value~=2)and(value~=3)and(value~=4) then--Go Default
-		if esprite.sequence~="walk" then
-			if (esprite.frame==esprite.numFrames)then
-				esprite:setSequence( "walk" )
-				esprite:play()
+		if (value)==(2) then--Change to Hit
+			local hat=math.random(1,3)
+			if hat==1 then
+				psprite:setSequence( "hit1" )
+			elseif hat==2 then
+				psprite:setSequence( "hit2" )
 			else
-				timer.performWithDelay(20,MobSprite)
+				psprite:setSequence( "hit3" )
+			end
+			psprite:play()
+		end
+		if (value)==(3) then--Change to Hurt
+			psprite:setSequence( "hurt" )
+			psprite:play()
+		end
+		if (value)==(4) then--Set to Casting
+			psprite:setSequence( "cast" )
+			psprite:play()
+		end
+		if (value~=1)and(value~=2)and(value~=3)and(value~=4) then--Go Default
+			if (psprite)and(psprite.sequence~="walk")then
+				if (psprite.frame==psprite.numFrames)or(psprite.sequence=="cast")then
+					psprite:setSequence( "walk" )
+					psprite:play()
+				else
+					timer.performWithDelay(20,P1Sprite)
+				end
 			end
 		end
 	end
@@ -761,6 +774,8 @@ function UpdateStats()
 		mpBar2:setFrame(math.floor(( (p1.MP/p1.MaxMP)*66 )+1))
 		hpBar2:setFrame(math.floor(( (p1.HP/p1.MaxHP)*66 )+1))
 		hpBar:setFrame(math.floor(( (enemy.HP/enemy.MaxHP)*66 )+1))
+		MobSprite()
+		P1Sprite()
 	end
 end
 
@@ -779,6 +794,7 @@ function RunAttempt()
 end
 
 function PlayerAttacks()
+	P1Sprite(2)
 	ShowSorcery(true)
 	local isHit=EvadeCalc("mob",16)
 	if isHit>=(enemy.stats[5]/6)*2 then
@@ -788,6 +804,7 @@ function PlayerAttacks()
 				Hits("BLK!",false,true,false)
 			else
 				enemy.HP=enemy.HP-Damage
+				MobSprite(3)
 				UpdateStats()
 				Hits((Damage),true,true,false)
 			end
@@ -797,6 +814,7 @@ function PlayerAttacks()
 				Hits("BLK!",false,true,false)
 			else
 				enemy.HP=enemy.HP-Damage
+				MobSprite(3)
 				UpdateStats()
 				Hits((Damage),false,true,false)
 			end
@@ -934,13 +952,13 @@ function EndCombat(outcome)
 		elseif (outcome)=="Ran" then
 			gom=display.newGroup()
 			
-			OMenu=display.newImageRect("deathmenu.png", 700, 500)
+			OMenu=display.newImageRect("usemenu.png", 768, 308)
 			OMenu.x,OMenu.y = display.contentWidth*0.5, 450
 			gom:insert(OMenu)	
 			
-			local msg=display.newText("Got away safely!",0,0, "Game Over", 190)
+			local msg=display.newText("Got away safely!",0,0, "Game Over", 150)
 			msg.x = display.contentWidth/2
-			msg.y = 280
+			msg.y = OMenu.y-80
 			gom:insert(msg)
 			
 			local OKBtn= widget.newButton{
@@ -954,7 +972,7 @@ function EndCombat(outcome)
 			}
 			OKBtn:setReferencePoint( display.CenterReferencePoint )
 			OKBtn.x = display.contentWidth/2
-			OKBtn.y = display.contentHeight*0.61
+			OKBtn.y = OMenu.y+80
 			gom:insert(OKBtn)
 		end
 	end
@@ -1079,7 +1097,11 @@ function ShowSorcery(dumb)
 end
 
 function CastSorcery(name)
+	P1Sprite(4)
 	ShowSorcery(true)
+	display.remove(AttackBtn)
+	display.remove(MagicBtn)
+	display.remove(RunBtn)
 	for s=1, table.maxn(p1.spells) do
 		if p1.spells[s][1]==name then
 			p1.MP=p1.MP-p1.spells[s][4]
@@ -1089,6 +1111,7 @@ function CastSorcery(name)
 		local Damage=MagicCalc((math.random(15,20)/10),22)
 		Hits((Damage),true,true,"SPL")
 		enemy.HP=enemy.HP-Damage
+		MobSprite(3)
 		if enemy.HP<=0 then
 			if enemy.HP<0 then
 				enemy.HP=0
@@ -1127,6 +1150,7 @@ function CastSorcery(name)
 				enemy.status="BRN"
 				Hits(("Burn!"),false,true,"SPL")
 				enemy.HP=enemy.HP-Damage
+				MobSprite(3)
 				statusdisplay:setFrame(3)
 				UpdateStats()
 				BurnLimit=p1.stats[4]*2
@@ -1161,6 +1185,7 @@ function CastSorcery(name)
 					enemy.status="BRN"
 					Hits(("Burn!"),false,true,"SPL")
 					enemy.HP=enemy.HP-Damage
+					MobSprite(3)
 					statusdisplay:setFrame(3)
 					UpdateStats()
 					BurnLimit=p1.stats[4]+2
@@ -1177,6 +1202,7 @@ function CastSorcery(name)
 					enemy.status="BRN"
 					Hits(("Burn!"),false,true,"SPL")
 					enemy.HP=enemy.HP-Damage
+					MobSprite(3)
 					statusdisplay:setFrame(3)
 					UpdateStats()
 					BurnLimit=p1.stats[4]+2
@@ -1211,6 +1237,7 @@ function CastSorcery(name)
 				enemy.stats[5]=enemy.stats[5]-(math.floor(enemy.stats[5]*.2))
 				Hits(("Slowed!"),false,true,"SPL")
 				enemy.HP=enemy.HP-Damage
+				MobSprite(3)
 				UpdateStats()
 				Hits((Damage),true,true,"SPL")
 			end
@@ -1254,6 +1281,7 @@ function CastSorcery(name)
 					enemy.status="PSN"
 					Hits(("Poison!"),false,true,"SPL")
 					enemy.HP=enemy.HP-Damage
+					MobSprite(3)
 					statusdisplay:setFrame(5)
 					UpdateStats()
 					Hits((Damage),true,true,"SPL")
@@ -1266,6 +1294,7 @@ function CastSorcery(name)
 					enemy.status="PSN"
 					Hits(("Poison!"),false,true,"SPL")
 					enemy.HP=enemy.HP-Damage
+					MobSprite(3)
 					statusdisplay:setFrame(5)
 					UpdateStats()
 					Hits((Damage),false,true,"SPL")

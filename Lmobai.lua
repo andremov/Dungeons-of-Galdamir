@@ -187,7 +187,6 @@ function DoTurns()
 		end
 	end
 	MobSpawn()
-	DidSomething=false
 	if DidSomething==false then
 		timer.performWithDelay(20,mov.ShowArrows)
 	end

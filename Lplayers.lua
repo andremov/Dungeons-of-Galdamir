@@ -81,7 +81,7 @@ function CreatePlayers(name)
 		(player.nat[5]+player.eqs[5]),
 		(player.nat[6]+player.eqs[6]),
 	}
-	player.pnts=12
+	player.pnts=5
 	--Spells
 	player.spells={
 		{"Fireball","Cast a firey ball of death and burn the enemy.",true,30},
@@ -150,6 +150,7 @@ function ShowStats()
 		LifeDisplay.y = display.contentHeight-115
 	end
 	if not(LifeSymbol) then
+		player.life=0
 		LifeSymbol=display.newSprite( heartfsheet, {name="heart",start=1,count=16,time=(1800)} )
 		LifeSymbol.yScale=3.75
 		LifeSymbol.xScale=3.75
@@ -183,17 +184,17 @@ function ShowStats()
 		LifeSymbol.y = display.contentHeight-110
 		LifeSymbol:play()
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
-	elseif (math.floor((player.HP/player.MaxHP)*100))<20 and not (player.HP==0) and player.life~=2 then
+	elseif player.HP/player.MaxHP<=.2 and player.life~=2 then
 		display.remove(LifeSymbol)
 		player.life=2
-		LifeSymbol=display.newSprite( heartfsheet, {name="heart",start=1,count=16,time=(18*20)} )
+		LifeSymbol=display.newSprite( heartfsheet, {name="heart",start=1,count=16,time=(360)} )
 		LifeSymbol.yScale=3.75
 		LifeSymbol.xScale=3.75
 		LifeSymbol.x = 50
 		LifeSymbol.y = display.contentHeight-110
 		LifeSymbol:play()
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
-	elseif player.life~=0 and not ((math.floor((player.HP/player.MaxHP)*100))<20) then
+	elseif player.life~=0 then
 		display.remove(LifeSymbol)
 		player.life=0
 		LifeSymbol=display.newSprite( heartfsheet, {name="heart",start=1,
@@ -450,10 +451,11 @@ function LearnSorcery(name)
 	end
 end
 
-function LoadPlayer( cls,chr,stam,atk,dfnc,mgk,dxtrty,intlct,lv,xpnts,hitp,manp,neim,golp)
+function LoadPlayer(cls,chr,stam,atk,dfnc,mgk,dxtrty,intlct,pnts,lv,xpnts,hitp,manp,neim,golp)
+	Runtime:removeEventListener("enterFrame",ShowStats)
 
 	display.remove(player)
-	player=nil
+	Statless()
 	local char =chr
 	local class=cls
 	
@@ -475,7 +477,8 @@ function LoadPlayer( cls,chr,stam,atk,dfnc,mgk,dxtrty,intlct,lv,xpnts,hitp,manp,
 	player.MaxXP=player.lvl*50
 	player.XP=xpnts
 	
-	player.eqs={0,0,0,0,0}
+	player.statnames=	{"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity",	"Intellect"}
+	player.eqs={0,0,0,0,0,0}
 	
 	player.nat={}
 	player.nat[1]=stam
@@ -484,6 +487,8 @@ function LoadPlayer( cls,chr,stam,atk,dfnc,mgk,dxtrty,intlct,lv,xpnts,hitp,manp,
 	player.nat[4]=mgk
 	player.nat[5]=dxtrty
 	player.nat[6]=intlct
+	
+	player.pnts=pnts
 	
 	player.stats={}
 	
@@ -502,6 +507,16 @@ function LoadPlayer( cls,chr,stam,atk,dfnc,mgk,dxtrty,intlct,lv,xpnts,hitp,manp,
 		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,120},
 	}
 	
+	StatCheck()
+	
+	if (player) then
+		print "!1"
+		check=119
+		Runtime:addEventListener("enterFrame",ShowStats)
+		su.FrontNCenter()
+		player.HP=player.HP-1
+		player.MP=player.MP-1
+	end
 	local size=b.GetData(0)
 	local curround=WD.Circle()
 	if curround%2==0 then
@@ -509,6 +524,12 @@ function LoadPlayer( cls,chr,stam,atk,dfnc,mgk,dxtrty,intlct,lv,xpnts,hitp,manp,
 	else
 		player.loc=(math.sqrt(size)+2)
 	end
+	timer.performWithDelay(100,Wow)
+end
+
+function Wow()
+	player.HP=player.HP+1
+	player.MP=player.MP+1
 end
 
 function LoadSpells(name)

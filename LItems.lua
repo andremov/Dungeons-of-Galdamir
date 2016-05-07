@@ -289,9 +289,9 @@ function Essentials()
 		{"HealthPotion3",	0,200,		"Heals for 200 Hit Points."},
 		{"PurpleElixir",	0,-20,		"The label is teared off."},	
 		{"GreenPotion",		0,-100,		"Smells funny."},
-		{"ManaPotion",		1,30,		"Grants 1 Mana to every sorcery."},
-		{"ManaPotion2",		1,60,		"Grants 2 Mana to every sorcery."},
-		{"ManaPotion3",		1,120,		"Grants 3 Mana to every sorcery."},
+		{"ManaPotion",		1,30,		"Recovers 30 Mana."},
+		{"ManaPotion2",		1,60,		"Recovers 60 Mana."},
+		{"ManaPotion3",		1,120,		"Recovers 120 Mana."},
 	}
 	scrolls={
 		{"ScrollOfCleave",		"Cleave",		"Teaches the \"Cleave\" sorcery."},
@@ -302,12 +302,12 @@ function Essentials()
 		{"ScrollOfPoison",		"Poison Blade",	"Teaches the \"Poison Blade\" sorcery."},
 	}
 	gems={
-		{"GemBlue",		"DEF","Glows with a blue light.\nIt seems tough to break."},
-		{"GemPurple",	"MGC","Glows with a purple light.\nIt has some strange aura emanating from it."},
-		{"GemPink",		"STA","Glows with a pink light.\nIt pounds faintly every once in a while."},
-		{"GemRed",		"ATT","Glows with a red light.\nIt vibrates angrily every once in a while."},
-		{"GemYellow",	"DEX","Glows with a yellow light.\nIt seems lightweight and sharp."},
-		{"GemGreen",	"INT","Glows with a green light.\nLetters and symbols seems to spin around the orb inside."},
+		{"GemBlue",		3,"Glows with a blue light.\nIt seems tough to break."},
+		{"GemPurple",	4,"Glows with a purple light.\nIt has some strange aura emanating from it."},
+		{"GemPink",		1,"Glows with a pink light.\nIt pounds faintly every once in a while."},
+		{"GemRed",		2,"Glows with a red light.\nIt vibrates angrily every once in a while."},
+		{"GemYellow",	5,"Glows with a yellow light.\nIt seems lightweight and sharp."},
+		{"GemGreen",	6,"Glows with a green light.\nLetters and symbols seems to spin around the orb inside."},
 	}
 	special={
 		{"UpperScroll",			"Teleports you to an upper floor.",1},
@@ -666,22 +666,22 @@ function ReturnInfo(id,wachuwah)
 		wahewah=(itemlist[id][1])
 		return wahewah
 	elseif wachuwah==1 then
-		wahewah=(scrolls[id][2])
+		wahewah=(scrolls[id-8][2])
 		return wahewah
 	elseif wachuwah==2 then
-		wahewah=(gems[id][2])
+		wahewah=(gems[id-14][2])
 		return wahewah
 	elseif wachuwah==3 then
 		wahewah=(itemlist[id][2])
 		return wahewah
 	elseif wachuwah==4 then
 		if id<=8 then
-				wahewah=0
-				name=(items[id][1])
-				itemuse=(items[id][2])
-				stat1=(items[id][3])
-				stat2=(items[id][4])
-				return wahewah,name,itemuse,stat1,stat2
+			wahewah=0
+			name=(items[id][1])
+			itemuse=(items[id][2])
+			stat1=(items[id][3])
+			stat2=(items[id][4])
+			return wahewah,name,itemuse,stat1,stat2
 		elseif id<=14 then
 			wahewah=3
 			name=(scrolls[id-8][1])
