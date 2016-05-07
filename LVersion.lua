@@ -7,7 +7,7 @@ module(..., package.seeall)
 local m=require("Lmenu")
 --[[
 DUNGEONS OF GAL'DARAH
-CURRENT VERSION: BETA 1.8.2
+CURRENT VERSION: BETA 1.8.5
 
 Font1: Monotype Corsiva
 Font2: Game Over
@@ -23,12 +23,11 @@ For Logo:
 	5. Glow - 6,10,75
 ----------------------
 
-	Int Equipment
 	
 --]]
 
 local RSS
-local GVersion="BETA 1.8.2"
+local GVersion="BETA 1.8.5"
 
 function HowDoIVersion(val)
 	if val==true then

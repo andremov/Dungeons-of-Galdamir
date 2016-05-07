@@ -143,8 +143,8 @@ function SellMenu()
 			pitems[s].txt=display.newText( (pitems[s][3]) ,pitems[s].img.x+50,pitems[s].img.y-30,"Game Over",80)
 			if pitems[s][4]~=nil then
 				pitems[s].prc=display.newText( ("Sell for "..pitems[s][4].." gold.") ,pitems[s].img.x+50,pitems[s].img.y,"Game Over",70)
+				pitems[s].prc:setTextColor( 255, 255, 0)
 			end
-			pitems[s].prc:setTextColor( 255, 255, 0)
 			function itemGive()
 				SellItem(pitems[s][1],pitems[s][3],pitems[s][4],(s+(5*(page-1))))
 			end
@@ -153,7 +153,9 @@ function SellMenu()
 			end
 			gsm:insert(pitems[s].img)
 			gsm:insert(pitems[s].txt)
-			gsm:insert(pitems[s].prc)
+			if (pitems[s].prc) then
+				gsm:insert(pitems[s].prc)
+			end
 		end
 	end
 	
