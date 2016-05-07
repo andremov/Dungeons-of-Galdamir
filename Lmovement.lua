@@ -22,7 +22,7 @@ local espaciox=80
 local espacioy=80
 local yinicial=display.contentHeight/2
 local xinicial=display.contentWidth/2
-local Toggle=1
+local Toggle=math.random(3,6)
 
 function ShowArrows(value)
 	if value=="clean" then
@@ -52,7 +52,7 @@ function ShowArrows(value)
 			display.remove(mright)
 			display.remove(inter)
 			if Toggle==0 then
-				Toggle=Toggle+1
+				Toggle=math.random(3,6)
 				mob.DoTurns()
 			end
 		else
@@ -505,7 +505,10 @@ end
 function ShopInteract( event )
 	if event.phase=="began" then
 		ShowArrows("clean")
-		timer.performWithDelay(100,sho.DisplayShop)
+		function closure1()
+			sho.DisplayShop(p1.loc)
+		end
+		timer.performWithDelay(100,closure1)
 	end
 end
 function GoinDown( event )
@@ -526,10 +529,7 @@ function moveplayerup( event )
 		P1=p.GetPlayer()
 		map.y=map.y+80
 		p.MovePlayer(-math.sqrt(size))
-		Toggle=Toggle+1
-		if Toggle>3 then
-			Toggle=0
-		end
+		Toggle=Toggle-1
 		ShowArrows()
 	end
 end
@@ -540,10 +540,7 @@ function moveplayerdown( event )
 		P1=p.GetPlayer()
 		map.y=map.y-80
 		p.MovePlayer(math.sqrt(size))
-		Toggle=Toggle+1
-		if Toggle>3 then
-			Toggle=0
-		end
+		Toggle=Toggle-1
 		ShowArrows()
 	end
 end	
@@ -554,10 +551,7 @@ function moveplayerleft( event )
 		P1=p.GetPlayer()
 		map.x=map.x+80
 		p.MovePlayer(-1)
-		Toggle=Toggle+1
-		if Toggle>3 then
-			Toggle=0
-		end
+		Toggle=Toggle-1
 		ShowArrows()
 	end
 end	
@@ -568,10 +562,7 @@ function moveplayerright( event )
 		P1=p.GetPlayer()
 		map.x=map.x-80
 		p.MovePlayer(1)
-		Toggle=Toggle+1
-		if Toggle>3 then
-			Toggle=0
-		end
+		Toggle=Toggle-1
 		ShowArrows()
 	end
 end

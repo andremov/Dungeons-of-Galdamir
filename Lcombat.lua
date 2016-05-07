@@ -28,10 +28,12 @@ local timersheet = graphics.newImageSheet( "timer.png",{ width=100, height=100, 
 local mov=require("Lmovement")
 local players=require("Lplayers")
 local gp=require("LGold")
+local item=require("LItems")
 local mob=require("Lmobai")
 local ui=require("LUI")
 local builder=require("LMapBuilder")
 local WD=require("LProgress")
+local win=require("Lwindow")
 local audio=require("LAudio")
 local widget = require "widget"
 local physics = require "physics"
@@ -58,14 +60,20 @@ local BurnLimit
 local statusdisplay
 local SorceryUI
 local outcomed
+local timersprite
 
 function Essentials()
 	SBookDisplayed=false
 	Sorcery={}
 	inCombat=false
-	SorcIniX=20
+	SorcIniX=display.contentCenterX-(190+20)
 	SorcIniY=display.contentHeight-120
 	outcomed=false
+	inv=false
+	xinvicial=75
+	yinvicial=156
+	espaciox=64
+	espacioy=64
 end
 
 function Attacking(victim)
@@ -106,16 +114,16 @@ function DisplayCombat()
 	bkg.y = 146
 	gcm:insert(bkg)
 	
-	window1=display.newImage("window.png",171,160)
-	window1.x=180
-	window1.y=yCoord
-	window1.xScale=2.0
+	window1=display.newImage("window.png",171,43)
+	window1.x=190
+	window1.y=yCoord-120
+	window1.xScale=2.25
 	window1.yScale=window1.xScale
 	gcm:insert(window1)
 	
-	window2=display.newImage("window2.png",171,160)
-	window2.x=display.contentWidth-180
-	window2.y=yCoord
+	window2=display.newImage("window2.png",171,43)
+	window2.x=display.contentWidth-window1.x
+	window2.y=window1.y
 	window2.xScale=window1.xScale
 	window2.yScale=window2.xScale
 	gcm:insert(window2)
@@ -131,81 +139,165 @@ function DisplayCombat()
 	
 	--Timers
 	timersprite=display.newSprite( timersheet, { name="timerid", start=1, count=25, loopCount=1, time=1000+(1500*p1.SPD)}  )
-	timersprite.x=display.contentWidth-60
-	timersprite.y=display.contentHeight-60
+	timersprite.x=display.contentCenterX
+	timersprite.y=display.contentCenterY+100
 	timersprite:play()
 	gcm:insert(timersprite)
 	
+	HideActions()
+	
 	ptimer=timer.performWithDelay(1000+(1500*p1.SPD),ShowActions)
 	etimer=timer.performWithDelay(1001+(1500*enemy.SPD),MobsTurn)
+end
+
+function HideActions()
+	
+	if (AttackBtn) then
+		display.remove(AttackBtn)
+	end
+	
+	if (MagicBtn) then
+		display.remove(MagicBtn)
+	end
+	
+	if (ItemBtn) then
+		display.remove(ItemBtn)
+	end
+	
+	if (RunBtn) then
+		display.remove(RunBtn)
+	end
+	
+	AttackBtn=display.newImageRect("combataction3.png",342,86)
+	AttackBtn.x=timersprite.x-172
+	AttackBtn.y=timersprite.y-44
+	gcm:insert( AttackBtn )
+	
+	MagicBtn=display.newImageRect("combataction3.png",342,86)
+	MagicBtn.x = timersprite.x+172
+	MagicBtn.y = AttackBtn.y
+	gcm:insert( MagicBtn )
+	
+	ItemBtn=display.newImageRect("combataction3.png",342,86)
+	ItemBtn.x = AttackBtn.x
+	ItemBtn.y = timersprite.y+44
+	gcm:insert( ItemBtn )
+	
+	RunBtn=display.newImageRect("combataction3.png",342,86)
+	RunBtn.x = MagicBtn.x
+	RunBtn.y = timersprite.y+44
+	gcm:insert( RunBtn )
+	
+	timersprite:toFront()
 end
 
 function ShowActions()
 	ptimer=nil
 	local ep=timer.pause(etimer)
 	
-	function toAttack()
+	if (AttackBtn) then
 		display.remove(AttackBtn)
+		AttackBtn=nil
+	end
+	
+	if (MagicBtn) then
 		display.remove(MagicBtn)
+		MagicBtn=nil
+	end
+	
+	if (ItemBtn) then
+		display.remove(ItemBtn)
+		ItemBtn=nil
+	end
+	
+	if (RunBtn) then
 		display.remove(RunBtn)
+		RunBtn=nil
+	end
+	
+	function toAttack()
+		HideActions()
 		
 		PlayerAttacks()
 	end
 	
-	AttackBtn= widget.newButton{
-		label="Attack",
-		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
-		defaultFile="cbutton.png",
-		overFile="cbutton2.png",
-		width=252, height=55,
-		onRelease = toAttack}
-	AttackBtn:setReferencePoint( display.CenterReferencePoint )
-	AttackBtn.x = window1.x-30
-	AttackBtn.y = window1.y-20
-	gcm:insert( AttackBtn )
+	if not(AttackBtn)then
+		AttackBtn= widget.newButton{
+			label="Attack",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=30,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = toAttack}
+		AttackBtn:setReferencePoint( display.CenterReferencePoint )
+		AttackBtn.x = timersprite.x-172
+		AttackBtn.y = timersprite.y-44
+		gcm:insert( AttackBtn )
+	end
 	
-	function toSorcery()
-	--	display.remove(AttackBtn)
-	--	display.remove(MagicBtn)
-	--	display.remove(RunBtn)
-		
+	function toSorcery()		
 		ShowSorcery()
 	end
 	
-	MagicBtn= widget.newButton{
-		label="Sorcery",
-		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
-		defaultFile="cbutton.png",
-		overFile="cbutton2.png",
-		width=252, height=55,
-		onRelease = toSorcery}
-	MagicBtn:setReferencePoint( display.CenterReferencePoint )
-	MagicBtn.x = AttackBtn.x
-	MagicBtn.y = AttackBtn.y+65
-	gcm:insert( MagicBtn )
+	if not(MagicBtn)then
+		MagicBtn= widget.newButton{
+			label="Sorcery",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=30,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = toSorcery}
+		MagicBtn:setReferencePoint( display.CenterReferencePoint )
+		MagicBtn.x = timersprite.x+172
+		MagicBtn.y = AttackBtn.y
+		gcm:insert( MagicBtn )
+	end
+	
+	function toItems()
+		HideActions()
+		
+		ShowBag()
+	end
+	
+	if not(ItemBtn)then
+		ItemBtn= widget.newButton{
+			label="Item",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=30,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = toItems}
+		ItemBtn:setReferencePoint( display.CenterReferencePoint )
+		ItemBtn.x = AttackBtn.x
+		ItemBtn.y = timersprite.y+44
+		gcm:insert( ItemBtn )
+	end
 	
 	function toRun()
-		display.remove(AttackBtn)
-		display.remove(MagicBtn)
-		display.remove(RunBtn)
+		HideActions()
 		
 		RunAttempt()
 	end
 	
-	RunBtn= widget.newButton{
-		label="Retreat",
-		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
-		defaultFile="cbutton.png",
-		overFile="cbutton2.png",
-		width=252, height=55,
-		onRelease = toRun}
-	RunBtn:setReferencePoint( display.CenterReferencePoint )
-	RunBtn.x = AttackBtn.x
-	RunBtn.y = MagicBtn.y+65
-	gcm:insert( RunBtn )
+	if not(RunBtn)then
+		RunBtn= widget.newButton{
+			label="Retreat",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=30,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = toRun}
+		RunBtn:setReferencePoint( display.CenterReferencePoint )
+		RunBtn.x = MagicBtn.x
+		RunBtn.y = ItemBtn.y
+		gcm:insert( RunBtn )
+	end
+	
+	timersprite:toFront()
 end
 
 function MobsTurn()
@@ -219,6 +311,7 @@ function MobsTurn()
 			local Damage=DamageCalc("p1",(math.random(15,20)/10),16)
 			if (Damage)<=0 then
 				Hits("BLK!",false,false,false)
+				UpdateStats()
 			else
 				players.ReduceHP(Damage,"Mob")
 				P1Sprite(3)
@@ -229,6 +322,7 @@ function MobsTurn()
 			local Damage=DamageCalc("p1",1,16)
 			if (Damage)<=0 then
 				Hits("BLK!",false,false,false)
+				UpdateStats()
 			else
 				players.ReduceHP(Damage,"Mob")
 				P1Sprite(3)
@@ -238,15 +332,15 @@ function MobsTurn()
 		end
 	else
 		Hits("MSS!",false,false,false)
+		UpdateStats()
 	end
 	if enemy.status=="BRN" then
 		if BurnLimit>0 then
 			local Burn=(math.floor(enemy.MaxHP*.05))
 			enemy.HP=enemy.HP-Burn
-			UpdateStats()
 			BurnLimit=BurnLimit-1
 			Hits((Burn),false,true,"BRN")
-				UpdateStats()
+			UpdateStats()
 		elseif BurnLimit<=0 then
 			if BurnLimit<0 then
 				BurnLimit=0
@@ -261,9 +355,8 @@ function MobsTurn()
 		else
 			local Poison=(math.floor(enemy.MaxHP*.02))
 			enemy.HP=enemy.HP-Poison
-			UpdateStats()
 			Hits((Poison),false,true,"PSN")
-				UpdateStats()
+			UpdateStats()
 		end
 	end
 	if p1.HP<=0 then
@@ -283,7 +376,6 @@ function MobsTurn()
 		end
 		timer.performWithDelay(200,closure2)
 	else
-		EndTurn()
 	end
 end
 
@@ -640,6 +732,8 @@ function CreateMobStats()
 			enemy.class=i
 		end
 	end
+	enemy.classnames={"Gladiator","Berserker","Gladiator","Wizard","Berserker"}
+	enemy.classname=enemy.classnames[enemy.class]
 	MobSprite(1)
 	enemy.MaxHP=(100*enemy.lvl)+(enemy.stats[1]*10)
 	enemy.MaxMP=(enemy.lvl*15)+(enemy.stats[4]*10)
@@ -651,9 +745,10 @@ function CreateMobStats()
 end
 
 function UpdateStats()
-	if not(hpBar)then
-		--Mob
+	if not(Created)and(gcm)then
+	--[[ MOB ]]
 	-- Life
+		eHPcnt=enemy.HP
 		hpBar=display.newSprite( hpsheet, { name="hpsheet", start=1, count=67, time=(1800) })
 		hpBar.yScale=1.25
 		hpBar.xScale=hpBar.yScale
@@ -661,7 +756,7 @@ function UpdateStats()
 		hpBar.y = yCoord-135
 		hpBar:toFront()
 		gcm:insert(hpBar)
-		hpBar:setFrame(math.floor(( (enemy.HP/enemy.MaxHP)*66 )+1))
+		hpBar:setFrame(math.floor(( (eHPcnt/enemy.MaxHP)*66 )+1))
 		
 		LifeSymbol=display.newSprite( heartsheet, { name="heart", start=1, count=16, time=(1800) })
 		LifeSymbol.yScale=3.25
@@ -672,7 +767,7 @@ function UpdateStats()
 		LifeSymbol:toFront()
 		gcm:insert(LifeSymbol)
 		
-		LifeDisplay = display.newText( (enemy.HP.."/"..enemy.MaxHP), 0, 0, "Game Over", 75 )
+		LifeDisplay = display.newText( (eHPcnt.."/"..enemy.MaxHP), 0, 0, "Game Over", 75 )
 		LifeDisplay:setTextColor( 0, 0, 0)
 		LifeDisplay.x = LifeSymbol.x+140
 		LifeDisplay.y = LifeSymbol.y-5
@@ -681,23 +776,29 @@ function UpdateStats()
 		
 
 	-- Level
-		
-		LvlDisplay = display.newText( ("Lv: "..enemy.lvl), 0, 0, "Game Over", 75 )
-		LvlDisplay:setTextColor( 0, 255, 0)
-		LvlDisplay.x = LifeDisplay.x-100
-		LvlDisplay.y = LifeDisplay.y+40
-		LvlDisplay:toFront()
-		gcm:insert(LvlDisplay)
-		
 		statusdisplay=display.newSprite( statussheet, { name="status", start=1, count=6, time=800 }  )
 		statusdisplay.yScale=0.75
 		statusdisplay.xScale=statusdisplay.yScale
-		statusdisplay.x = LvlDisplay.x+130
-		statusdisplay.y = LvlDisplay.y+5
+		statusdisplay.x = LifeDisplay.x-150
+		statusdisplay.y = LifeDisplay.y+40
 		gcm:insert(statusdisplay)
 		
-		--Player
+		LvlDisplay = display.newText( ("Lv: "..enemy.lvl), 0, 0, "Game Over", 75 )
+		LvlDisplay:setTextColor( 50, 255, 50)
+		LvlDisplay.x = LifeSymbol.x-80
+		LvlDisplay.y = LifeDisplay.y
+		LvlDisplay:toFront()
+		gcm:insert(LvlDisplay)
+		
+		classdisplay= display.newText( (""..enemy.classname), 0, 0, "Game Over", 75 )
+		classdisplay:setTextColor( 0, 0, 0)
+		classdisplay.x = statusdisplay.x+150
+		classdisplay.y = statusdisplay.y
+		gcm:insert(classdisplay)
+		
+	--[[ PLAYER ]]
 	-- Life
+		pHPcnt=p1.HP
 		hpBar2=display.newSprite( hpsheet, { name="hpsheet", start=1, count=67, time=(1800) })
 		hpBar2.yScale=1.25
 		hpBar2.xScale=hpBar2.yScale
@@ -705,7 +806,7 @@ function UpdateStats()
 		hpBar2.y = yCoord-135
 		hpBar2:toFront()
 		gcm:insert(hpBar2)
-		hpBar2:setFrame(math.floor(( (p1.HP/p1.MaxHP)*66 )+1))
+		hpBar2:setFrame(math.floor(( (pHPcnt/p1.MaxHP)*66 )+1))
 		
 		LifeSymbol2=display.newSprite( heartsheet, { name="heart", start=1, count=16, time=(1800) })
 		LifeSymbol2.yScale=3.25
@@ -716,14 +817,15 @@ function UpdateStats()
 		LifeSymbol2:toFront()
 		gcm:insert(LifeSymbol2)
 		
-		LifeDisplay2 = display.newText( (p1.HP.."/"..p1.MaxHP), 0, 0, "Game Over", 75 )
+		LifeDisplay2 = display.newText( (pHPcnt.."/"..p1.MaxHP), 0, 0, "Game Over", 75 )
 		LifeDisplay2:setTextColor( 0, 0, 0)
 		LifeDisplay2.x = LifeSymbol2.x-140
 		LifeDisplay2.y = LifeSymbol2.y-5
 		LifeDisplay2:toFront()
 		gcm:insert(LifeDisplay2)
+		
 	--Mana
-
+		pMPcnt=p1.MP
 		mpBar2=display.newSprite( mpsheet, { name="mpsheet", start=1, count=67, time=(1800) })
 		mpBar2.yScale=1.25
 		mpBar2.xScale=mpBar2.yScale
@@ -731,7 +833,7 @@ function UpdateStats()
 		mpBar2.y = yCoord-95
 		mpBar2:toFront()
 		gcm:insert(mpBar2)
-		mpBar2:setFrame(math.floor(( (p1.HP/p1.MaxHP)*66 )+1))
+		mpBar2:setFrame(math.floor(( (pMPcnt/p1.MaxMP)*66 )+1))
 		
 		ManaSymbol2=display.newSprite( manasheet, { name="mana", start=1, count=3, time=(500) })
 		ManaSymbol2.yScale=0.9
@@ -742,40 +844,131 @@ function UpdateStats()
 		ManaSymbol2:toFront()
 		gcm:insert(ManaSymbol2)
 		
-		ManaDisplay2 = display.newText( (p1.MP.."/"..p1.MaxMP), 0, 0, "Game Over", 75 )
+		ManaDisplay2 = display.newText( (pMPcnt.."/"..p1.MaxMP), 0, 0, "Game Over", 75 )
 		ManaDisplay2:setTextColor( 0, 0, 0)
 		ManaDisplay2.x = ManaSymbol2.x-140
 		ManaDisplay2.y = ManaSymbol2.y-5
 		ManaDisplay2:toFront()
 		gcm:insert(ManaDisplay2)
-	-- Level
-		--[[
-		statusdisplay2=display.newSprite( statussheet, { name="status", start=1, count=6, time=800 }  )
-		statusdisplay2.yScale=0.75
-		statusdisplay2.xScale=statusdisplay2.yScale
-		statusdisplay2.x = LifeDisplay2.x-30
-		statusdisplay2.y = LifeDisplay2.y+45
-		gcm:insert(statusdisplay2)
-		statusdisplay2:play()
-		]]
+		
+	end
+	
+	local done=true
+	
+	if p1.MP<0 then
+		p1.MP=0
+	end
+	if p1.HP<0 then
+		p1.HP=0
+	end
+	if enemy.HP<0 then
+		enemy.HP=0
+	end
+	
+	if pHPcnt-p1.HP==0 then
+	elseif pHPcnt-p1.HP>0 then
+		if pHPcnt-p1.HP>500 then
+			pHPcnt=pHPcnt-25
+			done=false
+		elseif pHPcnt-p1.HP>200 then
+			pHPcnt=pHPcnt-10
+			done=false
+		elseif pHPcnt-p1.HP>50 then
+			pHPcnt=pHPcnt-5
+			done=false
+		elseif pHPcnt-p1.HP>20 then
+			pHPcnt=pHPcnt-2
+			done=false
+		else
+			pHPcnt=pHPcnt-1
+			done=false
+		end
+	elseif pHPcnt-p1.HP<0 then
+		if pHPcnt-p1.HP<-500 then
+			pHPcnt=pHPcnt+25
+			done=false
+		elseif pHPcnt-p1.HP<-200 then
+			pHPcnt=pHPcnt+10
+			done=false
+		elseif pHPcnt-p1.HP<-50 then
+			pHPcnt=pHPcnt+5
+			done=false
+		elseif pHPcnt-p1.HP<-20 then
+			pHPcnt=pHPcnt+2
+			done=false
+		else
+			pHPcnt=pHPcnt+1
+			done=false
+		end
+	end
+	
+	if pMPcnt-p1.MP==0 then
+	elseif pMPcnt-p1.MP>0 then
+		if pMPcnt-p1.MP>500 then
+			pMPcnt=pMPcnt-25
+			done=false
+		elseif pMPcnt-p1.MP>200 then
+			pMPcnt=pMPcnt-10
+			done=false
+		elseif pMPcnt-p1.MP>50 then
+			pMPcnt=pMPcnt-5
+			done=false
+		elseif pMPcnt-p1.MP>20 then
+			pMPcnt=pMPcnt-2
+			done=false
+		else
+			pMPcnt=pMPcnt-1
+			done=false
+		end
+	elseif pMPcnt-p1.MP<0 then
+		if pMPcnt-p1.MP<-500 then
+			pMPcnt=pMPcnt+25
+			done=false
+		elseif pMPcnt-p1.MP<-200 then
+			pMPcnt=pMPcnt+10
+			done=false
+		elseif pMPcnt-p1.MP<-50 then
+			pMPcnt=pMPcnt+5
+			done=false
+		elseif pMPcnt-p1.MP<-20 then
+			pMPcnt=pMPcnt+2
+			done=false
+		else
+			pMPcnt=pMPcnt+1
+			done=false
+		end
+	end
+	
+	if eHPcnt-enemy.HP==0 then
+	elseif eHPcnt-enemy.HP>500 then
+		eHPcnt=eHPcnt-25
+		done=false
+	elseif eHPcnt-enemy.HP>200 then
+		eHPcnt=eHPcnt-10
+		done=false
+	elseif eHPcnt-enemy.HP>50 then
+		eHPcnt=eHPcnt-5
+		done=false
+	elseif eHPcnt-enemy.HP>20 then
+		eHPcnt=eHPcnt-2
+		done=false
 	else
-		if p1.MP<0 then
-			p1.MP=0
-		end
-		if p1.HP<0 then
-			p1.HP=0
-		end
-		if enemy.HP<0 then
-			enemy.HP=0
-		end
-		ManaDisplay2.text=(p1.MP.."/"..p1.MaxMP)
-		LifeDisplay2.text=(p1.HP.."/"..p1.MaxHP)
-		LifeDisplay.text=(enemy.HP.."/"..enemy.MaxHP)
-		mpBar2:setFrame(math.floor(( (p1.MP/p1.MaxMP)*66 )+1))
-		hpBar2:setFrame(math.floor(( (p1.HP/p1.MaxHP)*66 )+1))
-		hpBar:setFrame(math.floor(( (enemy.HP/enemy.MaxHP)*66 )+1))
-		MobSprite()
-		P1Sprite()
+		eHPcnt=eHPcnt-1
+		done=false
+	end
+
+	ManaDisplay2.text=(pMPcnt.."/"..p1.MaxMP)
+	LifeDisplay2.text=(pHPcnt.."/"..p1.MaxHP)
+	LifeDisplay.text=(eHPcnt.."/"..enemy.MaxHP)
+	mpBar2:setFrame(math.floor(( (pMPcnt/p1.MaxMP)*66 )+1))
+	hpBar2:setFrame(math.floor(( (pHPcnt/p1.MaxHP)*66 )+1))
+	hpBar:setFrame(math.floor(( (eHPcnt/enemy.MaxHP)*66 )+1))
+	if (done==true) and Created==true and (gcm) then
+		EndTurn()
+	elseif (done==true) and Created~=true and (gcm) then
+		Created=true
+	elseif (done~=true) and (Created==true) and (gcm) then
+		timer.performWithDelay(25,UpdateStats)
 	end
 end
 
@@ -802,6 +995,7 @@ function PlayerAttacks()
 			local Damage=DamageCalc("mob",(math.random(15,20)/10),16)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,false)
+				UpdateStats()
 			else
 				enemy.HP=enemy.HP-Damage
 				MobSprite(3)
@@ -812,6 +1006,7 @@ function PlayerAttacks()
 			local Damage=DamageCalc("mob",1,16)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,false)
+				UpdateStats()
 			else
 				enemy.HP=enemy.HP-Damage
 				MobSprite(3)
@@ -821,6 +1016,7 @@ function PlayerAttacks()
 		end
 	else
 		Hits("MSS!",false,true,false)
+		UpdateStats()
 	end
 	if enemy.HP<=0 then
 		if enemy.HP<0 then
@@ -831,7 +1027,6 @@ function PlayerAttacks()
 		end
 		timer.performWithDelay(200,closure)
 	end
-	EndTurn()
 end
 
 function EndTurn()
@@ -868,7 +1063,7 @@ function EndCombat(outcome)
 		gcm[i]=nil
 	end
 	gcm=nil
-	hpBar=nil
+	Created=nil
 	
 	if outcomed==false then
 		
@@ -954,12 +1149,38 @@ function EndCombat(outcome)
 			
 			OMenu=display.newImageRect("usemenu.png", 768, 308)
 			OMenu.x,OMenu.y = display.contentWidth*0.5, 450
-			gom:insert(OMenu)	
+			gom:insert(OMenu)
 			
-			local msg=display.newText("Got away safely!",0,0, "Game Over", 150)
+			local msg=display.newText("Got away successfully!",0,0, "Game Over", 150)
 			msg.x = display.contentWidth/2
 			msg.y = OMenu.y-80
 			gom:insert(msg)
+			
+			local chance=math.random(1,10)
+			if chance<9 then
+				local RunDmg=math.floor( p1.MaxHP/(10+((math.random(0,4))-2)) )
+				if RunDmg>p1.HP then
+					RunDmg=(p1.HP-1)
+					players.ReduceHP(RunDmg,"Mob")
+				else
+					players.ReduceHP(RunDmg,"Mob")
+				end
+				if RunDmg~=0 then
+					local msg2=display.newText(("The mob hit you for "),50,0, "Game Over", 100)
+					msg2.y = msg.y+80
+					gom:insert(msg2)
+					
+					RunDmg=tostring(RunDmg)
+					local msg3=display.newText((RunDmg),msg2.x+180+(#RunDmg*5),0, "Game Over", 100)
+					msg3:setTextColor(255,50,50)
+					msg3.y = msg2.y
+					gom:insert(msg3)
+					
+					local msg4=display.newText((" upon running."),msg3.x+30+(#msg3.text*5),0, "Game Over", 100)
+					msg4.y = msg2.y
+					gom:insert(msg4)
+				end
+			end
 			
 			local OKBtn= widget.newButton{
 				label="Okay",
@@ -1036,8 +1257,141 @@ function GetHits()
 	return hits
 end
 
-function ShowSorcery(dumb)
-	if dumb==true then
+function ShowBag(action)
+	if inv==false and action~=true then
+		inv=true
+		
+		ginv=display.newGroup()
+		items={}
+		items2={}
+		for i=1,table.maxn(p1.inv) do
+			if (p1.inv[i])~=nil and p1.inv[i][1]<=8 then
+				local itmnme=item.ReturnInfo(p1.inv[i][1],0)
+				print ("Player has "..p1.inv[i][2].." of "..itmnme..".")
+				
+				items2[#items2+1]=display.newRect(0,0,65,65)
+				items2[#items2]:setFillColor(50,50,50)
+				items2[#items2].xScale=1.25
+				items2[#items2].yScale=1.25
+				items2[#items2].x = xinvicial+ (((#items2-1)%8)*((espaciox*items2[#items2].xScale)+4))
+				items2[#items2].y = display.contentHeight-250
+				
+				if p1.inv[i][1]==2 then
+					items[#items+1]=display.newSprite( HPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
+					items[#items]:play()
+				elseif p1.inv[i][1]==3 then
+					items[#items+1]=display.newSprite( HPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
+					items[#items]:play()
+				elseif p1.inv[i][1]==7 then
+					items[#items+1]=display.newSprite( MPot2sheet, { name="Pot2", start=1, count=16, time=1000 }  )
+					items[#items]:play()
+				elseif p1.inv[i][1]==8 then
+					items[#items+1]=display.newSprite( MPot3sheet, { name="Pot2", start=1, count=16, time=1000 }  )
+					items[#items]:play()
+				else
+					items[#items+1]=display.newImageRect( "items/"..itmnme..".png" ,64,64)
+				end
+				items[#items].xScale=1.25
+				items[#items].yScale=1.25
+				items[#items].x = xinvicial+ (((#items-1)%8)*((espaciox*items[#items].xScale)+4))
+				items[#items].y = display.contentHeight-250
+				
+				function Gah()
+					UseItem(p1.inv[i][1],i)
+				end
+				items2[#items2]:addEventListener("tap",Gah)
+				ginv:insert( items2[#items2] )
+				ginv:insert( items[#items] )
+				if p1.inv[i][2]~=1 then
+					if p1.inv[i][2]>9 then
+						items[#items].num=display.newText( (p1.inv[i][2]) ,items[#items].x+5,items[#items].y-5,"Game Over",80)
+						ginv:insert( items[#items].num )
+					elseif p1.inv[i][2]<=9 then
+						items[#items].num=display.newText( (p1.inv[i][2]) ,items[#items].x+15,items[#items].y-5,"Game Over",80)
+						ginv:insert( items[#items].num )
+					end
+				end
+			end
+		end
+		ginv:toFront()
+		if table.maxn(p1.inv)==0 then
+			print "Inventory is empty."
+		end
+		
+		closeInvBtn=widget.newButton{
+			label="Close",
+			labelColor = { default={0,0,0}, over={255,255,255} },
+			fontSize=30,
+			defaultFile="combataction.png",
+			overFile="combataction2.png",
+			width=342, height=86,
+			onRelease = toItems}
+		closeInvBtn:setReferencePoint( display.CenterReferencePoint )
+		closeInvBtn.x = display.contentCenterX
+		closeInvBtn.y = display.contentHeight-150
+		gcm:insert( closeInvBtn )
+	elseif inv==true or action==true then
+		inv=false
+		display.remove(closeInvBtn)
+		closeInvBtn=nil
+		for i=table.maxn(items),1,-1 do
+			display.remove(items[i])
+			items[i]=nil
+			display.remove(items2[i])
+			items2[i]=nil
+		end
+		items=nil
+		items2=nil
+		for i=ginv.numChildren,1,-1 do
+			display.remove(ginv[i])
+			ginv[i]=nil
+		end
+		ginv=nil
+		ShowActions()
+	end
+end
+
+function UseItem(id,slot)
+	inv=false
+	display.remove(closeInvBtn)
+	closeInvBtn=nil
+	for i=table.maxn(items),1,-1 do
+		display.remove(items[i])
+		items[i]=nil
+		display.remove(items2[i])
+		items2[i]=nil
+	end
+	items=nil
+	items2=nil
+	for i=ginv.numChildren,1,-1 do
+		display.remove(ginv[i])
+		ginv[i]=nil
+	end
+	ginv=nil
+	
+	if p1.inv[slot][2]==1 then
+		table.remove( p1.inv, slot )
+	elseif p1.inv[slot][2]~=1 then
+		p1.inv[slot][2]=p1.inv[slot][2]-1
+	end
+	
+	local itemstats={
+		item.ReturnInfo(id,4)
+	}
+	
+	if itemstats[3]==0 then
+		if itemstats[4]<0 then
+			players.ReduceHP((itemstats[4]*-1),"Poison")
+		elseif itemstats[4]>0 then
+			players.AddHP(itemstats[4])
+		end
+	elseif itemstats[3]==1 then
+		players.AddMP(itemstats[4])
+	end
+	UpdateStats()
+end
+function ShowSorcery(comm)
+	if comm==true then
 		if SBookDisplayed==true then
 			function deletion()
 				display.remove(SorceryUI)
@@ -1079,7 +1433,7 @@ function ShowSorcery(dumb)
 			end
 			
 			SorceryUI=display.newImageRect("scrollui4.png", 460, 600)
-			SorceryUI.x, SorceryUI.y = 230, display.contentHeight+300
+			SorceryUI.x, SorceryUI.y = display.contentCenterX, display.contentHeight+300
 			transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y-(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=finishSpells})
 			SBookDisplayed=true
 		elseif SBookDisplayed==true then
@@ -1099,9 +1453,9 @@ end
 function CastSorcery(name)
 	P1Sprite(4)
 	ShowSorcery(true)
-	display.remove(AttackBtn)
-	display.remove(MagicBtn)
-	display.remove(RunBtn)
+	
+	HideActions()
+	
 	for s=1, table.maxn(p1.spells) do
 		if p1.spells[s][1]==name then
 			p1.MP=p1.MP-p1.spells[s][4]
@@ -1146,21 +1500,23 @@ function CastSorcery(name)
 			local Damage=MagicCalc((math.random(15,20)/10),22)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,"SPL")
+				UpdateStats()
 			else
 				enemy.status="BRN"
 				Hits(("Burn!"),false,true,"SPL")
 				enemy.HP=enemy.HP-Damage
 				MobSprite(3)
 				statusdisplay:setFrame(3)
-				UpdateStats()
 				BurnLimit=p1.stats[4]*2
 				if BurnLimit>15 then
 					BurnLimit=20
 				end
 				Hits((Damage),true,true,"SPL")
+				UpdateStats()
 			end
 		else
 			Hits("MSS!",false,true,"SPL")
+			UpdateStats()
 		end
 		if enemy.HP<=0 then
 			if enemy.HP<0 then
@@ -1181,39 +1537,42 @@ function CastSorcery(name)
 				local Damage=MagicCalc((math.random(15,20)/10),22)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
+					UpdateStats()
 				else
 					enemy.status="BRN"
 					Hits(("Burn!"),false,true,"SPL")
 					enemy.HP=enemy.HP-Damage
 					MobSprite(3)
 					statusdisplay:setFrame(3)
-					UpdateStats()
 					BurnLimit=p1.stats[4]+2
 					if BurnLimit>15 then
 						BurnLimit=15
 					end
 					Hits((Damage),true,true,"SPL")
+					UpdateStats()
 				end
 			else
 				local Damage=MagicCalc(1,22)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
+					UpdateStats()
 				else
 					enemy.status="BRN"
 					Hits(("Burn!"),false,true,"SPL")
 					enemy.HP=enemy.HP-Damage
 					MobSprite(3)
 					statusdisplay:setFrame(3)
-					UpdateStats()
 					BurnLimit=p1.stats[4]+2
 					if BurnLimit>15 then
 						BurnLimit=15
 					end
 					Hits((Damage),false,true,"SPL")
+					UpdateStats()
 				end
 			end
 		else
 			Hits("MSS!",false,true,"SPL")
+			UpdateStats()
 		end
 		if enemy.HP<=0 then
 			if enemy.HP<0 then
@@ -1233,16 +1592,18 @@ function CastSorcery(name)
 			local Damage=MagicCalc((math.random(15,20)/10),22)
 			if (Damage)<=0 then
 				Hits("BLK!",false,true,"SPL")
+				UpdateStats()
 			else
 				enemy.stats[5]=enemy.stats[5]-(math.floor(enemy.stats[5]*.2))
 				Hits(("Slowed!"),false,true,"SPL")
 				enemy.HP=enemy.HP-Damage
 				MobSprite(3)
-				UpdateStats()
 				Hits((Damage),true,true,"SPL")
+				UpdateStats()
 			end
 		else
 			Hits("MSS!",false,true,"SPL")
+			UpdateStats()
 		end
 		if enemy.HP<=0 then
 			if enemy.HP<0 then
@@ -1277,31 +1638,34 @@ function CastSorcery(name)
 				local Damage=MagicCalc((math.random(15,20)/10),22)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
+					UpdateStats()
 				else
 					enemy.status="PSN"
 					Hits(("Poison!"),false,true,"SPL")
 					enemy.HP=enemy.HP-Damage
 					MobSprite(3)
 					statusdisplay:setFrame(5)
-					UpdateStats()
 					Hits((Damage),true,true,"SPL")
+					UpdateStats()
 				end
 			else
 				local Damage=MagicCalc(1,22)
 				if (Damage)<=0 then
 					Hits("BLK!",false,true,"SPL")
+					UpdateStats()
 				else
 					enemy.status="PSN"
 					Hits(("Poison!"),false,true,"SPL")
 					enemy.HP=enemy.HP-Damage
 					MobSprite(3)
 					statusdisplay:setFrame(5)
-					UpdateStats()
 					Hits((Damage),false,true,"SPL")
+					UpdateStats()
 				end
 			end
 		else
 			Hits("MSS!",false,true,"SPL")
+			UpdateStats()
 		end
 		if enemy.HP<=0 then
 			if enemy.HP<0 then
@@ -1314,7 +1678,6 @@ function CastSorcery(name)
 		end
 		UpdateStats()
 	end
-	EndTurn()
 end
 
 function NoMansLand()

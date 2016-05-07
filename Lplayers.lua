@@ -62,7 +62,11 @@ function CreatePlayers(name)
 	player.lvl=1
 	player.MaxXP=50
 	player.XP=0
+<<<<<<< HEAD
 	player.clsnames={"Knight","Warrior","Thief","Viking","Mage","Scholar"}
+=======
+	player.clsnames={"Knight","Warrior","Thief","Viking","Sorceror","Scholar"}
+>>>>>>> B1.8.2
 	player.char=char
 	player.class=class
 	player.life=0
@@ -403,6 +407,32 @@ function LvlUp()
 	player.MaxMP=(player.lvl*15)+(player.stats[6]*10)
 	player.HP=player.MaxHP
 	player.MP=player.MaxMP
+	LvlFanfare()
+end
+
+function LvlFanfare()
+	if not (LvlWindow) then
+		transp10=255
+		LvlWindow=display.newImageRect("fanfarelevelup.png",330,142)
+		LvlWindow.xScale=2
+		LvlWindow.yScale=LvlWindow.xScale
+		LvlWindow.x=display.contentCenterX
+		LvlWindow.y=display.contentCenterY-250
+		LvlWindow:toFront()
+		LvlWindow:setFillColor( transp10, transp10, transp10, transp10)
+		timer.performWithDelay(10,LvlFanfare)
+	else
+		if transp10<20 then
+			transp10=0
+			display.remove(LvlWindow)
+			LvlWindow=nil
+		else
+			transp10=transp10-(255/50)
+			LvlWindow:setFillColor( transp10, transp10, transp10, transp10)
+			LvlWindow:toFront()
+			timer.performWithDelay(2,LvlFanfare)
+		end
+	end
 end
 
 function OhCrap()
@@ -439,7 +469,7 @@ function ModStats(sta,att,def,mgc,dex,int)
 	player.eqs[3]=player.eqs[3]+def
 	player.eqs[4]=player.eqs[4]+mgc
 	player.eqs[5]=player.eqs[5]+dex
-	player.eqs[6]=player.eqs[6]+dex
+	player.eqs[6]=player.eqs[6]+int
 	StatCheck()
 end
 
@@ -493,7 +523,11 @@ function LoadPlayer(cls,chr,stam,atk,dfnc,mgk,dxtrty,intlct,pnts,lv,xpnts,hitp,m
 	
 	player.stats={}
 	
+<<<<<<< HEAD
 	player.clsnames={"Knight","Warrior","Thief","Viking","Mage","Scholar"}
+=======
+	player.clsnames={"Knight","Warrior","Thief","Viking","Sorceror","Scholar"}
+>>>>>>> B1.8.2
 	player.char=char
 	player.class=class
 	player.inv={}
@@ -501,12 +535,12 @@ function LoadPlayer(cls,chr,stam,atk,dfnc,mgk,dxtrty,intlct,pnts,lv,xpnts,hitp,m
 	
 	player.spells={
 		{"Fireball","Cast a firey ball of death and burn the enemy.",true,30},
-		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,20},
+		{"Cleave","Hits for twice maximum daSorceror. Can't be evaded.",false,20},
 		{"Slow","Reduces enemy's dexterity.",false,50},
 		{"Poison Blade","Inflicts poison.",false,50},
-		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,50},
+		{"Fire Sword","Hits for twice daSorceror and inflicts a burn.",false,50},
 		{"Healing","Heals for 20% of maximum Hit Points.",false,60},
-		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,120},
+		{"Ice Sword","Hits for twice daSorceror and reduces enemy's dexterity.",false,120},
 	}
 	
 	StatCheck()

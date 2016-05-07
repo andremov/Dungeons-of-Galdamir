@@ -11,6 +11,7 @@ local MPot3sheet = graphics.newImageSheet( "items/ManaPotion3.png", { width=64, 
 local widget = require "widget"
 local audio=require("LAudio")
 local g=require("LGold")
+local c=require("lcombat")
 local mov=require("Lmovement")
 local p=require("Lplayers")
 local WD=require("LProgress")
@@ -26,22 +27,39 @@ local gdm
 local gum
 local isOpn
 local isUse
+local items
 
 function Essentials()
 	p1=p.GetPlayer()
-	gum=display.newGroup()
 	xinvicial=75
 	yinvicial=156
+	espaciox=64
+	espacioy=64
 	xeqpicial=75
 	yeqpicial=698
 	statchangey=(display.contentHeight/2)-60
 	statchangex=(display.contentWidth/2)-295
 	statchangexs=120
-	espaciox=64
-	espacioy=64
 	isUse=false
 	isOpn=false
 	statchange={}
+end
+
+function CloseErrthang()
+	if not (gdm) then
+		if (gum) then
+			UseMenu()
+		end
+		if (ginf) then
+			ToggleInfo()
+		end
+		if (ginv) then
+			ToggleBag()
+		end
+		return true
+	else
+		return false
+	end
 end
 
 function ToggleBag()
@@ -137,6 +155,24 @@ function ToggleBag()
 	elseif isOpn==true and (ginv) then
 		
 		if isUse==false then
+			for i=table.maxn(items),1,-1 do
+				display.remove(items[i])
+				items[i]=nil
+			end
+			items=nil
+			for i=table.maxn(curreqp),1,-1 do
+				display.remove(curreqp[i])
+				curreqp[i]=nil
+			end
+			curreqp=nil
+			isOpn=false
+			for i=ginv.numChildren,1,-1 do
+				display.remove(ginv[i])
+				ginv[i]=nil
+			end
+			ginv=nil
+		else
+			SpecialUClose()
 			for i=table.maxn(items),1,-1 do
 				display.remove(items[i])
 				items[i]=nil
@@ -499,27 +535,26 @@ function UseMenu(id,slot)
 	if isUse==false then
 	
 		function UsedIt()
-			
 			isUse=false
 			for i=gum.numChildren,1,-1 do
 				local child = gum[i]
 				child.parent:remove( child )
 			end
+			gum=nil
 			if amount==1 then
 				table.remove( p1.inv, slot )
 			elseif amount~=1 then
 				p1.inv[slot][2]=p1.inv[slot][2]-1
 			end
-			ToggleBag()
 			if itemstats[3]==0 then
-				ToggleBag()
 				if itemstats[4]<0 then
-					WD.Hurt("Poison",(itemstats[4]*-1))
+					p.ReduceHP((itemstats[4]*-1),"Poison")
 				elseif itemstats[4]>0 then
 					p.AddHP(itemstats[4])
 				end
+				ToggleBag()
 			elseif itemstats[3]==1 then
-				p.GrantMana(itemstats[4])
+				p.AddMP(itemstats[4])
 				ToggleBag()
 			else
 				if itemstats[4]==0 then
@@ -530,6 +565,7 @@ function UseMenu(id,slot)
 					s.Save()
 				end
 			end
+			ToggleBag()
 		end
 		
 		function LearnedIt()
@@ -541,6 +577,7 @@ function UseMenu(id,slot)
 				local child = gum[i]
 				child.parent:remove( child )
 			end
+			gum=nil
 			table.remove( inv, slot )
 			ToggleBag()
 			ToggleBag()
@@ -554,6 +591,7 @@ function UseMenu(id,slot)
 				local child = gum[i]
 				child.parent:remove( child )
 			end
+			gum=nil
 			if amount==1 then
 				table.remove( inv, slot )
 			elseif amount~=1 then
@@ -583,6 +621,7 @@ function UseMenu(id,slot)
 				local child = gum[i]
 				child.parent:remove( child )
 			end
+			gum=nil
 			
 			table.remove( p1.inv, slot )
 			
@@ -593,20 +632,22 @@ function UseMenu(id,slot)
 		end
 		
 		function DroppedIt()
-			
 			statchange={}
 			isUse=false
 			for i=gum.numChildren,1,-1 do
 				local child = gum[i]
 				child.parent:remove( child )
 			end
+			gum=nil
 			table.remove( p1.inv, slot )
 			ToggleBag()
 			ToggleBag()
 		end
 		
+		gum=display.newGroup()
 		gum:toFront()
 		isUse=true
+		
 		print ("Player wants to use item "..id..", in slot "..slot..".")
 		window=display.newImageRect("usemenu.png", 768, 308)
 		window.x,window.y = display.contentWidth/2, 450
@@ -617,13 +658,38 @@ function UseMenu(id,slot)
 				items[i]:removeEventListener("tap",Gah)
 			end
 		end
-	
+		
+		local backbtn= widget.newButton{
+			label="Back",
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			fontSize=30,
+			defaultFile="cbutton.png",
+			overFile="cbutton2.png",
+			width=200, height=55,
+			onRelease = UseMenu}
+		backbtn:setReferencePoint( display.CenterReferencePoint )
+		backbtn.x = (display.contentWidth/2)
+		backbtn.y = (display.contentHeight/2)+30
+		gum:insert( backbtn )
+		
+		local dropbtn= widget.newButton{
+			label="Drop",
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			fontSize=30,
+			defaultFile="cbutton.png",
+			overFile="cbutton2.png",
+			width=200, height=55,
+			onRelease = DroppedIt}
+		dropbtn:setReferencePoint( display.CenterReferencePoint )
+		dropbtn.x = ((display.contentWidth/4)*3)+50
+		dropbtn.y = (display.contentHeight/2)+30
+		gum:insert( dropbtn )
+		
 		itemstats={
 			item.ReturnInfo(id,4)
 		}
 		
 		if itemstats[1]==0 then
-		
 			local usebtn= widget.newButton{
 				label="Use",
 				labelColor = { default={255,255,255}, over={0,0,0} },
@@ -650,10 +716,9 @@ function UseMenu(id,slot)
 			gum:insert( descrip )
 		end	
 		if itemstats[1]==1 then
-		
 			local eqpstatchnge=false
 			local itmfound=false
-			
+				
 			local equipbtn= widget.newButton{
 				label="Equip",
 				labelColor = { default={255,255,255}, over={0,0,0} },
@@ -799,10 +864,8 @@ function UseMenu(id,slot)
 				stabonus.y=statchangey
 				gum:insert( stabonus )
 			end
-			
 		end
 		if itemstats[1]==2 then
-		
 			if itemstats[4]==0 or itemstats[4]==1 then
 				local usebtn= widget.newButton{
 					label="Teleport",
@@ -843,7 +906,6 @@ function UseMenu(id,slot)
 			descrip.x=display.contentWidth/2
 			descrip.y=(display.contentHeight/2)-80
 			gum:insert( descrip )
-			
 		end
 		if itemstats[1]==3 then	
 		
@@ -902,42 +964,21 @@ function UseMenu(id,slot)
 			
 		end
 		
-		local backbtn= widget.newButton{
-			label="Back",
-			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
-			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
-			width=200, height=55,
-			onRelease = UseMenu}
-		backbtn:setReferencePoint( display.CenterReferencePoint )
-		backbtn.x = (display.contentWidth/2)
-		backbtn.y = (display.contentHeight/2)+30
-		gum:insert( backbtn )
-		
-		local dropbtn= widget.newButton{
-			label="Drop",
-			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
-			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
-			width=200, height=55,
-			onRelease = DroppedIt}
-		dropbtn:setReferencePoint( display.CenterReferencePoint )
-		dropbtn.x = ((display.contentWidth/4)*3)+50
-		dropbtn.y = (display.contentHeight/2)+30
-		gum:insert( dropbtn )
-		
 	elseif isUse==true then
-		isUse=false
-		statchange={}
-		for i=gum.numChildren,1,-1 do
-			local child = gum[i]
-			child.parent:remove( child )
-		end
+		SpecialUClose()
 		ToggleBag()
 		ToggleBag()
 	end
+end
+
+function SpecialUClose()
+	isUse=false
+	statchange={}
+	for i=gum.numChildren,1,-1 do
+		local child = gum[i]
+		child.parent:remove( child )
+	end
+	gum=nil
 end
 
 function OpenWindow()
