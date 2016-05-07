@@ -180,7 +180,6 @@ function onTutBtnRelease()
 end
 
 function onOptnBtnRelease()
-	
 	if canGo==true then
 		for i=group.numChildren,1,-1 do
 			local child = group[i]
@@ -192,7 +191,6 @@ function onOptnBtnRelease()
 end
 
 function onScreBtnRelease()
-	
 	if canGo==true then
 		for i=group.numChildren,1,-1 do
 			local child = group[i]
