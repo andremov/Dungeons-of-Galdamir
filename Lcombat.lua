@@ -148,7 +148,7 @@ function ShowActions()
 		display.remove(AttackBtn)
 		display.remove(MagicBtn)
 		display.remove(RunBtn)
-		audio.Play(12)
+		
 		PlayerAttacks()
 	end
 	
@@ -166,10 +166,10 @@ function ShowActions()
 	gcm:insert( AttackBtn )
 	
 	function toSorcery()
-		display.remove(AttackBtn)
-		display.remove(MagicBtn)
-		display.remove(RunBtn)
-		audio.Play(12)
+	--	display.remove(AttackBtn)
+	--	display.remove(MagicBtn)
+	--	display.remove(RunBtn)
+		
 		ShowSorcery()
 	end
 	
@@ -190,7 +190,7 @@ function ShowActions()
 		display.remove(AttackBtn)
 		display.remove(MagicBtn)
 		display.remove(RunBtn)
-		audio.Play(12)
+		
 		RunAttempt()
 	end
 	
@@ -962,7 +962,7 @@ end
 
 function AcceptOutcome()
 	Runtime:removeEventListener("enterFrame", NoMansLand)
-	audio.Play(12)
+	
 	outcomed=false
 	Automatic=false
 	for i=gom.numChildren,1,-1 do

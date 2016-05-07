@@ -103,7 +103,7 @@ function Continue()
 	end
 	Loading=nil
 	if DoStuff==true then
-		ui.Pause()
+		ui.Pause(true)
 		inv.ToggleInfo()
 		audio.Play(3)
 		audio.Play(10)

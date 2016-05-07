@@ -25,7 +25,7 @@ function LoadSounds()
 			soundboard[7] = audio.loadSound		("sounds/NewLife.wav")
 			soundboard[10] = audio.loadSound	("sounds/bkgmusic.wav")
 			soundboard[11] = audio.loadSound	("sounds/portal.wav")
-			soundboard[12] = audio.loadSound	("sounds/Button.wav")
+		--	soundboard[12] = audio.loadSound	("sounds/Button.wav")
 			soundboard[13] = audio.loadSound	("sounds/rock1.mp3")
 			soundboard[14] = audio.loadSound	("sounds/rock2.mp3")
 			soundboard[15] = audio.loadSound	("sounds/rock3.mp3")
@@ -41,18 +41,19 @@ function Play(id)
 	local check=audio.isChannelPlaying(id)
 	if check==false and (soundboard[1]) then
 		if id==10 and Stawp==false then
-		--[[	bkgmusic=audio.play( soundboard[id], {channel=id, onComplete=RepeatBkg} )
-			audio.setVolume( 0.1, { channel=id  })
+		--[[audio.setVolume( 0.1, { channel=id  })
+			bkgmusic=audio.play( soundboard[id], {channel=id, onComplete=RepeatBkg} )
 			if Music==false then
 				audio.pause(bkgmusic)
 			end]]
 		elseif Sound==true then
 			if id==13 then
-				id2=id+(math.random(0,4))
-			else
-				id2=id
+				id=id+(math.random(0,4))
 			end
-			audio.play( soundboard[id2], {channel=id} )
+			if id==15 or id==16 then
+				audio.setVolume( 0.4, { channel=id  })
+			end
+			audio.play( soundboard[id], {channel=id} )
 		end
 	end
 end

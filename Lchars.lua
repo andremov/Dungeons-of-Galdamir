@@ -15,59 +15,59 @@ local currentchar
 local curmenu
 
 function onLunRelease()
-	a.Play(12)
+	
 	charname=0
 	Classes()
 	CurrentChar()
 end
 
 function onRefRelease()
-	a.Play(12)
+	
 	charname=2
 	Classes()
 	CurrentChar()
 end
 
 function onArcRelease()
-	a.Play(12)
+	
 	charname=1
 	Classes()
 	CurrentChar()
 end
 
 function onIngRelease()
-	a.Play(12)
+	
 	charname=3
 	Classes()	
 	CurrentChar()
 end
 
 function onKnightRelease()
-	a.Play(12)
+	
 	charclass=0
 	CurrentChar()
 end
 
 function onThiefRelease()
-	a.Play(12)
+	
 	charclass=2
 	CurrentChar()
 end
 
 function onVikingRelease()
-	a.Play(12)
+	
 	charclass=3
 	CurrentChar()
 end
 
 function onWarriorRelease()
-	a.Play(12)
+	
 	charclass=1
 	CurrentChar()
 end
 
 function onMageRelease()
-	a.Play(12)
+	
 	charclass=4
 	CurrentChar()
 end
@@ -355,7 +355,7 @@ function GetCharInfo(field)
 end
 
 function onBackRelease()
-	a.Play(12)
+	
 	if (charmenu) then
 		for i=charmenu.numChildren,1,-1 do
 			local child = charmenu[i]

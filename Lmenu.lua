@@ -32,7 +32,7 @@ function ReadySetGo()
 end
 
 function onPlayBtnRelease()
-	a.Play(12)
+	
 	a.Menu(false)
 	if canGo==true then
 		if saved==true then
@@ -80,7 +80,7 @@ function onPlayBtnRelease()
 end
 
 function GoPlay()
-	a.Play(12)
+	
 	for i=group.numChildren,1,-1 do
 		local child = group[i]
 		child.parent:remove( child )
@@ -94,7 +94,7 @@ function GoPlay()
 end
 
 function Stahp()
-	a.Play(12)
+	
 	display.remove(CanBtn)
 	display.remove(CantBtn)
 	display.remove(asd2)
@@ -148,7 +148,7 @@ function openAd2()
 end
 
 function onContBtnRelease()
-	a.Play(12)
+	
 	a.Menu(false)
 	if canGo==true then
 		for i=group.numChildren,1,-1 do
@@ -161,7 +161,7 @@ function onContBtnRelease()
 end
 
 function onTutBtnRelease()
-	a.Play(12)
+	
 	if canGo==true then
 		--[[
 		for i=group.numChildren,1,-1 do
@@ -181,7 +181,7 @@ function onTutBtnRelease()
 end
 
 function onOptnBtnRelease()
-	a.Play(12)
+	
 	if canGo==true then
 		for i=group.numChildren,1,-1 do
 			local child = group[i]
@@ -193,7 +193,7 @@ function onOptnBtnRelease()
 end
 
 function onScreBtnRelease()
-	a.Play(12)
+	
 	if canGo==true then
 		for i=group.numChildren,1,-1 do
 			local child = group[i]

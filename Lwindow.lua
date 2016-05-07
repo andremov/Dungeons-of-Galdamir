@@ -31,9 +31,9 @@ function Essentials()
 	p1=p.GetPlayer()
 	gum=display.newGroup()
 	xinvicial=75
-	yinvicial=243
-	xeqpicial=307
-	yeqpicial=398
+	yinvicial=156
+	xeqpicial=75
+	yeqpicial=698
 	statchangey=(display.contentHeight/2)-60
 	statchangex=(display.contentWidth/2)-240
 	statchangexs=120
@@ -48,9 +48,10 @@ function ToggleBag()
 	if isOpn==false then
 		ginv=display.newGroup()
 		items={}
+		curreqp={}
 		
-		invinterface=display.newImageRect("container.png", 570, 486)
-		invinterface.x,invinterface.y = display.contentWidth/2, 450
+		invinterface=display.newImageRect("container.png", 570, 549)
+		invinterface.x,invinterface.y = display.contentWidth/2, 400
 		invinterface.xScale,invinterface.yScale=1.2280701755,1.2280701755
 		ginv:insert( invinterface )
 		isOpn=true
@@ -94,41 +95,6 @@ function ToggleBag()
 				end
 			end
 		end
-		ginv:toFront()
-		if table.maxn(p1.inv)==0 then
-			print "Inventory is empty."
-		end
-		
-	elseif isOpn==true and (ginv) then
-		
-		if isUse==false then
-			for i=table.maxn(items),1,-1 do
-				display.remove(items[i])
-				items[i]=nil
-			end
-			items=nil
-			isOpn=false
-			for i=ginv.numChildren,1,-1 do
-				display.remove(ginv[i])
-				ginv[i]=nil
-			end
-			ginv=nil
-		end
-		
-	end
-end
-
-function ToggleEquip()
-	if isOpn==false then
-		geqp=display.newGroup()
-		curreqp={}
-		
-		eqpinterface=display.newImageRect("equip.png", 192, 234)
-		eqpinterface.x,eqpinterface.y = display.contentWidth/2, 450
-		eqpinterface.xScale,eqpinterface.yScale=1.2280701755,1.2280701755
-		
-		geqp:insert( eqpinterface )
-		isOpn=true
 		
 		for i=1,table.maxn(p1.eqp) do
 			if (p1.eqp[i])~=nil then
@@ -156,31 +122,39 @@ function ToggleEquip()
 				elseif p1.eqp[i][2]==8 then
 					plcmnt=9
 				end
-				curreqp[#curreqp].x = xeqpicial+ (((plcmnt-1)%3)*((espaciox*curreqp[#curreqp].xScale)+4))
-				curreqp[#curreqp].y = yeqpicial+ ((math.floor((plcmnt-1)/3))*((espacioy*curreqp[#curreqp].yScale)+4))
-				geqp:insert( curreqp[#curreqp] )
+				curreqp[#curreqp].x = xeqpicial+ (((plcmnt-1)%9)*((espaciox*curreqp[#curreqp].xScale)+4))
+				curreqp[#curreqp].y = yeqpicial
+				ginv:insert( curreqp[#curreqp] )
 			end
 		end
-		geqp:toFront()
+		ginv:toFront()
+		if table.maxn(p1.inv)==0 then
+			print "Inventory is empty."
+		end
 		if table.maxn(p1.eqp)==0 then
 			print "Player has nothing equipped."
 		end
-		
-	elseif isOpn==true and (geqp) then
+	elseif isOpn==true and (ginv) then
 		
 		if isUse==false then
+			for i=table.maxn(items),1,-1 do
+				display.remove(items[i])
+				items[i]=nil
+			end
+			items=nil
 			for i=table.maxn(curreqp),1,-1 do
 				display.remove(curreqp[i])
 				curreqp[i]=nil
 			end
 			curreqp=nil
 			isOpn=false
-			for i=geqp.numChildren,1,-1 do
-				display.remove(geqp[i])
-				geqp[i]=nil
+			for i=ginv.numChildren,1,-1 do
+				display.remove(ginv[i])
+				ginv[i]=nil
 			end
-			geqp=nil
+			ginv=nil
 		end
+		
 	end
 end
 
@@ -194,7 +168,7 @@ function ToggleInfo()
 		bkg.x,bkg.y = display.contentWidth/2, 400
 		ginf:insert( bkg )
 		
-		if p1.name=="Error" or p1.name=="error" or p1.name=="ERROR" then
+		if p1.name=="Error" then
 			info[1]=display.newText(
 				(
 					"I AM ERROR."
@@ -290,12 +264,13 @@ function ToggleInfo()
 		
 		if p1.name=="Magus" then
 			info[#info+1]=display.newImageRect("player/Magus.png",120,120)
-			info[#info].x=display.contentWidth-130
-			info[#info].y=130
-			info[#info].xScale=2.0
+			info[#info].x=display.contentWidth-120
+			info[#info].y=150
+			info[#info].xScale=1.5
 			info[#info].yScale=info[#info].xScale
 			ginf:insert(info[#info])
 		end
+		
 		if p1.pnts~=0 then
 			pli={}
 			mini={}
@@ -329,19 +304,6 @@ function ToggleInfo()
 			end
 		end
 		ginf:toFront()
-		
-		local ExitBtn=widget.newButton{
-			label="Menu",
-			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
-			defaultFile="cbutton.png",
-			overFile="cbutton2.png",
-			width=252, height=55,
-			onRelease = onToMenuBtnRelease}
-		ExitBtn:setReferencePoint( display.CenterReferencePoint )
-		ExitBtn.x = display.contentWidth-150
-		ExitBtn.y = 30
-		ginf:insert(ExitBtn)
 		
 	elseif isOpn==true and (ginf) then
 		isOpn=false
@@ -533,7 +495,7 @@ function UseMenu(id,slot)
 	if isUse==false then
 	
 		function UsedIt()
-			audio.Play(12)
+			
 			isUse=false
 			for i=gum.numChildren,1,-1 do
 				local child = gum[i]
@@ -567,7 +529,7 @@ function UseMenu(id,slot)
 		end
 		
 		function LearnedIt()
-			audio.Play(12)
+			
 			isUse=false
 			local watevah=item.ReturnInfo(id,1)
 			p.LearnSorcery(watevah)
@@ -581,7 +543,7 @@ function UseMenu(id,slot)
 		end
 		
 		function StatBoost()
-			audio.Play(12)
+			
 			isUse=false
 			local watevah=item.ReturnInfo(id,2)
 			p.StatBoost(watevah)
@@ -599,7 +561,7 @@ function UseMenu(id,slot)
 		end
 		
 		function EquippedIt()
-			audio.Play(12)
+			
 			for i=1,table.maxn(p1.eqp) do
 				if p1.eqp[i][2]==itemstats[3] then
 					p1.inv[#p1.inv+1]={}
@@ -623,16 +585,12 @@ function UseMenu(id,slot)
 			
 			ToggleBag()
 			ToggleBag()
-			if table.maxn(statchange)~=0 then
-				p.ModStats(statchange[1],statchange[2],statchange[3],statchange[4],statchange[5])
-			else
-				p.ModStats(itemstats[4],itemstats[5],itemstats[6],itemstats[7],itemstats[8])
-			end
+			p.ModStats(statchange[1],statchange[2],statchange[3],statchange[4],statchange[5])
 			statchange={}
 		end
 		
 		function DroppedIt()
-			audio.Play(12)
+			
 			statchange={}
 			isUse=false
 			for i=gum.numChildren,1,-1 do
@@ -648,7 +606,7 @@ function UseMenu(id,slot)
 		isUse=true
 		print ("Player wants to use item "..id..", in slot "..slot..".")
 		window=display.newImageRect("usemenu.png", 768, 308)
-		window.x,window.y = display.contentWidth/2, invinterface.y
+		window.x,window.y = display.contentWidth/2, 450
 		gum:insert( window )
 		
 		for i=1,table.maxn(items) do
@@ -656,8 +614,6 @@ function UseMenu(id,slot)
 				items[i]:removeEventListener("tap",Gah)
 			end
 		end
-		
-	--				equipable,data1,data2,data3,data4,data5,data6,data7=item.ReturnInfo(id,"isEquip")
 	
 		itemstats={
 			item.ReturnInfo(id,4)
@@ -693,7 +649,7 @@ function UseMenu(id,slot)
 		if itemstats[1]==1 then
 		
 			local eqpstatchnge=false
-			itmfound=false
+			local itmfound=false
 			
 			local equipbtn= widget.newButton{
 				label="Equip",
@@ -714,152 +670,108 @@ function UseMenu(id,slot)
 			lolname.y=(display.contentHeight/2)-150
 			gum:insert( lolname )
 			
+			local equipstats
 			for i=1,table.maxn(p1.eqp) do
 				if p1.eqp[i][2]==itemstats[3] then
-					local equipstats={item.ReturnInfo(p1.eqp[i][1],4)}
+					equipstats={item.ReturnInfo(p1.eqp[i][1],4)}
 					
 					itmfound=true
-					statchange={
-						itemstats[4]-equipstats[4],
-						itemstats[5]-equipstats[5],
-						itemstats[6]-equipstats[6],
-						itemstats[7]-equipstats[7],
-						itemstats[8]-equipstats[8]
-					}
 					
 				end
 			end
 			
-			if itmfound==true then
-				
-					if statchange[1]>0 then
-						stabonus=display.newText( ("STA +"..statchange[1]) ,0,0,"Game Over",85)
-						stabonus:setTextColor( 60, 180, 60)
-						stabonus.x=statchangex+(statchangexs*0)
-						stabonus.y=statchangey
-						gum:insert( stabonus )
-						eqpstatchnge=true
-					elseif statchange[1]<0 then
-						stabonus=display.newText( ("STA "..statchange[1]) ,0,0,"Game Over",85)
-						stabonus:setTextColor( 180, 60, 60)
-						stabonus.x=statchangex+(statchangexs*0)
-						stabonus.y=statchangey
-						gum:insert( stabonus )
-						eqpstatchnge=true
-					end
-					
-					if statchange[2]>0 then
-						attbonus=display.newText( ("ATT +"..statchange[2]) ,0,0,"Game Over",85)
-						attbonus:setTextColor( 60, 180, 60)
-						attbonus.x=statchangex+(statchangexs*1)
-						attbonus.y=statchangey
-						gum:insert( attbonus )
-						eqpstatchnge=true
-					elseif statchange[2]<0 then
-						attbonus=display.newText( ("ATT "..statchange[2]) ,0,0,"Game Over",85)
-						attbonus:setTextColor( 180, 60, 60)
-						attbonus.x=statchangex+(statchangexs*1)
-						attbonus.y=statchangey
-						gum:insert( attbonus )
-						eqpstatchnge=true
-					end
-					
-					if statchange[3]>0 then
-						accbonus=display.newText( ("MGC +"..statchange[3]) ,0,0,"Game Over",85)
-						accbonus:setTextColor( 60, 180, 60)
-						accbonus.x=statchangex+(statchangexs*2)
-						accbonus.y=statchangey
-						gum:insert( accbonus )
-						eqpstatchnge=true
-					elseif statchange[3]<0 then
-						accbonus=display.newText( ("MGC "..statchange[3]) ,0,0,"Game Over",85)
-						accbonus:setTextColor( 180, 60, 60)
-						accbonus.x=statchangex+(statchangexs*2)
-						accbonus.y=statchangey
-						gum:insert( accbonus )
-						eqpstatchnge=true
-					end
-					
-					if statchange[4]>0 then
-						defbonus=display.newText( ("DEF +"..statchange[4]) ,0,0,"Game Over",85)
-						defbonus:setTextColor( 60, 180, 60)
-						defbonus.x=statchangex+(statchangexs*3)
-						defbonus.y=statchangey
-						gum:insert( defbonus )
-						eqpstatchnge=true
-					elseif statchange[4]<0 then
-						defbonus=display.newText( ("DEF "..statchange[4]) ,0,0,"Game Over",85)
-						defbonus:setTextColor( 180, 60, 60)
-						defbonus.x=statchangex+(statchangexs*3)
-						defbonus.y=statchangey
-						gum:insert( defbonus )
-						eqpstatchnge=true
-					end
-					
-					if statchange[5]>0 then
-						dexbonus=display.newText( ("MGC +"..statchange[5]) ,0,0,"Game Over",85)
-						dexbonus:setTextColor( 60, 180, 60)
-						dexbonus.x=statchangex+(statchangexs*4)
-						dexbonus.y=statchangey
-						gum:insert( dexbonus )
-						eqpstatchnge=true
-					elseif statchange[5]<0 then
-						dexbonus=display.newText( ("DEX "..statchange[5]) ,0,0,"Game Over",85)
-						dexbonus:setTextColor( 180, 60, 60)
-						dexbonus.x=statchangex+(statchangexs*4)
-						dexbonus.y=statchangey
-						gum:insert( dexbonus )
-						eqpstatchnge=true
-					end
-				end
-				if itmfound==false then
-
-					if itemstats[4]~=0 then
-						stabonus=display.newText( ("STA +"..itemstats[4]) ,0,0,"Game Over",85)
-						stabonus:setTextColor( 60, 180, 60)
-						stabonus.x=statchangex+(statchangexs*0)
-						stabonus.y=statchangey
-						gum:insert( stabonus )
-						eqpstatchnge=true
-					end
-					
-					if itemstats[5]~=0 then
-						attbonus=display.newText( ("ATT +"..itemstats[5]) ,0,0,"Game Over",85)
-						attbonus:setTextColor( 60, 180, 60)
-						attbonus.x=statchangex+(statchangexs*1)
-						attbonus.y=statchangey
-						gum:insert( attbonus )
-						eqpstatchnge=true
-					end
-					
-					if itemstats[6]~=0 then
-						accbonus=display.newText( ("MGC +"..itemstats[6]) ,0,0,"Game Over",85)
-						accbonus:setTextColor( 60, 180, 60)
-						accbonus.x=statchangex+(statchangexs*2)
-						accbonus.y=statchangey
-						gum:insert( accbonus )
-						eqpstatchnge=true
-					end
-					
-					if itemstats[7]~=0 then
-						defbonus=display.newText( ("DEF +"..itemstats[7]) ,0,0,"Game Over",85)
-						defbonus:setTextColor( 60, 180, 60)
-						defbonus.x=statchangex+(statchangexs*3)
-						defbonus.y=statchangey
-						gum:insert( defbonus )
-						eqpstatchnge=true
-					end
-					
-					if itemstats[8]~=0 then
-						dexbonus=display.newText( ("DEX +"..itemstats[8]) ,0,0,"Game Over",85)
-						dexbonus:setTextColor( 60, 180, 60)
-						dexbonus.x=statchangex+(statchangexs*4)
-						dexbonus.y=statchangey
-						gum:insert( dexbonus )
-						eqpstatchnge=true
-					end
-				end
-				
+			if itmfound==false then
+				equipstats={0,0,0,0,0,0,0,0}
+			end
+			
+			statchange={
+				itemstats[4]-equipstats[4],
+				itemstats[5]-equipstats[5],
+				itemstats[6]-equipstats[6],
+				itemstats[7]-equipstats[7],
+				itemstats[8]-equipstats[8]
+			}		
+			
+			if statchange[1]>0 then
+				stabonus=display.newText( ("STA +"..statchange[1]) ,0,0,"Game Over",85)
+				stabonus:setTextColor( 60, 180, 60)
+				stabonus.x=statchangex+(statchangexs*0)
+				stabonus.y=statchangey
+				gum:insert( stabonus )
+				eqpstatchnge=true
+			elseif statchange[1]<0 then
+				stabonus=display.newText( ("STA "..statchange[1]) ,0,0,"Game Over",85)
+				stabonus:setTextColor( 180, 60, 60)
+				stabonus.x=statchangex+(statchangexs*0)
+				stabonus.y=statchangey
+				gum:insert( stabonus )
+				eqpstatchnge=true
+			end
+			
+			if statchange[2]>0 then
+				attbonus=display.newText( ("ATT +"..statchange[2]) ,0,0,"Game Over",85)
+				attbonus:setTextColor( 60, 180, 60)
+				attbonus.x=statchangex+(statchangexs*1)
+				attbonus.y=statchangey
+				gum:insert( attbonus )
+				eqpstatchnge=true
+			elseif statchange[2]<0 then
+				attbonus=display.newText( ("ATT "..statchange[2]) ,0,0,"Game Over",85)
+				attbonus:setTextColor( 180, 60, 60)
+				attbonus.x=statchangex+(statchangexs*1)
+				attbonus.y=statchangey
+				gum:insert( attbonus )
+				eqpstatchnge=true
+			end
+			
+			if statchange[3]>0 then
+				accbonus=display.newText( ("DEF +"..statchange[3]) ,0,0,"Game Over",85)
+				accbonus:setTextColor( 60, 180, 60)
+				accbonus.x=statchangex+(statchangexs*2)
+				accbonus.y=statchangey
+				gum:insert( accbonus )
+				eqpstatchnge=true
+			elseif statchange[3]<0 then
+				accbonus=display.newText( ("DEF "..statchange[3]) ,0,0,"Game Over",85)
+				accbonus:setTextColor( 180, 60, 60)
+				accbonus.x=statchangex+(statchangexs*2)
+				accbonus.y=statchangey
+				gum:insert( accbonus )
+				eqpstatchnge=true
+			end
+			
+			if statchange[4]>0 then
+				defbonus=display.newText( ("MGC +"..statchange[4]) ,0,0,"Game Over",85)
+				defbonus:setTextColor( 60, 180, 60)
+				defbonus.x=statchangex+(statchangexs*3)
+				defbonus.y=statchangey
+				gum:insert( defbonus )
+				eqpstatchnge=true
+			elseif statchange[4]<0 then
+				defbonus=display.newText( ("MGC "..statchange[4]) ,0,0,"Game Over",85)
+				defbonus:setTextColor( 180, 60, 60)
+				defbonus.x=statchangex+(statchangexs*3)
+				defbonus.y=statchangey
+				gum:insert( defbonus )
+				eqpstatchnge=true
+			end
+			
+			if statchange[5]>0 then
+				dexbonus=display.newText( ("DEX +"..statchange[5]) ,0,0,"Game Over",85)
+				dexbonus:setTextColor( 60, 180, 60)
+				dexbonus.x=statchangex+(statchangexs*4)
+				dexbonus.y=statchangey
+				gum:insert( dexbonus )
+				eqpstatchnge=true
+			elseif statchange[5]<0 then
+				dexbonus=display.newText( ("DEX "..statchange[5]) ,0,0,"Game Over",85)
+				dexbonus:setTextColor( 180, 60, 60)
+				dexbonus.x=statchangex+(statchangexs*4)
+				dexbonus.y=statchangey
+				gum:insert( dexbonus )
+				eqpstatchnge=true
+			end
+			
 			if eqpstatchnge==false then
 				stabonus=display.newText( ("No change.") ,0,0,"Game Over",85)
 				stabonus:setTextColor( 180, 180, 180)
@@ -1023,7 +935,6 @@ function SilentQuip(id)
 end
 
 function onToMenuBtnRelease()
-	audio.Play(12)
 	if (gdm) then
 		DeathMenu()
 	end

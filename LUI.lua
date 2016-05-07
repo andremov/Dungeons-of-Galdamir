@@ -19,6 +19,7 @@ local m=require("Lmovement")
 local isPaused
 local Map
 local P1
+local gexui
 local bkglevel
 local Coins
 local topthing
@@ -85,25 +86,25 @@ function UI()
 	bag:addEventListener("touch",OpenBag)
 	pwg:insert(bag)
 	
-	equip = display.newImageRect("equipbtn.png", 50, 50)
-	equip.x, equip.y = bag.x+(50*bag.xScale), bag.y
-	equip.yScale = bag.yScale
-	equip.xScale = bag.xScale
-	equip:addEventListener("touch",OpenEquip)
-	pwg:insert(equip)
-	
 	info = display.newImageRect("infobtn.png", 50, 50)
-	info.x, info.y = equip.x+(50*equip.xScale), equip.y
+	info.x, info.y = bag.x+(50*bag.xScale), bag.y
 	info.yScale = bag.yScale
 	info.xScale = bag.xScale
 	info:addEventListener("touch",OpenInfo)
 	pwg:insert(info)
 	
+	uiexit = display.newImageRect("exit.png", 50, 50)
+	uiexit.x, uiexit.y = info.x+(150*info.xScale), bag.y
+	uiexit.yScale = bag.yScale
+	uiexit.xScale = bag.xScale
+	uiexit:addEventListener("tap",Exit)
+	pwg:insert(uiexit)
+	
 	Sound=audio.sfx()
 	Music=audio.muse()
 	
 	SMute = display.newImageRect("soundoff.png",50,50)
-	SMute.x,SMute.y = info.x+(50*info.xScale), equip.y
+	SMute.x,SMute.y = info.x+(50*info.xScale), bag.y
 	SMute.xScale=bag.xScale
 	SMute.yScale=bag.yScale
 	SMute.isVisible=false
@@ -118,7 +119,7 @@ function UI()
 	pwg:insert(SUnmute)
 	
 	MMute = display.newImageRect("musicoff.png",50,50)
-	MMute.x,MMute.y = SMute.x+(50*SMute.xScale), equip.y
+	MMute.x,MMute.y = SMute.x+(50*SMute.xScale), bag.y
 	MMute.xScale=SMute.xScale
 	MMute.yScale=SMute.yScale
 	MMute.isVisible=false
@@ -145,7 +146,7 @@ function UI()
 	MapIndicators("create")
 end
 
-function Pause()
+function Pause(mute)
 	local busy=inv.OpenWindow()
 	local shap=shp.AtTheMall()
 	local fight=c.InTrouble()
@@ -155,12 +156,16 @@ function Pause()
 		if isPaused==true then
 			isPaused=false
 			print "Game resumed."
-			audio.Play(5)
+			if mute~=true then
+				audio.Play(5)
+			end
 		elseif isPaused==false then
 			isPaused=true
 			m.ShowArrows("clean")
-			audio.Play(6)
 			print "Game paused."
+			if mute~=true then
+				audio.Play(6)
+			end
 		end
 	end
 end
@@ -182,6 +187,82 @@ function MovePause(val)
 	end
 end
 
+function Exit()
+	local busy=inv.OpenWindow()
+	local shap=shp.AtTheMall()
+	local fight=c.InTrouble()
+	if busy==false and shap==false and fight==false then
+		if not(gexui) then
+			gexui=display.newGroup()
+			
+			window=display.newImageRect("usemenu.png", 768, 308)
+			window.x,window.y = display.contentWidth/2, 450
+			gexui:insert( window )
+			
+			lolname=display.newText( ("You pressed the exit button.") ,0,0,"Game Over",110)
+			lolname.x=display.contentWidth/2
+			lolname.y=(display.contentHeight/2)-150
+			gexui:insert( lolname )
+			
+			lolname2=display.newText( ("Are you sure you want to exit?") ,0,0,"Game Over",80)
+			lolname2.x=display.contentWidth/2
+			lolname2.y=lolname.y+50
+			gexui:insert(lolname2)
+			
+
+			lolname3=display.newText( ("\(Unsaved progress will be lost.\)") ,0,0,"Game Over",65)
+			lolname3:setTextColor(180,180,180)
+			lolname3.x=display.contentWidth/2
+			lolname3.y=lolname2.y+50
+			gexui:insert(lolname3)
+			
+			local backbtn= widget.newButton{
+				label="Yes",
+				labelColor = { default={255,255,255}, over={0,0,0} },
+				fontSize=30,
+				defaultFile="cbutton.png",
+				overFile="cbutton2.png",
+				width=200, height=55,
+				onRelease = DoExit}
+			backbtn:setReferencePoint( display.CenterReferencePoint )
+			backbtn.x = (display.contentWidth/2)-130
+			backbtn.y = (display.contentHeight/2)+30
+			gexui:insert( backbtn )
+			
+			local dropbtn= widget.newButton{
+				label="No",
+				labelColor = { default={255,255,255}, over={0,0,0} },
+				fontSize=30,
+				defaultFile="cbutton.png",
+				overFile="cbutton2.png",
+				width=200, height=55,
+				onRelease = Exit}
+			dropbtn:setReferencePoint( display.CenterReferencePoint )
+			dropbtn.x = (display.contentWidth/2)+130
+			dropbtn.y = (display.contentHeight/2)+30
+			gexui:insert( dropbtn )
+			
+			gexui:toFront()
+			
+		elseif (gexui) then
+			for i=gexui.numChildren,1,-1 do
+				display.remove(gexui[i])
+				gexui[i]=nil
+			end
+			gexui=nil
+		end
+	end
+end
+
+function DoExit()
+	for i=gexui.numChildren,1,-1 do
+		display.remove(gexui[i])
+		gexui[i]=nil
+	end
+	gexui=nil
+	WD.SrsBsns()
+end
+
 function OpenBag( event )
 	if event.phase=="ended" then
 		inv.ToggleBag()
@@ -191,12 +272,6 @@ end
 function OpenInfo( event )
 	if event.phase=="ended" then
 		inv.ToggleInfo()
-	end
-end
-
-function OpenEquip( event )
-	if event.phase=="ended" then
-		inv.ToggleEquip()
 	end
 end
 

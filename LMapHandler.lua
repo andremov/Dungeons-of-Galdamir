@@ -80,7 +80,7 @@ function MapSizeMenu()
 	opt:insert(background)
 	
 	function SmallMap()
-		audio.Play(12)
+		
 		Size(1)
 		display.remove(CurSize)
 		CurSize = display.newText( ("Current Map Size: Small"), 0, 0, "Game Over", 110 )
@@ -90,7 +90,7 @@ function MapSizeMenu()
 	end
 	
 	function MedMap()
-		audio.Play(12)
+		
 		Size(2)
 		display.remove(CurSize)
 		CurSize = display.newText( ("Current Map Size: Medium"), 0, 0, "Game Over", 110 )
@@ -100,7 +100,7 @@ function MapSizeMenu()
 	end
 	
 	function LargeMap()
-		audio.Play(12)
+		
 		Size(3)
 		display.remove(CurSize)
 		CurSize = display.newText( ("Current Map Size: Large"), 0, 0, "Game Over", 110 )
@@ -110,7 +110,7 @@ function MapSizeMenu()
 	end
 	
 	function HCMap()
-		audio.Play(12)
+		
 		Size(4)
 		display.remove(CurSize)
 		CurSize = display.newText( ("Current Map Size: Hardcore"), 0, 0, "Game Over", 110 )
@@ -120,7 +120,7 @@ function MapSizeMenu()
 	end
 	
 	function onBackRelease()
-		audio.Play(12)
+		
 		for i=opt.numChildren,1,-1 do
 			local child = opt[i]
 			child.parent:remove( child )
@@ -129,7 +129,7 @@ function MapSizeMenu()
 	end
 	
 	function DefaultTSet()
-		audio.Play(12)
+		
 		SetTile(0)
 		display.remove(CurTile)
 		CurTile = display.newText( ("Current Tileset: Default"), 0, 0, "Game Over", 110 )
@@ -139,7 +139,7 @@ function MapSizeMenu()
 	end
 	
 	function NotebookTSet()
-		audio.Play(12)
+		
 		SetTile(1)
 		display.remove(CurTile)
 		CurTile = display.newText( ("Current Tileset: Notebook"), 0, 0, "Game Over", 110 )
@@ -149,7 +149,7 @@ function MapSizeMenu()
 	end
 	
 	function BWTSet()
-		audio.Play(12)
+		
 		SetTile(3)
 		display.remove(CurTile)
 		CurTile = display.newText( ("Current Tileset: BW"), 0, 0, "Game Over", 110 )
@@ -159,7 +159,7 @@ function MapSizeMenu()
 	end
 	
 	function RealTSet()
-		audio.Play(12)
+		
 		SetTile(2)
 		display.remove(CurTile)
 		CurTile = display.newText( ("Current Tileset: Realistic"), 0, 0, "Game Over", 110 )

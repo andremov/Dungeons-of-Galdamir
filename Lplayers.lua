@@ -50,6 +50,10 @@ function CreatePlayers(name)
 	--Leveling
 	if name==nil or name=="" or name==" " then
 		player.name=names[math.random(1,table.maxn(names))]
+	elseif name=="Magus" or name=="MAGUS" or name=="magus" then
+		player.name="Magus"
+	elseif p1.name=="Error"	or p1.name=="error" or p1.name=="ERROR" then
+		player.name="Error"
 	else
 		player.name=name
 	end
@@ -62,7 +66,7 @@ function CreatePlayers(name)
 	--Extras
 	player.gp=0
 	player.eqp={  }
-	player.inv={ {1,10} }
+	player.inv={ {1,10},{23,1},{31,1} }
 	--Stats
 	player.statnames=	{"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity"}
 	player.eqs=			{0,			0,			0,			0,			0}
@@ -249,6 +253,27 @@ function ShowStats()
 		XPDisplay:setTextColor( 0, 0, 0,transp2)
 	end
 	
+-- Stat Points
+	if not (StatSymbol) then
+		transp4=0
+		StatSymbol=display.newImageRect("unspent.png",240,80)
+		StatSymbol.x = display.contentWidth-130
+		StatSymbol.y = display.contentHeight-250
+		StatSymbol:toFront()
+		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
+		su.FrontNCenter()
+	end
+	
+	if player.pnts~=0 then
+		transp4=255
+		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
+	elseif player.pnts==0 and transp4~=0 then
+		transp4=transp4-(255/50)
+		if transp4<20 then
+			transp4=0
+		end
+		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
+	end
 end
 
 function ReduceHP(amount,cause)
@@ -293,11 +318,13 @@ function Statless()
 	display.remove(ManaSymbol)
 	display.remove(XPSymbol)
 	display.remove(XPDisplay)
+	display.remove(StatSymbol)
 	LifeDisplay=nil
 	LifeSymbol=nil
 	ManaDisplay=nil
 	ManaSymbol=nil
 	XPDisplay=nil
+	StatSymbol=nil
 	XPSymbol=nil
 end
 
@@ -379,12 +406,12 @@ function Bonuses()
 	return statbonus[1],statbonus[2],statbonus[3],statbonus[4],statbonus[5]
 end
 
-function ModStats(sta,att,acc,def,dex)
+function ModStats(sta,att,def,mgc,dex)
 	player.eqs[1]=player.eqs[1]+sta
-	player.eqs[2]=player.eqs[2]+dex
+	player.eqs[2]=player.eqs[2]+att
 	player.eqs[3]=player.eqs[3]+def
-	player.eqs[4]=player.eqs[4]+att
-	player.eqs[5]=player.eqs[5]+acc
+	player.eqs[4]=player.eqs[4]+mgc
+	player.eqs[5]=player.eqs[5]+dex
 	if player.HP>player.MaxHP then
 		player.HP=player.MaxHP
 	end

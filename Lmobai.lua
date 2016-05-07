@@ -280,7 +280,7 @@ function MoveLeft(i)
 		CanMove[i]=false
 		mobs[i].x=mobs[i].x-80
 		mobs[i].loc=(mobs[i].loc-1)
-		if (map[mobs[i].loc].isVisible) then
+		if (map[mobs[i].loc])and(map[mobs[i].loc].isVisible) then
 			if map[mobs[i].loc].isVisible==false then
 				mobs[i].isVisible=false
 			elseif map[mobs[i].loc].isVisible==true then
@@ -297,7 +297,7 @@ function MoveUp(i)
 		CanMove[i]=false
 		mobs[i].y=mobs[i].y-80
 		mobs[i].loc=(mobs[i].loc-(math.sqrt(size)))
-		if (map[mobs[i].loc].isVisible) then
+		if (map[mobs[i].loc])and(map[mobs[i].loc].isVisible) then
 			if map[mobs[i].loc].isVisible==false then
 				mobs[i].isVisible=false
 			elseif map[mobs[i].loc].isVisible==true then
@@ -314,7 +314,7 @@ function MoveDown(i)
 		CanMove[i]=false
 		mobs[i].y=mobs[i].y+80
 		mobs[i].loc=(mobs[i].loc+(math.sqrt(size)))
-		if (map[mobs[i].loc].isVisible) then
+		if (map[mobs[i].loc])and(map[mobs[i].loc].isVisible) then
 			if map[mobs[i].loc].isVisible==false then
 				mobs[i].isVisible=false
 			elseif map[mobs[i].loc].isVisible==true then
@@ -331,7 +331,7 @@ function MoveRight(i)
 		CanMove[i]=false
 		mobs[i].x=mobs[i].x+80
 		mobs[i].loc=(mobs[i].loc+1)
-		if (map[mobs[i].loc].isVisible) then
+		if (map[mobs[i].loc])and(map[mobs[i].loc].isVisible) then
 			if map[mobs[i].loc].isVisible==false then
 				mobs[i].isVisible=false
 			elseif map[mobs[i].loc].isVisible==true then

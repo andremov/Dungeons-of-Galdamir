@@ -27,7 +27,7 @@ Gold Count
 
 
 function onBackBtn()
-	audio.Play(12)
+	
 	if (Text) then
 		for i=table.maxn(Text),1,-1 do
 			local child = Text[i]

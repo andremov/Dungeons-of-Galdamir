@@ -24,7 +24,7 @@ local Med
 local Large
 
 function onBackRelease()
-	audio.Play(12)
+	
 	for i=optionz.numChildren,1,-1 do
 		local child = optionz[i]
 		child.parent:remove( child )
@@ -38,7 +38,7 @@ function onBackRelease()
 end
 	
 function FunSize()
-	audio.Play(12)
+	
 	map.MapSizeMenu()
 	SUnmute:removeSelf()
 	SMute:removeSelf()
@@ -51,7 +51,7 @@ function FunSize()
 end
 
 function onCharRelease()
-	audio.Play(12)
+	
 	for i=optionz.numChildren,1,-1 do
 		local child = optionz[i]
 		child.parent:remove( child )

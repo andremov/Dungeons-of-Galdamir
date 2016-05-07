@@ -856,11 +856,7 @@ function YouShallNowPass(val)
 	if (val==true) or (val==false) then
 		side=val
 	end
-	
-	for i=Level.numChildren,1,-1 do
-		display.remove(Level[i])
-		Level[i]=nil
-	end
+	WipeMap()
 	if (Gate) then
 		display.remove(Gate)
 		Gate=nil
@@ -869,9 +865,6 @@ function YouShallNowPass(val)
 		boundary[i]=nil
 	end
 	if Level.numChildren==0 and table.maxn(boundary)==0 then
-		boundary=nil
-		Level=nil
-		count=nil
 		Gen()
 	end
 	bkg:toBack()
@@ -885,6 +878,16 @@ function WipeMap()
 			Level[i]=nil
 		end
 	end
+	if (dmobs) then
+		for i=Level.numChildren,1,-1 do
+			display.remove(Level[i])
+			Level[i]=nil
+		end
+	end
+	dmobs=nil
+	boundary=nil
+	Level=nil
+	count=nil
 	bkg:toBack()
 end
 

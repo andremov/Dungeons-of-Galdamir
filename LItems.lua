@@ -74,6 +74,23 @@ function Essentials()
 		{"ManaPotion2",true,6,25},
 		{"ManaPotion3",true,13,40},
 		--
+		{"ScrollOfCleave",false,3,100},
+		{"ScrollOfFireSword",false,10,100},
+		{"ScrollOfIceSword",false,16,100},
+		{"ScrollOfHealing",false,12,100},
+		{"ScrollOfSlow",false,5,100},
+		{"ScrollOfPoison",false,7,100},
+		--
+		{"GemBlue",true,3,50},
+		{"GemGreen",true,3,50},
+		{"GemPink",true,3,50},
+		{"GemRed",true,3,50},
+		{"GemYellow",true,3,50},
+		--
+		{"UpperScroll",true,1,10},
+		{"LowerScroll",true,2,10},
+		{"ScrollOfSalvation",true,1,20},
+		--
 		{"WoodSword",false,1,10},
 		{"StoneSword",false,3,20},
 		{"GoldSword",false,5,20},
@@ -104,19 +121,6 @@ function Essentials()
 		{"DiamondLeggings",false,15,nil},
 		{"DiamondBoots",false,15,nil},
 		--
-		{"ScrollOfCleave",false,3,100},
-		{"ScrollOfFireSword",false,10,100},
-		{"ScrollOfIceSword",false,16,100},
-		{"ScrollOfHealing",false,12,100},
-		{"ScrollOfSlow",false,5,100},
-		{"ScrollOfPoison",false,7,100},
-		--
-		{"GemBlue",true,3,50},
-		{"GemGreen",true,3,50},
-		{"GemPink",true,3,50},
-		{"GemRed",true,3,50},
-		{"GemYellow",true,3,50},
-		--
 		{"BronzeRing",false,1,15},
 		{"BronzeRing",false,1,15},
 		{"BronzeRing",false,1,15},
@@ -152,10 +156,6 @@ function Essentials()
 		{"IronRing",false,4,35},
 		{"IronRing",false,4,35},
 		{"IronRing",false,4,35},
-		--
-		{"UpperScroll",true,1,10},
-		{"LowerScroll",true,2,10},
-		{"ScrollOfSalvation",true,1,20},
 		--
 		{"SilverRing",false,7,50},
 		{"SilverRing",false,7,50},
@@ -293,6 +293,26 @@ function Essentials()
 		{"ManaPotion",		1,30,		"Grants 1 Mana to every sorcery."},
 		{"ManaPotion2",		1,60,		"Grants 2 Mana to every sorcery."},
 		{"ManaPotion3",		1,120,		"Grants 3 Mana to every sorcery."},
+	}
+	scrolls={
+		{"ScrollOfCleave",		"Cleave",		"Teaches the \"Cleave\" sorcery."},
+		{"ScrollOfFireSword",	"Fire Sword",	"Teaches the \"Fire Sword\" sorcery."},
+		{"ScrollOfIceSword",	"Ice Sword",	"Teaches the \"Ice Sword\" sorcery."},
+		{"ScrollOfHealing",		"Healing",		"Teaches the \"Healing\" sorcery."},
+		{"ScrollOfSlow",		"Slow",			"Teaches the \"Slow\" sorcery."},
+		{"ScrollOfPoison",		"Poison Blade",	"Teaches the \"Poison Blade\" sorcery."},
+	}
+	gems={
+		{"GemBlue",		"DEF","Glows with a blue light.\nIt seems tough to break."},
+		{"GemGreen",	"MGC","Glows with a green light.\nIt has some strange aura emanating from it."},
+		{"GemPink",		"STA","Glows with a pink light.\nIt pounds faintly every once in a while."},
+		{"GemRed",		"ATT","Glows with a red light.\nIt vibrates angrily every once in a while."},
+		{"GemYellow",	"DEX","Glows with a yellow light.\nIt seems lightweight and sharp."},
+	}
+	special={
+		{"UpperScroll",			"Teleports you to an upper floor.",1},
+		{"LowerScroll",			"Teleports you to a lower floor.",0},
+		{"ScrollOfSalvation",	"Saves your progress.",2},
 	}
 	equips={					--		STA 	ATT		DEF		MGC		DEX
 		{"WoodSword",0,					0,		1,		0,		0,		0},
@@ -489,26 +509,6 @@ function Essentials()
 		{"GoldRing",6,					0,		0,		2,		2,		0},
 		{"GoldRing",6,					0,		0,		2,		2,		0},
 	}
-	scrolls={
-		{"ScrollOfCleave",		"Cleave",		"Teaches the Cleave sorcery."},
-		{"ScrollOfFireSword",	"Fire Sword",	"Teaches the \"Fire Sword\" sorcery."},
-		{"ScrollOfIceSword",	"Ice Sword",	"Teaches the \"Ice Sword\" sorcery."},
-		{"ScrollOfHealing",		"Healing",		"Teaches the \"Healing\" sorcery."},
-		{"ScrollOfSlow",		"Slow",			"Teaches the \"Slow\" sorcery."},
-		{"ScrollOfPoison",		"Poison Blade",	"Teaches the \"Poison Blade\" sorcery."},
-	}
-	gems={
-		{"GemBlue",		"DEF","Glows with a blue light.\nIt seems tough to break."},
-		{"GemGreen",	"MGC","Glows with a green light.\nIt has some strange aura emanating from it."},
-		{"GemPink",		"STA","Glows with a pink light.\nIt pounds faintly every once in a while."},
-		{"GemRed",		"ATT","Glows with a red light.\nIt vibrates angrily every once in a while."},
-		{"GemYellow",	"DEX","Glows with a yellow light.\nIt seems lightweight and sharp."},
-	}
-	special={
-		{"UpperScroll",			"Teleports you to an upper floor.",1},
-		{"LowerScroll",			"Teleports you to a lower floor.",0},
-		{"ScrollOfSalvation",	"Saves your progress.",2},
-	}
 end
 
 function ItemDrop(boost)
@@ -567,12 +567,8 @@ function ItemDrop(boost)
 			return true
 		else
 			local choose=math.random(1,(table.maxn(PosItems)))
-			for i=1,table.maxn(itemlist) do
-				if PosItems[choose]==i then
-					inv.AddItem(i,itemlist[i][2])
-					asdname=itemlist[i][1]
-				end
-			end
+			inv.AddItem((PosItems[choose]),itemlist[(PosItems[choose])][2])
+			asdname=itemlist[(PosItems[choose])][1]
 			
 			gum:toFront()
 			local window=display.newImageRect("usemenu.png", 768, 308)
@@ -667,90 +663,53 @@ end
 
 function ReturnInfo(id,wachuwah)
 	if wachuwah==0 then
-		for i=1,table.maxn(itemlist) do
-			if i==id then
-				wahewah=(itemlist[i][1])
-			end
-		end
+		wahewah=(itemlist[id][1])
 		return wahewah
 	elseif wachuwah==1 then
-		for i=1,table.maxn(scrolls) do
-			if scrolls[i]==id then
-				wahewah=(scrolls[i][2])
-			end
-		end
+		wahewah=(scrolls[id][2])
 		return wahewah
 	elseif wachuwah==2 then
-		for i=1,table.maxn(gems) do
-			if gems[i]==id then
-				wahewah=(gems[i][2])
-			end
-		end
+		wahewah=(gems[id][2])
 		return wahewah
 	elseif wachuwah==3 then
-		for i=1,table.maxn(itemlist) do
-			if itemlist[i]==id then
-				wahewah=(itemlist[i][2])
-			end
-		end
+		wahewah=(itemlist[id][2])
 		return wahewah
 	elseif wachuwah==4 then
-	
-		for i=1,table.maxn(items) do
-			if items[i][1]==itemlist[id][1] then
+		if id<=8 then
 				wahewah=0
-				name=(items[i][1])
-				itemuse=(items[i][2])
-				stat1=(items[i][3])
-				stat2=(items[i][4])
+				name=(items[id][1])
+				itemuse=(items[id][2])
+				stat1=(items[id][3])
+				stat2=(items[id][4])
 				return wahewah,name,itemuse,stat1,stat2
-			end
-		end
-	
-		for i=1,table.maxn(equips) do
-			if equips[i][1]==itemlist[id][1] then
-				wahewah=1
-				name=(equips[i][1])
-				itemuse=(equips[i][2])
-				stat1=(equips[i][3])
-				stat2=(equips[i][4])
-				stat3=(equips[i][5])
-				stat4=(equips[i][6])
-				stat5=(equips[i][7])
-				
-				return wahewah,name,itemuse,stat1,stat2,stat3,stat4,stat5
-			end
-		end
-		
-		for i=1,table.maxn(special) do
-			if special[i][1]==itemlist[id][1] then
-				wahewah=2
-				name=(special[i][1])
-				stat1=(special[i][2])
-				stat2=(special[i][3])
-				
-				return wahewah,name,stat1,stat2
-			end
-		end
-		
-		for i=1,table.maxn(scrolls) do
-			if scrolls[i][1]==itemlist[id][1] then
-				wahewah=3
-				name=(scrolls[i][1])
-				itemuse=(scrolls[i][2])
-				stat1=(scrolls[i][3])
-				return wahewah,name,itemuse,stat1
-			end
-		end
-		
-		for i=1,table.maxn(gems) do
-			if gems[i][1]==itemlist[id][1] then
-				wahewah=4
-				name=(gems[i][1])
-				stat1=(gems[i][2])
-				stat2=(gems[i][3])
-				return wahewah,name,stat1,stat2
-			end
+		elseif id<=14 then
+			wahewah=3
+			name=(scrolls[id-8][1])
+			itemuse=(scrolls[id-8][2])
+			stat1=(scrolls[id-8][3])
+			return wahewah,name,itemuse,stat1
+		elseif id<=19 then
+			wahewah=4
+			name=(gems[id-14][1])
+			stat1=(gems[id-14][2])
+			stat2=(gems[id-14][3])
+			return wahewah,name,stat1,stat2
+		elseif id<=22 then
+			wahewah=2
+			name=(special[id-19][1])
+			stat1=(special[id-19][2])
+			stat2=(special[id-19][3])
+			return wahewah,name,stat1,stat2
+		else
+			wahewah=1
+			name=(equips[id-22][1])
+			itemuse=(equips[id-22][2])
+			stat1=(equips[id-22][3])
+			stat2=(equips[id-22][4])
+			stat3=(equips[id-22][5])
+			stat4=(equips[id-22][6])
+			stat5=(equips[id-22][7])
+			return wahewah,name,itemuse,stat1,stat2,stat3,stat4,stat5
 		end
 	end
 end
