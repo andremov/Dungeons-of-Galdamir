@@ -39,6 +39,7 @@ local names={
 	}
 	
 function CreatePlayers(name)
+--[[
 	local char =c.GetCharInfo(0)
 	local class=c.GetCharInfo(1)
 
@@ -48,7 +49,9 @@ function CreatePlayers(name)
 	if not (class) then
 		class=math.random(0,5)
 	end
-	
+	]]
+	char=0
+	class=6
 	--Visual
 	player=display.newImageRect( "chars/"..char.."/"..class.."/char.png", 76 ,76)
 	player.x, player.y = display.contentWidth/2, display.contentHeight/2
@@ -69,7 +72,7 @@ function CreatePlayers(name)
 	player.lvl=1
 	player.MaxXP=50
 	player.XP=0
-	player.clsnames={"Viking","Warrior","Knight","Sorcerer","Thief","Scholar"}
+	player.clsnames={"Viking","Warrior","Knight","Sorcerer","Thief","Scholar","Freelancer"}
 	player.char=char
 	player.class=class
 	--Extras
@@ -195,6 +198,7 @@ function ShowStats()
 		LifeSymbol.y = display.contentHeight-170
 		LifeSymbol:play()
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
+		Runtime:removeEventListener("enterFrame",ShowStats)
 	end
 	
 -- Mana
@@ -348,7 +352,7 @@ end
 
 function openStats( event )
 	if event.phase=="ended" and DisplayCan==true then
-		ui.Pause(true)
+		ui.Pause()
 		w.ToggleInfo()
 	end
 end

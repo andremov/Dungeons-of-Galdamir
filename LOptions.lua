@@ -46,7 +46,7 @@ function DisplayOptions()
 	BackBtn.x = display.contentWidth*0.5
 	BackBtn.y = display.contentHeight-100
 	optionz:insert(BackBtn)
-	
+	--[[
 	Char = widget.newButton{
 		label="Character",
 		labelColor = { default={255,255,255}, over={0,0,0} },
@@ -60,7 +60,7 @@ function DisplayOptions()
 	Char.x = display.contentWidth*0.25
 	Char.y = display.contentHeight*0.5+210
 	optionz:insert(Char)
-	
+	]]
 	Map = widget.newButton{
 		label="Map",
 		labelColor = { default={255,255,255}, over={0,0,0} },
@@ -72,7 +72,7 @@ function DisplayOptions()
 	}
 	Map:setReferencePoint( display.CenterReferencePoint )
 	Map.x = display.contentWidth*0.75
-	Map.y = Char.y
+	Map.y = display.contentHeight*0.5+210
 	optionz:insert(Map)
 	
 	ScreBtn = widget.newButton{
@@ -86,7 +86,7 @@ function DisplayOptions()
 	}
 	ScreBtn:setReferencePoint( display.CenterReferencePoint )
 	ScreBtn.x = display.contentCenterX
-	ScreBtn.y = Char.y-100
+	ScreBtn.y = Map.y-100
 	optionz:insert(ScreBtn)
 	
 	scroll=display.newImageRect("scroll.png",600,50)

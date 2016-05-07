@@ -41,7 +41,7 @@ function DisplayShop(id,room)
 	ShopID=id
 	page=1
 	menu.FindMe(7)
-	
+	isUse=false
 	window=display.newImageRect("shop.png", 768, 600)
 	window.x,window.y = display.contentWidth*0.5, 425
 	swg:insert(window)
@@ -234,43 +234,45 @@ function SellMenu()
 end
 
 function SellItem(id,name,prc,slot)
-	local p1=p.GetPlayer()
-	a.Play(1)
-	
-	if p1.inv[slot][2]==1 then
-		table.remove( p1.inv, slot )
-		for i=gsm.numChildren,1,-1 do
-			display.remove(gsm[i])
-			gsm[i]=nil
+	if isUse==false then
+		local p1=p.GetPlayer()
+		a.Play(1)
+		
+		if p1.inv[slot][2]==1 then
+			table.remove( p1.inv, slot )
+			for i=gsm.numChildren,1,-1 do
+				display.remove(gsm[i])
+				gsm[i]=nil
+			end
+			if page>math.ceil(table.maxn(p1.inv)/5) then
+				page=page-1
+			end
+			SellMenu()
+		else
+			p1.inv[slot][2]=p1.inv[slot][2]-1
+			for i=gsm.numChildren,1,-1 do
+				display.remove(gsm[i])
+				gsm[i]=nil
+			end
+			if page>math.ceil(table.maxn(p1.inv)/5) then
+				page=page-1
+			end
+			SellMenu()
 		end
-		if page>math.ceil(table.maxn(p1.inv)/5) then
-			page=page-1
+		
+		if (BoughtTxt) then
+			display.remove(BoughtTxt)
+			BoughtTxt=nil
 		end
-		SellMenu()
-	else
-		p1.inv[slot][2]=p1.inv[slot][2]-1
-		for i=gsm.numChildren,1,-1 do
-			display.remove(gsm[i])
-			gsm[i]=nil
-		end
-		if page>math.ceil(table.maxn(p1.inv)/5) then
-			page=page-1
-		end
-		SellMenu()
+		
+		--[[
+		BoughtTxt=display.newText(("You sold a "..name.."."),0,0,"Game Over",70)
+		BoughtTxt:setTextColor( 255, 255, 0)
+		BoughtTxt.x=display.contentCenterX
+		BoughtTxt.y=750]]
+		
+		gp.CallAddCoins(prc)
 	end
-	
-	if (BoughtTxt) then
-		display.remove(BoughtTxt)
-		BoughtTxt=nil
-	end
-	
-	--[[
-	BoughtTxt=display.newText(("You sold a "..name.."."),0,0,"Game Over",70)
-	BoughtTxt:setTextColor( 255, 255, 0)
-	BoughtTxt.x=display.contentCenterX
-	BoughtTxt.y=750]]
-	
-	gp.CallAddCoins(prc)
 end
 
 function NextPage()
@@ -293,6 +295,9 @@ end
 
 function CloseShop()
 	menu.FindMe(6)
+	if isUse==true then
+		ItemInfo()
+	end
 	atShop=false
 	for i=gsm.numChildren,1,-1 do
 		display.remove(gsm[i])
@@ -323,11 +328,17 @@ function BuyItem(id,name,prc)
 		a.Play(1)
 		inv.AddItem(id,stacks,1)
 		gp.CallAddCoins(-prc)
+		
+		for i=gsm.numChildren,1,-1 do
+			display.remove(gsm[i])
+			gsm[i]=nil
+		end
+		SellMenu()
 	end
 end
 
 function ItemInfo(slot)
-	if (slot) and type(slot)=="number" then
+	if (slot) and type(slot)=="number" and isUse==false then
 		local p1=p.GetPlayer()
 		local statchangexs=200
 		local statchangey=(display.contentCenterY)-70
@@ -345,17 +356,6 @@ function ItemInfo(slot)
 		window=display.newImageRect("usemenu.png", 768, 308)
 		window.x,window.y = display.contentWidth/2, 450
 		gum:insert( window )
-		
-		for i=1,table.maxn(item) do
-			if item[i] then
-				item[i].sq:removeEventListener("tap",itemGet)
-			end
-		end
-		for i=1,table.maxn(pitems) do
-			if pitems[i] then
-				pitems[i].sq:removeEventListener("tap",itemGive)
-			end
-		end
 		
 		if curShop.item[slot][3]>p1.gp then
 			local usebtn= widget.newButton{
@@ -420,7 +420,7 @@ function ItemInfo(slot)
 			local equipstats
 			for i=1,table.maxn(p1.eqp) do
 				if p1.eqp[i][2]==itemstats[3] then
-					equipstats={item.ReturnInfo(p1.eqp[i][1],4)}
+					equipstats={it.ReturnInfo(p1.eqp[i][1],4)}
 					itmfound=true
 				end
 			end
@@ -489,7 +489,7 @@ function ItemInfo(slot)
 			gum:insert( descrip )
 		end
 		
-	else
+	elseif isUse==true then
 		isUse=false
 		statchange={}
 		for i=gum.numChildren,1,-1 do
@@ -497,17 +497,6 @@ function ItemInfo(slot)
 			child.parent:remove( child )
 		end
 		gum=nil
-		
-		for i=gsm.numChildren,1,-1 do
-			display.remove(gsm[i])
-			gsm[i]=nil
-		end
-		for i=gbm.numChildren,1,-1 do
-			display.remove(gbm[i])
-			gbm[i]=nil
-		end
-		timer.performWithDelay(10,BuyMenu)
-		timer.performWithDelay(10,SellMenu)
 	end
 end
 

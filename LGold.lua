@@ -8,6 +8,7 @@ local coinsheet = graphics.newImageSheet( "coinsprite.png", { width=32, height=3
 local players = require("Lplayers")
 local physics = require "physics"
 local ui=require("Lui")
+local a=require("Laudio")
 local builder=require("Lmapbuilder")
 local DisplayS=1.25
 local Displayx=45
@@ -38,6 +39,7 @@ function Coins()
 end
 
 function CallAddCoins(amount)
+	a.Play(1)
 	P1.gp=P1.gp+amount
 end
 

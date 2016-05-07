@@ -70,7 +70,6 @@ function onChestCollision()
 				display.remove(Chests[r][l])
 				Chests[r][l]=nil
 				gold.CallCoins(Round)
-				audio.Play(1)
 				builder.ModMap(l)
 				Dropped=item.ItemDrop()
 				return Dropped
@@ -398,7 +397,6 @@ function PortCheck()
 			P1.portcd=0
 		end
 	end
-	P1.portcd=0
 	return info
 end
 

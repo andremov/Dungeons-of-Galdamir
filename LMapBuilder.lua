@@ -75,9 +75,9 @@ local MP
 local EP
 local MS
 -- Constants
-local TileIDsNum=true
+local TileIDsNum=false
 local isLoaded=false
-local Peaceful=true
+local Peaceful=false
 local didStair
 local xinicial
 local yinicial

@@ -16,14 +16,13 @@ local player1 = graphics.newImageSheet( "player/0.png", { width=39, height=46, n
 local player2 = graphics.newImageSheet( "player/1.png", { width=24, height=33, numFrames=25 } )
 local player3 = graphics.newImageSheet( "player/2.png", { width=30, height=49, numFrames=25 } )
 local player4 = graphics.newImageSheet( "player/3.png", { width=33, height=53, numFrames=35 } )
-local player5 = graphics.newImageSheet( "player/4.png", { width=32, height=32, numFrames=80 } )
 local timersheet = graphics.newImageSheet( "timer.png",{ width=100, height=100, numFrames=25 })
 local mgc2 = graphics.newImageSheet( "enemy/mage2.png",{ width=30, height=40, numFrames=10 })
 local mgc3 = graphics.newImageSheet( "enemy/mage3.png",{ width=30, height=40, numFrames=10 })
 local hpsheet = graphics.newImageSheet("hp.png",{ width=200, height=30, numFrames=67 })
 local mpsheet = graphics.newImageSheet("mp.png",{ width=200, height=30, numFrames=67 })
 local epsheet = graphics.newImageSheet("ep.png",{ width=200, height=30, numFrames=67 })
-local p1sprite={player1,player2,player3,player4,player5}
+local p1sprite={player1,player2,player3,player4}
 local xCoord=display.contentWidth-250
 local dexatt={dexatt3,dexatt2}
 local stadef={stadef3,stadef2}
@@ -716,24 +715,7 @@ end
 function P1Sprite(value)
 	if inCombat==true then
 		if (value)==(1) then--Create
-			if p1.name=="Magus" then
-				pseqs={
-					{name="walk", start=1, count=3, time=1000},
-					{name="hit1", start=17, count=8, loopCount=1, time=1000},
-					{name="hit2", start=33, count=8, loopCount=1, time=1000},
-					{name="hit3", start=49, count=16, loopCount=1, time=1000},
-					{name="cast", start=65, count=7, time=1000},
-					{name="hurt", start=4, count=1, time=1000}
-				}
-				psprite=display.newSprite( p1sprite[5], pseqs  )
-				psprite:setSequence( "walk" )
-				psprite.x=(display.contentWidth/2)-50
-				psprite.y=170
-				psprite.xScale=3.0
-				psprite.yScale=psprite.xScale
-				psprite:play()
-				gcm:insert(psprite)
-			elseif (p1.char==0) then
+			if (p1.char==0) then
 				pseqs={
 					{name="walk", start=1, count=4, time=1000},
 					{name="hit1", start=6, count=3, loopCount=1, time=1000},
