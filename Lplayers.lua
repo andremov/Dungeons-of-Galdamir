@@ -20,6 +20,7 @@ local su=require("LStartup")
 local yCoord=856
 local xCoord=70
 local Map
+local check=119
 local player
 local Cheat=false
 local transp
@@ -29,6 +30,7 @@ local names={
 		"Nameless",
 		"Orphan",
 		"Smith",
+		"Slave",
 	}
 	
 function CreatePlayers(name)
@@ -52,7 +54,7 @@ function CreatePlayers(name)
 		player.name=names[math.random(1,table.maxn(names))]
 	elseif name=="Magus" or name=="MAGUS" or name=="magus" then
 		player.name="Magus"
-	elseif p1.name=="Error"	or p1.name=="error" or p1.name=="ERROR" then
+	elseif player.name=="Error"	or player.name=="error" or player.name=="ERROR" then
 		player.name="Error"
 	else
 		player.name=name
@@ -66,19 +68,20 @@ function CreatePlayers(name)
 	--Extras
 	player.gp=0
 	player.eqp={  }
-	player.inv={ {1,10},{23,1},{31,1} }
+	player.inv={ {1,10}}
 	--Stats
-	player.statnames=	{"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity"}
-	player.eqs=			{0,			0,			0,			0,			0}
-	player.nat=			{2,			2,			2,			2,			2}
+	player.statnames=	{"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity",	"Intellect"}
+	player.eqs=			{0,			0,			0,			0,			0,				0}
+	player.nat=			{2,			2,			2,			2,			2,				2}
 	player.stats={
 		(player.nat[1]+player.eqs[1]),
 		(player.nat[2]+player.eqs[2]),
 		(player.nat[3]+player.eqs[3]),
 		(player.nat[4]+player.eqs[4]),
 		(player.nat[5]+player.eqs[5]),
+		(player.nat[6]+player.eqs[6]),
 	}
-	player.pnts=6
+	player.pnts=12
 	--Spells
 	player.spells={
 		{"Fireball","Cast a firey ball of death and burn the enemy.",true,30},
@@ -93,7 +96,7 @@ function CreatePlayers(name)
 	player.portcd=0
 	player.MaxHP=(100*player.lvl)+(player.stats[1]*10)
 	player.HP=player.MaxHP
-	player.MaxMP=( (player.lvl*15)+(player.stats[4]*10) )
+	player.MaxMP=( (player.lvl*15)+(player.stats[6]*10) )
 	player.MP=player.MaxMP
 	player.SPD=(1.00-(player.stats[5]/100))
 	--
@@ -132,13 +135,10 @@ function MovePlayer(dist)
 end
 
 function ShowStats()
-	player.MaxHP=(100*player.lvl)+(player.stats[1]*10)
-	player.MaxMP=(player.lvl*15)+(player.stats[4]*10)
-	if player.HP>player.MaxHP then
-		player.HP=player.MaxHP
-	end
-	if player.MP>player.MaxMP then
-		player.MP=player.MaxMP
+	check=check+1
+	if check==120 then
+		StatCheck()
+		check=-1
 	end
 	
 -- Life
@@ -306,6 +306,41 @@ function AddMP(amount)
 	end
 end
 
+function StatCheck()
+	player.stats={
+		(player.nat[1]+player.eqs[1]),
+		(player.nat[2]+player.eqs[2]),
+		(player.nat[3]+player.eqs[3]),
+		(player.nat[4]+player.eqs[4]),
+		(player.nat[5]+player.eqs[5]),
+		(player.nat[6]+player.eqs[6]),
+	}
+	if player.class==0 then
+		player.stats[6]=player.stats[6]+math.floor(player.stats[3]/6)
+		player.stats[1]=player.stats[1]+math.floor(player.stats[3]/6)
+	elseif player.class==1 then
+		player.stats[5]=player.stats[5]+math.floor(player.stats[2]/3)
+	elseif player.class==2 then
+		player.stats[2]=player.stats[2]+math.floor(player.stats[5]/6)
+		player.stats[4]=player.stats[4]+math.floor(player.stats[5]/6)
+	elseif player.class==3 then
+		player.stats[3]=player.stats[3]+math.floor(player.stats[1]/3)
+	elseif player.class==4 then
+		player.stats[5]=player.stats[5]+math.floor(player.stats[4]/3)
+	elseif player.class==5 then
+		player.stats[3]=player.stats[3]+math.floor(player.stats[6]/3)
+	end
+	player.SPD=(1.00-(player.stats[5]/100))
+	player.MaxHP=(100*player.lvl)+(player.stats[1]*10)
+	player.MaxMP=(player.lvl*15)+(player.stats[6]*10)
+	if player.HP>player.MaxHP then
+		player.HP=player.MaxHP
+	end
+	if player.MP>player.MaxMP then
+		player.MP=player.MaxMP
+	end
+end
+
 function WhosYourDaddy()
 	Cheat=true
 end
@@ -330,19 +365,13 @@ end
 
 function StatBoost(stat)
 	player.nat[stat]=player.nat[stat]+1
+	StatCheck()
 end
 
 function Natural(statnum,amnt)
 	player.nat[statnum]=player.nat[statnum]+amnt
 	player.pnts=player.pnts-(amnt)
-	player.stats={
-		(player.nat[1]+player.eqs[1]),
-		(player.nat[2]+player.eqs[2]),
-		(player.nat[3]+player.eqs[3]),
-		(player.nat[4]+player.eqs[4]),
-		(player.nat[5]+player.eqs[5]),
-	}
-	player.SPD=(1.00-(player.stats[5]/100))
+	StatCheck()
 end
 
 function GrantXP(orbs)
@@ -369,7 +398,7 @@ function LvlUp()
 	player.pnts=player.pnts+4
 	
 	player.MaxHP=(100*player.lvl)+(player.stats[1]*10)
-	player.MaxMP=(player.lvl*15)+(player.stats[4]*10)
+	player.MaxMP=(player.lvl*15)+(player.stats[6]*10)
 	player.HP=player.MaxHP
 	player.MP=player.MaxMP
 end
@@ -402,30 +431,14 @@ function OhCrap()
 	end
 end
 
-function Bonuses()
-	return statbonus[1],statbonus[2],statbonus[3],statbonus[4],statbonus[5]
-end
-
-function ModStats(sta,att,def,mgc,dex)
+function ModStats(sta,att,def,mgc,dex,int)
 	player.eqs[1]=player.eqs[1]+sta
 	player.eqs[2]=player.eqs[2]+att
 	player.eqs[3]=player.eqs[3]+def
 	player.eqs[4]=player.eqs[4]+mgc
 	player.eqs[5]=player.eqs[5]+dex
-	if player.HP>player.MaxHP then
-		player.HP=player.MaxHP
-	end
-	if player.MP>player.MaxMP then
-		player.MP=player.MaxMP
-	end
-	player.stats={
-		(player.nat[1]+player.eqs[1]),
-		(player.nat[2]+player.eqs[2]),
-		(player.nat[3]+player.eqs[3]),
-		(player.nat[4]+player.eqs[4]),
-		(player.nat[5]+player.eqs[5]),
-	}
-	player.SPD=(1.00-(player.stats[5]/100))
+	player.eqs[6]=player.eqs[6]+dex
+	StatCheck()
 end
 
 function LearnSorcery(name)
@@ -437,7 +450,7 @@ function LearnSorcery(name)
 	end
 end
 
-function LoadPlayer( cls,chr,stam,atk,dfnc,mgk,dxtrty,lv,xpnts,hitp,manp,neim,golp)
+function LoadPlayer( cls,chr,stam,atk,dfnc,mgk,dxtrty,intlct,lv,xpnts,hitp,manp,neim,golp)
 
 	display.remove(player)
 	player=nil
@@ -470,23 +483,14 @@ function LoadPlayer( cls,chr,stam,atk,dfnc,mgk,dxtrty,lv,xpnts,hitp,manp,neim,go
 	player.nat[3]=dfnc
 	player.nat[4]=mgk
 	player.nat[5]=dxtrty
+	player.nat[6]=intlct
 	
 	player.stats={}
-	player.stats={
-		(player.nat[1]+player.eqs[1]),
-		(player.nat[2]+player.eqs[2]),
-		(player.nat[3]+player.eqs[3]),
-		(player.nat[4]+player.eqs[4]),
-		(player.nat[5]+player.eqs[5]),
-	}
 	
 	player.char=char
 	player.class=class
 	player.inv={}
 	player.eqp={}
-	
-	player.MaxHP=(100*player.lvl)+(player.stats[1]*10)
-	player.MaxMP=( (player.lvl*15)+(player.stats[4]*10) )
 	
 	player.spells={
 		{"Fireball","Cast a firey ball of death and burn the enemy.",true,30},
@@ -498,7 +502,6 @@ function LoadPlayer( cls,chr,stam,atk,dfnc,mgk,dxtrty,lv,xpnts,hitp,manp,neim,go
 		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,120},
 	}
 	
-	player.SPD=(1.00-(player.stats[5]/100))
 	local size=b.GetData(0)
 	local curround=WD.Circle()
 	if curround%2==0 then

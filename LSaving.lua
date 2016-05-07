@@ -50,7 +50,7 @@ function Load()
 			p.LoadPlayer( Sve[l+1],Sve[l+2],
 				Sve[l+3],Sve[l+4],Sve[l+5],Sve[l+6],
 				Sve[l+7],Sve[l+8],Sve[l+9],Sve[l+10],
-				Sve[l+11],Sve[l+12],Sve[l+12]
+				Sve[l+11],Sve[l+12],Sve[l+13],Sve[l+14]
 			)
 			
 		elseif l>SplStrt and l<EqpStrt then
@@ -98,7 +98,7 @@ function Save()
 	
 	local P1=p.GetPlayer()
 	fh:write( "Player\n",P1.class,"\n",P1.char,"\n",P1.stats[1],
-	"\n",P1.stats[2],"\n",P1.stats[3],"\n",P1.stats[4],"\n",P1.stats[5],
+	"\n",P1.stats[2],"\n",P1.stats[3],"\n",P1.stats[4],"\n",P1.stats[5],"\n",P1.stats[6],
 	"\n",P1.lvl,"\n",P1.XP,"\n",P1.HP,"\n",P1.MP,"\n",P1.name,"\n",P1.gp,"\n")
 	
 	fh:write( "Spells\n")

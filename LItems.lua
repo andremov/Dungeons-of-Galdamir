@@ -37,14 +37,13 @@ local p1
 	--]]
 	--[[ Weapon/Armor Data:
 		Data 1: Name (text)
-		Data 2: isConsumable? (true/false)
-		Data 3: Floor Drop
-		Data 4: Slot (number)
-		Data 5: Stamina Bonus (number)
-		Data 6: Attack Bonus (number)
-		Data 7: Defense Bonus (number)
-		Data 8: Magic Bonus (number)
-		Data 9: Dexterity Bonus (number)
+		Data 2: Slot (number)
+		Data 3: Stamina Bonus (number)
+		Data 4: Attack Bonus (number)
+		Data 5: Defense Bonus (number)
+		Data 6: Magic Bonus (number)
+		Data 7: Dexterity Bonus (number)
+		Data 8: Intellect Bonus (number)
 	--]]
 	--[[ Consumables Use IDs:
 		0 - Restore Health
@@ -99,7 +98,7 @@ function Essentials()
 		{"StoneAxe",false,3,20},
 		{"GoldAxe",false,5,20},
 		{"IronAxe",false,8,30},
-		{"SteelSword",false,20,nil},
+		{"EversteelSword",false,20,nil},
 		--
 		{"LeatherCap",false,2,20},
 		{"LeatherTunic",false,2,20},
@@ -304,210 +303,211 @@ function Essentials()
 	}
 	gems={
 		{"GemBlue",		"DEF","Glows with a blue light.\nIt seems tough to break."},
-		{"GemGreen",	"MGC","Glows with a green light.\nIt has some strange aura emanating from it."},
+		{"GemPurple",	"MGC","Glows with a purple light.\nIt has some strange aura emanating from it."},
 		{"GemPink",		"STA","Glows with a pink light.\nIt pounds faintly every once in a while."},
 		{"GemRed",		"ATT","Glows with a red light.\nIt vibrates angrily every once in a while."},
 		{"GemYellow",	"DEX","Glows with a yellow light.\nIt seems lightweight and sharp."},
+		{"GemGreen",	"INT","Glows with a green light.\nLetters and symbols seems to spin around the orb inside."},
 	}
 	special={
 		{"UpperScroll",			"Teleports you to an upper floor.",1},
 		{"LowerScroll",			"Teleports you to a lower floor.",0},
 		{"ScrollOfSalvation",	"Saves your progress.",2},
 	}
-	equips={					--		STA 	ATT		DEF		MGC		DEX
-		{"WoodSword",0,					0,		1,		0,		0,		0},
-		{"StoneSword",0,				0,		2,		1,		0,		0},
-		{"GoldSword",0,					0,		1,		2,		0,		0},
-		{"IronSword",0,					0,		3,		1,		0,		0},
-		{"DiamondSword",0,				0,		4,		1,		0,		1},
-		{"StoneAxe",0,					0,		2,		0,		0,		1},
-		{"GoldAxe",0,					0,		1,		0,		0,		2},
-		{"IronAxe",0,					0,		3,		0,		0,		1},
-		{"SteelSword",0,				1,		5,		2,		1,		2},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"LeatherCap",2,				0,		0,		0,		1,		1},
-		{"LeatherTunic",4,				0,		0,		0,		1,		1},
-		{"LeatherPants",5,				0,		0,		0,		1,		1},
-		{"LeatherShoes",8,				0,		0,		0,		1,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"ChainHelm",2,					0,		0,		1,		1,		1},
-		{"ChainPlate",4,				0,		0,		0,		2,		1},
-		{"ChainLeggings",5,				0,		0,		0,		2,		1},
-		{"ChainBoots",8,				0,		0,		0,		2,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"IronHelm",2,					0,		0,		1,		3,		0},
-		{"IronPlate",4,					0,		0,		0,		4,		0},
-		{"IronLeggings",5,				0,		0,		0,		4,		0},
-		{"IronBoots",8,					0,		0,		0,		3,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"DiamondHelm",2,				0,		0,		1,		4,		0},
-		{"DiamondPlate",4,				1,		0,		0,		4,		0},
-		{"DiamondLeggings",5,			1,		0,		0,		4,		0},
-		{"DiamondBoots",8,				0,		0,		0,		4,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"BronzeRing",6,				1,		0,		0,		0,		0},
-		{"BronzeRing",6,				0,		1,		0,		0,		0},
-		{"BronzeRing",6,				0,		0,		1,		0,		0},
-		{"BronzeRing",6,				0,		0,		0,		1,		0},
-		{"BronzeRing",6,				0,		0,		0,		0,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"IronRing",6,					2,		0,		0,		0,		0},
-		{"IronRing",6,					1,		1,		0,		0,		0},
-		{"IronRing",6,					1,		0,		1,		0,		0},
-		{"IronRing",6,					1,		0,		0,		1,		0},
-		{"IronRing",6,					1,		0,		0,		0,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"IronRing",6,					1,		1,		0,		0,		0},
-		{"IronRing",6,					0,		2,		0,		0,		0},
-		{"IronRing",6,					0,		1,		1,		0,		0},
-		{"IronRing",6,					0,		1,		0,		1,		0},
-		{"IronRing",6,					0,		1,		0,		0,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"IronRing",6,					1,		0,		1,		0,		0},
-		{"IronRing",6,					0,		1,		1,		0,		0},
-		{"IronRing",6,					0,		0,		2,		0,		0},
-		{"IronRing",6,					0,		0,		1,		1,		0},
-		{"IronRing",6,					0,		0,		1,		0,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"IronRing",6,					1,		0,		0,		1,		0},
-		{"IronRing",6,					0,		1,		0,		1,		0},
-		{"IronRing",6,					0,		0,		1,		1,		0},
-		{"IronRing",6,					0,		0,		0,		2,		0},
-		{"IronRing",6,					0,		0,		0,		1,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"IronRing",6,					1,		0,		0,		0,		1},
-		{"IronRing",6,					0,		1,		0,		0,		1},
-		{"IronRing",6,					0,		0,		1,		0,		1},
-		{"IronRing",6,					0,		0,		0,		1,		1},
-		{"IronRing",6,					0,		0,		0,		0,		2},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"SilverRing",6,				1,		0,		0,		1,		1},
-		{"SilverRing",6,				1,		1,		0,		0,		1},
-		{"SilverRing",6,				1,		0,		1,		0,		1},
-		{"SilverRing",6,				0,		0,		1,		1,		1},
-		{"SilverRing",6,				0,		1,		0,		1,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"SilverRing",6,				1,		0,		1,		1,		0},
-		{"SilverRing",6,				1,		1,		0,		1,		0},
-		{"SilverRing",6,				1,		1,		1,		0,		0},
-		{"SilverRing",6,				0,		1,		1,		1,		0},
+	equips={					--		STA 	ATT		DEF		MGC		DEX		INT
+		{"WoodSword",0,					0,		1,		0,		0,		0,		0},
+		{"StoneSword",0,				0,		2,		1,		0,		0,		0},
+		{"GoldSword",0,					0,		1,		2,		0,		0,		0},
+		{"IronSword",0,					0,		3,		1,		0,		0,		0},
+		{"DiamondSword",0,				0,		4,		1,		0,		1,		0},
+		{"StoneAxe",0,					0,		2,		0,		0,		1,		0},
+		{"GoldAxe",0,					0,		1,		0,		0,		2,		0},
+		{"IronAxe",0,					0,		3,		0,		0,		1,		0},
+		{"EversteelSword",0,				1,		5,		2,		1,		2,		1},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"LeatherCap",2,				0,		0,		0,		1,		1,		0},
+		{"LeatherTunic",4,				0,		0,		0,		1,		1,		0},
+		{"LeatherPants",5,				0,		0,		0,		1,		1,		0},
+		{"LeatherShoes",8,				0,		0,		0,		1,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"ChainHelm",2,					0,		0,		1,		1,		1,		0},
+		{"ChainPlate",4,				0,		0,		0,		2,		1,		0},
+		{"ChainLeggings",5,				0,		0,		0,		2,		1,		0},
+		{"ChainBoots",8,				0,		0,		0,		2,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"IronHelm",2,					0,		0,		1,		3,		0,		0},
+		{"IronPlate",4,					0,		0,		0,		4,		0,		0},
+		{"IronLeggings",5,				0,		0,		0,		4,		0,		0},
+		{"IronBoots",8,					0,		0,		0,		3,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"DiamondHelm",2,				0,		0,		1,		4,		0,		0},
+		{"DiamondPlate",4,				1,		0,		0,		4,		0,		0},
+		{"DiamondLeggings",5,			1,		0,		0,		4,		0,		0},
+		{"DiamondBoots",8,				0,		0,		0,		4,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"BronzeRing",6,				1,		0,		0,		0,		0,		0},
+		{"BronzeRing",6,				0,		1,		0,		0,		0,		0},
+		{"BronzeRing",6,				0,		0,		1,		0,		0,		0},
+		{"BronzeRing",6,				0,		0,		0,		1,		0,		0},
+		{"BronzeRing",6,				0,		0,		0,		0,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"IronRing",6,					2,		0,		0,		0,		0,		0},
+		{"IronRing",6,					1,		1,		0,		0,		0,		0},
+		{"IronRing",6,					1,		0,		1,		0,		0,		0},
+		{"IronRing",6,					1,		0,		0,		1,		0,		0},
+		{"IronRing",6,					1,		0,		0,		0,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"IronRing",6,					1,		1,		0,		0,		0,		0},
+		{"IronRing",6,					0,		2,		0,		0,		0,		0},
+		{"IronRing",6,					0,		1,		1,		0,		0,		0},
+		{"IronRing",6,					0,		1,		0,		1,		0,		0},
+		{"IronRing",6,					0,		1,		0,		0,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"IronRing",6,					1,		0,		1,		0,		0,		0},
+		{"IronRing",6,					0,		1,		1,		0,		0,		0},
+		{"IronRing",6,					0,		0,		2,		0,		0,		0},
+		{"IronRing",6,					0,		0,		1,		1,		0,		0},
+		{"IronRing",6,					0,		0,		1,		0,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"IronRing",6,					1,		0,		0,		1,		0,		0},
+		{"IronRing",6,					0,		1,		0,		1,		0,		0},
+		{"IronRing",6,					0,		0,		1,		1,		0,		0},
+		{"IronRing",6,					0,		0,		0,		2,		0,		0},
+		{"IronRing",6,					0,		0,		0,		1,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"IronRing",6,					1,		0,		0,		0,		1,		0},
+		{"IronRing",6,					0,		1,		0,		0,		1,		0},
+		{"IronRing",6,					0,		0,		1,		0,		1,		0},
+		{"IronRing",6,					0,		0,		0,		1,		1,		0},
+		{"IronRing",6,					0,		0,		0,		0,		2,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"SilverRing",6,				1,		0,		0,		1,		1,		0},
+		{"SilverRing",6,				1,		1,		0,		0,		1,		0},
+		{"SilverRing",6,				1,		0,		1,		0,		1,		0},
+		{"SilverRing",6,				0,		0,		1,		1,		1,		0},
+		{"SilverRing",6,				0,		1,		0,		1,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"SilverRing",6,				1,		0,		1,		1,		0,		0},
+		{"SilverRing",6,				1,		1,		0,		1,		0,		0},
+		{"SilverRing",6,				1,		1,		1,		0,		0,		0},
+		{"SilverRing",6,				0,		1,		1,		1,		0,		0},
 		{"SilverRing",6,				0,		1,		1,		0,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"SilverRing",6,				3,		0,		0,		0,		0},
-		{"SilverRing",6,				1,		2,		0,		0,		0},
-		{"SilverRing",6,				1,		0,		2,		0,		0},
-		{"SilverRing",6,				1,		0,		0,		2,		0},
-		{"SilverRing",6,				1,		0,		0,		0,		2},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"SilverRing",6,				2,		1,		0,		0,		0},
-		{"SilverRing",6,				0,		3,		0,		0,		0},
-		{"SilverRing",6,				0,		1,		2,		0,		0},
-		{"SilverRing",6,				0,		1,		0,		2,		0},
-		{"SilverRing",6,				0,		1,		0,		0,		2},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"SilverRing",6,				2,		0,		0,		1,		0},
-		{"SilverRing",6,				0,		2,		0,		1,		0},
-		{"SilverRing",6,				0,		0,		2,		1,		0},
-		{"SilverRing",6,				0,		0,		0,		3,		0},
-		{"SilverRing",6,				0,		0,		0,		1,		2},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"SilverRing",6,				2,		0,		1,		0,		0},
-		{"SilverRing",6,				0,		2,		1,		0,		0},
-		{"SilverRing",6,				0,		0,		3,		0,		0},
-		{"SilverRing",6,				0,		0,		1,		2,		0},
-		{"SilverRing",6,				0,		0,		1,		0,		2},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"SilverRing",6,				2,		0,		0,		0,		1},
-		{"SilverRing",6,				0,		2,		0,		0,		1},
-		{"SilverRing",6,				0,		0,		2,		0,		1},
-		{"SilverRing",6,				0,		0,		0,		2,		1},
-		{"SilverRing",6,				0,		0,		0,		0,		3},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					2,		0,		0,		1,		1},
-		{"GoldRing",6,					2,		0,		1,		0,		1},
-		{"GoldRing",6,					2,		1,		0,		0,		1},
-		{"GoldRing",6,					2,		0,		1,		1,		0},
-		{"GoldRing",6,					2,		1,		1,		0,		0},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					2,		1,		0,		1,		0},
-		{"GoldRing",6,					1,		2,		0,		1,		0},
-		{"GoldRing",6,					1,		2,		0,		0,		1},
-		{"GoldRing",6,					1,		2,		1,		0,		0},
-		{"GoldRing",6,					0,		2,		1,		0,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					0,		2,		0,		1,		1},
-		{"GoldRing",6,					0,		2,		1,		1,		0},
-		{"GoldRing",6,					1,		1,		2,		0,		0},
-		{"GoldRing",6,					1,		0,		2,		1,		0},
-		{"GoldRing",6,					1,		0,		2,		0,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					0,		0,		2,		1,		1},
-		{"GoldRing",6,					0,		1,		2,		1,		0},
-		{"GoldRing",6,					0,		1,		2,		0,		1},
-		{"GoldRing",6,					1,		0,		2,		1,		0},
-		{"GoldRing",6,					0,		0,		1,		2,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					0,		1,		0,		2,		1},
-		{"GoldRing",6,					0,		1,		1,		2,		0},
-		{"GoldRing",6,					1,		1,		0,		2,		0},
-		{"GoldRing",6,					1,		0,		1,		2,		0},
-		{"GoldRing",6,					1,		0,		0,		2,		1},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					0,		0,		1,		1,		2},
-		{"GoldRing",6,					0,		1,		0,		1,		2},
-		{"GoldRing",6,					0,		1,		1,		0,		2},
-		{"GoldRing",6,					1,		1,		0,		0,		2},
-		{"GoldRing",6,					1,		0,		1,		0,		2},
-		{"GoldRing",6,					1,		0,		0,		1,		2},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					0,		1,		1,		1,		1},
-		{"GoldRing",6,					1,		0,		1,		1,		1},
-		{"GoldRing",6,					1,		1,		0,		1,		1},
-		{"GoldRing",6,					1,		1,		1,		0,		1},
-		{"GoldRing",6,					1,		1,		1,		1,		0},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					4,		0,		0,		0,		0},
-		{"GoldRing",6,					1,		3,		0,		0,		0},
-		{"GoldRing",6,					1,		0,		3,		0,		0},
-		{"GoldRing",6,					1,		0,		0,		3,		0},
-		{"GoldRing",6,					1,		0,		0,		0,		3},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					3,		1,		0,		0,		0},
-		{"GoldRing",6,					0,		4,		0,		0,		0},
-		{"GoldRing",6,					0,		1,		3,		0,		0},
-		{"GoldRing",6,					0,		1,		0,		3,		0},
-		{"GoldRing",6,					0,		1,		0,		0,		3},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					3,		0,		1,		0,		0},
-		{"GoldRing",6,					0,		3,		1,		0,		0},
-		{"GoldRing",6,					0,		0,		4,		0,		0},
-		{"GoldRing",6,					0,		0,		1,		3,		0},
-		{"GoldRing",6,					0,		0,		1,		0,		3},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					3,		0,		0,		1,		0},
-		{"GoldRing",6,					0,		3,		0,		1,		0},
-		{"GoldRing",6,					0,		0,		3,		1,		0},
-		{"GoldRing",6,					0,		0,		0,		4,		0},
-		{"GoldRing",6,					0,		0,		0,		1,		3},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					3,		0,		0,		0,		1},
-		{"GoldRing",6,					0,		3,		0,		0,		1},
-		{"GoldRing",6,					0,		0,		3,		0,		1},
-		{"GoldRing",6,					0,		0,		0,		3,		1},
-		{"GoldRing",6,					0,		0,		0,		0,		4},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					2,		2,		0,		0,		0},
-		{"GoldRing",6,					2,		0,		2,		0,		0},
-		{"GoldRing",6,					2,		0,		0,		2,		0},
-		{"GoldRing",6,					2,		0,		0,		0,		2},
-		{"GoldRing",6,					0,		0,		0,		2,		2},
-		--								STA 	ATT		DEF		MGC		DEX
-		{"GoldRing",6,					0,		0,		2,		0,		2},
-		{"GoldRing",6,					0,		2,		0,		0,		2},
-		{"GoldRing",6,					0,		2,		2,		0,		0},
-		{"GoldRing",6,					0,		2,		0,		2,		0},
-		{"GoldRing",6,					0,		0,		2,		2,		0},
-		{"GoldRing",6,					0,		0,		2,		2,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"SilverRing",6,				3,		0,		0,		0,		0,		0},
+		{"SilverRing",6,				1,		2,		0,		0,		0,		0},
+		{"SilverRing",6,				1,		0,		2,		0,		0,		0},
+		{"SilverRing",6,				1,		0,		0,		2,		0,		0},
+		{"SilverRing",6,				1,		0,		0,		0,		2,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"SilverRing",6,				2,		1,		0,		0,		0,		0},
+		{"SilverRing",6,				0,		3,		0,		0,		0,		0},
+		{"SilverRing",6,				0,		1,		2,		0,		0,		0},
+		{"SilverRing",6,				0,		1,		0,		2,		0,		0},
+		{"SilverRing",6,				0,		1,		0,		0,		2,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"SilverRing",6,				2,		0,		0,		1,		0,		0},
+		{"SilverRing",6,				0,		2,		0,		1,		0,		0},
+		{"SilverRing",6,				0,		0,		2,		1,		0,		0},
+		{"SilverRing",6,				0,		0,		0,		3,		0,		0},
+		{"SilverRing",6,				0,		0,		0,		1,		2,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"SilverRing",6,				2,		0,		1,		0,		0,		0},
+		{"SilverRing",6,				0,		2,		1,		0,		0,		0},
+		{"SilverRing",6,				0,		0,		3,		0,		0,		0},
+		{"SilverRing",6,				0,		0,		1,		2,		0,		0},
+		{"SilverRing",6,				0,		0,		1,		0,		2,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"SilverRing",6,				2,		0,		0,		0,		1,		0},
+		{"SilverRing",6,				0,		2,		0,		0,		1,		0},
+		{"SilverRing",6,				0,		0,		2,		0,		1,		0},
+		{"SilverRing",6,				0,		0,		0,		2,		1,		0},
+		{"SilverRing",6,				0,		0,		0,		0,		3,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					2,		0,		0,		1,		1,		0},
+		{"GoldRing",6,					2,		0,		1,		0,		1,		0},
+		{"GoldRing",6,					2,		1,		0,		0,		1,		0},
+		{"GoldRing",6,					2,		0,		1,		1,		0,		0},
+		{"GoldRing",6,					2,		1,		1,		0,		0,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					2,		1,		0,		1,		0,		0},
+		{"GoldRing",6,					1,		2,		0,		1,		0,		0},
+		{"GoldRing",6,					1,		2,		0,		0,		1,		0},
+		{"GoldRing",6,					1,		2,		1,		0,		0,		0},
+		{"GoldRing",6,					0,		2,		1,		0,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					0,		2,		0,		1,		1,		0},
+		{"GoldRing",6,					0,		2,		1,		1,		0,		0},
+		{"GoldRing",6,					1,		1,		2,		0,		0,		0},
+		{"GoldRing",6,					1,		0,		2,		1,		0,		0},
+		{"GoldRing",6,					1,		0,		2,		0,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					0,		0,		2,		1,		1,		0},
+		{"GoldRing",6,					0,		1,		2,		1,		0,		0},
+		{"GoldRing",6,					0,		1,		2,		0,		1,		0},
+		{"GoldRing",6,					1,		0,		2,		1,		0,		0},
+		{"GoldRing",6,					0,		0,		1,		2,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					0,		1,		0,		2,		1,		0},
+		{"GoldRing",6,					0,		1,		1,		2,		0,		0},
+		{"GoldRing",6,					1,		1,		0,		2,		0,		0},
+		{"GoldRing",6,					1,		0,		1,		2,		0,		0},
+		{"GoldRing",6,					1,		0,		0,		2,		1,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					0,		0,		1,		1,		2,		0},
+		{"GoldRing",6,					0,		1,		0,		1,		2,		0},
+		{"GoldRing",6,					0,		1,		1,		0,		2,		0},
+		{"GoldRing",6,					1,		1,		0,		0,		2,		0},
+		{"GoldRing",6,					1,		0,		1,		0,		2,		0},
+		{"GoldRing",6,					1,		0,		0,		1,		2,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					0,		1,		1,		1,		1,		0},
+		{"GoldRing",6,					1,		0,		1,		1,		1,		0},
+		{"GoldRing",6,					1,		1,		0,		1,		1,		0},
+		{"GoldRing",6,					1,		1,		1,		0,		1,		0},
+		{"GoldRing",6,					1,		1,		1,		1,		0,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					4,		0,		0,		0,		0,		0},
+		{"GoldRing",6,					1,		3,		0,		0,		0,		0},
+		{"GoldRing",6,					1,		0,		3,		0,		0,		0},
+		{"GoldRing",6,					1,		0,		0,		3,		0,		0},
+		{"GoldRing",6,					1,		0,		0,		0,		3,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					3,		1,		0,		0,		0,		0},
+		{"GoldRing",6,					0,		4,		0,		0,		0,		0},
+		{"GoldRing",6,					0,		1,		3,		0,		0,		0},
+		{"GoldRing",6,					0,		1,		0,		3,		0,		0},
+		{"GoldRing",6,					0,		1,		0,		0,		3,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					3,		0,		1,		0,		0,		0},
+		{"GoldRing",6,					0,		3,		1,		0,		0,		0},
+		{"GoldRing",6,					0,		0,		4,		0,		0,		0},
+		{"GoldRing",6,					0,		0,		1,		3,		0,		0},
+		{"GoldRing",6,					0,		0,		1,		0,		3,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					3,		0,		0,		1,		0,		0},
+		{"GoldRing",6,					0,		3,		0,		1,		0,		0},
+		{"GoldRing",6,					0,		0,		3,		1,		0,		0},
+		{"GoldRing",6,					0,		0,		0,		4,		0,		0},
+		{"GoldRing",6,					0,		0,		0,		1,		3,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					3,		0,		0,		0,		1,		0},
+		{"GoldRing",6,					0,		3,		0,		0,		1,		0},
+		{"GoldRing",6,					0,		0,		3,		0,		1,		0},
+		{"GoldRing",6,					0,		0,		0,		3,		1,		0},
+		{"GoldRing",6,					0,		0,		0,		0,		4,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					2,		2,		0,		0,		0,		0},
+		{"GoldRing",6,					2,		0,		2,		0,		0,		0},
+		{"GoldRing",6,					2,		0,		0,		2,		0,		0},
+		{"GoldRing",6,					2,		0,		0,		0,		2,		0},
+		{"GoldRing",6,					0,		0,		0,		2,		2,		0},
+		--								STA 	ATT		DEF		MGC		DEX		INT
+		{"GoldRing",6,					0,		0,		2,		0,		2,		0},
+		{"GoldRing",6,					0,		2,		0,		0,		2,		0},
+		{"GoldRing",6,					0,		2,		2,		0,		0,		0},
+		{"GoldRing",6,					0,		2,		0,		2,		0,		0},
+		{"GoldRing",6,					0,		0,		2,		2,		0,		0},
+		{"GoldRing",6,					0,		0,		2,		2,		0,		0},
 	}
 end
 
@@ -709,7 +709,8 @@ function ReturnInfo(id,wachuwah)
 			stat3=(equips[id-22][5])
 			stat4=(equips[id-22][6])
 			stat5=(equips[id-22][7])
-			return wahewah,name,itemuse,stat1,stat2,stat3,stat4,stat5
+			stat6=(equips[id-22][8])
+			return wahewah,name,itemuse,stat1,stat2,stat3,stat4,stat5,stat6
 		end
 	end
 end

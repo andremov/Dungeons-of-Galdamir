@@ -15,60 +15,56 @@ local currentchar
 local curmenu
 
 function onLunRelease()
-	
 	charname=0
 	Classes()
 	CurrentChar()
 end
 
-function onRefRelease()
-	
-	charname=2
-	Classes()
-	CurrentChar()
-end
-
 function onArcRelease()
-	
 	charname=1
 	Classes()
 	CurrentChar()
 end
 
+function onRefRelease()
+	charname=2
+	Classes()
+	CurrentChar()
+end
+
 function onIngRelease()
-	
 	charname=3
 	Classes()	
 	CurrentChar()
 end
 
 function onKnightRelease()
-	
 	charclass=0
 	CurrentChar()
 end
 
+function onWarriorRelease()
+	charclass=1
+	CurrentChar()
+end
+
 function onThiefRelease()
-	
 	charclass=2
 	CurrentChar()
 end
 
 function onVikingRelease()
-	
 	charclass=3
 	CurrentChar()
 end
 
-function onWarriorRelease()
-	
-	charclass=1
+function onMageRelease()
+	charclass=4
 	CurrentChar()
 end
 
-function onMageRelease()
-	
-	charclass=4
+function onScholarRelease()
+	charclass=5
 	CurrentChar()
 end
 
@@ -193,128 +189,153 @@ function Classes()
 	
 	--Viking
 	local Viktxt=display.newText("Viking\n+STA", 0, 0, "Game Over", 80)
-	Viktxt.x = display.contentWidth*0.2
+	Viktxt.x = (display.contentWidth/7)*1
 	Viktxt.y = display.contentHeight*0.5+80
 	classmenu:insert(Viktxt)
 	
 	local Viking1=display.newImageRect("chars/"..charname.."/3/char.png",65,65)
-	Viking1.x = display.contentWidth*0.2
-	Viking1.y = display.contentHeight*0.5
+	Viking1.x = Viktxt.x
+	Viking1.y = Viktxt.y-80
 	classmenu:insert(Viking1)
 	
 	local Viking = widget.newButton{
-	label="",
-	labelColor = { default={0,0,0}, over={255,255,255} },
-	fontSize=30,
-	defaultFile="charbutton.png",
-	overFile="charbutton-over.png",
-	width=80, height=80,
-	onRelease = onVikingRelease
+		label="",
+		labelColor = { default={0,0,0}, over={255,255,255} },
+		fontSize=30,
+		defaultFile="charbutton.png",
+		overFile="charbutton-over.png",
+		width=80, height=80,
+		onRelease = onVikingRelease
 	}
 	Viking:setReferencePoint( display.CenterReferencePoint )
-	Viking.x = display.contentWidth*0.2
-	Viking.y = display.contentHeight*0.5
+	Viking.x = Viking1.x
+	Viking.y = Viking1.y
 	classmenu:insert(Viking)
 	
 	--Warrior
 	local Wartxt=display.newText("Warrior\n+ATT", 0, 0, "Game Over", 80)
-	Wartxt.x = display.contentWidth*0.2+345.6
+	Wartxt.x = (display.contentWidth/7)*2
 	Wartxt.y = display.contentHeight*0.5+80
 	classmenu:insert(Wartxt)
 	
 	local Warrior1=display.newImageRect("chars/"..charname.."/1/char.png",65,65)
-	Warrior1.x = display.contentWidth*0.2+345.6
-	Warrior1.y = display.contentHeight*0.5
+	Warrior1.x = Wartxt.x
+	Warrior1.y = Wartxt.y-80
 	classmenu:insert(Warrior1)
 	
 	local Warrior = widget.newButton{
-	label="",
-	labelColor = { default={0,0,0}, over={255,255,255} },
-	fontSize=30,
-	defaultFile="charbutton.png",
-	overFile="charbutton-over.png",
-	width=80, height=80,
-	onRelease = onWarriorRelease
+		label="",
+		labelColor = { default={0,0,0}, over={255,255,255} },
+		fontSize=30,
+		defaultFile="charbutton.png",
+		overFile="charbutton-over.png",
+		width=80, height=80,
+		onRelease = onWarriorRelease
 	}
 	Warrior:setReferencePoint( display.CenterReferencePoint )
-	Warrior.x = display.contentWidth*0.2+345.6
-	Warrior.y = display.contentHeight*0.5
+	Warrior.x = Warrior1.x
+	Warrior.y = Warrior1.y
 	classmenu:insert(Warrior)
 	
 	--Knight
 	local Knitxt=display.newText("Knight\n+DEF", 0, 0, "Game Over", 80)
-	Knitxt.x = display.contentWidth*0.2+115.2
+	Knitxt.x = (display.contentWidth/7)*3
 	Knitxt.y = display.contentHeight*0.5+80
 	classmenu:insert(Knitxt)
 	
 	local Knight1=display.newImageRect("chars/"..charname.."/0/char.png",65,65)
-	Knight1.x = display.contentWidth*0.2+115.2
-	Knight1.y = display.contentHeight*0.5
+	Knight1.x = Knitxt.x
+	Knight1.y = Knitxt.y-80
 	classmenu:insert(Knight1)
 	
 	local Knight = widget.newButton{
-	label="",
-	labelColor = { default={0,0,0}, over={255,255,255} },
-	fontSize=30,
-	defaultFile="charbutton.png",
-	overFile="charbutton-over.png",
-	width=80, height=80,
-	onRelease = onKnightRelease
+		label="",
+		labelColor = { default={0,0,0}, over={255,255,255} },
+		fontSize=30,
+		defaultFile="charbutton.png",
+		overFile="charbutton-over.png",
+		width=80, height=80,
+		onRelease = onKnightRelease
 	}
 	Knight:setReferencePoint( display.CenterReferencePoint )
-	Knight.x = display.contentWidth*0.2+115.2
-	Knight.y = display.contentHeight*0.5
+	Knight.x = Knight1.x
+	Knight.y = Knight1.y
 	classmenu:insert(Knight)
 	
 	--Thief
 	local Thitxt=display.newText("Thief\n+DEX", 0, 0, "Game Over", 80)
-	Thitxt.x = display.contentWidth*0.8
+	Thitxt.x = (display.contentWidth/7)*5
 	Thitxt.y = display.contentHeight*0.5+80
 	classmenu:insert(Thitxt)
 	
 	local Thief1=display.newImageRect("chars/"..charname.."/2/char.png",65,65)
-	Thief1.x = display.contentWidth*0.8
-	Thief1.y = display.contentHeight*0.5
+	Thief1.x = Thitxt.x
+	Thief1.y = Thitxt.y-80
 	classmenu:insert(Thief1)
 	
 	local Thief = widget.newButton{
-	label="",
-	labelColor = { default={0,0,0}, over={255,255,255} },
-	fontSize=30,
-	defaultFile="charbutton.png",
-	overFile="charbutton-over.png",
-	width=80, height=80,
-	onRelease = onThiefRelease
+		label="",
+		labelColor = { default={0,0,0}, over={255,255,255} },
+		fontSize=30,
+		defaultFile="charbutton.png",
+		overFile="charbutton-over.png",
+		width=80, height=80,
+		onRelease = onThiefRelease
 	}
 	Thief:setReferencePoint( display.CenterReferencePoint )
-	Thief.x = display.contentWidth*0.8
-	Thief.y = display.contentHeight*0.5
+	Thief.x = Thief1.x
+	Thief.y = Thief1.y
 	classmenu:insert(Thief)
 	
 	--Mage
 	local Magtxt=display.newText("Mage\n+MGC", 0, 0, "Game Over", 80)
-	Magtxt.x = display.contentWidth*0.2+230.4
+	Magtxt.x = (display.contentWidth/7)*4
 	Magtxt.y = display.contentHeight*0.5+80
 	classmenu:insert(Magtxt)
 	
 	local Mage1=display.newImageRect("chars/"..charname.."/4/char.png",65,65)
-	Mage1.x = display.contentWidth*0.2+230.4
-	Mage1.y = display.contentHeight*0.5
+	Mage1.x = Magtxt.x
+	Mage1.y = Magtxt.y-80
 	classmenu:insert(Mage1)
 	
 	local Mage = widget.newButton{
-	label="",
-	labelColor = { default={0,0,0}, over={255,255,255} },
-	fontSize=30,
-	defaultFile="charbutton.png",
-	overFile="charbutton-over.png",
-	width=80, height=80,
-	onRelease = onMageRelease
+		label="",
+		labelColor = { default={0,0,0}, over={255,255,255} },
+		fontSize=30,
+		defaultFile="charbutton.png",
+		overFile="charbutton-over.png",
+		width=80, height=80,
+		onRelease = onMageRelease
 	}
 	Mage:setReferencePoint( display.CenterReferencePoint )
-	Mage.x = display.contentWidth*0.2+230.4
-	Mage.y = display.contentHeight*0.5
+	Mage.x = Mage1.x
+	Mage.y = Mage1.y
 	classmenu:insert(Mage)
+	
+	--Scholar
+	local Schtxt=display.newText("Scholar\n+INT", 0, 0, "Game Over", 80)
+	Schtxt.x = (display.contentWidth/7)*6
+	Schtxt.y = display.contentHeight*0.5+80
+	classmenu:insert(Schtxt)
+	
+	local Scholar1=display.newImageRect("chars/"..charname.."/5/char.png",65,65)
+	Scholar1.x = Schtxt.x
+	Scholar1.y = Schtxt.y-80
+	classmenu:insert(Scholar1)
+	
+	local Scholar = widget.newButton{
+		label="",
+		labelColor = { default={0,0,0}, over={255,255,255} },
+		fontSize=30,
+		defaultFile="charbutton.png",
+		overFile="charbutton-over.png",
+		width=80, height=80,
+		onRelease = onScholarRelease
+	}
+	Scholar:setReferencePoint( display.CenterReferencePoint )
+	Scholar.x = Scholar1.x
+	Scholar.y = Scholar1.y
+	classmenu:insert(Scholar)
 	
 end
 

@@ -35,7 +35,7 @@ function Essentials()
 	xeqpicial=75
 	yeqpicial=698
 	statchangey=(display.contentHeight/2)-60
-	statchangex=(display.contentWidth/2)-240
+	statchangex=(display.contentWidth/2)-295
 	statchangexs=120
 	espaciox=64
 	espacioy=64
@@ -213,7 +213,7 @@ function ToggleInfo()
 		)
 		ginf:insert(info[4])
 		
-		for s=1,5 do
+		for s=1,6 do
 			info[#info+1]=display.newText(
 				(
 					p1.statnames[s]
@@ -227,37 +227,37 @@ function ToggleInfo()
 			(
 				"Stat Points: "..p1.pnts
 			),
-			30,645,native.systemFont,40
+			30,690,native.systemFont,40
 		)
 		ginf:insert(info[#info])
 		
-		for s=1,5 do
+		for s=1,6 do
 			info[#info+1]=display.newText(
 				(
 					p1.nat[s]
 				),
-				info[6].x+220,420+(45*(s-1)),native.systemFont,40
+				info[7].x+220,420+(45*(s-1)),native.systemFont,40
 			)
 			ginf:insert(info[#info])
 		end
 		
-		for s=1,5 do
+		for s=1,6 do
 			info[#info+1]=display.newText(
 				(
 				"+"..p1.eqs[s]
 				),
-				info[11].x+120,420+(45*(s-1)),native.systemFont,40
+				info[13].x+120,420+(45*(s-1)),native.systemFont,40
 			)
 			info[#info]:setTextColor(50,200,50)
 			ginf:insert(info[#info])
 		end
 		
-		for s=1,5 do
+		for s=1,6 do
 			info[#info+1]=display.newText(
 				(
 					"= "..p1.stats[s]
 				),
-				info[17].x+50,420+(45*(s-1)),native.systemFont,40
+				info[19].x+50,420+(45*(s-1)),native.systemFont,40
 			)
 			ginf:insert(info[#info])
 		end
@@ -274,7 +274,7 @@ function ToggleInfo()
 		if p1.pnts~=0 then
 			pli={}
 			mini={}
-			for n=1,5 do
+			for n=1,6 do
 				--
 				if (p1.nat[n]+1)<(p1.lvl*12) then
 					pli[n]=widget.newButton{
@@ -284,7 +284,7 @@ function ToggleInfo()
 						onRelease = More,
 					}
 					pli[n].xScale,pli[n].yScale=2.0,2.0
-					pli[n].x = info[10+n].x+45
+					pli[n].x = info[11+n].x+45
 					pli[n].y = 445+((n-1)*45)
 					ginf:insert(pli[n])
 				end
@@ -297,7 +297,7 @@ function ToggleInfo()
 						onRelease = Less,
 					}
 					mini[n].xScale,mini[n].yScale=2.0,2.0
-					mini[n].x = info[10+n].x-75
+					mini[n].x = info[11+n].x-75
 					mini[n].y = 445+((n-1)*45)
 					ginf:insert(mini[n])
 				end
@@ -322,7 +322,7 @@ end
 
 function More( event )
 	local statnum
-	for i=1,5 do
+	for i=1,6 do
 		if (pli[i]) then
 			if event.y+21>pli[i].y and event.y-21<pli[i].y then
 				statnum=i
@@ -336,7 +336,7 @@ end
 
 function Less( event )
 	local statnum
-	for i=1,5 do
+	for i=1,6 do
 		if (mini[i]) then
 			if event.y+21>mini[i].y and event.y-21<mini[i].y then
 				statnum=i
@@ -585,7 +585,7 @@ function UseMenu(id,slot)
 			
 			ToggleBag()
 			ToggleBag()
-			p.ModStats(statchange[1],statchange[2],statchange[3],statchange[4],statchange[5])
+			p.ModStats(statchange[1],statchange[2],statchange[3],statchange[4],statchange[5],statchange[6])
 			statchange={}
 		end
 		
@@ -681,7 +681,7 @@ function UseMenu(id,slot)
 			end
 			
 			if itmfound==false then
-				equipstats={0,0,0,0,0,0,0,0}
+				equipstats={0,0,0,0,0,0,0,0,0}
 			end
 			
 			statchange={
@@ -689,7 +689,8 @@ function UseMenu(id,slot)
 				itemstats[5]-equipstats[5],
 				itemstats[6]-equipstats[6],
 				itemstats[7]-equipstats[7],
-				itemstats[8]-equipstats[8]
+				itemstats[8]-equipstats[8],
+				itemstats[9]-equipstats[9]
 			}		
 			
 			if statchange[1]>0 then
@@ -769,6 +770,22 @@ function UseMenu(id,slot)
 				dexbonus.x=statchangex+(statchangexs*4)
 				dexbonus.y=statchangey
 				gum:insert( dexbonus )
+				eqpstatchnge=true
+			end
+			
+			if statchange[6]>0 then
+				intbonus=display.newText( ("INT +"..statchange[5]) ,0,0,"Game Over",85)
+				intbonus:setTextColor( 60, 180, 60)
+				intbonus.x=statchangex+(statchangexs*5)
+				intbonus.y=statchangey
+				gum:insert(intbonus)
+				eqpstatchnge=true
+			elseif statchange[6]<0 then
+				intbonus=display.newText( ("INT "..statchange[5]) ,0,0,"Game Over",85)
+				intbonus:setTextColor( 180, 60, 60)
+				intbonus.x=statchangex+(statchangexs*5)
+				intbonus.y=statchangey
+				gum:insert(intbonus)
 				eqpstatchnge=true
 			end
 			
