@@ -148,7 +148,7 @@ function CheckSave(slot)
 	end
 end
 
-function Save()
+function Save(doMap)
 	local path = system.pathForFile(  "DoGSave"..saveSlot..".sav", system.DocumentsDirectory )
 	local fh, errStr = io.open( path, "w+" )
 	
@@ -203,6 +203,9 @@ function Save()
 	io.close( fh )
 --	print ("Progress saved on floor "..Round..".")
 	canMap=true
+	if doMap==true then
+		SaveMap()
+	end
 end
 
 function WipeSave(slot)
@@ -246,8 +249,8 @@ function SaveMap()
 				end
 			else
 			end
-			fh:write("--\n")
 		end
+		fh:write("--\n")
 		io.close( fh )
 		local Round=WD.Circle()
 	--	print ("Map saved on floor "..Round..".")
@@ -260,7 +263,12 @@ function LoadMap()
 	local var={}
 	local path = system.pathForFile(  "DoGMapSave"..saveSlot..".sav", system.DocumentsDirectory )
 	for line in io.lines( path ) do
-		firststop[#firststop+1]=line
+		n = tonumber(line)
+		if n == nil then
+			firststop[#firststop+1]=line
+		else
+			firststop[#firststop+1]=n
+		end
 	end
 	for i=1,table.maxn(firststop) do
 		if firststop[i]=="--" then

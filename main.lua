@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------------------------
 -- hide the status bar
 display.setStatusBar( display.HiddenStatusBar )
+system.setIdleTimer( false )
 local loadsheet = graphics.newImageSheet( "spriteload.png", { width=50, height=50, numFrames=8 } )
 local startup=require("Lstartup")
 local menu = require("Lmenu")

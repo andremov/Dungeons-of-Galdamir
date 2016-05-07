@@ -117,10 +117,13 @@ function Essentials()
 	Shops={}
 	walls={}
 	mobs={}
+	fog={}
 	if isLoaded~=true then
 		room={}
 	end
-	fog={}
+	if TileIDsNum==true then
+		num={}
+	end
 	layout={
 		1,0,0,0,0,
 		0,0,0,0,0,
@@ -128,9 +131,6 @@ function Essentials()
 		0,0,0,0,0,
 		0,0,0,0,0,
 	}
-	if TileIDsNum==true then
-		num={}
-	end
 	local round=WD.Circle()
 	if isLoaded~=true then
 		rooms=math.floor(math.random(round/2,round))
@@ -140,7 +140,6 @@ function Essentials()
 			rooms=25
 		end
 		curroom=1
-		roomid=1
 		for i=2,rooms do
 			local posrooms={}
 			for r=1,table.maxn(layout)do
@@ -157,23 +156,15 @@ function Essentials()
 			layout[posrooms[chosen]]=1
 		end
 	else
-		rooms=0
-		curroom=1
-		roomid=1
 		for r in pairs(room) do
 			if(room[r]~=false)then
-				print (r)
-				rooms=rooms+1
 				layout[r]=1
-			print (layout[r])
-			print (layout[6])
+				if not(curroom)then
+					curroom=r
+				end
 			end
-			print (layout[6])
-			print "--"
 		end
-	print (layout[6])
 	end
-	print (layout[6])
 	for r=1,table.maxn(layout) do
 		if layout[r]==1 then
 			if isLoaded~=true then
@@ -193,18 +184,17 @@ function Essentials()
 			if TileIDsNum==true then
 				num[r]={}
 			end
-		else
+		elseif isLoaded~=true then
 			room[r]=false
 		end
 	end
-	print (layout[6])
 	Tiles()
 	bkg=ui.Background()
-	print (layout[1].." "..layout[2].." "..layout[3].." "..layout[4].." "..layout[5])
-	print (layout[6].." "..layout[7].." "..layout[8].." "..layout[9].." "..layout[10])
-	print (layout[11].." "..layout[12].." "..layout[13].." "..layout[14].." "..layout[15])
-	print (layout[16].." "..layout[17].." "..layout[18].." "..layout[19].." "..layout[20])
-	print (layout[21].." "..layout[22].." "..layout[23].." "..layout[24].." "..layout[25])
+	--print (layout[1].." "..layout[2].." "..layout[3].." "..layout[4].." "..layout[5])
+	--print (layout[6].." "..layout[7].." "..layout[8].." "..layout[9].." "..layout[10])
+	--print (layout[11].." "..layout[12].." "..layout[13].." "..layout[14].." "..layout[15])
+	--print (layout[16].." "..layout[17].." "..layout[18].." "..layout[19].." "..layout[20])
+	--print (layout[21].." "..layout[22].." "..layout[23].." "..layout[24].." "..layout[25])
 end
 
 function BuildMap()
@@ -462,9 +452,7 @@ function BuildTile()
 		loadtxt.text=("Generating Room "..curroom.."...\n".."              "..math.floor((count/mapsize)*100).."%")
 		loadtxt:toFront()
 	end
-	print (room)
-	print (room[curroom])
-	print (room[curroom][count])
+	
 	if count~=mapsize+1 and not(room[curroom][count]) then
 	
 		if(map[count]=="1")then
@@ -753,6 +741,12 @@ function BuildTile()
 			mbounds[curroom][count]=0
 		end
 		
+		if(room[curroom][count]=="e") then
+			boundary[curroom][count]=1
+			mbounds[curroom][count]=1
+			Spawner=true
+		end
+		
 		if(room[curroom][count]=="h")then
 			mbounds[curroom][count]=1
 			boundary[curroom][count]=1
@@ -792,14 +786,12 @@ function BuildTile()
 			boundary[curroom][count]=1
 			mbounds[curroom][count]=1
 			BluePortal=true
-			room[curroom][count]="n"
 		end
 	
 		if(room[curroom][count]=="ñ")then
 			boundary[curroom][count]=1
 			mbounds[curroom][count]=1
 			RedPortal=true
-			room[curroom][count]="ñ"
 		end
 		
 		if(room[curroom][count]=="o")then
@@ -826,7 +818,7 @@ function BuildTile()
 		if(room[curroom][count]=="u") then
 			boundary[curroom][count]=1
 			mbounds[curroom][count]=1
-			Spawner=true
+			DarkPortal=true
 		end
 		
 		if(room[curroom][count]=="w")then
@@ -849,8 +841,8 @@ function BuildTile()
 		if(room[curroom][count]=="z")then
 			mbounds[curroom][count]=0
 			boundary[curroom][count]=1
-			exitloc=count
-			exitroom=curroom
+			finishpos[#finishpos+1]=(count)
+			finishroom[#finishroom+1]=(curroom)
 		end
 		
 	end
@@ -869,7 +861,7 @@ function RandomizeTile()
 		if (map[count]=="r") then
 			if i~=(math.sqrt(mapsize)+2) then
 				local TileRoll=math.random(1, 100)
-			
+				
 				if (TileRoll>=1) and (TileRoll<8) then
 					boundary[curroom][count]=1
 					mbounds[curroom][count]=1
@@ -1023,13 +1015,13 @@ function RandomizeTile()
 					end
 				end
 			
-				if (TileRoll>=10) and (TileRoll<15) then
+				if (TileRoll>=8) and (TileRoll<15) then
 					boundary[curroom][count]=1
 					mbounds[curroom][count]=0
 					room[curroom][count]="l"
 				end
 
-				if (TileRoll>=8) and (TileRoll<20) then
+				if (TileRoll>=15) and (TileRoll<20) then
 					boundary[curroom][count]=1
 					mbounds[curroom][count]=0
 					room[curroom][count]="w"

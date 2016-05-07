@@ -1046,7 +1046,7 @@ function UseMenu(id,slot)
 				elseif itemstats[4]==1 then
 					WD.FloorPort(true)
 				elseif itemstats[4]==2 then
-					s.Save()
+					s.Save(true)
 				end
 			end
 		end

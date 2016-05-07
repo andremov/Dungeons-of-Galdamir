@@ -40,7 +40,7 @@ local S={
 	"Stat Boosts!",
 	"Secret Items!",
 	"29 Pages of Code!",
-	"32MB of Pure Gold!",
+	"35MB of Pure Gold!",
 	"Over 100 items!",
 	"Rings!",
 	"Unused Equipment!",

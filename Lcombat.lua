@@ -115,6 +115,7 @@ function DisplayCombat()
 	Runtime:addEventListener("enterFrame", NoMansLand)
 	HitGroup=display.newGroup()
 	mov.CleanArrows()
+	players.CalmDownCowboy(false)
 	gcm=display.newGroup()
 	hits={}
 	
@@ -179,6 +180,10 @@ function HideActions()
 	
 	if (ItemBtn) then
 		display.remove(ItemBtn)
+	end
+	
+	if (RecoverBtn) then
+		display.remove(RecoverBtn)
 	end
 	
 	if (GuardBtn) then
@@ -964,7 +969,7 @@ function CreateMobStats()
 	local size=builder.GetData(0)
 	local col=(math.floor(enemy.loc%(math.sqrt(size))))
 	local row=(math.floor(enemy.loc/(math.sqrt(size))))+1
-	local zonas=((math.sqrt(size))/10)
+	local zonas=math.ceil((math.sqrt(size))/10)
 	local round=WD.Circle()
 	
 	if not (enemy.bonus) then
@@ -983,7 +988,7 @@ function CreateMobStats()
 				if col>((math.sqrt(size)/zonas)*(zonas-z)) and col<=((math.sqrt(size)/zonas)*((zonas+1)-z)) and row>=((math.sqrt(size)/zonas)*(zonas-z)) then
 					enemy.lvl=(z+(zonas*(round-1)))
 				elseif row>((math.sqrt(size)/zonas)*(zonas-z)) and row<=((math.sqrt(size)/zonas)*((zonas+1)-z)) and col>=((math.sqrt(size)/zonas)*((zonas+1)-z)) then
-					enemy.lvl=(z+(zonas*(round-1)))
+					enemy.lvl(z+(zonas*(round-1)))
 				end
 			end
 		else
@@ -1487,6 +1492,8 @@ function EndCombat(outcome)
 	end
 	gcm=nil
 	Created=nil
+	AutoAttack=0
+	players.CalmDownCowboy(true)
 	
 	if outcomed==false then
 		

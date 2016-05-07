@@ -235,7 +235,7 @@ end
 
 function MobDied(data)
 	for r in pairs(mobs) do
-		for t in pairs(mobs) do
+		for t in pairs(mobs[r]) do
 			if data==mobs[r][t] then
 				display.remove(mobs[r][t])
 				mobs[r][t]=nil

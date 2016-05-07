@@ -114,20 +114,21 @@ function Continue( event )
 			end
 		end
 		Loading=nil
-		ui.UI(true)
 		if DoStuff==true then
+			ui.UI(true)
 			ui.Pause(true)
 			inv.ToggleInfo()
+			players.CalmDownCowboy(true)
 			audio.Play(3)
 			audio.Play(10)
-		end
-		if DoStuff==false then
+		elseif DoStuff==false then
 			m.Visibility()
 		end
 	end
 end
 	
 function Operations(name)
+	players.CalmDownCowboy(false)
 	q.Essentials()
 	WD.Essentials()
 	handler.CallingZones()

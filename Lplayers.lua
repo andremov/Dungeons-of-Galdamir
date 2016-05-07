@@ -5,30 +5,31 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local heartnsheet = graphics.newImageSheet( "heartemptysprite.png", { width=25, height=25, numFrames=16 } )
+local energysheet = graphics.newImageSheet( "energysprite.png", { width=60, height=60, numFrames=4 } )
 local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height=25, numFrames=16 } )
 local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 } )
-local energysheet = graphics.newImageSheet( "energysprite.png", { width=60, height=60, numFrames=4 } )
 local xpsheet = graphics.newImageSheet( "xpbar.png", { width=392, height=40, numFrames=50 } )
 local b=require("Lmapbuilder")
-local gold=require("Lgold")
 local WD=require("Lprogress")
+local su=require("Lstartup")
+local gold=require("Lgold")
+local w=require("Lwindow")
 local c=require("Lchars")
 local a=require("Laudio")
 local i=require("Litems")
-local w=require("Lwindow")
 local ui=require("Lui")
-local su=require("Lstartup")
-local yCoord=856
-local xCoord=70
-local Map
-local check=119
-local player
+local DisplayCan=false
 local Cheat=false
-local scale=1.2
 local StrongForce
-local transp
+local yCoord=856
+local check=119
+local xCoord=70
+local scale=1.2
 local transp2
 local transp3
+local player
+local transp
+local Map
 local names={
 		"Nameless",
 		"Orphan",
@@ -171,6 +172,7 @@ function ShowStats()
 		LifeWindow.x=LifeDisplay.x
 		LifeWindow.y=LifeDisplay.y+5
 		
+		LifeSymbol:toFront()
 		LifeDisplay:toFront()
 		LifeDisplay:setTextColor( 255, 255, 255,transp)
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
@@ -231,6 +233,7 @@ function ShowStats()
 		ManaWindow.x=ManaDisplay.x
 		ManaWindow.y=ManaDisplay.y+5
 		
+		ManaSymbol:toFront()
 		ManaDisplay:toFront()
 		ManaDisplay:setTextColor( 255, 255, 255,transp3)
 		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
@@ -280,6 +283,7 @@ function ShowStats()
 		EnergyWindow.x=EnergyDisplay.x
 		EnergyWindow.y=EnergyDisplay.y+5
 		
+		EnergySymbol:toFront()
 		EnergyDisplay:toFront()
 		EnergyDisplay:setTextColor( 255, 255, 255,transp5)
 		EnergySymbol:setFillColor(transp5,transp5,transp5,transp5)
@@ -343,7 +347,7 @@ function ShowStats()
 end
 
 function openStats( event )
-	if event.phase=="ended" then
+	if event.phase=="ended" and DisplayCan==true then
 		ui.Pause(true)
 		w.ToggleInfo()
 	end
@@ -355,6 +359,10 @@ function LetsYodaIt()
 	else
 		StrongForce=false
 	end
+end
+
+function CalmDownCowboy(what)
+	DisplayCan=what
 end
 
 function ReduceHP(amount,cause)
@@ -542,6 +550,8 @@ function LvlFanfare()
 end
 
 function OhCrap()
+	XPSymbol:toFront()
+	XPDisplay:toFront()
 	if XPSymbol.frame==50 and player.XP>player.MaxXP then
 		LvlUp()
 	elseif XPSymbol.frame>math.floor((player.XP/player.MaxXP)*50) then

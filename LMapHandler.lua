@@ -22,7 +22,7 @@ local testin={}
 local mapsD={}
 local opt=display.newGroup()
 local TileID=0
-local SizeID=1
+local SizeID=3
 local CurSize
 local CurTile
 local Testing=false
@@ -43,7 +43,7 @@ function GetCMap(value)
 			currentmap=mapsL[1]
 			return currentmap
 		elseif SizeID==5 then
-			currentmap=mapsH[1]
+			currentmap=mapsD[1]
 			return currentmap
 		end
 	elseif value==-1 then

@@ -133,19 +133,19 @@ function Pause(mute)
 		portsprsnt.txt.text=(P1.portcd)
 		MovePause(true)
 		if isPaused==true then
+		--	print "!3"
 			isPaused=false
-	--		print "!2"
-	--		print "Game resumed."
+		--	print "Game resumed."
 			if mute~=true then
 				audio.Play(5)
 			end
 		elseif isPaused==false then
 			isPaused=true
-	--		print "!3"
+		--	print "!1"
 			m.CleanArrows()
 			gold.ShowGCounter()
 			players.LetsYodaIt()
-	--		print "Game paused."
+		--	print "Game paused."
 			if mute~=true then
 				audio.Play(6)
 			end
@@ -163,14 +163,14 @@ function MovePause(val)
 		if not (PauseBtn) then
 			timer.performWithDelay(50,MovePause)
 		elseif pwg.y==0 and val~=true then
-	--		print "!1"
+		--	print "!4"
 			window.loc=0
 			window.ready=1
 			m.Visibility()
 			gold.ShowGCounter()
 			players.LetsYodaIt()
 		elseif pwg.y==-216 and val~=true then
-	--		print "!4"
+		--	print "!2"
 			window.loc=1
 			window.ready=1
 		else

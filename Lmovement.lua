@@ -30,6 +30,7 @@ local Toggle=math.random(5,10)
 function ShowArrows()
 	CleanArrows()
 	
+	combatBug=c.InTrouble()
 	Key=coll.onKeyCollision()
 	Dropped=coll.onChestCollision()
 	Slowed=coll.onWaterCollision()
@@ -45,7 +46,7 @@ function ShowArrows()
 		mwindow=nil
 	end
 	
-	if Dropped==true or Key==true then
+	if Dropped==true or Key==true or combatBug==true then
 	elseif Toggle<=0 then
 		mtext=display.newText("Doing mob turns...",0,0,"MoolBoran",70)
 		mtext.x=display.contentCenterX
@@ -267,7 +268,7 @@ function ShowArrows()
 		local entrance,entranceroom=b.GetData(12)
 		local CurRound=WD.Circle()
 		if p1.loc==entrance and p1.room==entranceroom and CurRound>1 then
-			inter=display.newImageRect("interact3.png",80,80)
+			inter=display.newImageRect("interact3B.png",80,80)
 			inter.x=xinicial
 			inter.y=yinicial
 			inter.xScale=scale
