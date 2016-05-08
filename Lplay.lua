@@ -4,18 +4,19 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local widget = require "widget"
-local a = require("Laudio")
+local widget=require"widget"
 local t=require("Ltutorial")
 local su=require("Lstartup")
 local sav=require("Lsaving")
+local lc=require("Llocale")
+local a=require("Laudio")
 local m=require("Lmenu")
 local pmg
 
 function Display()
 	pmg=display.newGroup()
 	m.FindMe(1)
-	title=display.newText("Save game",0,0,"MoolBoran",100)
+	title=display.newText(lc.giveText("LOC029"),0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100
 	title:setTextColor(125,250,125)
@@ -200,7 +201,7 @@ function Display()
 	end
 	
 	BackBtn =  widget.newButton{
-		label="Back",
+		label=lc.giveText("LOC008"),
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		font="MoolBoran",
 		fontSize=50,
@@ -362,7 +363,7 @@ function Keyboard()
 	UpdateName()
 	
 	
-	title=display.newText("Character name",0,0,"MoolBoran",100)
+	title=display.newText(lc.giveText("LOC030"),0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100
 	title:setTextColor(125,250,125)
@@ -492,7 +493,7 @@ function Keyboard()
 	end
 	
 	DelBtn =  widget.newButton{
-		label="Backspace",
+		label=lc.giveText("LOC031"),
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		font="MoolBoran",
 		fontSize=50,
@@ -508,7 +509,7 @@ function Keyboard()
 	kbrd:insert( DelBtn )
 	
 	EndBtn =  widget.newButton{
-		label="Continue",
+		label=lc.giveText("LOC032"),
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		font="MoolBoran",
 		fontSize=50,
@@ -524,7 +525,7 @@ function Keyboard()
 	kbrd:insert( EndBtn )
 	
 	BackBtn =  widget.newButton{
-		label="Back",
+		label=lc.giveText("LOC008"),
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		font="MoolBoran",
 		fontSize=50,

@@ -16,6 +16,9 @@ Font3: Viner Hand ITC
 Font4: Adobe Devanagari
 Font5: MoolBoran
 
+AdBuddiz:
+6c7e651b-851d-4ab9-923d-a557d77d4a6a
+
 TO DO
 	COD-LIKE DAMAGE GFX
 	LOW HEALTH SFX
@@ -24,7 +27,7 @@ TO DO
 local RSS
 local shSuffix="RLSE"
 local loSuffix="RELEASE"
-local verNum="1.1.2"
+local verNum="1.1.3"
 local cVersion=(shSuffix.." "..verNum)
 local gVersion=(loSuffix.." "..verNum)
 

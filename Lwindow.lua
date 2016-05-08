@@ -1318,7 +1318,7 @@ function UseMenu(id,slot)
 				elseif itemstats[4]==1 then
 					WD.FloorPort(true)
 				elseif itemstats[4]==2 then
-					s.Save(true)
+					b.Expand()
 				end
 			end
 		end
@@ -1567,7 +1567,7 @@ function UseMenu(id,slot)
 				gum:insert( usebtn )
 			elseif itemstats[4]==2 then
 				local usebtn=  widget.newButton{
-					label="Save",
+					label="Expand",
 					labelColor = { default={255,255,255}, over={0,0,0} },
 					font="MoolBoran",
 					fontSize=50,

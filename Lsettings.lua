@@ -5,14 +5,13 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local o=require("Loptions")
+local lc=require("Llocale")
 local gsm
 local curname=1
 local window
 local snap=1
 local names={
-		"Gold Counter","Health Display","Mana Display",
-		"Energy Display","Stat Points Notice","Experience Bar",
-		"Quest Log","Pause Button"
+		"LOC009","LOC010","LOC011","LOC012","LOC013","LOC014","LOC015","LOC016",
 	}
 local info={
 		-- Gold
@@ -83,28 +82,28 @@ function Start()
 	block.y=display.contentCenterY
 	gsm:insert(block)
 	
-	prevtxt=display.newText("Previous",0,0,"MoolBoran",55)
+	prevtxt=display.newText(lc.giveText("LOC020"),0,0,"MoolBoran",55)
 	prevtxt.x=display.contentCenterX-180
 	prevtxt.y=display.contentCenterY+50
 	prevtxt:addEventListener("tap",doPrev)
 	prevtxt:setTextColor(125,125,250)
 	gsm:insert(prevtxt)
 	
-	resttxt=display.newText("Reset",0,0,"MoolBoran",55)
+	resttxt=display.newText(lc.giveText("LOC021"),0,0,"MoolBoran",55)
 	resttxt.x=display.contentCenterX
 	resttxt.y=display.contentCenterY+50
 	resttxt:addEventListener("tap",doReset)
 	resttxt:setTextColor(125,125,250)
 	gsm:insert(resttxt)
 	
-	backtxt=display.newText("Back",0,0,"MoolBoran",65)
+	backtxt=display.newText(lc.giveText("LOC008"),0,0,"MoolBoran",65)
 	backtxt.x=display.contentCenterX
 	backtxt.y=display.contentCenterY+200
 	backtxt:addEventListener("tap",doBack)
 	backtxt:setTextColor(180,180,180)
 	gsm:insert(backtxt)
 	
-	nexttxt=display.newText("Next",0,0,"MoolBoran",55)
+	nexttxt=display.newText(lc.giveText("LOC022"),0,0,"MoolBoran",55)
 	nexttxt.x=display.contentCenterX+180
 	nexttxt.y=display.contentCenterY+50
 	nexttxt:addEventListener("tap",doNext)
@@ -203,7 +202,7 @@ function Interface()
 	display.remove(snap3)
 	snap3=nil
 	
-	selected=display.newText((names[curname]),0,0,"MoolBoran",70)
+	selected=display.newText(( lc.giveText(names[curname]) ),0,0,"MoolBoran",70)
 	selected.x=display.contentCenterX
 	selected.y=display.contentCenterY-100
 	selected:setTextColor(230,230,230)
@@ -218,20 +217,20 @@ function Interface()
 		gsm:insert(alwaysV3)
 		
 	
-		alwaysV=display.newText("Always visible?",0,0,"MoolBoran",60)
+		alwaysV=display.newText(lc.giveText("LOC017"),0,0,"MoolBoran",60)
 		alwaysV.x=display.contentCenterX-45
 		alwaysV.y=display.contentCenterY-50
 		alwaysV:setTextColor(180,180,180)
 		gsm:insert(alwaysV)
 		
 		if positions[curname][3]==0 then
-			alwaysV2=display.newText("No",0,0,"MoolBoran",60)
+			alwaysV2=display.newText(lc.giveText("LOC018"),0,0,"MoolBoran",60)
 			alwaysV2.x=display.contentCenterX+120
 			alwaysV2.y=alwaysV.y
 			alwaysV2:setTextColor(255,125,125)
 			gsm:insert(alwaysV2)
 		else
-			alwaysV2=display.newText("Yes",0,0,"MoolBoran",60)
+			alwaysV2=display.newText(lc.giveText("LOC019"),0,0,"MoolBoran",60)
 			alwaysV2.x=display.contentCenterX+120
 			alwaysV2.y=alwaysV.y
 			alwaysV2:setTextColor(125,255,125)
@@ -246,20 +245,20 @@ function Interface()
 	snap3:addEventListener("tap",doSnap)
 	gsm:insert(snap3)
 	
-	snap1=display.newText("Snapping?",0,0,"MoolBoran",60)
+	snap1=display.newText(lc.giveText("LOC023"),0,0,"MoolBoran",60)
 	snap1.x=display.contentCenterX-45
 	snap1.y=display.contentCenterY+110
 	snap1:setTextColor(180,180,180)
 	gsm:insert(snap1)
 	
 	if snap==0 then
-		snap2=display.newText("No",0,0,"MoolBoran",60)
+		snap2=display.newText(lc.giveText("LOC018"),0,0,"MoolBoran",60)
 		snap2.x=display.contentCenterX+120
 		snap2.y=snap1.y
 		snap2:setTextColor(255,125,125)
 		gsm:insert(snap2)
 	else
-		snap2=display.newText("Yes",0,0,"MoolBoran",60)
+		snap2=display.newText(lc.giveText("LOC019"),0,0,"MoolBoran",60)
 		snap2.x=display.contentCenterX+120
 		snap2.y=snap1.y
 		snap2:setTextColor(125,255,125)

@@ -683,19 +683,18 @@ function Load1(cls,chr)
 	Runtime:removeEventListener("enterFrame",ShowStats)
 	display.remove(player)
 	Statless()
-	
 	local char =chr
 	local class=cls
 	
-	player=display.newImageRect( "chars/"..char.."/"..class.."/char.png", 76 ,76)
+	--Visual
+	player=display.newSprite( psheet, pseqs )
+	player:setSequence("stand1")
 	player.x, player.y = display.contentWidth/2, display.contentHeight/2
-	player:setStrokeColor(50, 50, 255)
-	player.strokeWidth = 4
 	player.xScale=scale
 	player.yScale=player.xScale
-	
 	player.char=char
 	player.class=class
+	
 end
 
 function Load2(stam,atk,dfnc,mgk,dxtrty,intlct)
@@ -736,7 +735,7 @@ end
 
 function FinishLoading()
 	player.statnames={"Stamina","Attack","Defense","Magic","Dexterity","Intellect"}
-	player.clsnames={"Knight","Warrior","Thief","Viking","Sorcerer","Scholar"}
+	player.clsnames={"Viking","Warrior","Knight","Sorcerer","Thief","Scholar","Freelancer"}
 	player.eqs={0,0,0,0,0,0}
 	player.bon={0,0,0,0,0,0}
 	player.weight=5

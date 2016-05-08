@@ -5,13 +5,14 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local widget = require "widget"
-local menu=require("Lmenu")
-local a=require("Laudio")
-local map=require("Lhandler")
-local char=require("Lchars")
-local scr=require("Lscore")
 local set=require("Lsettings")
+local char=require("Lchars")
 local sav=require("Lsaving")
+local menu=require("Lmenu")
+local map=require("Ltiles")
+local scr=require("Lscore")
+local lc=require("Llocale")
+local a=require("Laudio")
 local optionz=display.newGroup()
 local SMute
 local SUnmute
@@ -28,14 +29,14 @@ local Large
 function DisplayOptions()
 	scr.CheckScore()
 	menu.FindMe(2)
-	title=display.newText("Options",0,0,"MoolBoran",100)
+	title=display.newText(lc.giveText("LOC002"),0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100
 	title:setTextColor(125,250,125)
 	optionz:insert(title)
 	
 	BackBtn =  widget.newButton{
-		label="Back",
+		label=lc.giveText("LOC008"),
 		font="MoolBoran",
 		fontSize=50,
 		labelYOffset=10,
@@ -68,7 +69,7 @@ function DisplayOptions()
 	]]
 	
 	Map =  widget.newButton{
-		label="Map",
+		label=lc.giveText("LOC007"),
 		font="MoolBoran",
 		fontSize=50,
 		labelYOffset=10,
@@ -84,7 +85,7 @@ function DisplayOptions()
 	optionz:insert(Map)
 	
 	ScreBtn =  widget.newButton{
-		label="High Scores",
+		label=lc.giveText("LOC006"),
 		font="MoolBoran",
 		fontSize=50,
 		labelYOffset=10,
@@ -100,7 +101,7 @@ function DisplayOptions()
 	optionz:insert(ScreBtn)
 	
 	Setting =  widget.newButton{
-		label="UI Positions",
+		label=lc.giveText("LOC005"),
 		font="MoolBoran",
 		fontSize=50,
 		labelYOffset=10,
@@ -132,7 +133,7 @@ function DisplayOptions()
 	scrollind.yScale=scrollind.xScale
 	optionz:insert(scrollind)
 	
-	musicind=display.newText( ("Music Volume: "..(m*10).."%"),0,0,"MoolBoran",50 )
+	musicind=display.newText( (lc.giveText("LOC003").." "..(m*10).."%"),0,0,"MoolBoran",50 )
 	musicind.x=scroll.x
 	musicind.y=scroll.y+10
 	optionz:insert(musicind)
@@ -154,7 +155,7 @@ function DisplayOptions()
 	scrollind2.yScale=scrollind.xScale
 	optionz:insert(scrollind2)
 	
-	soundind=display.newText( ("Sound Volume: "..(s*10).."%"),0,0,"MoolBoran",50 )
+	soundind=display.newText( (lc.giveText("LOC004").." "..(s*10).."%"),0,0,"MoolBoran",50 )
 	soundind.x=scroll2.x
 	soundind.y=scroll2.y+10
 	optionz:insert(soundind)

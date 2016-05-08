@@ -8,9 +8,9 @@ local builder=require("Lbuilder")
 local players=require("Lplayers")
 local m=require("Lmenu")
 local mob=require("Lmobai")
-local handler=require("Lhandler")
+local handler=require("Ltiles")
 local mov=require("Lmoves")
-local col=require("Ltiles")
+local col=require("Levents")
 local audio=require("Laudio")
 local gp=require("Lgold")
 local inv=require("Lwindow")
@@ -124,6 +124,7 @@ function Win()
 	if Round>HighCard then
 		HighCard=Round
 		local gpgain=Round*((math.sqrt(size)/5)*2)
+		gpgain=math.ceil(gpgain)
 		if gpgain>(5*math.sqrt(size)) then
 			gpgain=(5*math.sqrt(size))
 		end

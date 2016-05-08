@@ -4,8 +4,8 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local handler=require("Lhandler")
-local col=require("Ltiles")
+local handler=require("Ltiles")
+local col=require("Levents")
 local WD=require("Lprogress")
 local bin=require("Lgarbage")
 local wdow=require("Lwindow")
@@ -32,6 +32,7 @@ local Destructibles
 local WaterBlocks
 local LavaBlocks
 local boundary
+local length=7
 local mbounds
 local loadtxt
 local Chests
@@ -44,6 +45,7 @@ local scale
 local map2
 local side
 local fog
+local map
 -- Extra Tiles
 local OrangePortal
 local entranceroom
@@ -190,11 +192,83 @@ function Essentials()
 	end
 	Tiles()
 	bkg=ui.Background()
-	--print (layout[1].." "..layout[2].." "..layout[3].." "..layout[4].." "..layout[5])
-	--print (layout[6].." "..layout[7].." "..layout[8].." "..layout[9].." "..layout[10])
-	--print (layout[11].." "..layout[12].." "..layout[13].." "..layout[14].." "..layout[15])
-	--print (layout[16].." "..layout[17].." "..layout[18].." "..layout[19].." "..layout[20])
-	--print (layout[21].." "..layout[22].." "..layout[23].." "..layout[24].." "..layout[25])
+	--[[--]]
+	print (layout[1].." "..layout[2].." "..layout[3].." "..layout[4].." "..layout[5])
+	print (layout[6].." "..layout[7].." "..layout[8].." "..layout[9].." "..layout[10])
+	print (layout[11].." "..layout[12].." "..layout[13].." "..layout[14].." "..layout[15])
+	print (layout[16].." "..layout[17].." "..layout[18].." "..layout[19].." "..layout[20])
+	print (layout[21].." "..layout[22].." "..layout[23].." "..layout[24].." "..layout[25])
+	
+end
+
+function doTemplate()
+	-- KEY
+	--[[
+		1-upper opening
+		2-left opening
+		3-right opening
+		4-lower opening
+		a-start					b-boundary
+		c-						d-break/wall
+		e-mobspawner			f-
+		g-						h-healpad
+		i-energypad				j-manapad
+		k-keyblock				l-lava
+		m-orange				n-blue
+		ñ-red					o-wall
+		p-						q-alwaysbreakable
+		r-random				s-shop
+		t-						u-darkblue
+		v-						w-water
+		x-walkable				y-
+		z-finish	
+
+		H = 10x10
+		S = 20x20
+		M = 30x30
+		L = 40x40
+	--]]
+	map={}
+	for i=1,length^2 do
+		map[i]="r"
+		local x=(((i-1)%length))
+		local y=(math.floor((i-1)/length))
+		if x==0 or x==length-1 or y==0 or y==length-1 then
+			if math.ceil(length/2)==x+1 then
+				if y==0 then
+					map[i]="1"
+				elseif y==length-1 then
+					map[i]="4"
+				end
+			elseif (length/2)+1==x+1 then
+				if y==0 then
+					map[i]="1"
+				elseif y==length-1 then
+					map[i]="4"
+				end
+			elseif math.ceil(length/2)==y+1 then
+				if x==0 then
+					map[i]="2"
+				elseif x==length-1 then
+					map[i]="3"
+				end
+			elseif (length/2)+1==y+1 then
+				if x==0 then
+					map[i]="2"
+				elseif x==length-1 then
+					map[i]="3"
+				end
+			else
+				map[i]="b"
+			end
+		else
+			if i==length+2 then
+				map[i]="a"
+			elseif i==(length^2)-(length+1) then
+				map[i]="z"
+			end
+		end
+	end
 end
 
 function BuildMap()
@@ -208,7 +282,7 @@ function BuildMap()
 		Essentials()
 		count=0
 	end
-	map=handler.GetCMap()
+	doTemplate()
 	mapsize=table.maxn( map )
 	
 	if room[curroom]~=false and curroom<table.maxn(layout)+1 then
@@ -286,8 +360,6 @@ function DisplayMap()
 	if (count==0)then
 	--	print "Starting Map Display..."
 	end
-	local map=handler.GetCMap()
-	mapsize=table.maxn( map )
 	xinicial=math.floor((curroom-1)%5)*(math.sqrt(mapsize)*espacio)
 	yinicial=math.floor((curroom-1)/5)*(math.sqrt(mapsize)*espacio)
 	
@@ -298,12 +370,12 @@ function DisplayMap()
 		DisplayTile()
 		DisplayTile()
 	elseif curroom==table.maxn(layout)+1 then
-		count=mapsize
+		count=mapsize+3
 	else
 		curroom=curroom+1
 	end
 	
-	if count~=mapsize then
+	if count<mapsize+1 then
 		timer.performWithDelay(0.2,DisplayMap)
 	else
 		if curroom~=table.maxn(layout)+1  then
@@ -311,8 +383,6 @@ function DisplayMap()
 			curroom=curroom+1
 			timer.performWithDelay(0.2,DisplayMap)
 		else
-			loadtxt.text=("Done.")
-			loadtxt:toFront()
 			mob.ReceiveMobs(mobs)
 			display.remove(loadtxt)
 			loadtxt=nil
@@ -378,8 +448,6 @@ function Extras()
 		xinicial=math.floor((r-1)%5)*(math.sqrt(mapsize)*espacio)
 		yinicial=math.floor((r-1)/5)*(math.sqrt(mapsize)*espacio)
 		if layout[r]==1 then
-			local map=handler.GetCMap()
-			mapsize=table.maxn( map )
 			for i=1, mapsize do
 				if i~=(math.sqrt(mapsize)+2) and room[r][i]=="x" then
 					
@@ -863,8 +931,6 @@ function RandomizeTile()
 	if count==1 then
 	--	print "Starting Map Randomization..."
 	end
-	local map=handler.GetCMap()
-	mapsize=table.maxn( map )
 	
 	if count~=mapsize+1 and not(room[curroom][count]) then
 		if (map[count]=="r") then
@@ -1123,7 +1189,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="e") then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1180,7 +1246,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="h")then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1201,7 +1267,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="i")then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1222,7 +1288,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="j")then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1243,7 +1309,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="k")then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1263,7 +1329,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="l")then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1282,7 +1348,7 @@ function DisplayTile()
 		end	
 		
 		if(room[curroom][count]=="m")then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1302,7 +1368,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="n")then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1322,7 +1388,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="ñ")then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1360,7 +1426,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="q")then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1413,7 +1479,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="s")then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1431,7 +1497,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="t")then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1450,7 +1516,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="u") then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1470,7 +1536,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="w")then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1489,7 +1555,7 @@ function DisplayTile()
 		end
 		
 		if(room[curroom][count]=="x")then
-			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[curroom][count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
@@ -1544,6 +1610,14 @@ function DisplayTile()
 			Level:insert( num[curroom][count] )
 		end
 		
+	end
+end
+
+function Expand(get)
+	if get==true then
+		return length
+	else
+		length=length+1
 	end
 end
 

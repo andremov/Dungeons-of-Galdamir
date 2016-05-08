@@ -24,7 +24,7 @@ local epsheet = graphics.newImageSheet("ep.png",{ width=200, height=30, numFrame
 local physics = require "physics"
 local widget = require "widget"
 local menu = require ("Lmenu")
-local mh=require("Lhandler")
+local mh=require("Ltiles")
 local a = require("Laudio")
 local idletimer=0
 local Narrator={}
@@ -739,7 +739,18 @@ function Essentials()
 	mbounds={}
 	walls={}
 	map2={}
-	map={}
+	map={
+		"b","b","b","b","b","b","b","b","b","b",
+		"b","x","x","x","x","l","x","x","x","b",
+		"b","o","o","o","o","o","o","o","h","b",
+		"b","x","x","o","x","x","x","o","o","b",
+		"b","x","o","o","x","o","o","o","o","b",
+		"b","x","o","o","x","o","x","j","i","b",
+		"b","x","x","x","x","o","x","o","x","b",
+		"b","#","o","o","o","o","x","o","x","b",
+		"b","x","x","x","w","x","x","o","z","b",
+		"b","b","b","b","b","b","b","b","b","b",
+	}
 	TSet=0
 end
 
@@ -748,8 +759,6 @@ function BuildMap()
 		Essentials()
 		count=0
 	end
-	mh.CallingZones()
-	map=mh.GetCMap(-1)
 	mapsize=table.maxn( map )
 	
 	BuildTile()

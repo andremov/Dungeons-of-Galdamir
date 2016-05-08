@@ -4,13 +4,16 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-
+local lc=require("Llocale")
 local Splash
 local Splashtxt
 local Tip
 local Tiptxt
 local Tiptxt2
-local S={
+local S={}
+local T={}
+
+S["EN"]={
 	"Now with splashes!",
 	"Random maps!",
 	"Now released!",
@@ -40,7 +43,7 @@ local S={
 	"Secret Items!",
 	"29 Pages of Code!",
 	"20MB of Pure Gold!",
-	"Over 100 items!",
+	"Over 100 Items!",
 	"Rings!",
 	"Sorcery!",
 	"Mana!",
@@ -63,8 +66,69 @@ local S={
 	"Rooms!",
 	"Blocked portals!",
 	"Ceci n'est pas un splash!",
+	"Now with more contrast!",
+	"Expandable maps!",
+	"Now with less files!",
 }
-local T={
+
+S["ES"]={
+	"Ahora en Español!",
+	"Mapas Aleatorios!",
+	"Ahora Disponible al Publico!",
+	"Finalmente!",
+	"Equipamento Funcional!",
+	"Inventorio Funcional!",
+	"Diversidad Racial Enemiga!",
+	"Restricciones de Tirar Items!",
+	"Elixires de Dudosa Procedencia",
+	"Libre de Omnipotencia!",
+	"Armadura de Mitril!",
+	"Correccion de Errores Mayores!",
+	"Magico!",
+	"Esquiva!",
+	"Requiere Cargador!",
+	"No Imposible!",
+	"Improbable!",
+	"Oro Mineral!",
+	"Runas Misteriosas!",
+	"No Entres en Panico!",
+	"Tiendas de Items!",
+	"Impuestos por Piso!",
+	"Lanzamientos Estables!",
+	"Balanceado!",
+	"Impulsos de Estadisticas!",
+	"Items Secretos!",
+	"29 Paginas de Codigo!",
+	"20MB de Oro Puro!",
+	"Mas de 100 Items!",
+	"Anillos!",
+	"Hechiceria!",
+	"Mana!",
+	"Suave!",
+	"Pesado en Contenido!",
+	"Tecnicas!",
+	"Energia!",
+	"Tiendas Limitadas!",
+	"Fatiga!",
+	"Misiones!",
+	"Ahora con Historia de Fondo!",
+	"Vaya, mujer!",
+	"Giros de la Trama!",
+	"Niebla de Guerra!",
+	"Optimizacion!",
+	"Reacondicionamientos!",
+	"Peso!",
+	"Ahora con mas muerte!",
+	"Combate perezoso-compatible!",
+	"Cuartos!",
+	"Portals bloqueados!",
+	"Ceci n'est pas un splash!",
+	"Ahora con mas contraste!",
+	"Mapas expandibles!",
+	"Ahora con menos archivos!",
+}
+
+T["EN"]={
 	{"Spend your stat points wisely!"},
 	{"Dexterity increases your chance of","hitting an enemy."},
 	{"Stamina increases your health."},
@@ -85,14 +149,41 @@ local T={
 	{"The game is currently loading."},
 	{"These tips are sometimes helpful."},
 	{"The map's looks can be changed","in the options menu."},
-	{"The map's size can be changed","in the options menu."},
 	{"You can check your highest scores","in the options menu."},
 	{"You can change the volume in the","options menu."},
+	{"The game auto-saves every so often."},
+}
+
+T["ES"]={
+	{"Gasta tus puntos de estadisticas","sabiamente!"},
+	{"La destreza incrementa la probabilidad","de pegarle a un enemigo."},
+	{"El aguante incrementa tu vida."},
+	{"La magia incrementa el daño que tus","ataques magicos causan."},
+	{"El ataque incrementa el daño que tus","ataques fisicos causan."},
+	{"La defensa reduce el dano que","recibes."},
+	{"El intelecto incrementa tu mana y","energia."},
+	{"El aspecto y clase de un enemigo depende","de su estadistica mas alta."},
+	{"Atacar con baja energia o baja mana","puede reducir el daño que causas."},
+	{"Estas tips son aleatorias."},
+	{"El agua te retarda, permitiendo a","enemigos a moverse mas rapido."},
+	{"Manten pociones de vida a la mano."},
+	{"La hechiceria causa mas daño que ataques","regulares, pero requiere ambos recursos."},
+	{"En el menu de pausa puedes ver las","caractericas de tu piso actual."},
+	{"Algo acecha en la niebla."},
+	{"Evita moverte cerca a un creador de","enemigos."},
+	{"Nunca olvides agarrar la llave."},
+	{"El juego esta cargando."},
+	{"Estas tips a veces son utiles."},
+	{"Puedes cambiar el aspecto del mapa","en el menu de opciones."},
+	{"Puedes ver tus mas altos puntajes","en el menu de opciones."},
+	{"Puedes cambiar el volumen en el menu","de opciones."},
+	{"El juego auto-guarda de vez en cuando."},
 }
 
 function GetSplash()
-	local chooser=math.random(1,table.maxn(S))
-	Splash=S[chooser]
+	local lang=lc.giveLang()
+	local chooser=math.random(1,table.maxn(S[lang]))
+	Splash=S[lang][chooser]
 	Splashtxt = display.newEmbossedText((Splash),0,0,"MoolBoran", 65 )
 	Splashtxt.x=display.contentCenterX
 	Splashtxt.y=310
@@ -102,18 +193,19 @@ function GetSplash()
 end
 
 function GetTip()
-	local chooser=math.random(1,table.maxn(T))
-	Tip=T[chooser]
+	local lang=lc.giveLang()
+	local chooser=math.random(1,table.maxn(T[lang]))
+	Tip=T[lang][chooser]
 	local TGroup=display.newGroup()
 	
-	Tiptxt = display.newEmbossedText(("Tip: "..Tip[1]),0,0,"MoolBoran", 50 )
+	Tiptxt = display.newEmbossedText(("Tip: "..Tip[lang][1]),0,0,"MoolBoran", 50 )
 	Tiptxt.x=display.contentCenterX
 	Tiptxt.y=100
 	Tiptxt:setTextColor( 200, 200, 200)
 	Tiptxt:toFront()
 	TGroup:insert( Tiptxt )
 	if (Tip[2]) then
-		Tiptxt2 = display.newEmbossedText((Tip[2]),0,0,"MoolBoran", 50 )
+		Tiptxt2 = display.newEmbossedText((Tip[lang][2]),0,0,"MoolBoran", 50 )
 		Tiptxt2.x=display.contentCenterX
 		Tiptxt2.y=Tiptxt.y+60
 		Tiptxt2:setTextColor( 200, 200, 200)

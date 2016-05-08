@@ -5,7 +5,7 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local b=require("Lbuilder")
-local m=require("Lhandler")
+local m=require("Ltiles")
 local WD=require("Lprogress")
 local su=require("Lstartup")
 local v=require("Lversion")
@@ -21,11 +21,7 @@ local SplStrt
 local SplEnd
 local Sve
 local OKVers={
-		"RELEASE 1.0.0",
-		"RELEASE 1.0.1",
-		"RELEASE 1.1.0",
-		"RELEASE 1.1.1",
-		"RELEASE 1.1.2",
+		"RELEASE 1.1.3",
 	}
 
 function Load()
@@ -162,7 +158,7 @@ function Save(doMap)
 	local Round=WD.Circle()
 	fh:write( "Round\n",Round,"\n")
 	
-	local Size=m.GetSize()
+	local Size=b.Expand(true)
 	fh:write( "Size\n",Size,"\n")
 	
 	local P1=p.GetPlayer()

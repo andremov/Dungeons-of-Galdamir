@@ -4,20 +4,17 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local widget = require "widget"
-local audio = require("Laudio")
-local o = require("Loptions")
-local v = require("Lversion")
-local m = require("Lmenu")
+local widget=require "widget"
+local audio=require("Laudio")
+local o=require("Loptions")
+local v=require("Lversion")
+local lc=require("Llocale")
+local m=require("Lmenu")
 local ghs=display.newGroup()
 local Score
 local GVersion
 local OKVers={
-		"RELEASE 1.0.0",
-		"RELEASE 1.0.1",
-		"RELEASE 1.1.0",
-		"RELEASE 1.1.1",
-		"RELEASE 1.1.2",
+		"RELEASE 1.1.3",
 	}
 local Default={
 		"AAA",10000,
@@ -125,7 +122,7 @@ function HighScores()
 	--Displays high scores
 	
 	m.FindMe(5)
-	title=display.newText("High Scores",0,0,"MoolBoran",100)
+	title=display.newText(lc.giveText("LOC006"),0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100
 	title:setTextColor(125,250,125)
@@ -133,7 +130,7 @@ function HighScores()
 	ghs:insert(title)
 	
 	BackBtn =  widget.newButton{
-		label="Back",
+		label=lc.giveText("LOC008"),
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		font="MoolBoran",
 		fontSize=50,

@@ -343,7 +343,7 @@ function Essentials()
 	special={
 		{"UpperScroll",			"Teleports you to an upper floor.",1},
 		{"LowerScroll",			"Teleports you to a lower floor.",0},
-		{"BlankScroll",			"Log your adventures on the blank scroll.",2},
+		{"OddScroll",			"Seems like an architect's building plans...",2},
 	}
 	equips={					--		STA 	ATT		DEF		MGC		DEX		INT
 		{"IronDagger",0,					0,		1,		0,		0,		0,		0},
@@ -2135,7 +2135,7 @@ function Essentials()
 		--
 		{"UpperScroll",true,1,10,0.25},
 		{"LowerScroll",true,2,10,0.25},
-		{"BlankScroll",true,nil,20,0.25},
+		{"OddScroll",true,nil,20,0.25},
 		--
 		{"IronDagger",false,1,10,4},
 		{"IronCutlass",false,3,20,6},

@@ -8,11 +8,12 @@ local b=require("Lbuilder")
 local p=require("Lplayers")
 local WD=require("Lprogress")
 local ui=require("Lui")
-local coll=require("Ltiles")
+local coll=require("Levents")
 local a=require("Laudio")
 local mob=require("Lmobai")
 local c=require("Lcombat")
 local sho=require("Lshop")
+local sv=require("Lsaving")
 local g=require("Lgold")
 local yinicial=display.contentHeight/2
 local xinicial=display.contentWidth/2
@@ -52,7 +53,7 @@ function ShowArrows()
 	
 	if Dropped==true or Key==true or combatBug==true then
 	elseif Toggle<=0 then
-		mtext=display.newText("Doing mob turns...",0,0,"MoolBoran",70)
+		mtext=display.newText("Saving...",0,0,"MoolBoran",70)
 		mtext.x=display.contentCenterX
 		mtext.y=display.contentHeight*.2
 		
@@ -63,7 +64,8 @@ function ShowArrows()
 		mtext:toFront()
 		
 		Toggle=math.random(5,10)
-		timer.performWithDelay(200,mob.DoTurns)
+		sv.Save(true)
+		timer.performWithDelay(300,mob.DoTurns)
 	else
 	--	print ("ROOM: "..p1.room.." LOC: "..p1.loc)
 		RoomChange=false
@@ -131,6 +133,8 @@ function ShowArrows()
 		end
 		
 		if RoomChange=="R" then
+			print (p1.room+1)
+			print (p1.loc-(size-1))
 			if boundary[p1.room+1][p1.loc-(size-1)]~=0 then
 				CanMoveRight=true
 			end

@@ -10,12 +10,13 @@ local group=display.newGroup()
 local set=require("Lsettings")
 local inv=require("Lwindow")
 local s=require("Lsplashes")
-local m=require("Lhandler")
+local lc=require("Llocale")
 local v=require("Lversion")
 local o=require("Loptions")
 local sc=require("Lscore")
 local c=require("Lchars")
 local a=require("Laudio")
+local m=require("Ltiles")
 local p=require("Lplay")
 local ui=require("Lui")
 local OffScreen
@@ -52,7 +53,7 @@ function ShowMenu()
 	group:insert(titleLogo)
 	
 	PlayBtn =  widget.newButton{
-		label="Play",
+		label=lc.giveText("LOC001"),
 		font="MoolBoran",
 		fontSize=50,
 		labelYOffset=10,
@@ -68,7 +69,7 @@ function ShowMenu()
 	group:insert(PlayBtn)
 	
 	OptnBtn =  widget.newButton{
-		label="Options",
+		label=lc.giveText("LOC002"),
 		font="MoolBoran",
 		fontSize=50,
 		labelYOffset=10,
@@ -82,6 +83,30 @@ function ShowMenu()
 	OptnBtn.x = display.contentWidth*0.5
 	OptnBtn.y = PlayBtn.y+100
 	group:insert(OptnBtn)
+	
+	langBtn=display.newImageRect("lang.png",430,350)
+	langBtn.xScale=0.3
+	langBtn.yScale=langBtn.xScale
+	langBtn.x=display.contentCenterX/2-50
+	langBtn.y=display.contentHeight-130
+	langBtn:addEventListener("tap",doThing)
+	group:insert(langBtn)
+	
+	local hieroglyphics=lc.giveLang()
+	
+	if hieroglyphics=="EN" then
+		langTxt=display.newText("English",0,0,"MoolBoran",70)
+		langTxt:setTextColor(80,255,80)
+		langTxt.x=langBtn.x
+		langTxt.y=langBtn.y+80
+		group:insert(langTxt)
+	elseif hieroglyphics=="ES" then
+		langTxt=display.newText("Espanol",0,0,"MoolBoran",70)
+		langTxt:setTextColor(80,255,80)
+		langTxt.x=langBtn.x
+		langTxt.y=langBtn.y+80
+		group:insert(langTxt)
+	end
 	
 	logo=display.newImageRect("Symbol3W.png",206,206)
 	logo.xScale=0.75
@@ -97,7 +122,7 @@ function ShowMenu()
 		sign=display.newImageRect("sign.png", 95, 70)
 		sign.xScale=2.3
 		sign.yScale=2.3
-		sign.x=(display.contentWidth-130)
+		sign.x=display.contentWidth/4*3+50
 		sign.y=(display.contentHeight-90)
 		group:insert(sign)
 		
@@ -113,23 +138,6 @@ function ShowMenu()
 		VDisplay.y=VerDisplay.y+40
 		group:insert(VDisplay)
 	end
-	--[[
-	ad1=display.newImageRect("ad1.png",57,57)
-	ad1.x=logo.x+160
-	ad1.y=logo.y+30
-	ad1.xScale=2.0
-	ad1.yScale=ad1.xScale
-	ad1:addEventListener("touch",openAd1)
-	group:insert(ad1)
-	
-	ad2=display.newImageRect("ad2.png",57,57)
-	ad2.x=ad1.x+(70*ad1.xScale)
-	ad2.y=ad1.y
-	ad2.xScale=ad1.xScale
-	ad2.yScale=ad1.xScale
-	ad2:addEventListener("touch",openAd2)
-	group:insert(ad2)
-	--]]
 	
 	Sounds=a.sfx()
 	
@@ -165,27 +173,6 @@ function onPlayBtnRelease()
 	p.Display()
 end
 
-function onUpdateBtnRelease( event )
-	if event.phase=="ended" then
-		a.Play(12)
-		system.openURL( "tinyurl.com/dogcub3d" )
-	end
-end
-
-function openAd1( event )
-	if event.phase=="ended" then
-		a.Play(12)
-		system.openURL( "tinyurl.com/togcub3d" )
-	end
-end
-
-function openAd2( event )
-	if event.phase=="ended" then
-		a.Play(12)
-		system.openURL( "tinyurl.com/mogcub3d" )
-	end
-end
-
 function onOptnBtnRelease()
 	a.Play(12)
 	for i=group.numChildren,1,-1 do
@@ -215,7 +202,6 @@ function isVersion(val)
 			VDisplay2.x=VDisplay.x
 			VDisplay2.y=VDisplay.y+45
 			group:insert(VDisplay2)
-			sign:addEventListener("touch",onUpdateBtnRelease)
 		end
 	elseif val==nil then
 		if (VDisplay) then
@@ -380,10 +366,6 @@ function CreditsTab(tab)
 		"Blarumyrran from OpenGameArt.org","- Artist of some items",
 		"Lorc from OpenGameArt.org","- Artist of most UI icons",
 		"Chilvence from DHTP","- Artist of most Default Tileset textures",
-	
-	
-	
-	
 	}
 	local tables={executives,sfx,gfx}
 	
@@ -412,3 +394,16 @@ function NextStep()
 	end
 	ShowMenu()
 end
+
+function doThing()
+	a.Play(12)
+	for i=group.numChildren,1,-1 do
+		local child = group[i]
+		child.parent:remove( child )
+	end
+	VDisplay=nil
+	lc.swapLang()
+	
+	ShowMenu()
+end
+
