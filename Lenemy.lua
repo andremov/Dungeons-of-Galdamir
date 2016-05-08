@@ -105,24 +105,15 @@ function Spawn(ax,ay)
 	enemy["MODE"]="IDLE"
 	enemy["ANIMATIONS"]=readAnims('Barry/BarryAnim.json')
 	
-	enemy["TARGETX"]=nil
-	enemy["TARGETY"]=nil
-	enemy["TARGETTILEX"]=nil
-	enemy["TARGETTILEY"]=nil
-	enemy["CATEGORY"]=nil
-	enemy["CONTACTCD"]=1000
-	
 	enemy["AIVALS"]={}
-	-- enemy["AIVALS"]["STATES"]={true,true}
-	enemy["AIVALS"]["TIMER"]=10
-	-- enemy["AIVALS"]["xCD"]=5
-	-- enemy["AIVALS"]["yCD"]=5
-	enemy["AIVALS"]["POS"]={0,0}
-	enemy["AIVALS"]["MOVEORDER"]={"N"}
-	enemy["AIVALS"]["N"]=0
-	enemy["AIVALS"]["S"]=0
-	enemy["AIVALS"]["W"]=0
-	enemy["AIVALS"]["E"]=0
+	enemy["AIVALS"]["UNIT"]["POS"]["X"]=nil
+	enemy["AIVALS"]["UNIT"]["POS"]["Y"]=nil
+	enemy["AIVALS"]["UNIT"]["TILE"]["X"]=nil
+	enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=nil
+	enemy["AIVALS"]["UNIT"]["CATEGORY"]=nil
+	enemy["AIVALS"]["TARGET"]["TILE"]["Y"]=nil
+	enemy["AIVALS"]["TARGET"]["TILE"]["X"]=nil
+	enemy["AIVALS"]["CONTACTCD"]=1000
 	
 	-- Animation Functions
 	enemy.saturation=function()
@@ -227,9 +218,9 @@ function Spawn(ax,ay)
 				-- enemy["MODE"]="PURSUIT"
 			-- end
 		elseif enemy["MODE"]=="PURSUIT" then
+		--[[
 			local speedvalue=160
-		--[[ KINDA WORKS
-			--]]
+			
 			local deltax=enemy["TARGETX"]-enemy.x
 			local deltay=enemy["TARGETY"]-enemy.y
 			local deltax1=deltax-140
@@ -237,7 +228,6 @@ function Spawn(ax,ay)
 			
 			-- print "IN PURSUIT"
 			
-			--
 			if math.abs(deltax)<160 and math.abs(deltay)<160 then
 				if enemy["TARGETX"]>enemy.x then
 					deltax=deltax1
@@ -520,68 +510,7 @@ function Spawn(ax,ay)
 			else
 				-- print ("WTF "..curState)
 			end
-		--[[ umm
-			local yState=0
-			local xState=0
-			
-			local deltax=enemy["TARGETX"]-enemy.x
-			local deltay=enemy["TARGETY"]-enemy.y
-			local deltax1=deltax-140
-			local deltax2=deltax+140
-			
-			if math.abs(deltax)<160 and math.abs(deltay)<160 then
-				if enemy["TARGETX"]>enemy.x then
-					deltax=deltax1
-				else
-					deltax=deltax2
-				end
-			end
-			
-			local ySuccess=(math.abs(deltay)<10)
-			local xSuccess=(math.abs(deltax)<25)
-			
-			local deltah=math.sqrt( deltax^2 + deltay^2 )
-			local deltatheta=math.tan( math.rad(deltay/deltax) )
-			
-			local deltaxenemy=(deltax/deltah)*speedvalue
-			local deltayenemy=(deltay/deltah)*speedvalue
-			
-			local yCanMove=true
-			local xCanMove=true
-			
-			if enemy["AIVALS"]["N"]>0 and deltayenemy<0 then
-				yCanMove=false
-			elseif enemy["AIVALS"]["S"]>0 and deltayenemy>0 then
-				yCanMove=false
-			end
-			
-			if enemy["AIVALS"]["W"]>0 and deltaxenemy<0 then
-				xCanMove=false
-			elseif enemy["AIVALS"]["E"]>0 and deltaxenemy>0 then
-				xCanMove=false
-			end
-			
-			if xCanMove==true and yCanMove==true then
-			elseif yCanMove==true then
-				deltaxenemy=math.abs(deltaxenemy)
-				if deltayenemy<0 then
-					deltaxenemy=deltaxenemy*-1
-				end
-				deltayenemy=deltayenemy+deltaxenemy
-				deltaxenemy=0
-			elseif xCanMove==true then
-				deltayenemy=math.abs(deltayenemy)
-				if deltaxenemy<0 then
-					deltayenemy=deltayenemy*-1
-				end
-				deltaxenemy=deltaxenemy+deltayenemy
-				deltayenemy=0
-			else
-				deltaxenemy=deltaxenemy*-1
-				deltayenemy=deltayenemy*-1
-			end
-			]]
-			-- if xSuccess and ySuccess then
+		-- if xSuccess and ySuccess then
 			if xState==1 and yState==1 then
 				-- print "GOT TO TARGET"
 				enemy["MODE"]="IDLE"
@@ -591,6 +520,7 @@ function Spawn(ax,ay)
 				enemy["AIVALS"]["POS"][1]=enemy.x
 				enemy["AIVALS"]["POS"][2]=enemy.y
 			end
+			]]
 		elseif enemy["MODE"]=="ATTACK" then
 			if enemy["TARGETX"]>enemy.x then
 				if enemy.xScale==-1 then
@@ -763,13 +693,17 @@ function Spawn(ax,ay)
 	enemy.radar=display.newRect(enemy.x,enemy.y,600,1)
 	enemy.radar:setFillColor(0,0,0,0)
 	enemy["radar"].collision = function( self, event )
-		enemy["CONTACTCD"]=enemy["CONTACTCD"]-1
+		enemy["AIVALS"]["CONTACTCD"]=enemy["AIVALS"]["CONTACTCD"]-1
 		if event.other.category=="player" then
-			enemy["TARGETTILEX"]=event["other"]["parent"]["CURX"]
-			enemy["TARGETTILEY"]=event["other"]["parent"]["CURY"]
-			enemy["CATEGORY"]="player"
-			-- local yCheck=(enemy.y+10>enemy["TARGETY"] and enemy.y-10<enemy["TARGETY"])
-			-- local xCheck=(enemy.x+165>enemy["TARGETX"] and enemy.x-165<enemy["TARGETX"])
+			enemy["AIVALS"]["UNIT"]["TILE"]["X"]=event["other"]["parent"]["CURX"]
+			enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=event["other"]["parent"]["CURY"]
+			enemy["AIVALS"]["UNIT"]["POS"]["X"]=event["other"].x
+			enemy["AIVALS"]["UNIT"]["POS"]["Y"]=event["other"].y
+			enemy["AIVALS"]["UNIT"]["CATEGORY"]="player"
+			local shortx=event["other"].x
+			local shorty=event["other"].y
+			local yCheck=(enemy.y+10>shorty and enemy.y-10<shorty)
+			local xCheck=(enemy.x+165>shortx and enemy.x-165<shortx)
 			if xCheck and yCheck then
 				if enemy["MODE"]~="ATTACK" then
 					-- print "AI FINISHED"
@@ -779,13 +713,17 @@ function Spawn(ax,ay)
 				enemy["MODE"]="PURSUIT"
 				-- print (enemy["TARGETTILEX"],enemy["TARGETTILEY"])
 			end
-			enemy["CONTACTCD"]=1000
-		elseif event.other.category=="enemy" and enemy["CATEGORY"]~="player" then
-			enemy["TARGETX"]=event.other.x
-			enemy["TARGETY"]=event.other.y
-			enemy["CATEGORY"]="enemy"
-			local yCheck=(enemy.y+20>enemy["TARGETY"] and enemy.y-20<enemy["TARGETY"])
-			local xCheck=(enemy.x+165>enemy["TARGETX"] and enemy.x-165<enemy["TARGETX"])
+			enemy["AIVALS"]["CONTACTCD"]=1000
+		elseif event.other.category=="enemy" and enemy["AIVALS"]["UNIT"]["CATEGORY"]~="player" then
+			enemy["AIVALS"]["UNIT"]["TILE"]["X"]=event["other"]["parent"]["CURX"]
+			enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=event["other"]["parent"]["CURY"]
+			enemy["AIVALS"]["UNIT"]["POS"]["X"]=event["other"].x
+			enemy["AIVALS"]["UNIT"]["POS"]["Y"]=event["other"].y
+			enemy["AIVALS"]["UNIT"]["CATEGORY"]="enemy"
+			local shortx=event["other"].x
+			local shorty=event["other"].y
+			local yCheck=(enemy.y+10>shorty and enemy.y-10<shorty)
+			local xCheck=(enemy.x+165>shortx and enemy.x-165<shortx)
 			if xCheck and yCheck then
 				if enemy["MODE"]~="IDLE" then
 					enemy["MODE"]="IDLE"
@@ -793,16 +731,19 @@ function Spawn(ax,ay)
 			elseif enemy["MODE"]~="PURSUIT" then
 				enemy["MODE"]="PURSUIT"
 			end
-			enemy["CONTACTCD"]=1000
+			enemy["AIVALS"]["CONTACTCD"]=1000
 		end
-		if enemy["CONTACTCD"]<=0 then
+		if enemy["AIVALS"]["CONTACTCD"]<=0 then
 			print "LOST PLAYER"
 			enemy["MODE"]="IDLE"
-			enemy["AIVALS"]["TIMER"]=10
-			enemy["AIVALS"]["xCD"]=5
-			enemy["AIVALS"]["yCD"]=5
-			enemy["AIVALS"]["POS"]={0,0}
-			enemy["AIVALS"]["MOVEORDER"]={"N"}
+			enemy["AIVALS"]["UNIT"]["POS"]["X"]=nil
+			enemy["AIVALS"]["UNIT"]["POS"]["Y"]=nil
+			enemy["AIVALS"]["UNIT"]["TILE"]["X"]=nil
+			enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=nil
+			enemy["AIVALS"]["UNIT"]["CATEGORY"]=nil
+			enemy["AIVALS"]["TARGET"]["TILE"]["Y"]=nil
+			enemy["AIVALS"]["TARGET"]["TILE"]["X"]=nil
+			enemy["AIVALS"]["CONTACTCD"]=1000
 		end
 	end
 	physics.addBody(enemy.radar,"dynamic",{isSensor=true,friction=0.5,filter={categoryBits=4,maskBits=2}})
