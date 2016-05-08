@@ -13,6 +13,8 @@ local o=require("Loptions")
 local sc=require("Lscore")
 local c=require("Lchars")
 local m=require("Lmaphandler")
+local ui=require("Lui")
+local inv=require("Lwindow")
 local group=display.newGroup()
 local GVersion
 local PlayBtn
@@ -25,6 +27,7 @@ local Sounds
 local Splash
 local OffScreen
 local canGo
+local egg=math.random(1,1000000)
 
 function ShowMenu()
 	function FrontNCenter2()
@@ -40,13 +43,19 @@ function ShowMenu()
 	CurMenu=0
 	GVersion=v.HowDoIVersion(true)
 	canGo=false
+	
 	--[[
 	local background = display.newImageRect( "bkgs/background.png", display.contentWidth, display.contentHeight )
 	background:setReferencePoint( display.TopLeftReferencePoint )
 	background.x, background.y = 0, 0
 	group:insert(background)
 	]]
-	local titleLogo = display.newImageRect( "titleW.png", 477, 254 )
+	
+	if egg==1 then
+		titleLogo = display.newImageRect( "title2.png", 477, 254 )
+	else
+		titleLogo = display.newImageRect( "titleW.png", 477, 254 )
+	end
 	titleLogo:setReferencePoint( display.CenterReferencePoint )
 	titleLogo.x = display.contentWidth * 0.5
 	titleLogo.y = 150
@@ -132,12 +141,7 @@ function ShowMenu()
 	else
 		a.LoadSounds()
 	end
-<<<<<<< HEAD
-	
-	a.Menu(true)
-=======
 	a.changeMusic(1)
->>>>>>> G1.2.0
 	Runtime:addEventListener( "key", onKeyEvent )
 end
 
@@ -279,13 +283,18 @@ function onKeyEvent( event )
 		elseif CurMenu==7 then
 			inv.ToggleExit()
 		elseif CurMenu==8 then
-<<<<<<< HEAD
-		
-=======
 			
->>>>>>> G1.2.0
 		elseif CurMenu==9 then
 			native.requestExit()
+		end
+		return true
+	end
+
+	if ( "menu" == keyName and phase == "up" ) then
+		if CurMenu==6 then
+			ui.Pause()
+		elseif CurMenu==7 then
+			ui.Pause()
 		end
 		return true
 	end

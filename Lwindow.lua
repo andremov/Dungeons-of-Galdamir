@@ -363,12 +363,9 @@ end
 
 function ToggleExit(sound)
 	if isOpn==false then
-<<<<<<< HEAD
-=======
 		if sound~=false then
 			a.Play(3)
 		end
->>>>>>> G1.2.0
 		m.FindMe(9)
 		isOpn=true
 		gexui=display.newGroup()
@@ -423,12 +420,9 @@ function ToggleExit(sound)
 		gexui:toFront()
 		
 	elseif isOpn==true and (gexui) then
-<<<<<<< HEAD
-=======
 		if sound~=false then
 			a.Play(4)
 		end
->>>>>>> G1.2.0
 		m.FindMe(6)
 		isOpn=false
 		for i=gexui.numChildren,1,-1 do

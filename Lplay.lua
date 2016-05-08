@@ -215,10 +215,7 @@ function onBackRelease()
 end
 
 function goSlot1()
-<<<<<<< HEAD
-=======
 	a.Play(12)
->>>>>>> G1.2.0
 	m.FindMe(6)
 	local saved=sav.CheckSave(1)
 	if saved~=false then
@@ -241,10 +238,7 @@ function goSlot1()
 end
 
 function goSlot2()
-<<<<<<< HEAD
-=======
 	a.Play(12)
->>>>>>> G1.2.0
 	m.FindMe(6)
 	local saved=sav.CheckSave(2)
 	if saved~=false then
@@ -267,10 +261,7 @@ function goSlot2()
 end
 
 function goSlot3()
-<<<<<<< HEAD
-=======
 	a.Play(12)
->>>>>>> G1.2.0
 	m.FindMe(6)
 	local saved=sav.CheckSave(3)
 	if saved~=false then

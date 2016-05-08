@@ -34,11 +34,7 @@ function DisplayShop(id,room)
 	ShopID=id
 	page=1
 	menu.FindMe(7)
-<<<<<<< HEAD
-	
-=======
 	isUse=false
->>>>>>> G1.2.0
 	window=display.newImageRect("shop.png", 768, 600)
 	window.x,window.y = display.contentWidth*0.5, 425
 	swg:insert(window)
@@ -156,16 +152,6 @@ function SellMenu()
 					pitem[s].num=display.newText( (pinv[s][2]) ,pitem[s].x+15,pitem[s].y-5,"Game Over",80)
 				end
 			end
-<<<<<<< HEAD
-			if pitems[s][4]~=nil then
-				pitems[s].prc=display.newText( ("Sell for "..pitems[s][4].." gold.") ,pitems[s].img.x+50,pitems[s].img.y,"MoolBoran",40)
-				pitems[s].prc:setTextColor( 255, 255, 0)
-			end
-			pitems[s].sq=display.newRect(0,0,350,80)
-			pitems[s].sq.x = pitems[s].img.x+135
-			pitems[s].sq.y = pitems[s].img.y
-			pitems[s].sq:setFillColor(0,0,0,0)
-=======
 			if pinv[s][4]~=nil then
 				pitem[s].prc=display.newText( ("Sell for "..pinv[s][4].." gold.") ,pitem[s].x+50,pitem[s].y,"MoolBoran",40)
 				pitem[s].prc:setTextColor( 255, 255, 0)
@@ -174,7 +160,6 @@ function SellMenu()
 			pitemw[s].x = pitem[s].x+135
 			pitemw[s].y = pitem[s].y
 			pitemw[s]:setFillColor(0,0,0,0)
->>>>>>> G1.2.0
 			function itemGive()
 				SellItem(pinv[s][4],(s+(5*(page-1))))
 			end
@@ -257,15 +242,11 @@ function PrevPage()
 end
 
 function CloseShop()
-<<<<<<< HEAD
-	menu.FindMe(6)
-=======
 	a.Play(4)
 	menu.FindMe(6)
 	if isUse==true then
 		ItemInfo()
 	end
->>>>>>> G1.2.0
 	atShop=false
 	if (gsm) then
 		for i=gsm.numChildren,1,-1 do
@@ -317,8 +298,6 @@ function ItemInfo(slot)
 		function Buy()
 			ItemInfo()
 			BuyItem(curShop.item[slot][1],curShop.item[slot][2],curShop.item[slot][3])
-<<<<<<< HEAD
-=======
 		end
 		
 		for s in pairs(pitemw) do
@@ -329,27 +308,12 @@ function ItemInfo(slot)
 		for s in pairs(itemw) do
 			display.remove(itemw[s])
 			itemw[s]=nil
->>>>>>> G1.2.0
 		end
 		
 		window=display.newImageRect("usemenu.png", 768, 308)
 		window.x,window.y = display.contentWidth/2, 450
 		gum:insert( window )
 		
-<<<<<<< HEAD
-		for i=1,table.maxn(item) do
-			if item[i] then
-				item[i].sq:removeEventListener("tap",itemGet)
-			end
-		end
-		for i=1,table.maxn(pitems) do
-			if pitems[i] then
-				pitems[i].sq:removeEventListener("tap",itemGive)
-			end
-		end
-		
-=======
->>>>>>> G1.2.0
 		if curShop.item[slot][3]>p1.gp then
 			local usebtn= widget.newButton{
 				label="Buy",
@@ -491,21 +455,7 @@ function ItemInfo(slot)
 			child.parent:remove( child )
 		end
 		gum=nil
-<<<<<<< HEAD
-		
-		for i=gsm.numChildren,1,-1 do
-			display.remove(gsm[i])
-			gsm[i]=nil
-		end
-		for i=gbm.numChildren,1,-1 do
-			display.remove(gbm[i])
-			gbm[i]=nil
-		end
-		timer.performWithDelay(10,BuyMenu)
-		timer.performWithDelay(10,SellMenu)
-=======
 		isUse=false
->>>>>>> G1.2.0
 	end
 end
 

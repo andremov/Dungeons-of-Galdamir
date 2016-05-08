@@ -139,7 +139,7 @@ function ItemDrop(boost)
 					child.parent:remove( child )
 				end
 				ui.Pause()
-				inv.ToggleBag()
+				inv.ToggleBag(false)
 			end
 			
 			local lolname=display.newText( ("Item Get!") ,0,0,"MoolBoran",90)

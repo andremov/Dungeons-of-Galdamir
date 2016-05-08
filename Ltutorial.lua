@@ -1938,28 +1938,6 @@ function CleanInv()
 	ginv=nil
 end
 
-<<<<<<< HEAD
-function Eight()
-	ShowArrows()
-	
-	Narrator[1]=display.newText("Can you move?",0, 0,"MoolBoran",60)
-	Narrator[1].x=display.contentCenterX
-	Narrator[1].y=display.contentHeight-200
-	
-	Narrator[2]=display.newText("Y'know, like any other normal human being.",0, 0,"MoolBoran",40)
-	Narrator[2].x=display.contentCenterX
-	Narrator[2].y=Narrator[1].y+45
-	
-	Narrator[3]=display.newText("Tap inside the square to move",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
-	Narrator[3].x=display.contentWidth-170
-	Narrator[3].y=display.contentHeight-40
-	
-	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
-	Narrator[4].x=120
-	Narrator[4].y=display.contentHeight-250
-=======
 function UseItem()
 	CleanInv()
 	player.HP=math.floor(player.MaxHP*.75)
@@ -1967,7 +1945,6 @@ function UseItem()
 	player.EP=math.floor(player.MaxEP*.6)
 	Continue()
 	UpdateStats()
->>>>>>> G1.2.0
 end
 
 

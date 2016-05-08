@@ -21,8 +21,7 @@ local SplStrt
 local SplEnd
 local Sve
 local OKVers={
-		"GAMMA 1.1.0",
-		"GAMMA 1.2.0",
+		"GAMMA 1.2.1",
 	}
 
 function Load()

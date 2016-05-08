@@ -18,7 +18,8 @@ local loadbkg
 local load1
 local loadtxt
 
-	print "C U B 3 D :  DUNGEONS OF GAL'DARAH"
+--	print "C U B 3 D :  DUNGEONS OF GAL'DARAH"
+	print "C U B 3 D :  DUNGEONS OF GALDAMIR"
 	print ("Version: "..GVersion)
 	
 	
