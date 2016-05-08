@@ -97,7 +97,7 @@ function ShowContinue()
 	load3=nil
 	
 	contxt = display.newText("Tap to continue", 0,0,"MoolBoran",60)
-	contxt:setTextColor(70,255,70)
+	contxt:setFillColor(70/255,255/255,70/255)
 	contxt.x = display.contentCenterX
 	contxt.y = display.contentHeight*.75
 	Loading:insert( contxt )

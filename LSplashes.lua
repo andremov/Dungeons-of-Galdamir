@@ -187,7 +187,7 @@ function GetSplash()
 	Splashtxt = display.newEmbossedText((Splash),0,0,"MoolBoran", 65 )
 	Splashtxt.x=display.contentCenterX
 	Splashtxt.y=310
-	Splashtxt:setTextColor( 255, 255, 0)
+	Splashtxt:setFillColor( 255/255, 255/255, 0/255)
 	Splashtxt:toFront()
 	return Splashtxt
 end
@@ -201,14 +201,14 @@ function GetTip()
 	Tiptxt = display.newEmbossedText(("Tip: "..Tip[1]),0,0,"MoolBoran", 50 )
 	Tiptxt.x=display.contentCenterX
 	Tiptxt.y=100
-	Tiptxt:setTextColor( 200, 200, 200)
+	Tiptxt:setFillColor( 200/255, 200/255, 200/255)
 	Tiptxt:toFront()
 	TGroup:insert( Tiptxt )
 	if (Tip[2]) then
 		Tiptxt2 = display.newEmbossedText((Tip[2]),0,0,"MoolBoran", 50 )
 		Tiptxt2.x=display.contentCenterX
 		Tiptxt2.y=Tiptxt.y+60
-		Tiptxt2:setTextColor( 200, 200, 200)
+		Tiptxt2:setFillColor( 200/255, 200/255, 200/255)
 		Tiptxt2:toFront()
 		TGroup:insert( Tiptxt2 )
 	end

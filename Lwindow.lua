@@ -37,7 +37,7 @@ DeathMessages["EN"]={
 		"Swimming in lava.",
 		"Hyperthermia.",
 		"Skin melting.",
-		"Do I smell barbeque?",
+		"Do I smell barbecue?",
 	},
 	-- Mob
 	{
@@ -181,11 +181,11 @@ function ToggleBag(sound)
 			label="X",
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=50,
+			font=native.systemFont,
 			defaultFile="sbutton.png",
 			overFile="sbutton-over.png",
 			width=80, height=80,
 			onRelease = CloseErrthang}
-		CloseBtn:setReferencePoint( display.CenterReferencePoint )
 		CloseBtn.xScale,CloseBtn.yScale=0.75,0.75
 		CloseBtn.x = display.contentCenterX-30+(570/2*1.28)
 		CloseBtn.y = 410-(507/2*1.28)
@@ -210,10 +210,18 @@ function ToggleBag(sound)
 				ginv:insert( items[#items] )
 				if p1.inv[i][2]~=1 then
 					if p1.inv[i][2]>9 then
-						items[#items].num=display.newText( (p1.inv[i][2]) ,items[#items].x+5,items[#items].y-5,"Game Over",80)
+						items[#items].num=display.newText( (p1.inv[i][2]) ,0,0,"Game Over",80)
+						items[#items].num.anchorX=0
+						items[#items].num.anchorY=0
+						items[#items].num.x=items[#items].x+5
+						items[#items].num.y=items[#items].y-5
 						ginv:insert( items[#items].num )
 					elseif p1.inv[i][2]<=9 then
-						items[#items].num=display.newText( (p1.inv[i][2]) ,items[#items].x+15,items[#items].y-5,"Game Over",80)
+						items[#items].num=display.newText( (p1.inv[i][2]) ,0,0,"Game Over",80)
+						items[#items].num.anchorX=0
+						items[#items].num.anchorY=0
+						items[#items].num.x=items[#items].x+15
+						items[#items].num.y=items[#items].y-5
 						ginv:insert( items[#items].num )
 					end
 				end
@@ -325,11 +333,11 @@ function ToggleInfo(sound)
 			label="X",
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=50,
+			font=native.systemFont,
 			defaultFile="sbutton.png",
 			overFile="sbutton-over.png",
 			width=80, height=80,
 			onRelease = CloseErrthang}
-		CloseBtn:setReferencePoint( display.CenterReferencePoint )
 		CloseBtn.xScale,CloseBtn.yScale=0.75,0.75
 		CloseBtn.x = display.contentWidth-30
 		CloseBtn.y = 30
@@ -393,10 +401,10 @@ function ToggleSound(sound)
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=50,
 			defaultFile="sbutton.png",
+			font=native.systemFont,
 			overFile="sbutton-over.png",
 			width=80, height=80,
 			onRelease = CloseErrthang}
-		CloseBtn:setReferencePoint( display.CenterReferencePoint )
 		CloseBtn.xScale,CloseBtn.yScale=0.75,0.75
 		CloseBtn.x = display.contentWidth-30
 		CloseBtn.y = display.contentCenterY-((308/2)-30)
@@ -492,7 +500,7 @@ function ToggleExit(sound)
 			text="\(Progreso no guardado sera perdido.\)"
 		end
 		lolname3=display.newText( (text) ,0,0,"MoolBoran",40)
-		lolname3:setTextColor(180,180,180)
+		lolname3:setFillColor(180/255,180/255,180/255)
 		lolname3.x=display.contentCenterX
 		lolname3.y=lolname2.y+50
 		gexui:insert(lolname3)
@@ -507,7 +515,6 @@ function ToggleExit(sound)
 			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = DoExit}
-		AcceptBtn:setReferencePoint( display.CenterReferencePoint )
 		AcceptBtn.x = (display.contentWidth/2)-130
 		AcceptBtn.y = (display.contentHeight/2)+30
 		gexui:insert( AcceptBtn )
@@ -522,7 +529,6 @@ function ToggleExit(sound)
 			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = ToggleExit}
-		BackBtn:setReferencePoint( display.CenterReferencePoint )
 		BackBtn.x = (display.contentWidth/2)+130
 		BackBtn.y = (display.contentHeight/2)+30
 		gexui:insert( BackBtn )
@@ -564,9 +570,9 @@ function ToggleSpells(sound)
 			fontSize=50,
 			defaultFile="sbutton.png",
 			overFile="sbutton-over.png",
+			font=native.systemFont,
 			width=80, height=80,
 			onRelease = CloseErrthang}
-		CloseBtn:setReferencePoint( display.CenterReferencePoint )
 		CloseBtn.xScale,CloseBtn.yScale=0.75,0.75
 		CloseBtn.x = display.contentWidth-30
 		CloseBtn.y = 30
@@ -577,7 +583,7 @@ function ToggleSpells(sound)
 			spelltrigger[i]=display.newRect(0,0,310,80)
 			spelltrigger[i].x = 170
 			spelltrigger[i].y = 120+((i-1)*85)
-			spelltrigger[i]:setFillColor(0,0,0,0)
+			spelltrigger[i]:setFillColor(0,0,0,0.01)
 			spelltrigger[i]:addEventListener("tap",SpellInfo)
 			gbk:insert(spelltrigger[i])
 			
@@ -587,9 +593,11 @@ function ToggleSpells(sound)
 				spellicons[i].y=120+((i-1)*85)
 				gbk:insert(spellicons[i])
 				
-				spellnames[i]=display.newText((p1.spells[i][1]),spellicons[i].x+45,0,"MoolBoran",55)
+				spellnames[i]=display.newText((p1.spells[i][1]),0,0,"MoolBoran",55)
+				spellnames[i].anchorX=0
+				spellnames[i].x=spellicons[i].x+45
 				spellnames[i].y=spellicons[i].y+20
-				spellnames[i]:setTextColor(0,0,0)
+				spellnames[i]:setFillColor(0,0,0)
 				gbk:insert(spellnames[i])
 			else
 				spellicons[i]=display.newImageRect(("spells/"..p1.spells[i][1].." X.png"),80,80)
@@ -597,9 +605,11 @@ function ToggleSpells(sound)
 				spellicons[i].y=120+((i-1)*85)
 				gbk:insert(spellicons[i])
 				
-				spellnames[i]=display.newText(("???"),spellicons[i].x+45,0,"MoolBoran",55)
+				spellnames[i]=display.newText(("???"),0,0,"MoolBoran",55)
+				spellnames[i].anchorX=0
+				spellnames[i].x=spellicons[i].x+45
 				spellnames[i].y=spellicons[i].y+20
-				spellnames[i]:setTextColor(0,0,0)
+				spellnames[i]:setFillColor(0,0,0)
 				gbk:insert(spellnames[i])
 			end
 		end
@@ -652,28 +662,32 @@ function SpellInfo( event )
 		spellshown[1]=display.newText( (p1.spells[selectedSpell][1]),0,0,"MoolBoran",80)
 		spellshown[1].x=((display.contentWidth/4)*3)-50
 		spellshown[1].y=100
-		spellshown[1]:setTextColor(0,0,0)
+		spellshown[1]:setFillColor(0,0,0)
 		gbk:insert(spellshown[1])
 		
 		spellshown[2]=display.newText( 
 			(p1.spells[selectedSpell][2]),
-			spellshown[1].x-190,
-			spellshown[1].y+50,
+			0,
+			0,
 			420,0,"MoolBoran",45
 		)
-		spellshown[2]:setTextColor(50,50,50)
+		spellshown[2].anchorX=0
+		spellshown[2].anchorY=0
+		spellshown[2].x=spellshown[1].x-190
+		spellshown[2].y=spellshown[1].y+50
+		spellshown[2]:setFillColor(50/255,50/255,50/255)
 		gbk:insert(spellshown[2])
 		
 		spellshown[3]=display.newText( (p1.spells[selectedSpell][4].." MP"),0,0,"MoolBoran",65)
-		spellshown[3].x=spellshown[2].x-110
+		spellshown[3].x=spellshown[2].x+80
 		spellshown[3].y=spellshown[2].y+150
-		spellshown[3]:setTextColor(180,70,180)
+		spellshown[3]:setFillColor(180/255,70/255,180/255)
 		gbk:insert(spellshown[3])
 		
 		spellshown[4]=display.newText( (p1.spells[selectedSpell][5].." EP"),0,0,"MoolBoran",65)
-		spellshown[4].x=spellshown[2].x+110
+		spellshown[4].x=spellshown[2].x+300
 		spellshown[4].y=spellshown[2].y+150
-		spellshown[4]:setTextColor(70,180,70)
+		spellshown[4]:setFillColor(70/255,180/255,70/255)
 		gbk:insert(spellshown[4])
 	else
 		local lang=lc.giveLang()
@@ -685,11 +699,15 @@ function SpellInfo( event )
 		end
 		spellshown[1]=display.newText(
 			(text),
-			((display.contentWidth/4)*3)-240,
-			150,
+			0,
+			0,
 			420,0,"MoolBoran",45
 		)
-		spellshown[1]:setTextColor(50,50,50)
+		spellshown[1].anchorX=0
+		spellshown[1].anchorY=0
+		spellshown[1].x=((display.contentWidth/4)*3)-240
+		spellshown[1].y=150
+		spellshown[1]:setFillColor(50/255,50/255,50/255)
 		gbk:insert(spellshown[1])
 	end
 end
@@ -722,10 +740,10 @@ function StatChange()
 			pli[#pli+1]=  widget.newButton{
 				defaultFile="sbutton.png",
 				overFile="sbutton-over.png",
+				font=native.systemFont,
 				width=80, height=80,
 				onRelease = More
 			}
-			pli[#pli]:setReferencePoint( display.CenterReferencePoint )
 			pli[#pli].x = info[6+s].x+90
 			pli[#pli].y = info[6+s].y-10
 			ginf:insert(pli[#pli])
@@ -743,29 +761,40 @@ function StatChange()
 			mini[#mini+1]=  widget.newButton{
 				defaultFile="sbutton.png",
 				overFile="sbutton-over.png",
+				font=native.systemFont,
 				width=80, height=80,
 				onRelease = Less
 			}
-			mini[#mini]:setReferencePoint( display.CenterReferencePoint )
 			mini[#mini].x = info[6+s].x-90
 			mini[#mini].y = info[6+s].y-10
 			ginf:insert(mini[#mini])
-			
-			mini[#mini+1]=display.newImageRect("-.png",11,11)
-			mini[#mini].x = mini[#mini-1].x
-			mini[#mini].y = mini[#mini-1].y
-			mini[#mini].xScale = 3.0
-			mini[#mini].yScale = 3.0
+		else
+			mini[#mini+1]=  widget.newButton{
+				defaultFile="sbutton.png",
+				overFile="sbutton-over.png",
+				font=native.systemFont,
+				width=80, height=80,
+				onRelease = Less,
+			}
+			mini[#mini].x = info[6+s].x-90
+			mini[#mini].y = info[6+s].y-10
+			mini[#mini].isVisible=false
 			ginf:insert(mini[#mini])
-		end
+		end		
+		mini[#mini+1]=display.newImageRect("-.png",11,11)
+		mini[#mini].x = mini[#mini-1].x
+		mini[#mini].y = mini[#mini-1].y
+		mini[#mini].xScale = 3.0
+		mini[#mini].yScale = 3.0
+		ginf:insert(mini[#mini])
 	end
 	
 	swapInfoBtn=  widget.newButton{
 		defaultFile="sbutton.png",
 		overFile="sbutton-over.png",
+		font=native.systemFont,
 		width=80, height=80,
 		onRelease = SwapInfo}
-	swapInfoBtn:setReferencePoint( display.CenterReferencePoint )
 	swapInfoBtn.x = display.contentWidth-60
 	swapInfoBtn.y = display.contentHeight-300
 	swapInfoBtn.state=true
@@ -789,10 +818,12 @@ function StatChange()
 		(
 			text
 		),
-		0,10,"MoolBoran",80
+		0,0,"MoolBoran",80
 	)
+	info[#info].anchorY=0
+	info[#info].y=10
 	info[#info].x=display.contentCenterX
-	info[#info]:setTextColor(125,250,125)
+	info[#info]:setFillColor(125/255,250/255,125/255)
 	ginf:insert(info[#info])
 	
 	if lang=="EN" then
@@ -804,12 +835,14 @@ function StatChange()
 		(
 			text.." "..p1.pnts
 		),
-		0,700,"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
+	info[#info].anchorY=0
+	info[#info].y=700
 	info[#info].x=display.contentCenterX
 	ginf:insert(info[#info])
 	if p1.pnts==0 then
-		info[#info]:setTextColor(180,180,180)
+		info[#info]:setFillColor(180/255,180/255,180/255)
 	end
 end
 
@@ -818,24 +851,32 @@ function StatInfo()
 	local baseY=90
 	local SpacingX=350
 	local SpacingY=50
-	local symLength=18
-	local primary=250
-	local secundary=75
+	local symLength=16
+	local primary=250/255
+	local secundary=75/255
 	if p1.name=="Error" then
 		info[1]=display.newText(
 			(
 				"I AM ERROR."
 			),
-			display.contentCenterX/2,10,"MoolBoran",80
+			0,0,"MoolBoran",80
 		)
+		info[#info].anchorX=0
+		info[#info].anchorY=0
+		info[#info].x=display.contentCenterX/2
+		info[#info].y=10
 		ginf:insert(info[1])
 	else
 		info[1]=display.newText(
 			(
 				p1.name
 			),
-			display.contentCenterX/2,10,"MoolBoran",80
+			0,0,"MoolBoran",80
 		)
+		info[#info].anchorX=0
+		info[#info].anchorY=0
+		info[#info].x=display.contentCenterX/2
+		info[#info].y=10
 		ginf:insert(info[1])
 	end
 	
@@ -843,78 +884,114 @@ function StatInfo()
 		(
 			"HP:"
 		),
-		baseX,baseY,"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX
+	info[#info].y=baseY
 	ginf:insert(info[#info])
 	
 	info[#info+1]=display.newText(
 		(
 			p1.HP.."/"..p1.MaxHP
 		),
-		baseX+(#(info[#info].text)*symLength)+symLength,baseY,"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
-	info[#info]:setTextColor(primary,secundary,secundary)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX+(#(info[#info].text)*symLength)+symLength
+	info[#info].y=baseY
+	info[#info]:setFillColor(primary,secundary,secundary)
 	ginf:insert(info[#info])
 	
 	info[#info+1]=display.newText(
 		(
 			"("..math.ceil(p1.HP/p1.MaxHP*100).."%"..")"
 		),
-		baseX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25),baseY,"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
-	info[#info]:setTextColor(primary,secundary,secundary)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25)
+	info[#info].y=baseY
+	info[#info]:setFillColor(primary,secundary,secundary)
 	ginf:insert(info[#info])
 	
 	info[#info+1]=display.newText(
 		(
 			"MP:"
 		),
-		baseX+SpacingX,baseY,"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX+SpacingX
+	info[#info].y=baseY
 	ginf:insert(info[#info])
 	
 	info[#info+1]=display.newText(
 		(
 			p1.MP.."/"..p1.MaxMP
 		),
-		baseX+SpacingX+(#(info[#info].text)*symLength)+symLength,baseY,"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
-	info[#info]:setTextColor(primary,secundary,primary)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX+SpacingX+(#(info[#info].text)*symLength)+symLength
+	info[#info].y=baseY
+	info[#info]:setFillColor(primary,secundary,primary)
 	ginf:insert(info[#info])
 	
 	info[#info+1]=display.newText(
 		(
 			"("..math.ceil(p1.MP/p1.MaxMP*100).."%"..")"
 		),
-		baseX+SpacingX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25),baseY,"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
-	info[#info]:setTextColor(primary,secundary,primary)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX+SpacingX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25)
+	info[#info].y=baseY
+	info[#info]:setFillColor(primary,secundary,primary)
 	ginf:insert(info[#info])
 	
 	info[#info+1]=display.newText(
 		(
 			"EP:"
 		),
-		baseX,baseY+SpacingY,"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX
+	info[#info].y=baseY+SpacingY
 	ginf:insert(info[#info])
 	
 	info[#info+1]=display.newText(
 		(
 			p1.EP.."/"..p1.MaxEP
 		),
-		baseX+(#(info[#info].text)*symLength)+symLength,baseY+SpacingY,"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
-	info[#info]:setTextColor(secundary,primary,secundary)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX+(#(info[#info].text)*symLength)+symLength
+	info[#info].y=baseY+SpacingY
+	info[#info]:setFillColor(secundary,primary,secundary)
 	ginf:insert(info[#info])
 	
 	info[#info+1]=display.newText(
 		(
 			"("..math.ceil(p1.EP/p1.MaxEP*100).."%"..")"
 		),
-		baseX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25),baseY+SpacingY,"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
-	info[#info]:setTextColor(secundary,primary,secundary)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25)
+	info[#info].y=baseY+SpacingY
+	info[#info]:setFillColor(secundary,primary,secundary)
 	ginf:insert(info[#info])
 	
 	--[[
@@ -938,34 +1015,50 @@ function StatInfo()
 		(
 			text.." "..p1.lvl
 		),
-		baseX,baseY+(SpacingY*2),"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX
+	info[#info].y=baseY+(SpacingY*2)
 	ginf:insert(info[#info])
 	
 	info[#info+1]=display.newText(
 		(
 			"XP:"
 		),
-		baseX+SpacingX,baseY+(SpacingY*2),"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX+SpacingX
+	info[#info].y=baseY+(SpacingY*2)
 	ginf:insert(info[#info])
 	
 	info[#info+1]=display.newText(
 		(
 			p1.XP.."/"..p1.MaxXP
 		),
-		baseX+SpacingX+(#(info[#info].text)*symLength)+symLength,baseY+(SpacingY*2),"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
-	info[#info]:setTextColor(secundary,secundary,primary)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX+SpacingX+(#(info[#info].text)*symLength)+symLength
+	info[#info].y=baseY+(SpacingY*2)
+	info[#info]:setFillColor(secundary,secundary,primary)
 	ginf:insert(info[#info])
 	
 	info[#info+1]=display.newText(
 		(
 			"("..math.ceil(p1.XP/p1.MaxXP*100).."%"..")"
 		),
-		baseX+SpacingX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25),baseY+(SpacingY*2),"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
-	info[#info]:setTextColor(secundary,secundary,primary)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX+SpacingX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25)
+	info[#info].y=baseY+(SpacingY*2)
+	info[#info]:setFillColor(secundary,secundary,primary)
 	ginf:insert(info[#info])
 	
 	if lang=="EN" then
@@ -978,8 +1071,12 @@ function StatInfo()
 		(
 			text.." "..flr
 		),
-		baseX,baseY+(SpacingY*3),"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX
+	info[#info].y=baseY+(SpacingY*3)
 	ginf:insert(info[#info])
 	
 	local text2
@@ -994,8 +1091,12 @@ function StatInfo()
 		(
 			text.." "..p1.gp.." "..text2
 		),
-		baseX+SpacingX,baseY+(SpacingY*3),"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX+SpacingX
+	info[#info].y=baseY+(SpacingY*3)
 	ginf:insert(info[#info])
 	
 	if lang=="EN" then
@@ -1007,8 +1108,12 @@ function StatInfo()
 		(
 			text
 		),
-		baseX-20,350,"MoolBoran",70
+		0,0,"MoolBoran",70
 	)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX-20
+	info[#info].y=350
 	ginf:insert(info[#info])
 	
 	for s=1,6 do
@@ -1016,8 +1121,12 @@ function StatInfo()
 			(
 				p1.statnames[s]
 			),
-			baseX,420+(45*(s-1)),"MoolBoran",60
+			0,0,"MoolBoran",60
 		)
+		info[#info].anchorX=0
+		info[#info].anchorY=0
+		info[#info].x=baseX
+		info[#info].y=420+(45*(s-1))
 		ginf:insert(info[#info])
 	end
 	
@@ -1030,8 +1139,12 @@ function StatInfo()
 		(
 			text.." "..p1.pnts
 		),
-		baseX,690,"MoolBoran",60
+		0,0,"MoolBoran",60
 	)
+	info[#info].anchorX=0
+	info[#info].anchorY=0
+	info[#info].x=baseX
+	info[#info].y=690
 	ginf:insert(info[#info])
 	
 	for s=1,6 do
@@ -1039,8 +1152,12 @@ function StatInfo()
 			(
 				p1.nat[s]
 			),
-			info[#info-s].x+160,420+(45*(s-1)),"MoolBoran",60
+			0,0,"MoolBoran",60
 		)
+		info[#info].anchorX=0
+		info[#info].anchorY=0
+		info[#info].x=info[#info-s].x+180
+		info[#info].y=420+(45*(s-1))
 		ginf:insert(info[#info])
 	end
 	
@@ -1049,14 +1166,18 @@ function StatInfo()
 			(
 			"+"..p1.eqs[s]
 			),
-			info[#info-s].x+60,420+(45*(s-1)),"MoolBoran",60
+			0,0,"MoolBoran",60
 		)
+		info[#info].anchorX=0
+		info[#info].anchorY=0
+		info[#info].x=info[#info-s].x+60
+		info[#info].y=420+(45*(s-1))
 		if p1.eqs[s]>0 then
-			info[#info]:setTextColor(50,200,50)
+			info[#info]:setFillColor(50/255,200/255,50/255)
 		elseif p1.eqs[s]<0 then
-			info[#info]:setTextColor(200,50,50)
+			info[#info]:setFillColor(200/255,50/255,50/255)
 		else
-			info[#info]:setTextColor(150,150,150)
+			info[#info]:setFillColor(150/255,150/255,150/255)
 		end
 		ginf:insert(info[#info])
 	end
@@ -1066,14 +1187,18 @@ function StatInfo()
 			(
 			"+"..p1.bon[s]+p1.bst[s]
 			),
-			info[#info-s].x+60,420+(45*(s-1)),"MoolBoran",60
+			0,0,"MoolBoran",60
 		)
-		if p1.bon[s]>0 then
-			info[#info]:setTextColor(50,200,50)
-		elseif p1.bon[s]<0 then
-			info[#info]:setTextColor(200,50,50)
+		info[#info].anchorX=0
+		info[#info].anchorY=0
+		info[#info].x=info[#info-s].x+60
+		info[#info].y=420+(45*(s-1))
+		if p1.eqs[s]>0 then
+			info[#info]:setFillColor(50/255,200/255,50/255)
+		elseif p1.eqs[s]<0 then
+			info[#info]:setFillColor(200/255,50/255,50/255)
 		else
-			info[#info]:setTextColor(150,150,150)
+			info[#info]:setFillColor(150/255,150/255,150/255)
 		end
 		ginf:insert(info[#info])
 	end
@@ -1083,12 +1208,16 @@ function StatInfo()
 			(
 				"= "..p1.stats[s]
 			),
-			info[#info-s].x+50,420+(45*(s-1)),"MoolBoran",60
+			0,0,"MoolBoran",60
 		)
+		info[#info].anchorX=0
+		info[#info].anchorY=0
+		info[#info].x=info[#info-s].x+50
+		info[#info].y=420+(45*(s-1))
 		if p1.stats[s]>p1.nat[s] then
-			info[#info]:setTextColor(50,200,50)
+			info[#info]:setFillColor(50/255,200/255,50/255)
 		elseif p1.stats[s]<p1.nat[s] then
-			info[#info]:setTextColor(200,50,50)
+			info[#info]:setFillColor(200/255,50/255,50/255)
 		else
 		end
 		ginf:insert(info[#info])
@@ -1097,9 +1226,9 @@ function StatInfo()
 	swapInfoBtn=  widget.newButton{
 		defaultFile="sbutton.png",
 		overFile="sbutton-over.png",
+		font=native.systemFont,
 		width=80, height=80,
 		onRelease = SwapInfo}
-	swapInfoBtn:setReferencePoint( display.CenterReferencePoint )
 	swapInfoBtn.x = display.contentWidth-60
 	swapInfoBtn.y = display.contentHeight-300
 	swapInfoBtn.state=false
@@ -1248,25 +1377,25 @@ function DeathMenu(cause)
 		Dthtxt:insert( Deathmsg )
 		
 		Deathmsg2=display.newText(" ",0,0,"MoolBoran", 55)
-		Deathmsg2:setTextColor(180, 180, 180)
+		Deathmsg2:setFillColor(180/255, 180/255, 180/255)
 		Deathmsg2.x = display.contentCenterX
 		Deathmsg2.y = Deathmsg.y+50
 		Dthtxt:insert( Deathmsg2 )
 		
 		if cause=="Lava" then
-			Deathmsg2.text=(DeathMessages[lc.giveLang()][1][math.random(1,table.maxn(DeathMessages[1]))])
+			Deathmsg2.text=(DeathMessages[lc.giveLang()][1][math.random(1,table.maxn(DeathMessages[lc.giveLang()][1]))])
 		end
 		if cause=="Mob" then
-			Deathmsg2.text=(DeathMessages[lc.giveLang()][2][math.random(1,table.maxn(DeathMessages[1]))])
+			Deathmsg2.text=(DeathMessages[lc.giveLang()][2][math.random(1,table.maxn(DeathMessages[lc.giveLang()][1]))])
 		end
 		if cause=="Poison" then
-			Deathmsg2.text=(DeathMessages[lc.giveLang()][3][math.random(1,table.maxn(DeathMessages[1]))])
+			Deathmsg2.text=(DeathMessages[lc.giveLang()][3][math.random(1,table.maxn(DeathMessages[lc.giveLang()][1]))])
 		end
 		if cause=="Portal" then
-			Deathmsg2.text=(DeathMessages[lc.giveLang()][4][math.random(1,table.maxn(DeathMessages[1]))])
+			Deathmsg2.text=(DeathMessages[lc.giveLang()][4][math.random(1,table.maxn(DeathMessages[lc.giveLang()][1]))])
 		end
 		if cause=="Energy" then
-			Deathmsg2.text=(DeathMessages[lc.giveLang()][5][math.random(1,table.maxn(DeathMessages[1]))])
+			Deathmsg2.text=(DeathMessages[lc.giveLang()][5][math.random(1,table.maxn(DeathMessages[lc.giveLang()][1]))])
 		end
 		
 		local lang=lc.giveLang()
@@ -1309,9 +1438,11 @@ function DeathMenu(cause)
 		InfoTxt1.y=Deathmsg2.y+100
 		GInfoTxt:insert( InfoTxt1 )
 		
-		InfoTxt2=display.newText(Round,InfoTxt1.x+140+(25*(#Round-1)),0,"MoolBoran", 60 )
-		InfoTxt2:setTextColor(50, 255, 50)
+		InfoTxt2=display.newText(Round,0,0,"MoolBoran", 60 )
+		InfoTxt2:setFillColor(50/255, 255/255, 50/255)
 		InfoTxt2.y=InfoTxt1.y
+		InfoTxt2.anchorX=0
+		InfoTxt2.x=InfoTxt1.x+20+(7*(#InfoTxt1.text))
 		GInfoTxt:insert( InfoTxt2 )
 		
 		if lang=="EN" then
@@ -1319,13 +1450,17 @@ function DeathMenu(cause)
 		elseif lang=="ES" then
 			text=" con "
 		end
-		InfoTxt3= display.newText(text,InfoTxt2.x+25+(25*(#Round-1)),0,"MoolBoran", 60 )
+		InfoTxt3= display.newText(text,0,0,"MoolBoran", 60 )
 		InfoTxt3.y=InfoTxt1.y
+		InfoTxt3.anchorX=0
+		InfoTxt3.x=InfoTxt2.x+20+(15*(#InfoTxt2.text))
 		GInfoTxt:insert( InfoTxt3 )
 		
-		InfoTxt4=display.newText(GCount,InfoTxt3.x+50,0,"MoolBoran", 60 )
+		InfoTxt4=display.newText(GCount,0,0,"MoolBoran", 60 )
 		InfoTxt4.y=InfoTxt1.y
-		InfoTxt4:setTextColor(255, 255, 50)
+		InfoTxt4.anchorX=0
+		InfoTxt4.x=InfoTxt3.x+20+(15*(#InfoTxt3.text))
+		InfoTxt4:setFillColor(255/255, 255/255, 50/255)
 		GInfoTxt:insert( InfoTxt4 )
 		
 		if lang=="EN" then
@@ -1335,6 +1470,8 @@ function DeathMenu(cause)
 		end
 		InfoTxt5=display.newText(" gold.",InfoTxt4.x+25+(15*(#GCount-1)),0,"MoolBoran", 60 )
 		InfoTxt5.y=InfoTxt1.y
+		InfoTxt5.anchorX=0
+		InfoTxt5.x=InfoTxt4.x+20+(15*(#InfoTxt4.text))
 		GInfoTxt:insert( InfoTxt5 )
 		
 		if hs==true then
@@ -1344,7 +1481,7 @@ function DeathMenu(cause)
 				text="Nuevo puntaje maximo:"
 			end
 			InfoTxt6=display.newText((text),0,0,"MoolBoran", 60 )
-			InfoTxt6:setTextColor(70, 255, 70)
+			InfoTxt6:setFillColor(70/255, 255/255, 70/255)
 			InfoTxt6.x=display.contentCenterX
 			InfoTxt6.y=display.contentCenterY-20
 			GInfoTxt:insert( InfoTxt6 )
@@ -1355,7 +1492,7 @@ function DeathMenu(cause)
 				text="Puntaje:"
 			end
 			InfoTxt6=display.newText((text),0,0,"MoolBoran", 60 )
-			InfoTxt6:setTextColor(70, 255, 70)
+			InfoTxt6:setFillColor(70/255, 255/255, 70/255)
 			InfoTxt6.x=display.contentCenterX
 			InfoTxt6.y=display.contentCenterY-20
 			GInfoTxt:insert( InfoTxt6 )
@@ -1578,7 +1715,6 @@ function UseMenu(id,slot)
 			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = UseMenu}
-		backbtn:setReferencePoint( display.CenterReferencePoint )
 		backbtn.x = (display.contentWidth/2)
 		backbtn.y = (display.contentHeight/2)+30
 		gum:insert( backbtn )
@@ -1598,7 +1734,6 @@ function UseMenu(id,slot)
 			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = DroppedIt}
-		dropbtn:setReferencePoint( display.CenterReferencePoint )
 		dropbtn.x = ((display.contentWidth/4)*3)+50
 		dropbtn.y = (display.contentHeight/2)+30
 		gum:insert( dropbtn )
@@ -1629,7 +1764,6 @@ function UseMenu(id,slot)
 				width=200, height=55,
 				onRelease = UsedIt
 			}
-			usebtn:setReferencePoint( display.CenterReferencePoint )
 			usebtn.x = (display.contentWidth/4)-50
 			usebtn.y = (display.contentHeight/2)+30
 			gum:insert( usebtn )
@@ -1637,7 +1771,7 @@ function UseMenu(id,slot)
 			local descrip=display.newText( (itemstats[5]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
 			descrip.x=display.contentWidth/2
-			descrip:setTextColor( 180, 180, 180)
+			descrip:setFillColor( 180/255, 180/255, 180/255)
 			gum:insert( descrip )
 		end	
 		if itemstats[1]==1 then
@@ -1657,7 +1791,6 @@ function UseMenu(id,slot)
 				width=200, height=55,
 				onRelease = EquippedIt
 			}
-			equipbtn:setReferencePoint( display.CenterReferencePoint )
 			equipbtn.x = (display.contentWidth/4)-50
 			equipbtn.y = (display.contentHeight/2)+30
 			gum:insert( equipbtn )
@@ -1690,14 +1823,14 @@ function UseMenu(id,slot)
 			for c=1,6 do
 				if statchange[c]>0 then
 					stattxts[c]=display.newText( (stats[c].." +"..statchange[c]),0,0,"MoolBoran",60)
-					stattxts[c]:setTextColor( 60, 180, 60)
+					stattxts[c]:setFillColor( 60/255, 180/255, 60/255)
 					stattxts[c].x=statchangex+(statchangexs*((c-1)%3))
 					stattxts[c].y=statchangey+(50*math.floor((c-1)/3))
 					gum:insert( stattxts[c] )
 					eqpstatchnge=true
 				elseif statchange[c]<0 then
 					stattxts[c]=display.newText( (stats[c].." "..statchange[c]) ,0,0,"MoolBoran",60)
-					stattxts[c]:setTextColor( 180, 60, 60)
+					stattxts[c]:setFillColor( 180/255, 60/255, 60/255)
 					stattxts[c].x=statchangex+(statchangexs*((c-1)%3))
 					stattxts[c].y=statchangey+(50*math.floor((c-1)/3))
 					gum:insert( stattxts[c] )
@@ -1712,7 +1845,7 @@ function UseMenu(id,slot)
 					text="No hay cambio."
 				end
 				stattxts[1]=display.newText( (text) ,0,0,"MoolBoran",55)
-				stattxts[1]:setTextColor( 180, 180, 180)
+				stattxts[1]:setFillColor( 180/255, 180/255, 180/255)
 				stattxts[1].y=(display.contentHeight/2)-50
 				stattxts[1].x=display.contentWidth/2
 				gum:insert( stattxts[1] )
@@ -1736,7 +1869,6 @@ function UseMenu(id,slot)
 					width=200, height=55,
 					onRelease = UsedIt
 				}
-				usebtn:setReferencePoint( display.CenterReferencePoint )
 				usebtn.x = (display.contentWidth/4)-50
 				usebtn.y = (display.contentHeight/2)+30
 				gum:insert( usebtn )
@@ -1757,7 +1889,6 @@ function UseMenu(id,slot)
 					width=200, height=55,
 					onRelease = UsedIt
 				}
-				usebtn:setReferencePoint( display.CenterReferencePoint )
 				usebtn.x = (display.contentWidth/4)-50
 				usebtn.y = (display.contentHeight/2)+30
 				gum:insert( usebtn )
@@ -1766,7 +1897,7 @@ function UseMenu(id,slot)
 			local descrip=display.newText( (itemstats[3]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
 			descrip.x=display.contentWidth/2
-			descrip:setTextColor( 180, 180, 180)
+			descrip:setFillColor( 180/255, 180/255, 180/255)
 			gum:insert( descrip )
 		end
 		if itemstats[1]==3 then
@@ -1786,7 +1917,6 @@ function UseMenu(id,slot)
 				width=200, height=55,
 				onRelease = LearnedIt
 			}
-			learnbtn:setReferencePoint( display.CenterReferencePoint )
 			learnbtn.x = (display.contentWidth/4)-50
 			learnbtn.y = (display.contentHeight/2)+30
 			gum:insert( learnbtn )
@@ -1794,7 +1924,7 @@ function UseMenu(id,slot)
 			local descrip=display.newText( (itemstats[4]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
 			descrip.x=display.contentWidth/2
-			descrip:setTextColor( 180, 180, 180)
+			descrip:setFillColor( 180/255, 180/255, 180/255)
 			gum:insert( descrip )
 			
 		end
@@ -1815,7 +1945,6 @@ function UseMenu(id,slot)
 				width=200, height=55,
 				onRelease = StatBoost
 			}
-			boostbtn:setReferencePoint( display.CenterReferencePoint )
 			boostbtn.x = (display.contentWidth/4)-50
 			boostbtn.y = (display.contentHeight/2)+30
 			gum:insert( boostbtn )
@@ -1823,7 +1952,7 @@ function UseMenu(id,slot)
 			local descrip=display.newText( (itemstats[4]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
 			descrip.x=display.contentWidth/2
-			descrip:setTextColor( 180, 180, 180)
+			descrip:setFillColor( 180/255, 180/255, 180/255)
 			gum:insert( descrip )
 			
 		end
@@ -1876,7 +2005,6 @@ function CheckMenu(id)
 			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = CheckMenu}
-		backbtn:setReferencePoint( display.CenterReferencePoint )
 		backbtn.x = (display.contentWidth/2)
 		backbtn.y = (display.contentHeight/2)+30
 		gum:insert( backbtn )
@@ -1906,13 +2034,13 @@ function CheckMenu(id)
 			for c=1,6 do
 				if statchange[c]>0 then
 					stattxts[c]=display.newText( (stats[c].." +"..statchange[c]),0,0,"MoolBoran",60)
-					stattxts[c]:setTextColor( 60, 180, 60)
+					stattxts[c]:setFillColor( 60/255, 180/255, 60/255)
 					stattxts[c].x=statchangex+(statchangexs*((c-1)%3))
 					stattxts[c].y=statchangey+(50*math.floor((c-1)/3))
 					gum:insert( stattxts[c] )
 				elseif statchange[c]<0 then
 					stattxts[c]=display.newText( (stats[c].." "..statchange[c]) ,0,0,"MoolBoran",60)
-					stattxts[c]:setTextColor( 180, 60, 60)
+					stattxts[c]:setFillColor( 180/255, 60/255, 60/255)
 					stattxts[c].x=statchangex+(statchangexs*((c-1)%3))
 					stattxts[c].y=statchangey+(50*math.floor((c-1)/3))
 					gum:insert( stattxts[c] )

@@ -19,7 +19,7 @@ function Display()
 	title=display.newText(lc.giveText("LOC029"),0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100
-	title:setTextColor(125,250,125)
+	title:setFillColor(125/255,250/255,125/255)
 	pmg:insert(title)
 
 	TutBtn =  widget.newButton{
@@ -33,7 +33,6 @@ function Display()
 		width=308, height=90,
 		onRelease = onTutBtnRelease
 	}
-	TutBtn:setReferencePoint( display.CenterReferencePoint )
 	TutBtn.x = display.contentWidth*0.5
 	TutBtn.y = display.contentHeight*0.3
 	pmg:insert(TutBtn)
@@ -52,7 +51,6 @@ function Display()
 			onRelease = goSlot1
 			
 		}
-		Slot1:setReferencePoint( display.CenterReferencePoint )
 		Slot1.x = display.contentWidth*0.5
 		Slot1.y = TutBtn.y+110
 		pmg:insert(Slot1)
@@ -65,12 +63,11 @@ function Display()
 			labelYOffset=10,
 			defaultFile="sbutton.png",
 			overFile="sbutton-over.png",
-			width=90, height=90,
+			width=80, height=80,
 			onRelease = cleanSlot1
 			
 		}
-		Clean1:setReferencePoint( display.CenterReferencePoint )
-		Clean1.x = Slot1.x+220
+		Clean1.x = Slot1.x+200
 		Clean1.y = Slot1.y
 		pmg:insert(Clean1)
 	else
@@ -86,7 +83,6 @@ function Display()
 			onRelease = goSlot1
 			
 		}
-		Slot1:setReferencePoint( display.CenterReferencePoint )
 		Slot1.x = display.contentWidth*0.5
 		Slot1.y = TutBtn.y+110
 		pmg:insert(Slot1)
@@ -106,7 +102,6 @@ function Display()
 			onRelease = goSlot2
 			
 		}
-		Slot2:setReferencePoint( display.CenterReferencePoint )
 		Slot2.x = display.contentWidth*0.5
 		Slot2.y = Slot1.y+110
 		pmg:insert(Slot2)
@@ -119,12 +114,11 @@ function Display()
 			labelYOffset=10,
 			defaultFile="sbutton.png",
 			overFile="sbutton-over.png",
-			width=90, height=90,
+			width=80, height=80,
 			onRelease = cleanSlot2
 			
 		}
-		Clean2:setReferencePoint( display.CenterReferencePoint )
-		Clean2.x = Slot2.x+220
+		Clean2.x = Slot2.x+200
 		Clean2.y = Slot2.y
 		pmg:insert(Clean2)
 	else
@@ -140,7 +134,6 @@ function Display()
 			onRelease = goSlot2
 			
 		}
-		Slot2:setReferencePoint( display.CenterReferencePoint )
 		Slot2.x = display.contentWidth*0.5
 		Slot2.y = Slot1.y+110
 		pmg:insert(Slot2)
@@ -160,7 +153,6 @@ function Display()
 			onRelease = goSlot3
 			
 		}
-		Slot3:setReferencePoint( display.CenterReferencePoint )
 		Slot3.x = display.contentWidth*0.5
 		Slot3.y = Slot2.y+110
 		pmg:insert(Slot3)
@@ -173,12 +165,11 @@ function Display()
 			labelYOffset=10,
 			defaultFile="sbutton.png",
 			overFile="sbutton-over.png",
-			width=90, height=90,
+			width=80, height=80,
 			onRelease = cleanSlot3
 			
 		}
-		Clean3:setReferencePoint( display.CenterReferencePoint )
-		Clean3.x = Slot3.x+220
+		Clean3.x = Slot3.x+200
 		Clean3.y = Slot3.y
 		pmg:insert(Clean3)
 	else
@@ -194,7 +185,6 @@ function Display()
 			onRelease = goSlot3
 			
 		}
-		Slot3:setReferencePoint( display.CenterReferencePoint )
 		Slot3.x = display.contentWidth*0.5
 		Slot3.y = Slot2.y+110
 		pmg:insert(Slot3)
@@ -211,7 +201,6 @@ function Display()
 		width=290, height=90,
 		onRelease = onBackRelease
 	}
-	BackBtn:setReferencePoint( display.CenterReferencePoint )
 	BackBtn.x = display.contentWidth*0.5
 	BackBtn.y = display.contentHeight-100
 	pmg:insert(BackBtn)
@@ -366,7 +355,7 @@ function Keyboard()
 	title=display.newText(lc.giveText("LOC030"),0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100
-	title:setTextColor(125,250,125)
+	title:setFillColor(125/255,250/255,125/255)
 	kbrd:insert(title)
 	
 	for i=1,10 do
@@ -503,7 +492,6 @@ function Keyboard()
 		width=216, height=90,
 		onRelease = Backspace
 	}
-	DelBtn:setReferencePoint( display.CenterReferencePoint )
 	DelBtn.x = display.contentCenterX
 	DelBtn.y = display.contentHeight-55
 	kbrd:insert( DelBtn )
@@ -519,7 +507,6 @@ function Keyboard()
 		width=216, height=90,
 		onRelease = End
 	}
-	EndBtn:setReferencePoint( display.CenterReferencePoint )
 	EndBtn.x = display.contentWidth-130
 	EndBtn.y = display.contentHeight-55
 	kbrd:insert( EndBtn )
@@ -535,7 +522,6 @@ function Keyboard()
 		width=216, height=90,
 		onRelease = Back2Menu
 	}
-	BackBtn:setReferencePoint( display.CenterReferencePoint )
 	BackBtn.x = 130
 	BackBtn.y = display.contentHeight-55
 	kbrd:insert( BackBtn )

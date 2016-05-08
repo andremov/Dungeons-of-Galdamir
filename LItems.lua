@@ -106,7 +106,7 @@ function ItemDrop(boost)
 			local lolname2=display.newText( (ItemName) ,0,0,"MoolBoran",55)
 			lolname2.y=(display.contentHeight/2)-50
 			lolname2.x=display.contentWidth/2
-			lolname2:setTextColor( 180, 180, 180)
+			lolname2:setFillColor( 180/255, 180/255, 180/255)
 			gum:insert( lolname2 )
 			
 			if lang=="EN" then
@@ -124,7 +124,6 @@ function ItemDrop(boost)
 				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = Backbtn}
-			backbtn:setReferencePoint( display.CenterReferencePoint )
 			backbtn.x = (display.contentWidth/2)
 			backbtn.y = (display.contentHeight/2)+30
 			gum:insert( backbtn )
@@ -171,7 +170,7 @@ function ItemDrop(boost)
 			gum:insert( lolname )
 			
 			local lolname2=display.newText( (asdname) ,0,0,"MoolBoran",55)
-			lolname2:setTextColor( 180, 180, 180)
+			lolname2:setFillColor( 180/255, 180/255, 180/255)
 			lolname2.x=display.contentWidth/2
 			lolname2.y=(display.contentHeight/2)-50
 			gum:insert( lolname2 )
@@ -191,7 +190,6 @@ function ItemDrop(boost)
 				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = Backbtn}
-			backbtn:setReferencePoint( display.CenterReferencePoint )
 			backbtn.x = (display.contentWidth/2)-105
 			backbtn.y = (display.contentHeight/2)+30
 			gum:insert( backbtn )
@@ -211,7 +209,6 @@ function ItemDrop(boost)
 				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = Bagbtn}
-			bagbtn:setReferencePoint( display.CenterReferencePoint )
 			bagbtn.x = (display.contentWidth/2)+105
 			bagbtn.y = (display.contentHeight/2)+30
 			gum:insert( bagbtn )

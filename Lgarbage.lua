@@ -8,22 +8,22 @@ function Font()
 	
 	for i,fontname in ipairs(fonts) do
 		count = count+1
-		j, k = string.find(fontname, "Mool")
+		j, k = string.find(fontname, "Mono")
 		if (j ~= nil) then
 			found_count = found_count + 1
 			print("found font: \""..fontname.."\"")
-			local obj = display.newText(fontname, 0, (found_count - 1) * 40, fontname, 48)
+			local obj = display.newText(fontname, 0, 50+((found_count-1)*40), fontname, 48)
 			g:insert(obj)
-			obj:setTextColor(255, 255, 255)
+			obj:setFillColor(1, 1, 1)
 			obj.x=display.contentWidth/2
 		end
 	end
 	print ("Font count: " .. count)
-	local count_text = display.newText("Found " .. count .. " fonts.", 0, (found_count) * 40, fontname, 32)
+	local count_text = display.newText("Found " .. count .. " fonts.", 0, 50+((found_count)*40), fontname, 32)
 			count_text.x=display.contentWidth/2
 	g:insert(count_text)
 	g:toFront()
-	count_text:setTextColor(255, 255, 255)
+	count_text:setFillColor(1, 1, 1)
 	--	
 end
 

@@ -39,9 +39,6 @@ function LoadSounds()
 			soundboard[16] = audio.loadSound	("sounds/step3.mp3")
 			soundboard[17] = audio.loadSound	("sounds/step4.mp3")
 			--
-			musicboard[1] = audio.loadStream	("sounds/menu.mp3")
-			musicboard[2] = audio.loadStream	("sounds/music.mp3")
-			musicboard[3] = audio.loadStream	("sounds/battle.mp3")
 			--
 			Loaded=true
 		else
@@ -96,10 +93,13 @@ function PlayMusic()
 		local check=audio.isChannelPlaying(mChannel)
 		if check==false then
 			if curMusic==1 then
+				musicboard[1] = audio.loadStream	("sounds/menu.mp3")
 				audio.setVolume( 0.5*Music, { channel=mChannel  })
 			elseif curMusic==2 then
-				audio.setVolume( 0.2*Music, { channel=mChannel  })
+				musicboard[2] = audio.loadStream	("sounds/music.mp3")
+				audio.setVolume( 0.7*Music, { channel=mChannel  })
 			elseif curMusic==3 then
+				musicboard[3] = audio.loadStream	("sounds/battle.mp3")
 				audio.setVolume( 0.5*Music, { channel=mChannel  })
 			end
 			bkgmusic=audio.play( musicboard[curMusic], {channel=mChannel, onComplete=RepeatBkg} )
@@ -122,20 +122,16 @@ function changeMusic(data)
 	end
 end
 
-function Stopbkg()
-	audio.fadeOut({ bkg, 100 })
-end
-
 function RepeatBkg()
 	if didChange==true then
 		didChange=false
+		for i in pairs (musicboard) do
+			audio.dispose(musicboard[i])
+			musicboard[i]=nil
+		end
 		timer.performWithDelay(3000,PlayMusic)
 	else
-		if curMusic==3 then
-			PlayMusic()
-		else
-			timer.performWithDelay(10000,PlayMusic)
-		end
+		timer.performWithDelay(15000,PlayMusic)
 	end
 end
 

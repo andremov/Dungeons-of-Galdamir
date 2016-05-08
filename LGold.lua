@@ -61,12 +61,18 @@ function GoldDisplay()
 			transp=255
 		end
 		
-		GCDisplay = display.newText( (GoldCount), Displayx, Displayy, "Game Over", 100 )
-		GCDisplay:setTextColor( 255, 255, 50, transp)
+		GCDisplay = display.newText( (GoldCount),0,0, "Game Over", 100 )
+		GCDisplay.anchorX=0
+		GCDisplay.anchorY=0
+		GCDisplay.x=Displayx
+		GCDisplay.y=Displayy
+		GCDisplay:setFillColor( 255/255, 255/255, 50/255, transp/255)
 		
 		GWindow = display.newRect (0,0,#GCDisplay.text*23,40)
-		GWindow:setFillColor( 150, 150, 150,transp/2)
-		GWindow.y=GCDisplay.y+5
+		GWindow:setFillColor( 150/255, 150/255, 150/255,transp/2/255)
+		GWindow.anchorX=0
+		GWindow.anchorY=0
+		GWindow.y=GCDisplay.y+12.5
 		GWindow.x=GCDisplay.x
 		
 		GCDisplay:toFront()
@@ -74,8 +80,9 @@ function GoldDisplay()
 	if not (CDisplay) then
 		CDisplay=display.newSprite( coinsheet, { name="coin", start=1, count=8, time=750}  )
 		CDisplay:setFillColor( 0, 0, 0, 0)
-		CDisplay:setReferencePoint( display.CenterRightReferencePoint )
-		CDisplay.x, CDisplay.y = GCDisplay.x-30, GCDisplay.y+5
+		CDisplay.anchorX=0
+		CDisplay.anchorY=0
+		CDisplay.x, CDisplay.y = GCDisplay.x-50, GCDisplay.y+10
 		CDisplay.xScale=DisplayS
 		CDisplay.yScale=DisplayS
 		CDisplay:toFront()
@@ -94,14 +101,16 @@ function GoldDisplay()
 		end
 		display.remove(GWindow)
 		GWindow = display.newRect (0,0,#GCDisplay.text*23,40)
-		GWindow:setFillColor( 150, 150, 150,transp/2)
+		GWindow:setFillColor( 150/255, 150/255, 150/255,transp/2/255)
+		GWindow.anchorX=0
+		GWindow.anchorY=0
 		GWindow.x=GCDisplay.x
-		GWindow.y=GCDisplay.y+5
+		GWindow.y=GCDisplay.y+12.5
 		
 		GCDisplay:toFront()
 		CDisplay:toFront()
-		-- GCDisplay:setTextColor( 255, 255, 50, transp)
-		CDisplay:setFillColor( transp, transp, transp, transp)
+		GCDisplay:setFillColor( 255/255, 255/255, 50/255, transp/255)
+		CDisplay:setFillColor( transp/255, transp/255, transp/255, transp/255)
 	else
 		if GoldCount<P1.gp then
 			GoldCount=GoldCount+1
@@ -111,14 +120,16 @@ function GoldDisplay()
 		transp=255
 		display.remove(GWindow)
 		GWindow = display.newRect (0,0,#GCDisplay.text*23,40)
-		GWindow:setFillColor( 150, 150, 150,transp/2)
+		GWindow:setFillColor( 150/255, 150/255, 150/255,transp/255/2)
+		GWindow.anchorX=0
+		GWindow.anchorY=0
 		GWindow.x=GCDisplay.x
-		GWindow.y=GCDisplay.y+5
+		GWindow.y=GCDisplay.y+12.5
 		
 		GCDisplay:toFront()
 		CDisplay:toFront()
-		-- GCDisplay:setTextColor( 255, 255, 50, transp)
-		CDisplay:setFillColor( transp, transp, transp, transp)
+		GCDisplay:setFillColor( 255/255, 255/255, 50/255, transp/255)
+		CDisplay:setFillColor( transp/255, transp/255, transp/255, transp/255)
 	end
 end
 

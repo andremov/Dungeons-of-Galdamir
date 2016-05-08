@@ -58,7 +58,7 @@ function Scoring(round,p1,size)
 		p1.gp/round
 	)
 	Score=(
-		Score*((size/10)-1)
+		Score*(size-6)
 	)
 	local process=(
 		p1.stats[1]+p1.stats[2]+p1.stats[3]+p1.stats[4]+p1.stats[5]+p1.stats[6]
@@ -125,7 +125,7 @@ function HighScores()
 	title=display.newText(lc.giveText("LOC006"),0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100
-	title:setTextColor(125,250,125)
+	title:setFillColor(125/255,250/255,125/255)
 	title:addEventListener("tap",ConfirmWipe)
 	ghs:insert(title)
 	
@@ -140,7 +140,6 @@ function HighScores()
 		width=290, height=90,
 		onRelease = onBackBtn
 	}
-	BackBtn:setReferencePoint( display.CenterReferencePoint )
 	BackBtn.x = display.contentWidth*0.5
 	BackBtn.y = display.contentHeight-100
 	ghs:insert(BackBtn)
@@ -158,21 +157,33 @@ function HighScores()
 	end
 	Nums={}
 	for n=1,10 do
-		Nums[#Nums+1] = display.newText( (n.."."),50,145+(72*#Nums),"MoolBoran", 75 )
-		Nums[#Nums]:setTextColor(250,250,125)
+		Nums[#Nums+1] = display.newText( (n.."."),0,0,"MoolBoran", 75 )
+		Nums[#Nums]:setFillColor(250/255,250/255,125/255)
+		Nums[#Nums].anchorX=0
+		Nums[#Nums].anchorY=0
+		Nums[#Nums].x=50
+		Nums[#Nums].y=73+(72*#Nums)
 		ghs:insert(Nums[#Nums])
 	end
 	
 	Lines={}
 	for l=1,10 do
-		Lines[#Lines+1] = display.newText( ("___________________________"),135,145+(72*#Lines),"MoolBoran", 75 )
-		Lines[#Lines]:setTextColor(125,125,125)
+		Lines[#Lines+1] = display.newText( ("___________________________"),0,0,"MoolBoran", 75 )
+		Lines[#Lines]:setFillColor(125/255,125/255,125/255)
+		Lines[#Lines].anchorX=0
+		Lines[#Lines].anchorY=0
+		Lines[#Lines].x=135
+		Lines[#Lines].y=73+(72*#Lines)
 		ghs:insert(Lines[#Lines])
 	end
 	
 	Text={}
 	for t=2,21,2 do
-		Text[#Text+1] = display.newText( ( (Sve[t].." - "..Sve[t+1]) ) ,140,145+(72*#Text),"MoolBoran", 75 )
+		Text[#Text+1] = display.newText( ( (Sve[t].." - "..Sve[t+1]) ) ,0,0,"MoolBoran", 75 )
+		Text[#Text].anchorX=0
+		Text[#Text].anchorY=0
+		Text[#Text].x=140
+		Text[#Text].y=73+(72*#Text)
 		ghs:insert(Text[#Text])
 	end
 end
@@ -281,7 +292,6 @@ function ConfirmWipe()
 		width=290, height=90,
 		onRelease = WipeScores
 	}
-	YesBtn:setReferencePoint( display.CenterReferencePoint )
 	YesBtn.x = (display.contentWidth/4)
 	YesBtn.y = display.contentHeight-100
 	ghs:insert(YesBtn)
@@ -297,7 +307,6 @@ function ConfirmWipe()
 		width=290, height=90,
 		onRelease = CancelWipe
 	}
-	NoBtn:setReferencePoint( display.CenterReferencePoint )
 	NoBtn.x = (display.contentWidth/4)*3
 	NoBtn.y = display.contentHeight-100
 	ghs:insert(NoBtn)

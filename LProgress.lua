@@ -51,8 +51,8 @@ function FloorSign()
 		if proftransp<20 then
 			proftransp=0
 		end
-		profbkg:setFillColor(proftransp,proftransp,proftransp,proftransp)
-		profbkg2:setTextColor(255,255,255,proftransp)
+		profbkg:setFillColor(proftransp/255,proftransp/255,proftransp/255,proftransp/255)
+		profbkg2:setFillColor(255/255,255/255,255/255,proftransp/255)
 		floorcount:toFront()
 		timer.performWithDelay(20,FloorSign)
 	else
@@ -61,11 +61,11 @@ function FloorSign()
 		profbkg=display.newImageRect("floorcount.png", 600, 250)
 		profbkg.xScale=0.5
 		profbkg.yScale=profbkg.xScale
-		profbkg:setFillColor(proftransp,proftransp,proftransp,proftransp)
+		profbkg:setFillColor(proftransp/255,proftransp/255,proftransp/255,proftransp/255)
 		profbkg.x, profbkg.y = display.contentCenterX, display.contentCenterY-200
 		
 		profbkg2=display.newText( (Round), 0, 0, "Game Over", 100 )
-		profbkg2:setTextColor(255,255,255,proftransp)
+		profbkg2:setFillColor(255/255,255/255,255/255,proftransp/255)
 		profbkg2.x, profbkg2.y = profbkg.x, profbkg.y+20
 		
 		floorcount:insert(profbkg)
@@ -92,6 +92,7 @@ function FloorPort(up)
 				gpgain=(5*math.sqrt(size))
 			end
 			gp.CallAddCoins(gpgain)
+			players.GrantXP( math.ceil(gpgain/1.5) )
 		end
 		su.Startup(false)
 		builder.Rebuild(false)
@@ -129,6 +130,7 @@ function Win()
 			gpgain=(5*math.sqrt(size))
 		end
 		gp.CallAddCoins(gpgain)
+		players.GrantXP( math.ceil(gpgain/1.5) )
 	end
 	su.Startup(false)
 	builder.Rebuild(false)

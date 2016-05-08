@@ -60,7 +60,7 @@ function Load()
 				WD.RoundChange(Sve[l+1])
 			
 			elseif (Sve[l])=="Size" then
-				m.Size(Sve[l+1])
+				b.Expand(false,Sve[l+1])
 			
 			elseif (Sve[l])=="Player" then
 				-- Player Load 1 - Class & Char
@@ -132,6 +132,7 @@ function CheckSave(slot)
 					okSave=true
 				end
 			end
+			io.close(fh)
 			if okSave==true then
 				return Sve[27]
 			else
@@ -139,10 +140,12 @@ function CheckSave(slot)
 				return false
 			end
 		else
+			io.close(fh)
 			WipeSave(slot)
 			return false
 		end
 	else
+		-- io.close(fh)
 		WipeSave(slot)
 		return false
 	end
@@ -151,61 +154,60 @@ end
 function Save(doMap)
 	local path = system.pathForFile(  "DoGSave"..saveSlot..".sav", system.DocumentsDirectory )
 	local fh, errStr = io.open( path, "w+" )
-	if (fh) then
-		local GVer=v.HowDoIVersion()
-		fh:write(GVer,"\n")
-		
-		local Round=WD.Circle()
-		fh:write( "Round\n",Round,"\n")
-		
-		local Size=b.Expand(true)
-		fh:write( "Size\n",Size,"\n")
-		
-		local P1=p.GetPlayer()
-		fh:write("Player\n")
-		--
-		fh:write(P1.class,"\n",P1.char,"\n")
-		--
-		fh:write(P1.nat[1],"\n",P1.nat[2],"\n",P1.nat[3],
-			"\n",P1.nat[4],"\n",P1.nat[5],"\n",P1.nat[6],
-			"\n"
-		)
-		--
-		fh:write(P1.bst[1],"\n",P1.bst[2],"\n",P1.bst[3],
-			"\n",P1.bst[4],"\n",P1.bst[5],"\n",P1.bst[6],
-			"\n"
-		)
-		--
-		fh:write(P1.pnts,"\n",P1.lvl,"\n",P1.XP,"\n")
-		--
-		fh:write(P1.HP,"\n",P1.MP,"\n",P1.EP,"\n",P1.name,"\n",P1.gp,"\n")
-		
-		fh:write( "Spells\n")
-		for s=1,table.maxn(P1.spells) do
-			if P1.spells[s][3]==true then
-				fh:write( P1.spells[s][1],"\n")
-			end
+	
+	local GVer=v.HowDoIVersion()
+	fh:write(GVer,"\n")
+	
+	local Round=WD.Circle()
+	fh:write( "Round\n",Round,"\n")
+	
+	local Size=b.Expand(true)
+	fh:write( "Size\n",Size,"\n")
+	
+	local P1=p.GetPlayer()
+	fh:write("Player\n")
+	--
+	fh:write(P1.class,"\n",P1.char,"\n")
+	--
+	fh:write(P1.nat[1],"\n",P1.nat[2],"\n",P1.nat[3],
+		"\n",P1.nat[4],"\n",P1.nat[5],"\n",P1.nat[6],
+		"\n"
+	)
+	--
+	fh:write(P1.bst[1],"\n",P1.bst[2],"\n",P1.bst[3],
+		"\n",P1.bst[4],"\n",P1.bst[5],"\n",P1.bst[6],
+		"\n"
+	)
+	--
+	fh:write(P1.pnts,"\n",P1.lvl,"\n",P1.XP,"\n")
+	--
+	fh:write(P1.HP,"\n",P1.MP,"\n",P1.EP,"\n",P1.name,"\n",P1.gp,"\n")
+	
+	fh:write( "Spells\n")
+	for s=1,table.maxn(P1.spells) do
+		if P1.spells[s][3]==true then
+			fh:write( P1.spells[s][1],"\n")
 		end
-		
-		fh:write( "Inv\n")
-		for i=1,table.maxn(P1.inv) do
-			if (P1.inv[i]) then
-				fh:write( P1.inv[i][1],"\n")
-				fh:write( P1.inv[i][2],"\n")
-			end
+	end
+	
+	fh:write( "Inv\n")
+	for i=1,table.maxn(P1.inv) do
+		if (P1.inv[i]) then
+			fh:write( P1.inv[i][1],"\n")
+			fh:write( P1.inv[i][2],"\n")
 		end
-		fh:write( "Eqp\n")
-		for i=1,table.maxn(P1.eqp) do
-			if (P1.eqp[i]) then
-				fh:write( P1.eqp[i][1],"\n")
-			end
+	end
+	fh:write( "Eqp\n")
+	for i=1,table.maxn(P1.eqp) do
+		if (P1.eqp[i]) then
+			fh:write( P1.eqp[i][1],"\n")
 		end
-		io.close( fh )
-	--	print ("Progress saved on floor "..Round..".")
-		canMap=true
-		if doMap==true then
-			SaveMap()
-		end
+	end
+	io.close( fh )
+--	print ("Progress saved on floor "..Round..".")
+	canMap=true
+	if doMap==true then
+		SaveMap()
 	end
 end
 
@@ -213,27 +215,26 @@ function WipeSave(slot)
 	if not(slot)then
 		local path = system.pathForFile(  "DoGSave"..saveSlot..".sav", system.DocumentsDirectory )
 		local fh, errStr = io.open( path, "w+" )
-		fh:write("")
-		io.close( fh )
-		
-		local path = system.pathForFile(  "DoGMapSave"..saveSlot..".sav", system.DocumentsDirectory )
-		local fh, errStr = io.open( path, "w+" )
-		fh:write("")
-		io.close( fh )
+		if (fh) then
+			fh:write("")
+			io.close( fh )
+			
+			local path = system.pathForFile(  "DoGMapSave"..saveSlot..".sav", system.DocumentsDirectory )
+			local fh, errStr = io.open( path, "w+" )
+			fh:write("")
+			io.close( fh )
+		end
 	else
 		local path = system.pathForFile(  "DoGSave"..slot..".sav", system.DocumentsDirectory )
 		local fh, errStr = io.open( path, "w+" )
-		if (fh) then
-			fh:write("")
-			io.close( fh )
-		end
+		
+		fh:write("")
+		io.close( fh )
 		
 		local path = system.pathForFile(  "DoGMapSave"..slot..".sav", system.DocumentsDirectory )
 		local fh, errStr = io.open( path, "w+" )
-		if (fh) then
-			fh:write("")
-			io.close( fh )
-		end
+		fh:write("")
+		io.close( fh )
 	end
 end
 

@@ -15,6 +15,7 @@ local c=require("Lcombat")
 local sho=require("Lshop")
 local sv=require("Lsaving")
 local g=require("Lgold")
+local lc=require("Llocale")
 local yinicial=display.contentHeight/2
 local xinicial=display.contentWidth/2
 local Toggle=math.random(5,10)
@@ -53,12 +54,17 @@ function ShowArrows()
 	
 	if Dropped==true or Key==true or combatBug==true then
 	elseif Toggle<=0 then
-		mtext=display.newText("Saving...",0,0,"MoolBoran",70)
+		local lang=lc.giveLang()
+		local text="Saving..."
+		if lang=="ES" then
+			text="Guardando..."
+		end
+		mtext=display.newText(text,0,0,"MoolBoran",70)
 		mtext.x=display.contentCenterX
 		mtext.y=display.contentHeight*.2
 		
 		mwindow=display.newRect (0,0,#mtext.text*22,60)
-		mwindow:setFillColor( 0, 0, 0, 122)
+		mwindow:setFillColor( 0, 0, 0, 122/255)
 		mwindow.x=mtext.x
 		mwindow.y=mtext.y-15
 		mtext:toFront()
@@ -133,8 +139,6 @@ function ShowArrows()
 		end
 		
 		if RoomChange=="R" then
-			print (p1.room+1)
-			print (p1.loc-(size-1))
 			if boundary[p1.room+1][p1.loc-(size-1)]~=0 then
 				CanMoveRight=true
 			end
@@ -395,17 +399,17 @@ function WindowManager()
 		cwin.x=display.contentCenterX
 		cwin.y=display.contentCenterY
 		cwin:addEventListener("touch",Interaction)
-		cwin:setFillColor(wintransp,wintransp,wintransp,wintransp)
+		cwin:setFillColor(wintransp/255,wintransp/255,wintransp/255,wintransp/255)
 		cwin.state=1
 	end
 	idletimer=idletimer+1
 	if idletimer>20 and idletimer<200 and cwin.state~=0 then
 		wintransp=wintransp-math.ceil(255/100)
-		if wintransp<10 then
-			wintransp=10
+		if wintransp/255<0.1 then
+			wintransp=0.1*255
 			cwin.state=0
 		end
-		cwin:setFillColor(wintransp,wintransp,wintransp,wintransp)
+		cwin:setFillColor(wintransp/255,wintransp/255,wintransp/255,wintransp/255)
 	end
 	if idletimer>1500 then
 		if cwin.state==0 then
@@ -414,20 +418,20 @@ function WindowManager()
 				wintransp=255
 				cwin.state=1
 			end
-			cwin:setFillColor(wintransp,wintransp,wintransp,wintransp)
+			cwin:setFillColor(wintransp/255,wintransp/255,wintransp/255,wintransp/255)
 		elseif cwin.state==1 then
 			wintransp=wintransp-math.ceil(255/50)
 			if wintransp<75 then
 				cwin.state=2
 			end
-			cwin:setFillColor(wintransp,wintransp,wintransp,wintransp)
+			cwin:setFillColor(wintransp/255,wintransp/255,wintransp/255,wintransp/255)
 		elseif cwin.state==2 then
 			wintransp=wintransp+math.ceil(255/50)
 			if wintransp>255 then
 				wintransp=255
 				cwin.state=1
 			end
-			cwin:setFillColor(wintransp,wintransp,wintransp,wintransp)
+			cwin:setFillColor(wintransp/255,wintransp/255,wintransp/255,wintransp/255)
 		end
 	end
 end

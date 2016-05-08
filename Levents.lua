@@ -1,4 +1,4 @@
------------------------------------------------------------------------------------------
+	-----------------------------------------------------------------------------------------
 --
 -- Collision.lua
 --
@@ -216,7 +216,7 @@ function onKeyCollision()
 			gum:insert( lolname )
 			
 			local lolname2=display.newText( "You hear a loud clang in the distance." ,0,0,"MoolBoran",55)
-			lolname2:setTextColor( 180, 180, 180)
+			lolname2:setFillColor( 180/255, 180/255, 180/255)
 			lolname2.x=display.contentWidth/2
 			lolname2.y=(display.contentHeight/2)-50
 			gum:insert( lolname2 )
@@ -231,7 +231,6 @@ function onKeyCollision()
 				overFile="cbutton-over.png",
 				width=200, height=55,
 				onRelease = Backbtn}
-			backbtn:setReferencePoint( display.CenterReferencePoint )
 			backbtn.x = (display.contentWidth/2)
 			backbtn.y = (display.contentHeight/2)+30
 			gum:insert( backbtn )

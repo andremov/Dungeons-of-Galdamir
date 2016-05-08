@@ -9,6 +9,7 @@ local qsheet = graphics.newImageSheet( "quest.png", { width=447, height=80, numF
 local b=require("Lbuilder")
 local gp=require("Lgold")
 local set=require("Lsettings")
+local lc=require("Llocale")
 local WD=require("Lprogress")
 local mob=require("Lmobai")
 local HasQuest
@@ -25,12 +26,20 @@ local locaX
 local locaY
 local coins={}
 local ItemName
-local ItemNames={
+local ItemNames={}
+ItemNames["EN"]={
 		"Magical Trinket",
 		"Guard Insignia",
 		"Ancient Book",
 		"Mirror Fragment",
 		"Dragon Claw",
+	}
+ItemNames["ES"]={
+		"Baratija Magica",
+		"Insignia de Guardia",
+		"Libro Antiguo",
+		"Fragmento de Espejo",
+		"Garra de dragon",
 	}
 
 function Essentials()
@@ -43,7 +52,8 @@ end
 
 function CreateQuest()
 	if HasQuest==false then
-		local roll=math.random(1,10)
+	--	local roll=math.random(1,10)
+		roll=6
 		if roll>=6 then
 	--		print "Quest get."
 			HasQuest=true
@@ -53,8 +63,19 @@ function CreateQuest()
 			QWindow:play()
 			gqm:insert(QWindow)
 			
-			QTitle=display.newText("Current Quest:",QWindow.x-155,QWindow.y-45,"MoolBoran",40)
-			QTitle:setTextColor( 255, 255, 255)
+			local lang=lc.giveLang()
+			local text
+			if lang=="EN" then
+				text="Current Quest:"
+			elseif lang=="ES" then
+				text="Mision Actual:"
+			end
+			QTitle=display.newText(text,0,0,"MoolBoran",40)
+			QTitle.anchorX=0
+			QTitle.anchorY=0
+			QTitle.x=QWindow.x-155
+			QTitle.y=QWindow.y-35,
+			QTitle:setFillColor( 255/255, 255/255, 255/255)
 			gqm:insert(QTitle)
 			
 			QuestType=math.random(1,3)
@@ -71,8 +92,23 @@ function CreateQuest()
 				if mobcount>=mobPerc then
 					CurKills=0
 					NumKills=math.random(1,math.floor(mobcount/mobPerc))
-					QText=display.newText(("Defeat "..NumKills.." mobs. ("..CurKills.."/"..NumKills..")"),QWindow.x-155,QTitle.y+8,"MoolBoran",40)
-					QText:setTextColor( 255, 255, 255)
+					
+					local text1
+					local text2
+					local text3
+					if lang=="EN" then
+						text1="Defeat"
+						text2="mobs."
+					elseif lang=="ES" then
+						text1="Derrota"
+						text2="enemigos."
+					end
+					QText=display.newText((text1.." "..NumKills.." "..text2.." ("..CurKills.."/"..NumKills..")"),0,0,"MoolBoran",40)
+					QText.anchorX=0
+					QText.anchorY=1.0
+					QText.x=QWindow.x-155
+					QText.y=QWindow.y+55
+					QText:setFillColor( 255/255, 255/255, 255/255)
 					gqm:insert(QText)
 					if NumKills==0 then
 	--					print "Quest Error. Wiping quest..."
@@ -86,11 +122,15 @@ function CreateQuest()
 			if QuestType==2 then
 			
 				CurItem=0
-				ItemName=(math.random(1,table.maxn(ItemNames)))
-				NumItem=math.ceil(ItemName/2)
+				ItemName=(math.random(1,table.maxn(ItemNames[lang])))
+				NumItem=math.random(1,4)
 				
-				QText=display.newText((ItemNames[ItemName].."s: ("..CurItem.."/"..NumItem..")"),QWindow.x-155,QTitle.y+8,"MoolBoran",40)
-				QText:setTextColor( 255, 255, 255)
+				QText=display.newText((ItemNames[lang][ItemName].."s: ("..CurItem.."/"..NumItem..")"),0,0,"MoolBoran",40)
+				QText.anchorX=0
+				QText.anchorY=1.0
+				QText.x=QWindow.x-155
+				QText.y=QWindow.y+55
+				QText:setFillColor( 255/255, 255/255, 255/255)
 				gqm:insert(QText)
 			end
 			if QuestType==3 then
@@ -110,8 +150,25 @@ function CreateQuest()
 					local round=WD.Circle()
 					MobLvl=(math.random(1,zonas)+(zonas*(round-1)))
 					
-					QText=display.newText(("Defeat "..NumKills.." level "..MobLvl.." mobs. ("..CurKills.."/"..NumKills..")"),QWindow.x-155,QTitle.y+8,"MoolBoran",40)
-					QText:setTextColor( 255, 255, 255)
+					local text1
+					local text2
+					local text3
+					if lang=="EN" then
+						text1="Defeat"
+						text2="level"
+						text3="mobs."
+					elseif lang=="ES" then
+						text1="Derrota"
+						text2="nivel"
+						text3="enemigos."
+					end
+					
+					QText=display.newText((text1.." "..NumKills.." "..text2.." "..MobLvl.." "..text3.." ("..CurKills.."/"..NumKills..")"),0,0,"MoolBoran",40)
+					QText.anchorX=0
+					QText.anchorY=1.0
+					QText.x=QWindow.x-155
+					QText.y=QWindow.y+55
+					QText:setFillColor( 255/255, 255/255, 255/255)
 					gqm:insert(QText)
 					if NumKills==0 then
 	--					print "Quest Error. Wiping quest..."
@@ -128,6 +185,7 @@ end
 
 function UpdateQuest(val,val2)
 	if HasQuest==true then
+		local lang=lc.giveLang()
 		if QuestType==1 and val=="mob" then
 	--		print "Quests updated."
 			QWindow:setFrame(1)
@@ -150,7 +208,7 @@ function UpdateQuest(val,val2)
 				Runtime:addEventListener("enterFrame",HandleIt)
 				
 				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
-				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
 				QUpdate:toFront()
@@ -171,7 +229,7 @@ function UpdateQuest(val,val2)
 				Runtime:addEventListener("enterFrame",HandleIt)
 				
 				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
-				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
 				QUpdate:toFront()
@@ -182,7 +240,7 @@ function UpdateQuest(val,val2)
 			QWindow:setFrame(1)
 			QWindow:play()
 			CurItem=CurItem+1
-			QText.text=(ItemNames[ItemName].."s: ("..CurItem.."/"..NumItem..")")
+			QText.text=(ItemNames[lang][ItemName].."s: ("..CurItem.."/"..NumItem..")")
 			if CurItem==NumItem then
 				if (QUpdate)then
 					Runtime:removeEventListener("enterFrame",HandleIt)
@@ -198,7 +256,7 @@ function UpdateQuest(val,val2)
 				Runtime:addEventListener("enterFrame",HandleIt)
 				
 				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
-				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
 				QUpdate:toFront()
@@ -219,7 +277,7 @@ function UpdateQuest(val,val2)
 				Runtime:addEventListener("enterFrame",HandleIt)
 				
 				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
-				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
 				QUpdate:toFront()
@@ -243,11 +301,11 @@ function UpdateQuest(val,val2)
 				QUpdate=display.newText(("Quest complete!"),0,0,"MoolBoran",70)
 				QUpdate.x=display.contentCenterX
 				QUpdate.y=display.contentHeight*.25
-				QUpdate:setTextColor( transp, transp, transp, transp)
+				QUpdate:setFillColor( transp/255, transp/255, transp/255, transp/255)
 				Runtime:addEventListener("enterFrame",HandleIt)
 				
 				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
-				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
 				QUpdate:toFront()
@@ -268,7 +326,7 @@ function UpdateQuest(val,val2)
 				Runtime:addEventListener("enterFrame",HandleIt)
 				
 				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
-				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
 				QUpdate:toFront()
@@ -284,9 +342,9 @@ function HandleIt()
 		transp=transp-(255/350)
 	end
 	QUWindow:toFront()
-	QUWindow:setFillColor( 0, 0, 0,transp/2)
+	QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 	QUpdate:toFront()
-	QUpdate:setTextColor( transp, transp, transp, transp)
+	QUpdate:setFillColor( transp/255, transp/255, transp/255, transp/255)
 	if transp==0 then
 		Runtime:removeEventListener("enterFrame",HandleIt)
 		display.remove(QUpdate)
@@ -378,7 +436,8 @@ function ReturnQuest()
 		if QuestType==1 then
 			return QuestType
 		elseif QuestType==2 then
-			return QuestType,ItemNames[ItemName]
+			local lang=lc.giveLang()
+			return QuestType,ItemNames[lang][ItemName]
 		elseif QuestType==3 then
 			return QuestType
 		elseif QuestType==4 then

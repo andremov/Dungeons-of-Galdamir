@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- MapHandler.lua
+-- tiles.lua
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
@@ -77,10 +77,9 @@ function MapSizeMenu()
 		width=290, height=90,
 		onRelease = DefaultTSet
 	}
-	DefaultTS:setReferencePoint( display.CenterReferencePoint )
 	DefaultTS.x = display.contentWidth*0.5
 	DefaultTS.y = display.contentHeight*0.3
-	opt:insert(DefaultTS)
+	opt:insert(DefaultTS)	
 	
 	local NotebookTS =  widget.newButton{
 		label=lc.giveText("LOC025"),
@@ -93,7 +92,6 @@ function MapSizeMenu()
 		width=290, height=90,
 		onRelease = NotebookTSet
 	}
-	NotebookTS:setReferencePoint( display.CenterReferencePoint )
 	NotebookTS.x = DefaultTS.x
 	NotebookTS.y = DefaultTS.y+100
 	opt:insert(NotebookTS)
@@ -109,7 +107,6 @@ function MapSizeMenu()
 		width=290, height=90,
 		onRelease = SimpleTSet
 	}
-	SimpleTS:setReferencePoint( display.CenterReferencePoint )
 	SimpleTS.x = NotebookTS.x
 	SimpleTS.y = NotebookTS.y+100
 	opt:insert(SimpleTS)
@@ -126,7 +123,6 @@ function MapSizeMenu()
 		width=290, height=90,
 		onRelease = BWTSet
 	}
-	BWTS:setReferencePoint( display.CenterReferencePoint )
 	BWTS.x = RealTS.x
 	BWTS.y = RealTS.y+100
 	opt:insert(BWTS)
@@ -135,7 +131,7 @@ function MapSizeMenu()
 	title=display.newText(lc.giveText("LOC007"),0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100
-	title:setTextColor(125,250,125)
+	title:setFillColor(125/255,250/255,125/255)
 	title:addEventListener("tap",Secret)
 	opt:insert(title)
 	
@@ -150,7 +146,6 @@ function MapSizeMenu()
 		width=290, height=90,
 		onRelease = onBackRelease
 	}
-	BackBtn:setReferencePoint( display.CenterReferencePoint )
 	BackBtn.x = display.contentWidth*0.5
 	BackBtn.y = display.contentHeight-100
 	opt:insert(BackBtn)

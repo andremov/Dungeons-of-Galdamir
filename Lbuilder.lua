@@ -193,13 +193,13 @@ function Essentials()
 	end
 	Tiles()
 	bkg=ui.Background()
-	--[[--]]
+	--[[
 	print (layout[1].." "..layout[2].." "..layout[3].." "..layout[4].." "..layout[5])
 	print (layout[6].." "..layout[7].." "..layout[8].." "..layout[9].." "..layout[10])
 	print (layout[11].." "..layout[12].." "..layout[13].." "..layout[14].." "..layout[15])
 	print (layout[16].." "..layout[17].." "..layout[18].." "..layout[19].." "..layout[20])
 	print (layout[21].." "..layout[22].." "..layout[23].." "..layout[24].." "..layout[25])
-	
+	--]]
 end
 
 function doTemplate()
@@ -283,8 +283,13 @@ function BuildMap()
 		Essentials()
 		count=0
 	end
-	doTemplate()
-	mapsize=table.maxn( map )
+	
+	if isLoaded==true then
+		mapsize=table.maxn( room[1] )
+	else
+		doTemplate()
+		mapsize=table.maxn( map )
+	end
 	
 	if room[curroom]~=false and curroom<table.maxn(layout)+1 then
 		BuildTile()
@@ -338,10 +343,15 @@ function BuildMap()
 			end
 			loadtxt.text=("Testing Map...")
 			loadtxt:toFront()
-			local CanBeDone=Pathfinding(entranceloc,exitloc,exitroom)
+			local CanBeDone
+			if isLoaded==true then
+				CanBeDone=true
+			else
+				CanBeDone=Pathfinding(entranceloc,exitloc,exitroom)
+			end
 			if CanBeDone==false then
 			--	print "Map failed."
-				loadtxt.text=("Map Failed.\n   Retrying...")
+				loadtxt.text=("Map Failed.\n Retrying...")
 				loadtxt:toFront()
 				timer.performWithDelay(500,Rebuild)
 			else
@@ -418,7 +428,6 @@ function DisplayMap()
 				p.PlayerLoc(exitloc,exitroom)
 				Level.x=Level.x+((math.floor((exitroom-1)%5))*(math.sqrt(mapsize)*espacio))
 				Level.y=Level.y+((math.floor((exitroom-1)/5))*(math.sqrt(mapsize)*espacio))
-			--	m.Visibility()
 				if CurRound%2==0 then
 				--	print "Abnormal Progression, Even Floor"
 				else
@@ -428,16 +437,18 @@ function DisplayMap()
 				end
 			elseif side==false then
 				p.PlayerLoc(entranceloc,entranceroom)
-			--	m.Visibility()
 				if CurRound%2==0 then
 				--	print "Normal Progression, Even Floor"
-					Level.x=Level.x-((math.sqrt(mapsize)-3)*espacio)
-					Level.y=Level.y-((math.sqrt(mapsize)-3)*espacio)
+						Level.x=Level.x-((math.sqrt(mapsize)-3)*espacio)
+						Level.y=Level.y-((math.sqrt(mapsize)-3)*espacio)
 				else
 				--	print "Normal Progression, Odd Floor"
 				end
 			end
 			su.ShowContinue()
+			if isLoaded==true then
+				isLoaded=false
+			end
 		--	print "Map Built."
 		end
 	end
@@ -468,7 +479,7 @@ function Extras()
 					end
 					
 					if Peaceful==false then
-						if mbounds[r][i]==1 and map[i]~="1" and map[i]~="2" and map[i]~="3" and map[i]~="4" then
+						if mbounds[r][i]==1 then
 							local isMob=math.random(1,30)
 							if isMob>28 then
 								mobs[r][i]=display.newImageRect( "tiles/"..TSet.."/mob.png",80,80)
@@ -477,7 +488,6 @@ function Extras()
 								mobs[r][i].isVisible=false
 								mobs[r][i].loc=(i)
 								mobs[r][i].room=(r)
-								room[r][i]="-"
 								mobs[r][i].xScale=scale
 								mobs[r][i].yScale=mobs[r][i].xScale
 								dmobs:insert( mobs[r][i] )
@@ -529,12 +539,13 @@ function BuildTile()
 		loadtxt:toFront()
 	end
 	
-	if count~=mapsize+1 and not(room[curroom][count]) then
 	
+	if count~=mapsize+1 and not(room[curroom][count]) then
+		local CurRound=WD.Circle()
 		if(map[count]=="1")then
 			if (room[curroom-5]) and room[curroom-5]~=false then
 				boundary[curroom][count]=1
-				mbounds[curroom][count]=1
+				mbounds[curroom][count]=0
 				room[curroom][count]="x"
 			else
 				boundary[curroom][count]=0
@@ -546,7 +557,7 @@ function BuildTile()
 		if(map[count]=="2")then
 			if (room[curroom-1]) and room[curroom-1]~=false then
 				boundary[curroom][count]=1
-				mbounds[curroom][count]=1
+				mbounds[curroom][count]=0
 				room[curroom][count]="x"
 			else
 				boundary[curroom][count]=0
@@ -558,7 +569,7 @@ function BuildTile()
 		if(map[count]=="3")then
 			if (room[curroom+1]) and room[curroom+1]~=false then
 				boundary[curroom][count]=1
-				mbounds[curroom][count]=1
+				mbounds[curroom][count]=0
 				room[curroom][count]="x"
 			else
 				boundary[curroom][count]=0
@@ -570,7 +581,7 @@ function BuildTile()
 		if(map[count]=="4")then
 			if (room[curroom+5]) and room[curroom+5]~=false then
 				boundary[curroom][count]=1
-				mbounds[curroom][count]=1
+				mbounds[curroom][count]=0
 				room[curroom][count]="x"
 			else
 				boundary[curroom][count]=0
@@ -754,8 +765,6 @@ function BuildTile()
 			room[curroom][count]="x"
 		end
 		
-		local CurRound=WD.Circle()
-		
 		if(map[count]=="a")then
 			if CurRound%2==0 then
 				mbounds[curroom][count]=1
@@ -820,7 +829,7 @@ function BuildTile()
 		end
 		
 	elseif count~=mapsize+1 then
-		
+	
 		if(room[curroom][count]=="b")then
 			boundary[curroom][count]=0
 			mbounds[curroom][count]=0
@@ -912,7 +921,13 @@ function BuildTile()
 		end
 		
 		if(room[curroom][count]=="x")then
-			mbounds[curroom][count]=1
+			local NZoneX=math.floor(count%(math.sqrt(mapsize)))
+			local NZoneY=math.floor(count/(math.sqrt(mapsize)))+1
+			if NZoneX==1 or NZoneX==math.sqrt(mapsize) or NZoneY==1 or NZoneY==math.sqrt(mapsize) then
+				mbounds[curroom][count]=0
+			else
+				mbounds[curroom][count]=1
+			end
 			boundary[curroom][count]=1
 		end
 		
@@ -1184,7 +1199,6 @@ function DisplayTile()
 	end
 	
 	if count~=mapsize+1 then
-	
 		if(room[curroom][count]=="b")then
 			local roll=math.random(1,18)
 			if roll<=9 then
@@ -1594,7 +1608,7 @@ function DisplayTile()
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
-			-- walls[curroom][count]
+			walls[curroom][count].rotation=180
 			walls[curroom][count].xScale=scale
 			walls[curroom][count].yScale=walls[curroom][count].xScale
 			Level:insert( walls[curroom][count] )
@@ -1620,7 +1634,7 @@ function DisplayTile()
 			end
 			
 			num[curroom][count]=display.newText( (curroom.."\n   "..NZone.."-"..count),0,0,"MoolBoran",40 )
-			num[curroom][count]:setTextColor(0,0,0)
+			num[curroom][count]:setFillColor(0,0,0)
 			num[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			num[curroom][count].y=yinicial+10+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			Level:insert( num[curroom][count] )
@@ -1629,9 +1643,11 @@ function DisplayTile()
 	end
 end
 
-function Expand(get)
+function Expand(get,value)
 	if get==true then
 		return length
+	elseif get==false then
+		length=value
 	else
 		length=length+1
 	end
@@ -1866,6 +1882,7 @@ function WipeMap()
 	boundary=nil
 	Level=nil
 	count=nil
+	curroom=1
 	bkg:toBack()
 end
 

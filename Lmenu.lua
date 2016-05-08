@@ -46,7 +46,6 @@ function ShowMenu()
 	else
 		titleLogo = display.newImageRect( "titleW.png", 477, 254 )
 	end
-	titleLogo:setReferencePoint( display.CenterReferencePoint )
 	titleLogo.x = display.contentWidth * 0.5
 	titleLogo.y = 150
 	titleLogo:addEventListener("tap",SplashChange)
@@ -63,7 +62,6 @@ function ShowMenu()
 		width=290, height=90,
 		onRelease = onPlayBtnRelease
 	}
-	PlayBtn:setReferencePoint( display.CenterReferencePoint )
 	PlayBtn.x = display.contentWidth*0.5
 	PlayBtn.y = display.contentCenterY-20
 	group:insert(PlayBtn)
@@ -79,34 +77,34 @@ function ShowMenu()
 		width=290, height=90,
 		onRelease = onOptnBtnRelease
 	}
-	OptnBtn:setReferencePoint( display.CenterReferencePoint )
 	OptnBtn.x = display.contentWidth*0.5
 	OptnBtn.y = PlayBtn.y+100
 	group:insert(OptnBtn)
 	
+	--[[
 	langBtn=display.newImageRect("lang.png",430,350)
-	langBtn.xScale=0.3
+	langBtn.xScale=0.2
 	langBtn.yScale=langBtn.xScale
-	langBtn.x=display.contentCenterX/2-50
-	langBtn.y=display.contentHeight-130
+	langBtn.x=70
+	langBtn.y=display.contentHeight-70
 	langBtn:addEventListener("tap",doThing)
 	group:insert(langBtn)
-	
 	local hieroglyphics=lc.giveLang()
 	
 	if hieroglyphics=="EN" then
-		langTxt=display.newText("English",0,0,"MoolBoran",70)
-		langTxt:setTextColor(80,255,80)
+		langTxt=display.newText("English",0,0,"MoolBoran",40)
+		langTxt:setFillColor(80/255,255/255,80/255)
 		langTxt.x=langBtn.x
-		langTxt.y=langBtn.y+80
+		langTxt.y=langBtn.y+50
 		group:insert(langTxt)
 	elseif hieroglyphics=="ES" then
-		langTxt=display.newText("Espanol",0,0,"MoolBoran",70)
-		langTxt:setTextColor(80,255,80)
+		langTxt=display.newText("Espanol",0,0,"MoolBoran",40)
+		langTxt:setFillColor(80/255,255/255,80/255)
 		langTxt.x=langBtn.x
-		langTxt.y=langBtn.y+80
+		langTxt.y=langBtn.y+50
 		group:insert(langTxt)
 	end
+	--]]
 	
 	logo=display.newImageRect("Symbol3W.png",206,206)
 	logo.xScale=0.75
@@ -127,13 +125,13 @@ function ShowMenu()
 		group:insert(sign)
 		
 		VerDisplay = display.newText(("Version:"),0,0,"MoolBoran", 70 )
-		VerDisplay:setTextColor( 0, 0, 0)
+		VerDisplay:setFillColor( 0/255, 0/255, 0/255)
 		VerDisplay.x=sign.x
 		VerDisplay.y=sign.y-30
 		group:insert(VerDisplay)
 		
 		VDisplay = display.newText((GVersion),0,0,"MoolBoran", 45 )
-		VDisplay:setTextColor( 0, 0, 0)
+		VDisplay:setFillColor( 0/255, 0/255, 0/255)
 		VDisplay.x=VerDisplay.x
 		VDisplay.y=VerDisplay.y+40
 		group:insert(VDisplay)
@@ -190,7 +188,7 @@ function isVersion(val)
 	if val==true then
 		if (VDisplay) then
 			VDisplay2 = display.newText(("Up to date."),0,0,"MoolBoran", 60 )
-			VDisplay2:setTextColor( 0, 150, 0)
+			VDisplay2:setFillColor( 0/255, 150/255, 0/255)
 			VDisplay2.x=VDisplay.x
 			VDisplay2.y=VDisplay.y+55
 			group:insert(VDisplay2)
@@ -198,7 +196,7 @@ function isVersion(val)
 	elseif val==false then
 		if (VDisplay) then
 			VDisplay2 = display.newText(("Update available!"),0,0,"MoolBoran", 45 )
-			VDisplay2:setTextColor( 150, 0, 0)
+			VDisplay2:setFillColor( 150/255, 0/255, 0/255)
 			VDisplay2.x=VDisplay.x
 			VDisplay2.y=VDisplay.y+45
 			group:insert(VDisplay2)
@@ -206,7 +204,7 @@ function isVersion(val)
 	elseif val==nil then
 		if (VDisplay) then
 			VDisplay2 = display.newText(("Update check failed."),0,0,"MoolBoran", 45 )
-			VDisplay2:setTextColor( 150, 0, 0)
+			VDisplay2:setFillColor( 150/255, 0/255, 0/255)
 			VDisplay2.x=VDisplay.x
 			VDisplay2.y=VDisplay.y+50
 			group:insert(VDisplay2)
@@ -271,7 +269,7 @@ function Credits( event )
 		title=display.newText("Credits",0,0,"MoolBoran",100)
 		title.x = display.contentWidth*0.5
 		title.y = 100
-		title:setTextColor(125,250,125)
+		title:setFillColor(125/255,250/255,125/255)
 		group:insert(title)
 		
 		function One()
@@ -282,7 +280,7 @@ function Credits( event )
 		coding.x=display.contentWidth/5
 		coding.y=display.contentHeight-100
 		coding:addEventListener("tap",One)
-		coding:setTextColor(125,125,250)
+		coding:setFillColor(125/255,125/255,250/255)
 		group:insert(coding)
 		
 		function Two()
@@ -293,7 +291,7 @@ function Credits( event )
 		sound.x=display.contentWidth/5*2
 		sound.y=display.contentHeight-100
 		sound:addEventListener("tap",Two)
-		sound:setTextColor(125,125,250)
+		sound:setFillColor(125/255,125/255,250/255)
 		group:insert(sound)
 		
 		function Three()
@@ -304,7 +302,7 @@ function Credits( event )
 		graphic.x=display.contentWidth/5*3
 		graphic.y=display.contentHeight-100
 		graphic:addEventListener("tap",Three)
-		graphic:setTextColor(125,125,250)
+		graphic:setFillColor(125/255,125/255,250/255)
 		group:insert(graphic)
 		
 		function Four()
@@ -315,7 +313,7 @@ function Credits( event )
 		back.x=display.contentWidth/5*4
 		back.y=display.contentHeight-100
 		back:addEventListener("tap",Four)
-		back:setTextColor(125,125,250)
+		back:setFillColor(125/255,125/255,250/255)
 		group:insert(back)
 	end
 end
@@ -325,15 +323,15 @@ function CreditsTab(tab)
 		display.remove(text[t])
 		text[t]=nil
 	end
-		coding:setTextColor(125,125,250)
-		sound:setTextColor(125,125,250)
-		graphic:setTextColor(125,125,250)
+		coding:setFillColor(125/255,125/255,250/255)
+		sound:setFillColor(125/255,125/255,250/255)
+		graphic:setFillColor(125/255,125/255,250/255)
 		if tab==1 then
-			coding:setTextColor(250,125,125)
+			coding:setFillColor(250/255,125/255,125/255)
 		elseif tab==2 then
-			sound:setTextColor(250,125,125)
+			sound:setFillColor(250/255,125/255,125/255)
 		elseif tab==3 then
-			graphic:setTextColor(250,125,125)
+			graphic:setFillColor(250/255,125/255,125/255)
 		end
 		--[[
 			TO DO:
@@ -341,7 +339,6 @@ function CreditsTab(tab)
 				- GOLD FREESOUND
 				- ROCK FREESOUND
 				- GATE FREESOUND
-				MAP TEXTURES
 				CHARACTER
 				ENEMIES
 		--]]
@@ -351,7 +348,7 @@ function CreditsTab(tab)
 	}
 	local sfx={
 		"HorrorPen from OpenGameArt.org","- Composer of \"No More Magic\"",
-		"Kevin Macleod from Incompetech.com","- Composer of \"Oppresive Gloom\"",
+		"Kevin Macleod from Incompetech.com","- Composer of \"Gagool\"",
 		"Mekathros from OpenGameArt.org","- Composer of \"Gran Batalla\"",
 		"bart from OpenGameArt.org","- Composer of the level up fanfare",
 		"qubodup from OpenGameArt.org","- Composer of the buttons and clicks",
@@ -370,12 +367,11 @@ function CreditsTab(tab)
 	local tables={executives,sfx,gfx}
 	
 	for s=1,table.maxn(tables[tab]) do
-		text[s]=display.newText(
-			tables[tab][s],
-			130+(-100*(s%2)),
-			125+(-30*((s%2)+1))+(100*math.ceil(s/2)),
-			"MoolBoran",45
-		)
+		text[s]=display.newText(tables[tab][s],0,0,"MoolBoran",45)
+		text[s].anchorX=0
+		text[s].anchorY=0
+		text[s].x=130+(-100*(s%2))
+		text[s].y=125+(-30*((s%2)+1))+(100*math.ceil(s/2))
 		group:insert(text[s])
 	--	print (s.."x-"..text[s].x)
 	--	print (s.."y-"..text[s].y)

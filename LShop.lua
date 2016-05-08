@@ -56,7 +56,6 @@ function DisplayShop(id,room)
 		width=303, height=52,
 		onRelease = CloseShop
 	}
-	ResumBtn:setReferencePoint( display.CenterReferencePoint )
 	ResumBtn.x = (display.contentWidth/4)*3
 	ResumBtn.y = (display.contentHeight/2)+150
 	swg:insert(ResumBtn)
@@ -96,9 +95,17 @@ function BuyMenu()
 			item[s]=display.newImageRect( "items/"..curShop.item[s][2]..".png" ,64,64)
 			item[s].x = display.contentCenterX+60
 			item[s].y = 280+((s-1)*100)
-			item[s].txt=display.newText( (curShop.item[s][2]) ,item[s].x+50,item[s].y-40,"MoolBoran",50)
-			item[s].prc=display.newText( ("Buy for "..curShop.item[s][3].." gold.") ,item[s].x+50,item[s].y,"MoolBoran",40)
-			item[s].prc:setTextColor( 255, 255, 0)
+			item[s].txt=display.newText( (curShop.item[s][2]),0,0,"MoolBoran",50)
+			item[s].txt.anchorX=0
+			item[s].txt.anchorY=0
+			item[s].txt.x=item[s].x+50
+			item[s].txt.y=item[s].y-40
+			item[s].prc=display.newText( ("Buy for "..curShop.item[s][3].." gold.") ,0,0,"MoolBoran",40)
+			item[s].prc.anchorX=0
+			item[s].prc.anchorY=0
+			item[s].prc.x=item[s].x+50
+			item[s].prc.y=item[s].y
+			item[s].prc:setFillColor( 255/255, 255/255, 0)
 			itemw[s]=display.newRect(0,0,350,80)
 			itemw[s].x = item[s].x+135
 			itemw[s].y = item[s].y
@@ -146,17 +153,33 @@ function SellMenu()
 			pitem[s]=display.newImageRect( "items/"..pinv[s][3]..".png" ,64,64)
 			pitem[s].x = 60
 			pitem[s].y = 280+((s-1)*80)
-			pitem[s].txt=display.newText( (pinv[s][3]) ,pitem[s].x+50,pitem[s].y-40,"MoolBoran",50)
+			pitem[s].txt=display.newText( (pinv[s][3]),0,0,"MoolBoran",50)
+			pitem[s].txt.anchorX=0
+			pitem[s].txt.anchorY=0
+			pitem[s].txt.x=pitem[s].x+50
+			pitem[s].txt.y=pitem[s].y-40
 			if pinv[s][2]~=1 then
 				if pinv[s][2]>9 then
-					pitem[s].num=display.newText( (pinv[s][2]) ,pitem[s].x+5,pitem[s].y-5,"Game Over",80)
+					pitem[s].num=display.newText( (pinv[s][2]),0,0,"Game Over",80)
+					pitem[s].num.anchorX=0
+					pitem[s].num.anchorY=0
+					pitem[s].num.x=pitem[s].x+5
+					pitem[s].num.y=pitem[s].y-5
 				elseif pinv[s][2]<=9 then
-					pitem[s].num=display.newText( (pinv[s][2]) ,pitem[s].x+15,pitem[s].y-5,"Game Over",80)
+					pitem[s].num=display.newText( (pinv[s][2]),0,0,"Game Over",80)
+					pitem[s].num.anchorX=0
+					pitem[s].num.anchorY=0
+					pitem[s].num.x=pitem[s].x+15
+					pitem[s].num.y=pitem[s].y-5
 				end
 			end
 			if pinv[s][4]~=nil then
-				pitem[s].prc=display.newText( ("Sell for "..pinv[s][4].." gold.") ,pitem[s].x+50,pitem[s].y,"MoolBoran",40)
-				pitem[s].prc:setTextColor( 255, 255, 0)
+				pitem[s].prc=display.newText( ("Sell for "..pinv[s][4].." gold."),0,0,"MoolBoran",40)
+				pitem[s].prc.anchorX=0
+				pitem[s].prc.anchorY=0
+				pitem[s].prc.x=pitem[s].x+50
+				pitem[s].prc.y=pitem[s].y
+				pitem[s].prc:setFillColor( 255/255, 255/255, 0)
 			end
 			pitemw[s]=display.newRect(0,0,350,80)
 			pitemw[s].x = pitem[s].x+135
@@ -192,7 +215,6 @@ function SellMenu()
 			width=50, height=50,
 			onRelease = PrevPage
 		}
-		PrevBtn:setReferencePoint( display.CenterReferencePoint )
 		PrevBtn.x = (display.contentCenterX/2)-120
 		PrevBtn.y = (display.contentCenterY)+150
 		PrevBtn.rotation=180
@@ -206,7 +228,6 @@ function SellMenu()
 			width=50, height=50,
 			onRelease = NextPage
 		}
-		NextBtn:setReferencePoint( display.CenterReferencePoint )
 		NextBtn.x = (display.contentCenterX/2)+120
 		NextBtn.y = (display.contentCenterY)+150
 		gsm:insert(NextBtn)
@@ -327,7 +348,6 @@ function ItemInfo(slot)
 				overFile="nbutton-over.png",
 				width=200, height=55,
 			}
-			usebtn:setReferencePoint( display.CenterReferencePoint )
 			usebtn.x = (display.contentWidth/2)-120
 			usebtn.y = (display.contentHeight/2)+30
 			gum:insert( usebtn )
@@ -343,7 +363,6 @@ function ItemInfo(slot)
 				width=200, height=55,
 				onRelease = Buy
 			}
-			usebtn:setReferencePoint( display.CenterReferencePoint )
 			usebtn.x = (display.contentWidth/2)-120
 			usebtn.y = (display.contentHeight/2)+30
 			gum:insert( usebtn )
@@ -359,7 +378,6 @@ function ItemInfo(slot)
 			overFile="cbutton-over.png",
 			width=200, height=55,
 			onRelease = ItemInfo}
-		backbtn:setReferencePoint( display.CenterReferencePoint )
 		backbtn.x = (display.contentWidth/2)+120
 		backbtn.y = (display.contentHeight/2)+30
 		gum:insert( backbtn )
@@ -377,7 +395,7 @@ function ItemInfo(slot)
 			local descrip=display.newText( (itemstats[5]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
 			descrip.x=display.contentWidth/2
-			descrip:setTextColor( 180, 180, 180)
+			descrip:setFillColor( 180/255, 180/255, 180/255)
 			gum:insert( descrip )
 		end	
 		if itemstats[1]==1 then
@@ -409,14 +427,14 @@ function ItemInfo(slot)
 			for c=1,6 do
 				if statchange[c]>0 then
 					stattxts[c]=display.newText( (stats[c].." +"..statchange[c]),0,0,"MoolBoran",60)
-					stattxts[c]:setTextColor( 60, 180, 60)
+					stattxts[c]:setFillColor( 60/255, 180/255, 60/255)
 					stattxts[c].x=statchangex+(statchangexs*((c-1)%3))
 					stattxts[c].y=statchangey+(50*math.floor((c-1)/3))
 					gum:insert( stattxts[c] )
 					eqpstatchnge=true
 				elseif statchange[c]<0 then
 					stattxts[c]=display.newText( (stats[c].." "..statchange[c]) ,0,0,"MoolBoran",60)
-					stattxts[c]:setTextColor( 180, 60, 60)
+					stattxts[c]:setFillColor( 180/255, 60/255, 60/255)
 					stattxts[c].x=statchangex+(statchangexs*((c-1)%3))
 					stattxts[c].y=statchangey+(50*math.floor((c-1)/3))
 					gum:insert( stattxts[c] )
@@ -426,7 +444,7 @@ function ItemInfo(slot)
 			
 			if eqpstatchnge==false then
 				stattxts[1]=display.newText( ("No change.") ,0,0,"MoolBoran",55)
-				stattxts[1]:setTextColor( 180, 180, 180)
+				stattxts[1]:setFillColor( 180/255, 180/255, 180/255)
 				stattxts[1].y=(display.contentHeight/2)-50
 				stattxts[1].x=display.contentWidth/2
 				gum:insert( stattxts[1] )
@@ -436,21 +454,21 @@ function ItemInfo(slot)
 			local descrip=display.newText( (itemstats[3]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
 			descrip.x=display.contentWidth/2
-			descrip:setTextColor( 180, 180, 180)
+			descrip:setFillColor( 180/255, 180/255, 180/255)
 			gum:insert( descrip )
 		end
 		if itemstats[1]==3 then
 			local descrip=display.newText( (itemstats[4]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
 			descrip.x=display.contentWidth/2
-			descrip:setTextColor( 180, 180, 180)
+			descrip:setFillColor( 180/255, 180/255, 180/255)
 			gum:insert( descrip )
 		end
 		if itemstats[1]==4 then
 			local descrip=display.newText( (itemstats[4]) ,0,0,"MoolBoran",55)
 			descrip.y=(display.contentHeight/2)-50
 			descrip.x=display.contentWidth/2
-			descrip:setTextColor( 180, 180, 180)
+			descrip:setFillColor( 180/255, 180/255, 180/255)
 			gum:insert( descrip )
 		end
 		

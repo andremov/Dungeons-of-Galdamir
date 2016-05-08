@@ -32,7 +32,7 @@ function DisplayOptions()
 	title=display.newText(lc.giveText("LOC002"),0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100
-	title:setTextColor(125,250,125)
+	title:setFillColor(125/255,250/255,125/255)
 	optionz:insert(title)
 	
 	BackBtn =  widget.newButton{
@@ -46,7 +46,6 @@ function DisplayOptions()
 		width=290, height=90,
 		onRelease = onBackRelease
 	}
-	BackBtn:setReferencePoint( display.CenterReferencePoint )
 	BackBtn.x = display.contentWidth*0.5
 	BackBtn.y = display.contentHeight-100
 	optionz:insert(BackBtn)
@@ -62,7 +61,6 @@ function DisplayOptions()
 		width=290, height=90,
 		onRelease = onCharRelease
 	}
-	Char:setReferencePoint( display.CenterReferencePoint )
 	Char.x = display.contentWidth*0.25
 	Char.y = display.contentHeight*0.5+210
 	optionz:insert(Char)
@@ -79,7 +77,6 @@ function DisplayOptions()
 		width=290, height=90,
 		onRelease = FunSize
 	}
-	Map:setReferencePoint( display.CenterReferencePoint )
 	Map.x = display.contentWidth*0.75
 	Map.y = display.contentHeight*0.5+210
 	optionz:insert(Map)
@@ -95,7 +92,6 @@ function DisplayOptions()
 		width=290, height=90,
 		onRelease = onScreBtnRelease
 	}
-	ScreBtn:setReferencePoint( display.CenterReferencePoint )
 	ScreBtn.x = display.contentWidth*0.25
 	ScreBtn.y = display.contentHeight*0.5+210
 	optionz:insert(ScreBtn)
@@ -111,7 +107,6 @@ function DisplayOptions()
 		width=290, height=90,
 		onRelease = onSettingRelease
 	}
-	Setting:setReferencePoint( display.CenterReferencePoint )
 	Setting.x = display.contentCenterX--ScreBtn.x
 	Setting.y = ScreBtn.y-100
 	optionz:insert(Setting)

@@ -43,7 +43,7 @@ local positions={
 		-- Unspent point
 		{display.contentWidth-210,display.contentHeight-45},
 		-- XP Bar
-		{(display.contentWidth/2)+180,27,0},
+		{384,142,0},
 		-- Quest
 		{display.contentWidth-225,40},
 		-- Pause Button
@@ -86,28 +86,28 @@ function Start()
 	prevtxt.x=display.contentCenterX-180
 	prevtxt.y=display.contentCenterY+50
 	prevtxt:addEventListener("tap",doPrev)
-	prevtxt:setTextColor(125,125,250)
+	prevtxt:setFillColor(125/255,125/255,250/255)
 	gsm:insert(prevtxt)
 	
 	resttxt=display.newText(lc.giveText("LOC021"),0,0,"MoolBoran",55)
 	resttxt.x=display.contentCenterX
 	resttxt.y=display.contentCenterY+50
 	resttxt:addEventListener("tap",doReset)
-	resttxt:setTextColor(125,125,250)
+	resttxt:setFillColor(125/255,125/255,250/255)
 	gsm:insert(resttxt)
 	
 	backtxt=display.newText(lc.giveText("LOC008"),0,0,"MoolBoran",65)
 	backtxt.x=display.contentCenterX
 	backtxt.y=display.contentCenterY+200
 	backtxt:addEventListener("tap",doBack)
-	backtxt:setTextColor(180,180,180)
+	backtxt:setFillColor(180/255,180/255,180/255)
 	gsm:insert(backtxt)
 	
 	nexttxt=display.newText(lc.giveText("LOC022"),0,0,"MoolBoran",55)
 	nexttxt.x=display.contentCenterX+180
 	nexttxt.y=display.contentCenterY+50
 	nexttxt:addEventListener("tap",doNext)
-	nexttxt:setTextColor(125,125,250)
+	nexttxt:setFillColor(125/255,125/255,250/255)
 	gsm:insert(nexttxt)
 	
 	for s=1,table.maxn(names) do
@@ -119,7 +119,7 @@ function Start()
 			window[s].y=positions[s][2]
 		end
 		if curname~=s then
-			window[s]:setFillColor(100,100,100,100)
+			window[s]:setFillColor(100/255,100/255,100/255,100/255)
 		end
 		gsm:insert(window[s])
 	end
@@ -170,7 +170,7 @@ function Windows()
 			window[s].y=positions[s][2]
 		end
 		if curname~=s then
-			window[s]:setFillColor(100,100,100,100)
+			window[s]:setFillColor(100/255,100/255,100/255,100/255)
 		end
 		gsm:insert(window[s])
 	end
@@ -205,14 +205,14 @@ function Interface()
 	selected=display.newText(( lc.giveText(names[curname]) ),0,0,"MoolBoran",70)
 	selected.x=display.contentCenterX
 	selected.y=display.contentCenterY-100
-	selected:setTextColor(230,230,230)
+	selected:setFillColor(230/255,230/255,230/255)
 	gsm:insert(selected)
 	
 	if curname==1 or curname==2 or curname==3 or curname==4 or curname==6 then
 		alwaysV3=display.newRect(0,0,400,50)
 		alwaysV3.x=display.contentCenterX
 		alwaysV3.y=display.contentCenterY-60
-		alwaysV3:setFillColor(255,255,255,0)
+		alwaysV3:setFillColor(1,1,1,0.01)
 		alwaysV3:addEventListener("tap",doVisible)
 		gsm:insert(alwaysV3)
 		
@@ -220,20 +220,20 @@ function Interface()
 		alwaysV=display.newText(lc.giveText("LOC017"),0,0,"MoolBoran",60)
 		alwaysV.x=display.contentCenterX-45
 		alwaysV.y=display.contentCenterY-50
-		alwaysV:setTextColor(180,180,180)
+		alwaysV:setFillColor(180/255,180/255,180/255)
 		gsm:insert(alwaysV)
 		
 		if positions[curname][3]==0 then
 			alwaysV2=display.newText(lc.giveText("LOC018"),0,0,"MoolBoran",60)
 			alwaysV2.x=display.contentCenterX+120
 			alwaysV2.y=alwaysV.y
-			alwaysV2:setTextColor(255,125,125)
+			alwaysV2:setFillColor(255/255,125/255,125/255)
 			gsm:insert(alwaysV2)
 		else
 			alwaysV2=display.newText(lc.giveText("LOC019"),0,0,"MoolBoran",60)
 			alwaysV2.x=display.contentCenterX+120
 			alwaysV2.y=alwaysV.y
-			alwaysV2:setTextColor(125,255,125)
+			alwaysV2:setFillColor(125/255,255/255,125/255)
 			gsm:insert(alwaysV2)
 		end
 	end
@@ -241,35 +241,35 @@ function Interface()
 	snap3=display.newRect(0,0,400,50)
 	snap3.x=display.contentCenterX
 	snap3.y=display.contentCenterY+100
-	snap3:setFillColor(255,255,255,0)
+	snap3:setFillColor(1,1,1,0.01)
 	snap3:addEventListener("tap",doSnap)
 	gsm:insert(snap3)
 	
 	snap1=display.newText(lc.giveText("LOC023"),0,0,"MoolBoran",60)
 	snap1.x=display.contentCenterX-45
 	snap1.y=display.contentCenterY+110
-	snap1:setTextColor(180,180,180)
+	snap1:setFillColor(180/255,180/255,180/255)
 	gsm:insert(snap1)
 	
 	if snap==0 then
 		snap2=display.newText(lc.giveText("LOC018"),0,0,"MoolBoran",60)
 		snap2.x=display.contentCenterX+120
 		snap2.y=snap1.y
-		snap2:setTextColor(255,125,125)
+		snap2:setFillColor(255/255,125/255,125/255)
 		gsm:insert(snap2)
 	else
 		snap2=display.newText(lc.giveText("LOC019"),0,0,"MoolBoran",60)
 		snap2.x=display.contentCenterX+120
 		snap2.y=snap1.y
-		snap2:setTextColor(125,255,125)
+		snap2:setFillColor(125/255,255/255,125/255)
 		gsm:insert(snap2)
 	end
 	
 	for s=1,table.maxn(names) do
 		if curname~=s then
-			window[s]:setFillColor(100,100,100,100)
+			window[s]:setFillColor(100/255,100/255,100/255,100/255)
 		else
-			window[s]:setFillColor(255,255,255,255)
+			window[s]:setFillColor(255/255,255/255,255/255,255/255)
 		end
 	end
 	
@@ -285,6 +285,7 @@ function doVisible()
 end
 
 function doSnap()
+print "!!"
 	if snap==1 then
 		snap=0
 	else
@@ -295,7 +296,7 @@ end
 
 function Moved( event )
 	if (window[curname]) then
-		if event.y>750 or event.y<350 then
+		if event.y>800 or event.y<200 then
 			window[curname].x=event.x
 			if snap==1 then
 				for s=1,table.maxn(names) do
@@ -338,13 +339,9 @@ function Moved( event )
 end
 
 function Load()
-	local exists=false
 	local path = system.pathForFile(  "DoGSettings.stn", system.DocumentsDirectory )
 	local fh, errStr = io.open( path, "r" )
 	if (fh) then
-		exists=true
-	end
-	if exists==true then
 		local Sve={}
 		local path = system.pathForFile(  "DoGSettings.stn", system.DocumentsDirectory )
 		for line in io.lines( path ) do
@@ -362,21 +359,22 @@ function Load()
 				positions[p][i]=Sve[count]
 			end
 		end
+		io.close(fh)
 	end
 end
 
 function Save()
 	local path = system.pathForFile(  "DoGSettings.stn", system.DocumentsDirectory )
 	local fh, errStr = io.open( path, "w+" )
-	if (fh) then
-		for p=1,table.maxn(positions) do
-			for i=1,table.maxn(positions[p]) do
-				fh:write(positions[p][i],"\n")
-			end
+	
+	for p=1,table.maxn(positions) do
+		for i=1,table.maxn(positions[p]) do
+			fh:write(positions[p][i],"\n")
 		end
-		
-		io.close( fh )
 	end
+	io.close( fh )
+	
+	
 end
 
 function WipeSave()

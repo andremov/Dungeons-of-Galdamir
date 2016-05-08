@@ -40,16 +40,8 @@ settings = {
 	
     plugins =
     {
-		--[[
 		["plugin.adbuddiz"] = { publisherId = "com.adbuddiz" }
        
-	   
-	   
-		["CoronaProvider.ads.inmobi"] =
-        {
-            publisherId = "com.coronalabs",
-        },
-		--]]
 		
     }, 
 	

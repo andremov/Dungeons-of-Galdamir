@@ -65,7 +65,6 @@ function UI(ready)
 			width=65, height=65,
 			onRelease = Pause
 		}
-		PauseBtn:setReferencePoint( display.CenterReferencePoint )
 		PauseBtn.xScale = 1.3
 		PauseBtn.yScale = PauseBtn.xScale
 		PauseBtn.x = info[1]
@@ -85,7 +84,7 @@ function UI(ready)
 		isPaused=false
 		
 		window=display.newRect(0,0,390,166)
-		window:setFillColor(100,100,100,150)
+		window:setFillColor(100/255,100/255,100/255,150/255)
 		window.x,window.y=(display.contentCenterX), display.contentCenterY
 		pwg:insert(window)
 		
@@ -95,7 +94,7 @@ function UI(ready)
 		pwg:insert(pausetxt)
 		
 		pausewin=display.newRect(0,0,(#pausetxt.text)*24,38)
-		pausewin:setFillColor(0,0,0,150)
+		pausewin:setFillColor(0,0,0,150/255)
 		pausewin.x=pausetxt.x
 		pausewin.y=pausetxt.y-15
 		pwg:insert(pausewin)
@@ -157,6 +156,7 @@ function Pause(mute)
 			gold.ShowGCounter()
 			players.LetsYodaIt()
 			pwg.isVisible=true
+			pwg:toFront()
 			if mute~=true then
 				audio.Play(4)
 			end
