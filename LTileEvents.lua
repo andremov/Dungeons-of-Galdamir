@@ -86,6 +86,28 @@ function onRockCollision()
 		if ((l)==(P1.loc)) and bounds[l]~=1 then
 			bounds[l]=1
 			builder.ModMap(l)
+			local stat
+			if P1.stats[2]>=Rocks[P1.room][l].req and P1.stats[4]>=Rocks[P1.room][l].req then
+				if P1.stats[2]>P1.stats[4] then
+					stat=P1.stats[2]
+				elseif P1.stats[2]<P1.stats[4] then
+					stat=P1.stats[4]
+				else
+					stat=P1.stats[2]
+				end
+			elseif P1.stats[2]<Rocks[P1.room][l].req and P1.stats[4]>=Rocks[P1.room][l].req then
+				stat=P1.stats[4]
+			elseif P1.stats[2]>=Rocks[P1.room][l].req and P1.stats[4]<Rocks[P1.room][l].req then
+				stat=P1.stats[2]
+			end
+			local loss=math.ceil((P1.MaxEP*.05)/(stat-Rocks[P1.room][l].req))
+			if P1.EP>=loss then
+				P1.EP=P1.EP-loss
+			else
+				local nope=math.ceil( (loss-P1.EP)/2 )
+				P1.EP=0
+				player.ReduceHP(nope,"Energy")
+			end
 			display.remove(Rocks[P1.room][l])
 			Rocks[P1.room][l]=nil
 			audio.Play(7)
@@ -140,6 +162,22 @@ function onRockCollision()
 	end
 end
 
+function RockCheck(loc)
+	local P1=player.GetPlayer()
+	local Rocks=builder.GetData(6)
+	local bounds=builder.GetData(2)
+	for l in pairs(Rocks[P1.room]) do
+		if ((l)==(loc)) and bounds[l]~=1 then
+			if P1.stats[2]>=Rocks[P1.room][l].req or P1.stats[4]>=Rocks[P1.room][l].req then
+				return 2
+			else
+				return 1
+			end
+		end
+	end
+	return 0
+end
+
 function onKeyCollision()
 	local P1=player.GetPlayer()
 	local bounds=builder.GetData(2)
@@ -181,10 +219,12 @@ function onKeyCollision()
 			lolname2.y=(display.contentHeight/2)-50
 			gum:insert( lolname2 )
 			
-			local backbtn= widget.newButton{
+			local backbtn=  widget.newButton{
 				label="Accept",
 				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
+				font="MoolBoran",
+				fontSize=50,
+				labelYOffset=10,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
 				width=200, height=55,

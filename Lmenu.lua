@@ -62,10 +62,12 @@ function ShowMenu()
 	titleLogo:addEventListener("tap",SplashChange)
 	group:insert(titleLogo)
 	
-	PlayBtn = widget.newButton{
+	PlayBtn =  widget.newButton{
 		label="Play",
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -76,10 +78,12 @@ function ShowMenu()
 	PlayBtn.y = display.contentCenterY-20
 	group:insert(PlayBtn)
 	
-	OptnBtn = widget.newButton{
+	OptnBtn =  widget.newButton{
 		label="Options",
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -90,25 +94,6 @@ function ShowMenu()
 	OptnBtn.y = PlayBtn.y+100
 	group:insert(OptnBtn)
 	
-	sign=display.newImageRect("sign.png", 95, 70)
-	sign.xScale=2.3
-	sign.yScale=2.3
-	sign.x=(display.contentWidth-130)
-	sign.y=(display.contentHeight-90)
-	group:insert(sign)
-	
-	VerDisplay = display.newText(("Version:"),0,0,"MoolBoran", 70 )
-	VerDisplay:setTextColor( 0, 0, 0)
-	VerDisplay.x=sign.x
-	VerDisplay.y=sign.y-30
-	group:insert(VerDisplay)
-	
-	VDisplay = display.newText((GVersion),0,0,"MoolBoran", 45 )
-	VDisplay:setTextColor( 0, 0, 0)
-	VDisplay.x=VerDisplay.x
-	VDisplay.y=VerDisplay.y+40
-	group:insert(VDisplay)
-	
 	logo=display.newImageRect("Symbol3W.png",206,206)
 	logo.xScale=0.75
 	logo.yScale=logo.xScale
@@ -116,6 +101,29 @@ function ShowMenu()
 	logo.y=display.contentHeight-130
 	group:insert(logo)
 	
+	if ( "simulator" == system.getInfo("environment") ) then
+		print "Hello, developer!"
+		
+		sign=display.newImageRect("sign.png", 95, 70)
+		sign.xScale=2.3
+		sign.yScale=2.3
+		sign.x=(display.contentWidth-130)
+		sign.y=(display.contentHeight-90)
+		group:insert(sign)
+		
+		VerDisplay = display.newText(("Version:"),0,0,"MoolBoran", 70 )
+		VerDisplay:setTextColor( 0, 0, 0)
+		VerDisplay.x=sign.x
+		VerDisplay.y=sign.y-30
+		group:insert(VerDisplay)
+		
+		VDisplay = display.newText((GVersion),0,0,"MoolBoran", 45 )
+		VDisplay:setTextColor( 0, 0, 0)
+		VDisplay.x=VerDisplay.x
+		VDisplay.y=VerDisplay.y+40
+		group:insert(VDisplay)
+	end
+	--[[
 	ad1=display.newImageRect("ad1.png",57,57)
 	ad1.x=logo.x+160
 	ad1.y=logo.y+30
@@ -131,7 +139,7 @@ function ShowMenu()
 	ad2.yScale=ad1.xScale
 	ad2:addEventListener("touch",openAd2)
 	group:insert(ad2)
-	
+	--]]
 	Splash=s.GetSplash()
 	group:insert(Splash)
 	

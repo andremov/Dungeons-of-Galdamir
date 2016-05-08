@@ -131,7 +131,11 @@ function RepeatBkg()
 		didChange=false
 		timer.performWithDelay(3000,PlayMusic)
 	else
-		timer.performWithDelay(10000,PlayMusic)
+		if curMusic==3 then
+			PlayMusic()
+		else
+			timer.performWithDelay(10000,PlayMusic)
+		end
 	end
 end
 

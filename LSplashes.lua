@@ -70,7 +70,7 @@ local S={
 	"Ceci n'est pas un splash!",
 }
 local T={
-	{"Change your class for a different","stat bonus."},
+--	{"Change your class for a different","stat bonus."},
 	{"Spend your stat points wisely!"},
 	{"Dexterity increases your chance of","hitting an enemy."},
 	{"Stamina increases your health."},
@@ -84,17 +84,17 @@ local T={
 	{"Water slows you down, allowing mobs","to follow you faster."},
 	{"Keep health potions at hand."},
 	{"Sorcery hits harder than regular","attacks, but require both resources."},
-	{"In the pause menu you can see what","features the floor has."},
+	{"In the pause menu you can see","your floor's features."},
 	{"Something lurks in the fog."},
 	{"Avoid moving near a mob spawner."},
 	{"Never forget to take the key."},
 	{"The game is currently loading."},
 	{"These tips are sometimes helpful."},
-	{"You can change your character's class","in the options menu."},
+--	{"You can change your character's class","in the options menu."},
 	{"The map's looks can be changed","in the options menu."},
 	{"The map's size can be changed","in the options menu."},
 	{"You can check your highest scores","in the options menu."},
-	{"There's a reason why the menu has no","sounds. Change the volume."},
+	{"You can change the volume in the","options menu."},
 }
 
 function GetSplash()

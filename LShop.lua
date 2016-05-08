@@ -45,10 +45,12 @@ function DisplayShop(id,room)
 	shopsign.xScale=shopsign.yScale
 	swg:insert(shopsign)
 	
-	local ResumBtn= widget.newButton{
+	local ResumBtn=  widget.newButton{
 		label="Close",
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=303, height=52,
@@ -184,7 +186,7 @@ function SellMenu()
 	gsm:insert(PageTxt)
 	
 	if page>1 then
-		PrevBtn= widget.newButton{
+		PrevBtn=  widget.newButton{
 			defaultFile="arrow.png",
 			overFile="arrow2.png",
 			width=50, height=50,
@@ -198,7 +200,7 @@ function SellMenu()
 	end
 	
 	if page~=math.ceil(table.maxn(p1.inv)/5) then
-		NextBtn= widget.newButton{
+		NextBtn=  widget.newButton{
 			defaultFile="arrow.png",
 			overFile="arrow2.png",
 			width=50, height=50,
@@ -315,10 +317,12 @@ function ItemInfo(slot)
 		gum:insert( window )
 		
 		if curShop.item[slot][3]>p1.gp then
-			local usebtn= widget.newButton{
+			local usebtn=  widget.newButton{
 				label="Buy",
 				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
+				font="MoolBoran",
+				fontSize=50,
+				labelYOffset=10,
 				defaultFile="nbutton.png",
 				overFile="nbutton-over.png",
 				width=200, height=55,
@@ -328,10 +332,12 @@ function ItemInfo(slot)
 			usebtn.y = (display.contentHeight/2)+30
 			gum:insert( usebtn )
 		else
-			local usebtn= widget.newButton{
+			local usebtn=  widget.newButton{
 				label="Buy",
 				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
+				font="MoolBoran",
+				fontSize=50,
+				labelYOffset=10,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
 				width=200, height=55,
@@ -343,10 +349,12 @@ function ItemInfo(slot)
 			gum:insert( usebtn )
 		end
 		
-		local backbtn= widget.newButton{
+		local backbtn=  widget.newButton{
 			label="Back",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=200, height=55,

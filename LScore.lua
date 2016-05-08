@@ -128,10 +128,12 @@ function HighScores()
 	title:addEventListener("tap",ConfirmWipe)
 	ghs:insert(title)
 	
-	BackBtn = widget.newButton{
+	BackBtn =  widget.newButton{
 		label="Back",
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -267,10 +269,19 @@ function ConfirmWipe()
 	title.text=("Wipe scores?")
 	BackBtn.isVisible=false
 	
+<<<<<<< HEAD
 	YesBtn = widget.newButton{
 		label="Yes",
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
+=======
+	YesBtn =  widget.newButton{
+		label="Yes",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
+>>>>>>> R1.0.0
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -281,10 +292,19 @@ function ConfirmWipe()
 	YesBtn.y = display.contentHeight-100
 	ghs:insert(YesBtn)
 	
+<<<<<<< HEAD
 	NoBtn = widget.newButton{
 		label="No",
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		fontSize=30,
+=======
+	NoBtn =  widget.newButton{
+		label="No",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
+>>>>>>> R1.0.0
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,

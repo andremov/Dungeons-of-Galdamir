@@ -23,8 +23,16 @@ TO DO
 --]]
 
 local RSS
+<<<<<<< HEAD
 local gVersion="GAMMA 1.2.1"
 local cVersion="GAMA 1.2.1"
+=======
+local shSuffix="RLSE"
+local loSuffix="RELEASE"
+local verNum="1.0.0"
+local cVersion=(shSuffix.." "..verNum)
+local gVersion=(loSuffix.." "..verNum)
+>>>>>>> R1.0.0
 
 function HowDoIVersion(val)
 	if val==true then

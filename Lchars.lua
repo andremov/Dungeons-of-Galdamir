@@ -70,7 +70,7 @@ function CharMenu()
 		imgs[i].y = display.contentHeight*0.3
 		charmenu:insert(imgs[i])
 	
-		btns[i] = widget.newButton{
+		btns[i] =  widget.newButton{
 			defaultFile="charbutton.png",
 			overFile="charbutton-over.png",
 			width=80, height=90,
@@ -88,10 +88,12 @@ function CharMenu()
 	title:setTextColor(125,250,125)
 	charmenu:insert(title)
 	
-	BackBtn = widget.newButton{
+	BackBtn =  widget.newButton{
 		label="Back",
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -143,7 +145,7 @@ function ClassMenu()
 		imgs2[i].y = info[i].y-80
 		classmenu:insert(imgs2[i])
 	
-		btns2[i] = widget.newButton{
+		btns2[i] =  widget.newButton{
 			defaultFile="charbutton.png",
 			overFile="charbutton-over.png",
 			width=80, height=90,

@@ -391,10 +391,12 @@ function ToggleExit(sound)
 		lolname3.y=lolname2.y+50
 		gexui:insert(lolname3)
 		
-		AcceptBtn= widget.newButton{
+		AcceptBtn=  widget.newButton{
 			label="Yes",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+				font="MoolBoran",
+				fontSize=50,
+				labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=200, height=55,
@@ -404,10 +406,12 @@ function ToggleExit(sound)
 		AcceptBtn.y = (display.contentHeight/2)+30
 		gexui:insert( AcceptBtn )
 		
-		BackBtn= widget.newButton{
+		BackBtn=  widget.newButton{
 			label="No",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+				font="MoolBoran",
+				fontSize=50,
+				labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=200, height=55,
@@ -588,7 +592,7 @@ function StatChange()
 	end
 	for s=1,6 do
 		if p1.pnts>0 and p1.nat[s]<p1.lvl*10 then
-			pli[#pli+1]= widget.newButton{
+			pli[#pli+1]=  widget.newButton{
 				defaultFile="sbutton.png",
 				overFile="sbutton-over.png",
 				width=80, height=80,
@@ -609,7 +613,7 @@ function StatChange()
 	end
 	for s=1,6 do
 		if p1.nat[s]>1 then
-			mini[#mini+1]= widget.newButton{
+			mini[#mini+1]=  widget.newButton{
 				defaultFile="sbutton.png",
 				overFile="sbutton-over.png",
 				width=80, height=80,
@@ -629,7 +633,7 @@ function StatChange()
 		end
 	end
 	
-	swapInfoBtn= widget.newButton{
+	swapInfoBtn=  widget.newButton{
 		defaultFile="sbutton.png",
 		overFile="sbutton-over.png",
 		width=80, height=80,
@@ -844,7 +848,7 @@ function StatInfo()
 		ginf:insert(info[#info])
 	end
 	
-	swapInfoBtn= widget.newButton{
+	swapInfoBtn=  widget.newButton{
 		defaultFile="sbutton.png",
 		overFile="sbutton-over.png",
 		width=80, height=80,
@@ -1019,10 +1023,12 @@ function DeathMenu(cause)
 			Deathmsg2.text=(DeathMessages[5][math.random(1,table.maxn(DeathMessages[1]))])
 		end
 		
-		ToMenuBtn = widget.newButton{
+		ToMenuBtn =  widget.newButton{
 			label="Back To Menu",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+				font="MoolBoran",
+				fontSize=50,
+				labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=290, height=80,
@@ -1278,10 +1284,12 @@ function UseMenu(id,slot)
 			end
 		end
 		
-		local backbtn= widget.newButton{
+		local backbtn=  widget.newButton{
 			label="Back",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+				font="MoolBoran",
+				fontSize=50,
+				labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=200, height=55,
@@ -1291,10 +1299,12 @@ function UseMenu(id,slot)
 		backbtn.y = (display.contentHeight/2)+30
 		gum:insert( backbtn )
 		
-		local dropbtn= widget.newButton{
+		local dropbtn=  widget.newButton{
 			label="Drop",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=200, height=55,
@@ -1314,10 +1324,12 @@ function UseMenu(id,slot)
 		gum:insert( lolname )
 		
 		if itemstats[1]==0 then
-			local usebtn= widget.newButton{
+			local usebtn=  widget.newButton{
 				label="Use",
 				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
+				font="MoolBoran",
+				fontSize=50,
+				labelYOffset=10,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
 				width=200, height=55,
@@ -1335,10 +1347,12 @@ function UseMenu(id,slot)
 			gum:insert( descrip )
 		end	
 		if itemstats[1]==1 then
-			local equipbtn= widget.newButton{
+			local equipbtn=  widget.newButton{
 				label="Equip",
 				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
+				font="MoolBoran",
+				fontSize=50,
+				labelYOffset=10,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
 				width=200, height=55,
@@ -1402,10 +1416,12 @@ function UseMenu(id,slot)
 		end
 		if itemstats[1]==2 then
 			if itemstats[4]==0 or itemstats[4]==1 then
-				local usebtn= widget.newButton{
+				local usebtn=  widget.newButton{
 					label="Teleport",
 					labelColor = { default={255,255,255}, over={0,0,0} },
-					fontSize=30,
+					font="MoolBoran",
+					fontSize=50,
+					labelYOffset=10,
 					defaultFile="cbutton.png",
 					overFile="cbutton-over.png",
 					width=200, height=55,
@@ -1416,10 +1432,12 @@ function UseMenu(id,slot)
 				usebtn.y = (display.contentHeight/2)+30
 				gum:insert( usebtn )
 			elseif itemstats[4]==2 then
-				local usebtn= widget.newButton{
+				local usebtn=  widget.newButton{
 					label="Save",
 					labelColor = { default={255,255,255}, over={0,0,0} },
-					fontSize=30,
+					font="MoolBoran",
+					fontSize=50,
+					labelYOffset=10,
 					defaultFile="cbutton.png",
 					overFile="cbutton-over.png",
 					width=200, height=55,
@@ -1439,10 +1457,12 @@ function UseMenu(id,slot)
 		end
 		if itemstats[1]==3 then	
 		
-			local learnbtn= widget.newButton{
+			local learnbtn=  widget.newButton{
 				label="Learn",
 				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
+				font="MoolBoran",
+				fontSize=50,
+				labelYOffset=10,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
 				width=200, height=55,
@@ -1462,10 +1482,12 @@ function UseMenu(id,slot)
 		end
 		if itemstats[1]==4 then	
 		
-			local boostbtn= widget.newButton{
+			local boostbtn=  widget.newButton{
 				label="Use",
 				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
+				font="MoolBoran",
+				fontSize=50,
+				labelYOffset=10,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
 				width=200, height=55,
@@ -1517,10 +1539,12 @@ function CheckMenu(id)
 			end
 		end
 		
-		local backbtn= widget.newButton{
+		local backbtn=  widget.newButton{
 			label="Back",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=200, height=55,

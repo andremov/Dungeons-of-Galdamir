@@ -21,10 +21,12 @@ function Display()
 	title:setTextColor(125,250,125)
 	pmg:insert(title)
 
-	TutBtn = widget.newButton{
+	TutBtn =  widget.newButton{
 		label="Tutorial",
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=308, height=90,
@@ -37,10 +39,12 @@ function Display()
 	
 	local saved=sav.CheckSave(1)
 	if saved~=false then
-		Slot1 = widget.newButton{
+		Slot1 =  widget.newButton{
 			label=saved,
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=308, height=90,
@@ -52,10 +56,12 @@ function Display()
 		Slot1.y = TutBtn.y+110
 		pmg:insert(Slot1)
 		
-		Clean1= widget.newButton{
+		Clean1=  widget.newButton{
 			label="X",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="sbutton.png",
 			overFile="sbutton-over.png",
 			width=90, height=90,
@@ -67,10 +73,12 @@ function Display()
 		Clean1.y = Slot1.y
 		pmg:insert(Clean1)
 	else
-		Slot1 = widget.newButton{
+		Slot1 =  widget.newButton{
 			label="No data",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=308, height=90,
@@ -85,10 +93,12 @@ function Display()
 	
 	local saved=sav.CheckSave(2)
 	if saved~=false then
-		Slot2 = widget.newButton{
+		Slot2 =  widget.newButton{
 			label=saved,
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=308, height=90,
@@ -100,10 +110,12 @@ function Display()
 		Slot2.y = Slot1.y+110
 		pmg:insert(Slot2)
 		
-		Clean2= widget.newButton{
+		Clean2=  widget.newButton{
 			label="X",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="sbutton.png",
 			overFile="sbutton-over.png",
 			width=90, height=90,
@@ -115,10 +127,12 @@ function Display()
 		Clean2.y = Slot2.y
 		pmg:insert(Clean2)
 	else
-		Slot2 = widget.newButton{
+		Slot2 =  widget.newButton{
 			label="No data",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=308, height=90,
@@ -133,10 +147,12 @@ function Display()
 	
 	local saved=sav.CheckSave(3)
 	if saved~=false then
-		Slot3 = widget.newButton{
+		Slot3 =  widget.newButton{
 			label=saved,
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=308, height=90,
@@ -148,10 +164,12 @@ function Display()
 		Slot3.y = Slot2.y+110
 		pmg:insert(Slot3)
 		
-		Clean3= widget.newButton{
+		Clean3=  widget.newButton{
 			label="X",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="sbutton.png",
 			overFile="sbutton-over.png",
 			width=90, height=90,
@@ -163,10 +181,12 @@ function Display()
 		Clean3.y = Slot3.y
 		pmg:insert(Clean3)
 	else
-		Slot3 = widget.newButton{
+		Slot3 =  widget.newButton{
 			label="No data",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=308, height=90,
@@ -179,10 +199,12 @@ function Display()
 		pmg:insert(Slot3)
 	end
 	
-	BackBtn = widget.newButton{
+	BackBtn =  widget.newButton{
 		label="Back",
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -469,10 +491,12 @@ function Keyboard()
 		LetterChange(true)
 	end
 	
-	DelBtn = widget.newButton{
+	DelBtn =  widget.newButton{
 		label="Backspace",
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=216, height=90,
@@ -483,10 +507,12 @@ function Keyboard()
 	DelBtn.y = display.contentHeight-55
 	kbrd:insert( DelBtn )
 	
-	EndBtn = widget.newButton{
+	EndBtn =  widget.newButton{
 		label="Continue",
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=216, height=90,
@@ -497,10 +523,12 @@ function Keyboard()
 	EndBtn.y = display.contentHeight-55
 	kbrd:insert( EndBtn )
 	
-	BackBtn = widget.newButton{
+	BackBtn =  widget.newButton{
 		label="Back",
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=216, height=90,

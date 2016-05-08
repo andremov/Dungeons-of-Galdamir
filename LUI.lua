@@ -57,7 +57,7 @@ end
 
 function UI(ready)
 	if ready==true then
-		PauseBtn = widget.newButton{
+		PauseBtn =  widget.newButton{
 			defaultFile="pauseon.png",
 			overFile="pauseoff.png",
 			width=65, height=65,
