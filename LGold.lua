@@ -7,12 +7,14 @@ module(..., package.seeall)
 local coinsheet = graphics.newImageSheet( "coinsprite.png", { width=32, height=32, numFrames=8 } )
 local players = require("Lplayers")
 local physics = require "physics"
-local ui=require("Lui")
+local builder=require("Lbuilder")
+local set=require("Lsettings")
 local a=require("Laudio")
-local builder=require("Lmapbuilder")
+local ui=require("Lui")
 local DisplayS=1.25
-local Displayx=45
-local Displayy=30
+local Displayx
+local Displayy
+local alwaysV
 local GoldCount
 local CoinGroup=display.newGroup()
 local coins={}
@@ -25,6 +27,10 @@ local Handbrake
 function Essentials()
 	P1=players.GetPlayer()
 	GoldCount=0
+	local info=set.Get(0)
+	Displayx=info[1]
+	Displayy=info[2]
+	alwaysV=info[3]
 end
 
 function Coins()
@@ -49,42 +55,45 @@ end
 
 function GoldDisplay()
 	if not (GCDisplay) then
-		transp=0
-		GCDisplay = display.newText( (GoldCount), 0, 0, "Game Over", 100 )
-		GCDisplay:setTextColor( 255, 255, 50, transp)
-		GCDisplay.y = Displayy+10
-		GCDisplay.x = Displayx+20
+		if alwaysV==0 then
+			transp=0
+		else
+			transp=255
+		end
 		
-		GWindow = display.newRect (0,0,#GCDisplay.text*22,40)
+		GCDisplay = display.newText( (GoldCount), Displayx, Displayy, "Game Over", 100 )
+		GCDisplay:setTextColor( 255, 255, 50, transp)
+		
+		GWindow = display.newRect (0,0,#GCDisplay.text*23,40)
 		GWindow:setFillColor( 150, 150, 150,transp/2)
-		GWindow.x=GCDisplay.x
 		GWindow.y=GCDisplay.y+5
+		GWindow.x=GCDisplay.x
 		
 		GCDisplay:toFront()
 	end
 	if not (CDisplay) then
 		CDisplay=display.newSprite( coinsheet, { name="coin", start=1, count=8, time=750}  )
 		CDisplay:setFillColor( 0, 0, 0, 0)
-		CDisplay.x, CDisplay.y = Displayx, Displayy+12
+		CDisplay:setReferencePoint( display.CenterRightReferencePoint )
+		CDisplay.x, CDisplay.y = GCDisplay.x-30, GCDisplay.y+5
 		CDisplay.xScale=DisplayS
 		CDisplay.yScale=DisplayS
 		CDisplay:toFront()
 		CDisplay:play()
 	end
-	if (GoldCount<1000) then
-		GCDisplay.x = Displayx+60
-	else
-		GCDisplay.x = Displayx+20
-	end
 	GCDisplay.text=(GoldCount)
 	if GoldCount==P1.gp and Handbrake~=true then
-		if transp<20 then
-			transp=0
+		if alwaysV==0 then
+			if transp<20 then
+				transp=0
+			else
+				transp=transp-(255/100)
+			end
 		else
-			transp=transp-(255/100)
+			transp=255
 		end
 		display.remove(GWindow)
-		GWindow = display.newRect (0,0,#GCDisplay.text*22,40)
+		GWindow = display.newRect (0,0,#GCDisplay.text*23,40)
 		GWindow:setFillColor( 150, 150, 150,transp/2)
 		GWindow.x=GCDisplay.x
 		GWindow.y=GCDisplay.y+5
@@ -101,7 +110,7 @@ function GoldDisplay()
 		end
 		transp=255
 		display.remove(GWindow)
-		GWindow = display.newRect (0,0,#GCDisplay.text*22,40)
+		GWindow = display.newRect (0,0,#GCDisplay.text*23,40)
 		GWindow:setFillColor( 150, 150, 150,transp/2)
 		GWindow.x=GCDisplay.x
 		GWindow.y=GCDisplay.y+5

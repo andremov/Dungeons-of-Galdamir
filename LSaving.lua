@@ -4,8 +4,8 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local b=require("Lmapbuilder")
-local m=require("Lmaphandler")
+local b=require("Lbuilder")
+local m=require("Lhandler")
 local WD=require("Lprogress")
 local su=require("Lstartup")
 local v=require("Lversion")
@@ -21,7 +21,9 @@ local SplStrt
 local SplEnd
 local Sve
 local OKVers={
-		"GAMMA 1.2.1",
+		"RELEASE 1.0.0",
+		"RELEASE 1.0.1",
+		"RELEASE 1.1.0",
 	}
 
 function Load()

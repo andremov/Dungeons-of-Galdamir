@@ -4,13 +4,13 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local builder=require("Lmapbuilder")
+local builder=require("Lbuilder")
 local players=require("Lplayers")
 local m=require("Lmenu")
 local mob=require("Lmobai")
-local handler=require("Lmaphandler")
-local mov=require("Lmovement")
-local col=require("Ltileevents")
+local handler=require("Lhandler")
+local mov=require("Lmoves")
+local col=require("Ltiles")
 local audio=require("Laudio")
 local gp=require("Lgold")
 local inv=require("Lwindow")

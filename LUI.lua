@@ -4,32 +4,33 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
+local builder=require("Lbuilder")
 local players=require("Lplayers")
-local inv=require("Lwindow")
-local audio=require("Laudio")
-local gold=require("Lgold")
-local col=require("Ltileevents")
-local WD=require("Lprogress")
-local builder=require("Lmapbuilder")
-local c=require("Lcombat")
-local mob=require("Lmobai")
 local widget = require "widget"
+local set=require("Lsettings")
+local WD=require("Lprogress")
+local audio=require("Laudio")
+local inv=require("Lwindow")
+local mob=require("Lmobai")
+local gold=require("Lgold")
+local col=require("Ltiles")
+local c=require("Lcombat")
 local shp=require("Lshop")
-local m=require("Lmovement")
+local m=require("Lmoves")
+local portsnprsnt
+local portsprsnt
+local rportprsnt
+local mpdnprsnt
+local hpdnprsnt
 local isPaused
+local bkglevel
+local topthing
+local hpdprsnt
+local mpdprsnt
+local Coins
+local pwg
 local Map
 local P1
-local bkglevel
-local Coins
-local topthing
-local portsprsnt
-local portsnprsnt
-local rportprsnt
-local hpdprsnt
-local hpdnprsnt
-local mpdprsnt
-local mpdnprsnt
-local pwg
 
 function Background()
 	if (bkglevel) then
@@ -57,6 +58,7 @@ end
 
 function UI(ready)
 	if ready==true then
+		local info=set.Get(7)
 		PauseBtn =  widget.newButton{
 			defaultFile="pauseon.png",
 			overFile="pauseoff.png",
@@ -64,11 +66,10 @@ function UI(ready)
 			onRelease = Pause
 		}
 		PauseBtn:setReferencePoint( display.CenterReferencePoint )
-		PauseBtn.x = window.x+150
-		PauseBtn.y = window.y-180
 		PauseBtn.xScale = 1.3
 		PauseBtn.yScale = PauseBtn.xScale
-		pwg:insert(PauseBtn)
+		PauseBtn.x = info[1]
+		PauseBtn.y = info[2]
 	else
 		if (pwg) then
 			for i=pwg.numChildren,1,-1 do
@@ -76,6 +77,8 @@ function UI(ready)
 				pwg[i]=nil		
 			end	
 			pwg=nil
+			display.remove(PauseBtn)
+			PauseBtn=nil
 		end
 		P1=players.GetPlayer()
 		pwg=display.newGroup()
@@ -83,9 +86,7 @@ function UI(ready)
 		
 		window=display.newRect(0,0,390,166)
 		window:setFillColor(100,100,100,150)
-		window.x,window.y=(display.contentWidth-200), display.contentHeight+130
-		window.loc=0
-		window.ready=1
+		window.x,window.y=(display.contentCenterX), display.contentCenterY
 		pwg:insert(window)
 		
 		pausetxt=display.newText("Game Paused.",0,0,"MoolBoran",60)
@@ -129,6 +130,8 @@ function UI(ready)
 		magic:addEventListener("touch",OpenBook)
 		pwg:insert(magic)
 		
+		pwg.isVisible=false
+		
 		MapIndicators("create")
 	end
 end
@@ -137,23 +140,23 @@ function Pause(mute)
 	local busy=inv.OpenWindow()
 	local shap=shp.AtTheMall()
 	local fight=c.InTrouble()
-	if busy==false and shap==false and fight==false and window.ready==1 then
+	if busy==false and shap==false and fight==false then
 		portsprsnt.txt.text=(P1.portcd)
-		MovePause(true)
 		if isPaused==true then
-		--	print "!3"
 			isPaused=false
-		--	print "Game resumed."
+			m.Visibility()
+			gold.ShowGCounter()
+			players.LetsYodaIt()
+			pwg.isVisible=false
 			if mute~=true then
 				audio.Play(3)
 			end
 		elseif isPaused==false then
 			isPaused=true
-		--	print "!1"
 			m.CleanArrows()
 			gold.ShowGCounter()
 			players.LetsYodaIt()
-		--	print "Game paused."
+			pwg.isVisible=true
 			if mute~=true then
 				audio.Play(4)
 			end
@@ -162,39 +165,6 @@ function Pause(mute)
 		local success=inv.CloseErrthang()
 		if success==true then
 			Pause()
-		end
-	end
-end
-
-function MovePause(val)
-	if (pwg) then
-		if not (PauseBtn) then
-			timer.performWithDelay(50,MovePause)
-		elseif pwg.y==0 and val~=true then
-		--	print "!4"
-			window.loc=0
-			window.ready=1
-			m.Visibility()
-			gold.ShowGCounter()
-			players.LetsYodaIt()
-		elseif pwg.y==-216 and val~=true then
-		--	print "!2"
-			window.loc=1
-			window.ready=1
-		else
-			if window.loc==0 then
-				window.ready=0
-				pwg.y=pwg.y-27
-				PauseBtn.y=PauseBtn.y+27
-				PauseBtn.x=PauseBtn.x-50
-				timer.performWithDelay(50,MovePause)
-			elseif window.loc==1 then
-				window.ready=0
-				pwg.y=pwg.y+27
-				PauseBtn.y=PauseBtn.y-27
-				PauseBtn.x=PauseBtn.x+50
-				timer.performWithDelay(50,MovePause)
-			end
 		end
 	end
 end
@@ -342,6 +312,8 @@ function CleanSlate()
 			pwg[i]=nil		
 		end	
 		pwg=nil
+		display.remove(PauseBtn)
+		PauseBtn=nil
 	end
 	if (bkglevel) then
 		display.remove(bkglevel)

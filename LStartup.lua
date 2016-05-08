@@ -5,26 +5,26 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local loadsheet = graphics.newImageSheet( "spriteload.png", { width=50, height=50, numFrames=8 } )
-local handler=require("Lmaphandler")
-local gp=require("Lgold")
-local builder=require("Lmapbuilder")
+local handler=require("Lhandler")
+local builder=require("Lbuilder")
 local players=require("Lplayers")
-local audio=require("Laudio")
-local col=require("Ltileevents")
-local com=require("Lcombat")
-local ui=require("Lui")
-local q=require("Lquest")
-local inv=require("Lwindow")
-local itm=require("Litems")
 local WD=require("Lprogress")
+local audio=require("Laudio")
+local com=require("Lcombat")
+local inv=require("Lwindow")
 local s=require("Lsplashes")
-local m=require("Lmovement")
 local sav=require("Lsaving")
+local col=require("Ltiles")
+local itm=require("Litems")
 local menu=require("Lmenu")
-local Round
+local gp=require("Lgold")
+local m=require("Lmoves")
+local q=require("Lquest")
+local ui=require("Lui")
+local DoLoad=false
 local Loading
 local DoStuff
-local DoLoad=false
+local Round
 
 function Startup(val)
 	--	print "Game loading..."
@@ -35,6 +35,7 @@ function Startup(val)
 	end
 	Loading=display.newGroup()
 	menu.FindMe(8)
+	
 	loadbkg = display.newImage("bkgs/bkg_leveldark.png", true)
 	loadbkg.x = display.contentWidth/2
 	loadbkg.y = display.contentHeight/2

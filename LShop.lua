@@ -6,8 +6,8 @@
 module(..., package.seeall)
 local widget = require "widget"
 local ui=require("Lui")
-local b=require("Lmapbuilder")
-local mov=require("Lmovement")
+local b=require("Lbuilder")
+local mov=require("Lmoves")
 local WD=require("Lprogress")
 local it=require("Litems")
 local gp=require("Lgold")

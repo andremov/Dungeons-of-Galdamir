@@ -13,6 +13,7 @@ local widget = require "widget"
 local physics = require "physics"
 local bin = require("Lgarbage")
 local v=require("Lversion")
+local a=require"ads"
 local GVersion=v.HowDoIVersion(false)
 local loadbkg
 local load1
@@ -21,8 +22,7 @@ local loadtxt
 --	print "C U B 3 D :  DUNGEONS OF GAL'DARAH"
 	print "C U B 3 D :  DUNGEONS OF GALDAMIR"
 	print ("Version: "..GVersion)
-	
-	
+--	a.init("inmobi","02fc688c9d624055ac42828a818cf54b",AddMe)
 	physics.start()
 	physics.setGravity(0,30)
 	menu.ShowMenu()
@@ -30,3 +30,6 @@ local loadtxt
 --	startup.Startup()
 --	bin.Font()
 	
+	function AddMe()
+		print "Uh-oh."
+	end

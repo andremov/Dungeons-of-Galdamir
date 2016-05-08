@@ -10,10 +10,11 @@ local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height
 local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 } )
 local xpsheet = graphics.newImageSheet( "xpbar.png", { width=392, height=40, numFrames=50 } )
 local psheet = graphics.newImageSheet( "player.png", { width=24, height=32, numFrames=56 } )
-local b=require("Lmapbuilder")
+local b=require("Lbuilder")
 local WD=require("Lprogress")
 local su=require("Lstartup")
 local gold=require("Lgold")
+local set=require("Lsettings")
 local w=require("Lwindow")
 local c=require("Lchars")
 local a=require("Laudio")
@@ -31,6 +32,7 @@ local transp3
 local player
 local transp
 local Map
+local statinfo
 local pseqs={
 		{name="stand1",		start=1,  count=1, time=1000},
 		{name="stand2",		start=2,  count=1, time=1000},
@@ -188,6 +190,12 @@ end
 function ShowStats()
 	check=check+1
 	if check==120 then
+		statinfo={}
+		statinfo[1]=set.Get(1)
+		statinfo[2]=set.Get(2)
+		statinfo[3]=set.Get(3)
+		statinfo[4]=set.Get(4)
+		statinfo[5]=set.Get(5)
 		StatCheck()
 		check=-1
 	end
@@ -198,8 +206,8 @@ function ShowStats()
 		
 		LifeDisplay = display.newText( (player.HP.."/"..player.MaxHP), 0, 0, "Game Over", 100 )
 		LifeDisplay:setTextColor( 255, 255, 255,transp)
-		LifeDisplay.x = 160
-		LifeDisplay.y = display.contentHeight-175
+		LifeDisplay.x = statinfo[1][1]
+		LifeDisplay.y = statinfo[1][2]
 		
 		LifeWindow = display.newRect (0,0,#LifeDisplay.text*22,40)
 		LifeWindow:setFillColor( 150, 150, 150,transp/2)
@@ -213,8 +221,8 @@ function ShowStats()
 		LifeSymbol=display.newSprite( heartsheet, {name="heart",start=1,count=16,time=(1800)} )
 		LifeSymbol.yScale=3.75
 		LifeSymbol.xScale=3.75
-		LifeSymbol.x = 50
-		LifeSymbol.y = display.contentHeight-170
+		LifeSymbol.x = LifeDisplay.x-110
+		LifeSymbol.y = LifeDisplay.y+5
 		LifeSymbol:play()
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
 	end
@@ -234,9 +242,13 @@ function ShowStats()
 		LifeDisplay:setTextColor( 255, 255, 255,transp)
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
 	elseif ((player.HP.."/"..player.MaxHP))==LifeDisplay.text and transp~=0 and player.HP==player.MaxHP and StrongForce~=true then
-		transp=transp-(255/50)
-		if transp<20 then
-			transp=0
+		if statinfo[1][3]==0 then
+			transp=transp-(255/50)
+			if transp<20 then
+				transp=0
+			end
+		else
+			transp=255
 		end
 		LifeWindow:setFillColor( 150, 150, 150,transp/2)
 		LifeDisplay:setTextColor( 255, 255, 255,transp)
@@ -261,8 +273,8 @@ function ShowStats()
 		
 		ManaDisplay = display.newText( (player.MP.."/"..player.MaxMP), 0, 0, "Game Over", 100 )
 		ManaDisplay:setTextColor( 255, 255, 255,transp3)
-		ManaDisplay.x = LifeDisplay.x
-		ManaDisplay.y = LifeDisplay.y+60
+		ManaDisplay.x = statinfo[2][1]
+		ManaDisplay.y = statinfo[2][2]
 		
 		ManaWindow = display.newRect (0,0,#ManaDisplay.text*22,40)
 		ManaWindow:setFillColor( 150, 150, 150,transp3/2)
@@ -275,8 +287,8 @@ function ShowStats()
 		ManaSymbol=display.newSprite( manasheet, {name="mana",start=1,count=3,time=500} )
 		ManaSymbol.yScale=1.0625
 		ManaSymbol.xScale=1.0625
-		ManaSymbol.x = LifeSymbol.x
-		ManaSymbol.y = LifeSymbol.y+60
+		ManaSymbol.x = ManaDisplay.x-110
+		ManaSymbol.y = ManaDisplay.y+5
 		ManaSymbol:play()
 		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
 	end
@@ -296,9 +308,13 @@ function ShowStats()
 		ManaDisplay:setTextColor( 255, 255, 255,transp3)
 		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
 	elseif ((player.MP.."/"..player.MaxMP))==ManaDisplay.text and transp3~=0 and player.MP==player.MaxMP and StrongForce~=true then
-		transp3=transp3-(255/50)
-		if transp3<20 then
-			transp3=0
+		if statinfo[1][3]==0 then
+			transp3=transp3-(255/50)
+			if transp3<20 then
+				transp3=0
+			end
+		else
+			transp3=255
 		end
 		ManaWindow:setFillColor( 150, 150, 150,transp3/2)
 		ManaDisplay:setTextColor( 255, 255, 255,transp3)
@@ -310,8 +326,8 @@ function ShowStats()
 		transp5=255
 		EnergyDisplay = display.newText( (player.EP.."/"..player.MaxEP), 0, 0, "Game Over", 100 )
 		EnergyDisplay:setTextColor( 255, 255, 255,transp5)
-		EnergyDisplay.x = ManaDisplay.x
-		EnergyDisplay.y = ManaDisplay.y+60
+		EnergyDisplay.x = statinfo[3][1]
+		EnergyDisplay.y = statinfo[3][2]
 		
 		EnergyWindow = display.newRect (0,0,#EnergyDisplay.text*22,40)
 		EnergyWindow:setFillColor( 150, 150, 150,transp5/2)
@@ -325,8 +341,8 @@ function ShowStats()
 		EnergySymbol=display.newSprite( energysheet, {name="energy",start=1,count=4,time=500} )
 		EnergySymbol.yScale=1.0625
 		EnergySymbol.xScale=1.0625
-		EnergySymbol.x = ManaSymbol.x
-		EnergySymbol.y = ManaSymbol.y+60
+		EnergySymbol.x = EnergyDisplay.x-110
+		EnergySymbol.y = EnergyDisplay.y+5
 		EnergySymbol:play()
 		EnergySymbol:setFillColor(transp5,transp5,transp5,transp5)
 	end
@@ -346,9 +362,13 @@ function ShowStats()
 		EnergyDisplay:setTextColor( 255, 255, 255,transp5)
 		EnergySymbol:setFillColor(transp5,transp5,transp5,transp5)
 	elseif ((player.EP.."/"..player.MaxEP))==EnergyDisplay.text and transp5~=0 and player.EP==player.MaxEP and StrongForce~=true then
-		transp5=transp5-(255/50)
-		if transp5<20 then
-			transp5=0
+		if statinfo[3][3]==0 then
+			transp5=transp5-(255/50)
+			if transp5<20 then
+				transp5=0
+			end
+		else
+			transp5=255
 		end
 		EnergyWindow:setFillColor( 150, 150, 150,transp5/2)
 		EnergyDisplay:setTextColor( 255, 255, 255,transp5)
@@ -359,8 +379,8 @@ function ShowStats()
 	if not (XPSymbol) then
 		transp2=0
 		XPSymbol=display.newSprite( xpsheet, { name="xpbar", start=1, count=50, time=(2000) }  )
-		XPSymbol.x = (display.contentWidth/2)+180
-		XPSymbol.y = 27
+		XPSymbol.x = statinfo[5][1]
+		XPSymbol.y = statinfo[5][2]
 		XPSymbol:toFront()
 		XPSymbol:setFillColor(transp2,transp2,transp2,transp2)
 		
@@ -375,8 +395,8 @@ function ShowStats()
 	if not (StatSymbol) then
 		transp4=0
 		StatSymbol=display.newImageRect("unspent.png",240,80)
-		StatSymbol.x = display.contentWidth-130
-		StatSymbol.y = display.contentHeight-150
+		StatSymbol.x = statinfo[4][1]
+		StatSymbol.y = statinfo[4][2]
 		StatSymbol:toFront()
 		StatSymbol:setFillColor(transp4,transp4,transp4,transp4)
 		su.FrontNCenter()
@@ -628,9 +648,13 @@ function OhCrap()
 		XPDisplay.text=((XPSymbol.frame*2).."%")
 		timer.performWithDelay(50,OhCrap)
 	elseif XPSymbol.frame==math.floor((player.XP/player.MaxXP)*50) and transp2~=0 then
-		transp2=transp2-(255/50)
-		if transp2<20 then
-			transp2=0
+		if statinfo[5][3]==0 then
+			transp2=transp2-(255/50)
+			if transp2<20 then
+				transp2=0
+			end
+		else
+			transp2=255
 		end
 		XPSymbol:setFillColor(transp2,transp2,transp2,transp2)
 		XPDisplay:setTextColor( 0, 0, 0,transp2)

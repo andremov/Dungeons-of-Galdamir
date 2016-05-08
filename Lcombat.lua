@@ -19,11 +19,11 @@ local epsheet = graphics.newImageSheet("ep.png",{ width=200, height=30, numFrame
 local p1sprite={player1,player2,player3,player4}
 local xCoord=display.contentWidth-250
 local yCoord=510
-local builder=require("Lmapbuilder")
+local builder=require("Lbuilder")
 local players=require("Lplayers")
 local physics = require "physics"
 local widget = require "widget"
-local mov=require("Lmovement")
+local mov=require("Lmoves")
 local WD=require("Lprogress")
 local audio=require("Laudio")
 local win=require("Lwindow")

@@ -16,12 +16,12 @@ local stadef = graphics.newImageSheet( "enemy/stadef.png",{ width=140, height=11
 local heartsheet = graphics.newImageSheet("heartsprite.png",{ width=25, height=25, numFrames=16})
 local timersheet = graphics.newImageSheet( "timer.png",{ width=100, height=100, numFrames=25 })
 local manasheet = graphics.newImageSheet("manasprite.png",{ width=60, height=60, numFrames=3})
-local psheet = graphics.newImageSheet( "player.png", { width=24, height=32, numFrames=24 } )
+local psheet = graphics.newImageSheet( "player.png", { width=24, height=32, numFrames=56 } )
 local xpsheet = graphics.newImageSheet("xpbar.png",{ width=392, height=40, numFrames=50})
 local hpsheet = graphics.newImageSheet("hp.png",{ width=200, height=30, numFrames=67 })
 local mpsheet = graphics.newImageSheet("mp.png",{ width=200, height=30, numFrames=67 })
 local epsheet = graphics.newImageSheet("ep.png",{ width=200, height=30, numFrames=67 })
-local mh=require("Lmaphandler")
+local mh=require("Lhandler")
 local physics = require "physics"
 local widget = require "widget"
 local menu = require ("Lmenu")
@@ -33,16 +33,23 @@ local Function
 local eHits={}
 local pHits={}
 local pseqs={
-		{name="stand1", start=1,  count=1, time=1000},
-		{name="stand2", start=2,  count=1, time=1000},
-		{name="stand3", start=3,  count=1, time=1000},
-		{name="stand4", start=4,  count=1, time=1000},
-		{name="walk1",  start=5,  count=4, time=500},
-		{name="walk2",  start=9,  count=4, time=500},
-		{name="walk3",  start=13, count=4, time=500},
-		{name="walk4",  start=17, count=4, time=500},
-		{name="hit",   start=21, count=3, time=1000},
-		{name="hurt",   start=24, count=1, time=1000},
+		{name="stand1",		start=1,  count=1, time=1000},
+		{name="stand2",		start=2,  count=1, time=1000},
+		{name="stand3",		start=3,  count=1, time=1000},
+		{name="stand4",		start=4,  count=1, time=1000},
+		{name="walk1",		start=5,  count=4, time=500},
+		{name="walk2",		start=9,  count=4, time=500},
+		{name="walk3",		start=13, count=4, time=500},
+		{name="walk4",		start=17, count=4, time=500},
+		{name="stance",		start=21, count=4, time=1000},
+		{name="melee",		start=25, count=4, time=600,loopCount=1},
+		{name="magic",		start=29, count=4, time=600,loopCount=1},
+		{name="recover",	start=33, count=4, time=750},
+		{name="hurt",		start=37, count=4, time=750},
+		{name="heal1",		start=41, count=4, time=750},
+		{name="heal2",		start=45, count=4, time=750},
+		{name="heal3",		start=49, count=4, time=750},
+		{name="heal4",		start=53, count=4, time=750},
 	}
 
 -- Movement
@@ -143,42 +150,44 @@ end
 
 function MoveMap(x,y)
 	local map=Level
-	if (x) and (y) then
-		if x>0 then
-			--Right
-			SpriteSeq("walk2")
-		elseif x<0 then
-			--Left
-			SpriteSeq("walk4")
-		elseif y>0 then
-			--Up
-			SpriteSeq("walk3")
-		elseif y<0 then
-			--Down
-			SpriteSeq("walk1")
+	if (map) then
+		if (x) and (y) then
+			if x>0 then
+				--Right
+				SpriteSeq("walk2")
+			elseif x<0 then
+				--Left
+				SpriteSeq("walk4")
+			elseif y>0 then
+				--Up
+				SpriteSeq("walk3")
+			elseif y<0 then
+				--Down
+				SpriteSeq("walk1")
+			end
+			targetx=map.x+x
+			targety=map.y+y
+			stepcd=1
 		end
-		targetx=map.x+x
-		targety=map.y+y
-		stepcd=1
-	end
-	stepcd=stepcd-1
-	if (math.ceil((targetx-map.x)/1.5))~=0 then
-		map.x=map.x+math.ceil((targetx-map.x)/1.5)
-	end
-	if (math.ceil((targety-map.y)/1.5))~=0 then
-		map.y=map.y+math.ceil((targety-map.y)/1.5)
-	end
-	if stepcd==0 then
-		stepcd=3
-		a.Step()
-	end
-	if math.ceil((targetx-map.x)/1.5)==0 and math.ceil((targety-map.y)/1.5)==0 then
-		SpriteSeq(false)
-		map.x=targetx
-		map.y=targety
-		ShowArrows()
-	else
-		timer.performWithDelay(50,MoveMap)
+		stepcd=stepcd-1
+		if (math.ceil((targetx-map.x)/1.5))~=0 then
+			map.x=map.x+math.ceil((targetx-map.x)/1.5)
+		end
+		if (math.ceil((targety-map.y)/1.5))~=0 then
+			map.y=map.y+math.ceil((targety-map.y)/1.5)
+		end
+		if stepcd==0 then
+			stepcd=3
+			a.Step()
+		end
+		if math.ceil((targetx-map.x)/1.5)==0 and math.ceil((targety-map.y)/1.5)==0 then
+			SpriteSeq(false)
+			map.x=targetx
+			map.y=targety
+			ShowArrows()
+		else
+			timer.performWithDelay(50,MoveMap)
+		end
 	end
 end
 
@@ -1253,6 +1262,14 @@ function BasicCombat()
 	local espaciox=64
 	local espacioy=64
 	player.isVisible=false
+	cwin.isVisible=false
+	
+	local bkg=display.newImage("bkgs/bkg1.png",480,272)
+	bkg.xScale = 1.5
+	bkg.yScale = 1.5
+	bkg.x = display.contentCenterX
+	bkg.y = 146
+	gcm:insert(bkg)
 	
 	window2=display.newImage("window2.png",171,43)
 	window2.x=display.contentWidth-192
@@ -1389,8 +1406,8 @@ function MobSprite(value)
 		esprite=display.newSprite( stadef, eseqs  )
 		esprite:setSequence( "walk" )
 		esprite.x=(display.contentWidth/2)+50
-		esprite.y=170
-		esprite.xScale=3.5
+		esprite.y=230
+		esprite.xScale=2.0
 		esprite.yScale=esprite.xScale
 		esprite:play()
 		gcm:insert(esprite)
@@ -1420,21 +1437,14 @@ function P1Sprite(value)
 		psprite=display.newSprite( psheet, pseqs  )
 		psprite:setSequence( "stance" )
 		psprite.x=(display.contentWidth/2)-50
-		psprite.y=170
-		psprite.xScale=4.0
+		psprite.y=230
+		psprite.xScale=3.0
 		psprite.yScale=psprite.xScale
 		psprite:play()
 		gcm:insert(psprite)
 	end
 	if (value)==(2) then--Change to Hit
-		local hat=math.random(1,3)
-		if hat==1 then
-			psprite:setSequence( "hit1" )
-		elseif hat==2 then
-			psprite:setSequence( "hit2" )
-		else
-			psprite:setSequence( "hit3" )
-		end
+		psprite:setSequence( "melee" )
 		psprite:play()
 	end
 	if (value)==(3) then--Change to Hurt
@@ -1442,7 +1452,11 @@ function P1Sprite(value)
 		psprite:play()
 	end
 	if (value)==(4) then--Set to Casting
-		psprite:setSequence( "hit" )
+		psprite:setSequence( "magic" )
+		psprite:play()
+	end
+	if (value)==(5) then--Set to Recover
+		psprite:setSequence( "recover" )
 		psprite:play()
 	end
 	if (value~=1)and(value~=2)and(value~=3)and(value~=4) then--Go Default
@@ -1806,36 +1820,55 @@ function EAttack()
 end
 
 function PMagic()
+	local yinvicial=display.contentHeight-180
+	local xinvicial=100
+	local espacio=64
 	CHideActions()
 	Continue()
-	local SorcIniX=display.contentCenterX-(300)
-	local SorcIniY=display.contentHeight-120
-	Sorcery[#Sorcery+1]=display.newText( "Fireball  10 MP  7 EP", SorcIniX, (SorcIniY-((#Sorcery-1)*50)), "Viner Hand ITC", 40)
-	Sorcery[#Sorcery]:setTextColor(50,50,50)
-	Sorcery[#Sorcery]:addEventListener("tap",CastSorcery)
-	Sorcery[#Sorcery].isVisible=false
 	
-	function finishSpells()
-		for i=1,table.maxn(Sorcery) do
-			Sorcery[i].isVisible=true
-			Sorcery[i]:toFront()
-		end
+	gspl=display.newGroup()
+	spells={}
+	spellframes={}
+	spellsep={}
+	spellsmp={}
+	
+	function Hoo()
+		CastSorcery()
 	end
-			
-	SorceryUI=display.newImageRect("scrollui4.png", 460, 600)
-	SorceryUI.x, SorceryUI.y = display.contentCenterX-90, display.contentHeight+300
-	transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y-(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=finishSpells})
+	spellframes[#spellframes+1]=display.newImageRect("itemframe.png",64,64)
+	spellframes[#spellframes].xScale=1.5
+	spellframes[#spellframes].yScale=spellframes[#spellframes].xScale
+	spellframes[#spellframes].x = xinvicial+ (((#spellframes-1)%4)*((espacio*spellframes[#spellframes].xScale)+4))
+	spellframes[#spellframes].y = yinvicial+(((espacio*spellframes[#spellframes].xScale)+4)*(math.floor((#spellframes-1)/4)))
+	gspl:insert( spellframes[#spellframes] )
+	
+	spells[#spells+1]=display.newImageRect( "spells/Fireball.png" ,80,80)
+	spells[#spells].xScale=1.2
+	spells[#spells].yScale=spells[#spells].xScale
+	spells[#spells].x = spellframes[#spellframes].x
+	spells[#spells].y = spellframes[#spellframes].y
+	gspl:insert( spells[#spells] )
+	
+	spellframes[#spellframes]:addEventListener("tap",Hoo)
+	spellframes[#spellframes]:toFront()
+	
+	gspl:toFront()
 end
 
 function CleanSorcery()
-	function deletion()
-		display.remove(SorceryUI)
+	for i=table.maxn(spells),1,-1 do
+		display.remove(spells[i])
+		spells[i]=nil
+		display.remove(spellframes[i])
+		spellframes[i]=nil
 	end
-	transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y+(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=deletion})
-	for i=table.maxn(Sorcery),1,-1 do
-		display.remove(Sorcery[i])
-		Sorcery[i]=nil
+	spells=nil
+	spellframes=nil
+	for i=gspl.numChildren,1,-1 do
+		display.remove(gspl[i])
+		gspl[i]=nil
 	end
+	gspl=nil
 end
 
 function CastSorcery(name)
@@ -1899,8 +1932,7 @@ end
 
 function ShowBag()
 	local xinvicial=100
-	local espaciox=64
-	local espacioy=64
+	local espacio=64
 	
 	Continue()
 	CHideActions()
@@ -1913,12 +1945,12 @@ function ShowBag()
 	items2[#items2]:setFillColor(50,50,50)
 	items2[#items2].xScale=1.25
 	items2[#items2].yScale=1.25
-	items2[#items2].x = xinvicial+ (((#items2-1)%8)*((espaciox*items2[#items2].xScale)+4))
+	items2[#items2].x = xinvicial+ (((#items2-1)%8)*((espacio*items2[#items2].xScale)+4))
 	items2[#items2].y = display.contentHeight-120
 	items[#items+1]=display.newImageRect( "items/SuperPotion.png" ,64,64)
 	items[#items].xScale=1.25
 	items[#items].yScale=1.25
-	items[#items].x = xinvicial+ (((#items-1)%8)*((espaciox*items[#items].xScale)+4))
+	items[#items].x = xinvicial+ (((#items-1)%8)*((espacio*items[#items].xScale)+4))
 	items[#items].y = display.contentHeight-120
 	
 	items2[#items2]:addEventListener("tap",UseItem)
@@ -1952,7 +1984,6 @@ function UseItem()
 	Continue()
 	UpdateStats()
 end
-
 
 -- Story
 function FromTheTop()
@@ -3060,6 +3091,7 @@ function FortyFive()
 	display.remove(Mob)
 	Mob=nil
 	player.isVisible=true
+	cwin.isVisible=true
 	ShowArrows()
 	
 	Narrator[1]=display.newText("Let's carry on.",0, 0,"MoolBoran",60)
@@ -3359,6 +3391,7 @@ end
 function FiftySix()
 	Runtime:removeEventListener("enterFrame",ShowStats)
 	CleanArrows()
+	CleanWindow()
 	for i=Level.numChildren,1,-1 do
 		display.remove(Level[i])
 		Level[i]=nil
@@ -3508,7 +3541,7 @@ function SixtyTwo()
 	Narrator[2].x=display.contentWidth-140
 	Narrator[2].y=display.contentHeight-40
 	
-	Narrator[3]=display.newText("Gal'Darah :",0, 0,"MoolBoran",70)
+	Narrator[3]=display.newText("Galdamir :",0, 0,"MoolBoran",70)
 	Narrator[3]:setTextColor(255,255,70)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
@@ -3526,7 +3559,7 @@ function SixtyThree()
 	Narrator[2].x=display.contentWidth-140
 	Narrator[2].y=display.contentHeight-40
 	
-	Narrator[3]=display.newText("Gal'Darah :",0, 0,"MoolBoran",70)
+	Narrator[3]=display.newText("Galdamir :",0, 0,"MoolBoran",70)
 	Narrator[3]:setTextColor(255,255,70)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250

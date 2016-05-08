@@ -13,19 +13,21 @@ local ghs=display.newGroup()
 local Score
 local GVersion
 local OKVers={
-		"GAMMA 1.2.1",
+		"RELEASE 1.0.0",
+		"RELEASE 1.0.1",
+		"RELEASE 1.1.0",
 	}
 local Default={
-		"Brownie S.",10000,
-		"Go Q.",9001,
-		"T. Pastry",7500,
-		"Blue X.",5000,
-		"H. Dew",2500,
-		"D. \"Fox\" Leigh",1000,
-		"M. Person",500,
-		"Moorabi",250,
-		"Reese C.",100,
-		"E. Z. Mood",10
+		"AAA",10000,
+		"AAA",9001,
+		"AAA",7500,
+		"AAA",5000,
+		"AAA",2500,
+		"AAA",1000,
+		"AAA",500,
+		"AAA",250,
+		"AAA",100,
+		"AAA",10
 	}
 	
 function onBackBtn()
@@ -269,19 +271,12 @@ function ConfirmWipe()
 	title.text=("Wipe scores?")
 	BackBtn.isVisible=false
 	
-<<<<<<< HEAD
-	YesBtn = widget.newButton{
-		label="Yes",
-		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
-=======
 	YesBtn =  widget.newButton{
 		label="Yes",
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		font="MoolBoran",
 		fontSize=50,
 		labelYOffset=10,
->>>>>>> R1.0.0
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -292,19 +287,12 @@ function ConfirmWipe()
 	YesBtn.y = display.contentHeight-100
 	ghs:insert(YesBtn)
 	
-<<<<<<< HEAD
-	NoBtn = widget.newButton{
-		label="No",
-		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
-=======
 	NoBtn =  widget.newButton{
 		label="No",
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		font="MoolBoran",
 		fontSize=50,
 		labelYOffset=10,
->>>>>>> R1.0.0
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,

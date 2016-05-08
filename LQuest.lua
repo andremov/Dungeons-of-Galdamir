@@ -6,8 +6,9 @@
 module(..., package.seeall)
 local coinsheet = graphics.newImageSheet( "bluecoinsprite.png", { width=32, height=32, numFrames=8 } )
 local qsheet = graphics.newImageSheet( "quest.png", { width=447, height=80, numFrames=7 } )
-local b=require("Lmapbuilder")
+local b=require("Lbuilder")
 local gp=require("Lgold")
+local set=require("Lsettings")
 local WD=require("Lprogress")
 local mob=require("Lmobai")
 local HasQuest
@@ -20,6 +21,8 @@ local NumItem
 local QUpdate
 local CurItem
 local AmCoins
+local locaX
+local locaY
 local coins={}
 local ItemName
 local ItemNames={
@@ -33,6 +36,9 @@ local ItemNames={
 function Essentials()
 	HasQuest=false
 	gqm=display.newGroup()
+	local info=set.Get(6)
+	locaX=info[1]
+	locaY=info[2]
 end
 
 function CreateQuest()
@@ -42,12 +48,12 @@ function CreateQuest()
 	--		print "Quest get."
 			HasQuest=true
 			QWindow=display.newSprite( qsheet, { name="quest", start=1, count=7, time=1000,loopCount=1}  )
-			QWindow.x= display.contentWidth-225
-			QWindow.y= 40
+			QWindow.x= locaX
+			QWindow.y= locaY
 			QWindow:play()
 			gqm:insert(QWindow)
 			
-			QTitle=display.newText("Current Quest:",display.contentWidth-380,-5,"MoolBoran",40)
+			QTitle=display.newText("Current Quest:",QWindow.x-155,QWindow.y-45,"MoolBoran",40)
 			QTitle:setTextColor( 255, 255, 255)
 			gqm:insert(QTitle)
 			
@@ -65,7 +71,7 @@ function CreateQuest()
 				if mobcount>=mobPerc then
 					CurKills=0
 					NumKills=math.random(1,math.floor(mobcount/mobPerc))
-					QText=display.newText(("Defeat "..NumKills.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+8,"MoolBoran",40)
+					QText=display.newText(("Defeat "..NumKills.." mobs. ("..CurKills.."/"..NumKills..")"),QWindow.x-155,QTitle.y+8,"MoolBoran",40)
 					QText:setTextColor( 255, 255, 255)
 					gqm:insert(QText)
 					if NumKills==0 then
@@ -83,7 +89,7 @@ function CreateQuest()
 				ItemName=(math.random(1,table.maxn(ItemNames)))
 				NumItem=math.ceil(ItemName/2)
 				
-				QText=display.newText((ItemNames[ItemName].."s: ("..CurItem.."/"..NumItem..")"),display.contentWidth-380,QTitle.y+8,"MoolBoran",40)
+				QText=display.newText((ItemNames[ItemName].."s: ("..CurItem.."/"..NumItem..")"),QWindow.x-155,QTitle.y+8,"MoolBoran",40)
 				QText:setTextColor( 255, 255, 255)
 				gqm:insert(QText)
 			end
@@ -104,7 +110,7 @@ function CreateQuest()
 					local round=WD.Circle()
 					MobLvl=(math.random(1,zonas)+(zonas*(round-1)))
 					
-					QText=display.newText(("Defeat "..NumKills.." level "..MobLvl.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+8,"MoolBoran",40)
+					QText=display.newText(("Defeat "..NumKills.." level "..MobLvl.." mobs. ("..CurKills.."/"..NumKills..")"),QWindow.x-155,QTitle.y+8,"MoolBoran",40)
 					QText:setTextColor( 255, 255, 255)
 					gqm:insert(QText)
 					if NumKills==0 then

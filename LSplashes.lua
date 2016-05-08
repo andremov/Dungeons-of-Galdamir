@@ -13,14 +13,13 @@ local Tiptxt2
 local S={
 	"Now with splashes!",
 	"Random maps!",
-	"Sooner than ever!",
-	"Gamma!",
+	"Now released!",
+	"Finally!",
 	"Working Equipment!",
 	"Working Inventory!",
 	"Mob Racial Diversity!",
 	"Item Drop Restrictions!",
 	"Hardcore!",
-	"Character Customization!",
 	"Elixirs Of Doubtful Origins!",
 	"Omnipotence-free!",
 	"Mithril Armor!",
@@ -40,7 +39,7 @@ local S={
 	"Stat Boosts!",
 	"Secret Items!",
 	"29 Pages of Code!",
-	"35MB of Pure Gold!",
+	"20MB of Pure Gold!",
 	"Over 100 items!",
 	"Rings!",
 	"Sorcery!",
@@ -50,8 +49,6 @@ local S={
 	"Techniques!",
 	"Energy!",
 	"Limited Shops!",
-	"RSS Feeds!",
-	"Version Checks!",
 	"Fatigue!",
 	"Quests!",
 	"Now with back story!",
@@ -60,8 +57,6 @@ local S={
 	"Fog of war!",
 	"Optimization!",
 	"Overhauls!",
-	"Now more greek!",
-	"Splashes perfectly measured to fit!",
 	"Weight!",
 	"Now with more death!",
 	"Lazy-compatible combat!",
@@ -70,7 +65,6 @@ local S={
 	"Ceci n'est pas un splash!",
 }
 local T={
---	{"Change your class for a different","stat bonus."},
 	{"Spend your stat points wisely!"},
 	{"Dexterity increases your chance of","hitting an enemy."},
 	{"Stamina increases your health."},
@@ -90,7 +84,6 @@ local T={
 	{"Never forget to take the key."},
 	{"The game is currently loading."},
 	{"These tips are sometimes helpful."},
---	{"You can change your character's class","in the options menu."},
 	{"The map's looks can be changed","in the options menu."},
 	{"The map's size can be changed","in the options menu."},
 	{"You can check your highest scores","in the options menu."},
@@ -100,7 +93,7 @@ local T={
 function GetSplash()
 	local chooser=math.random(1,table.maxn(S))
 	Splash=S[chooser]
-	Splashtxt = display.newEmbossedText((Splash),0,0,"MoolBoran", 75 )
+	Splashtxt = display.newEmbossedText((Splash),0,0,"MoolBoran", 65 )
 	Splashtxt.x=display.contentCenterX
 	Splashtxt.y=310
 	Splashtxt:setTextColor( 255, 255, 0)

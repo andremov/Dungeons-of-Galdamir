@@ -5,29 +5,29 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local widget = require "widget"
+local WD=require("Lprogress")
+local item=require("Litems")
+local mov=require("Lmoves")
+local b=require("Lbuilder")
+local p=require("Lplayers")
+local sc=require("Lscore")
+local s=require("Lsaving")
+local c=require("Lcombat")
 local a=require("Laudio")
 local g=require("Lgold")
-local c=require("Lcombat")
-local mov=require("Lmovement")
-local p=require("Lplayers")
-local WD=require("Lprogress")
-local ui=require("Lui")
-local item=require("Litems")
-local sc=require("Lscore")
-local b=require("Lmapbuilder")
-local s=require("Lsaving")
 local m=require("Lmenu")
-local ginv
-local geqp
-local gbk
-local ginf
-local gdm
-local gum
-local swg
+local ui=require("Lui")
 local gexui
 local isOpn
 local isUse
 local items
+local ginv
+local ginf
+local geqp
+local gbk
+local gdm
+local gum
+local swg
 local DeathMessages={
 	-- Lava
 	{
@@ -125,10 +125,24 @@ function ToggleBag(sound)
 		curreqp={}
 		
 		invinterface=display.newImageRect("container.png", 570, 507)
-		invinterface.x,invinterface.y = display.contentWidth/2, 440
+		invinterface.x,invinterface.y = display.contentCenterX, 440
 		invinterface.xScale,invinterface.yScale=1.28,1.28
 		ginv:insert( invinterface )
 		isOpn=true
+		
+		CloseBtn=widget.newButton{
+			label="X",
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			fontSize=50,
+			defaultFile="sbutton.png",
+			overFile="sbutton-over.png",
+			width=80, height=80,
+			onRelease = CloseErrthang}
+		CloseBtn:setReferencePoint( display.CenterReferencePoint )
+		CloseBtn.xScale,CloseBtn.yScale=0.75,0.75
+		CloseBtn.x = display.contentCenterX-30+(570/2*1.28)
+		CloseBtn.y = 410-(507/2*1.28)
+		ginv:insert( CloseBtn )
 		
 		InvCheck()
 		
@@ -260,6 +274,19 @@ function ToggleInfo(sound)
 		bkg=display.newImageRect("bkgs/pausebkg.png", 768, 800)
 		bkg.x,bkg.y = display.contentWidth/2, 400
 		
+		CloseBtn=widget.newButton{
+			label="X",
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			fontSize=50,
+			defaultFile="sbutton.png",
+			overFile="sbutton-over.png",
+			width=80, height=80,
+			onRelease = CloseErrthang}
+		CloseBtn:setReferencePoint( display.CenterReferencePoint )
+		CloseBtn.xScale,CloseBtn.yScale=0.75,0.75
+		CloseBtn.x = display.contentWidth-30
+		CloseBtn.y = 30
+		
 		StatInfo()
 	elseif isOpn==true and (ginf) then
 		if sound~=false then
@@ -267,6 +294,8 @@ function ToggleInfo(sound)
 		end
 		display.remove(bkg)
 		bkg=nil
+		display.remove(CloseBtn)
+		CloseBtn=nil
 		isOpn=false
 		for i=table.maxn(info),1,-1 do
 			display.remove(info[i])
@@ -311,6 +340,20 @@ function ToggleSound(sound)
 		scroll.yScale=scroll.xScale
 		scroll:addEventListener("touch",MusicScroll)
 		swg:insert(scroll)
+		
+		CloseBtn=widget.newButton{
+			label="X",
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			fontSize=50,
+			defaultFile="sbutton.png",
+			overFile="sbutton-over.png",
+			width=80, height=80,
+			onRelease = CloseErrthang}
+		CloseBtn:setReferencePoint( display.CenterReferencePoint )
+		CloseBtn.xScale,CloseBtn.yScale=0.75,0.75
+		CloseBtn.x = display.contentWidth-30
+		CloseBtn.y = display.contentCenterY-((308/2)-30)
+		swg:insert(CloseBtn)
 		
 		local m=a.muse()
 		m=m*10
@@ -394,9 +437,9 @@ function ToggleExit(sound)
 		AcceptBtn=  widget.newButton{
 			label="Yes",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-				font="MoolBoran",
-				fontSize=50,
-				labelYOffset=10,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=200, height=55,
@@ -409,9 +452,9 @@ function ToggleExit(sound)
 		BackBtn=  widget.newButton{
 			label="No",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-				font="MoolBoran",
-				fontSize=50,
-				labelYOffset=10,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=200, height=55,
@@ -451,6 +494,20 @@ function ToggleSpells(sound)
 		bkg=display.newImageRect("bkgs/magicbkg.png", 768, 800)
 		bkg.x,bkg.y = display.contentWidth/2, 400
 		gbk:insert(bkg)
+		
+		CloseBtn=widget.newButton{
+			label="X",
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			fontSize=50,
+			defaultFile="sbutton.png",
+			overFile="sbutton-over.png",
+			width=80, height=80,
+			onRelease = CloseErrthang}
+		CloseBtn:setReferencePoint( display.CenterReferencePoint )
+		CloseBtn.xScale,CloseBtn.yScale=0.75,0.75
+		CloseBtn.x = display.contentWidth-30
+		CloseBtn.y = 30
+		gbk:insert(CloseBtn)
 		
 		for i=1,table.maxn(p1.spells) do
 		
@@ -1026,9 +1083,9 @@ function DeathMenu(cause)
 		ToMenuBtn =  widget.newButton{
 			label="Back To Menu",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-				font="MoolBoran",
-				fontSize=50,
-				labelYOffset=10,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=290, height=80,
@@ -1287,9 +1344,9 @@ function UseMenu(id,slot)
 		local backbtn=  widget.newButton{
 			label="Back",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-				font="MoolBoran",
-				fontSize=50,
-				labelYOffset=10,
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
 			defaultFile="cbutton.png",
 			overFile="cbutton-over.png",
 			width=200, height=55,

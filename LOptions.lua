@@ -7,9 +7,10 @@ module(..., package.seeall)
 local widget = require "widget"
 local menu=require("Lmenu")
 local a=require("Laudio")
-local map=require("Lmaphandler")
+local map=require("Lhandler")
 local char=require("Lchars")
 local scr=require("Lscore")
+local set=require("Lsettings")
 local sav=require("Lsaving")
 local optionz=display.newGroup()
 local SMute
@@ -65,6 +66,7 @@ function DisplayOptions()
 	Char.y = display.contentHeight*0.5+210
 	optionz:insert(Char)
 	]]
+	
 	Map =  widget.newButton{
 		label="Map",
 		font="MoolBoran",
@@ -96,6 +98,22 @@ function DisplayOptions()
 	ScreBtn.x = display.contentWidth*0.25
 	ScreBtn.y = display.contentHeight*0.5+210
 	optionz:insert(ScreBtn)
+	
+	Setting =  widget.newButton{
+		label="UI Positions",
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
+		onRelease = onSettingRelease
+	}
+	Setting:setReferencePoint( display.CenterReferencePoint )
+	Setting.x = display.contentCenterX--ScreBtn.x
+	Setting.y = ScreBtn.y-100
+	optionz:insert(Setting)
 	
 	scroll=display.newImageRect("scroll.png",600,50)
 	scroll.x=display.contentCenterX
@@ -150,6 +168,15 @@ function onScreBtnRelease()
 		child.parent:remove( child )
 	end
 	scr.HighScores()
+end
+
+function onSettingRelease()
+	a.Play(12)
+	for i=optionz.numChildren,1,-1 do
+		local child = optionz[i]
+		child.parent:remove( child )
+	end
+	set.Start()
 end
 
 function onBackRelease()

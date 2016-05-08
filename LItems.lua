@@ -7,9 +7,9 @@ module(..., package.seeall)
 local widget = require "widget"
 local inv=require("Lwindow")
 local p=require("Lplayers")
-local mov=require("Lmovement")
+local mov=require("Lmoves")
 local WD=require("Lprogress")
-local b=require("Lmapbuilder")
+local b=require("Lbuilder")
 local q=require("Lquest")
 local ui=require("Lui")
 local itemlist
