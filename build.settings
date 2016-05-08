@@ -37,5 +37,12 @@ settings = {
 			"android.permission.INTERNET",
 		}
   	},
-
+	
+    plugins =
+    {
+		["plugin.adbuddiz"] = { publisherId = "com.adbuddiz" }
+       
+		
+    }, 
+	
 }

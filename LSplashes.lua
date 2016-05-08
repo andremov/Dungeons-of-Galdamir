@@ -4,23 +4,22 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-
 local Splash
 local Splashtxt
 local Tip
 local Tiptxt
 local Tiptxt2
+
 local S={
 	"Now with splashes!",
 	"Random maps!",
-	"Sooner than ever!",
-	"Gamma!",
+	"Now released!",
+	"Finally!",
 	"Working Equipment!",
 	"Working Inventory!",
 	"Mob Racial Diversity!",
 	"Item Drop Restrictions!",
 	"Hardcore!",
-	"Character Customization!",
 	"Elixirs Of Doubtful Origins!",
 	"Omnipotence-free!",
 	"Mithril Armor!",
@@ -40,8 +39,8 @@ local S={
 	"Stat Boosts!",
 	"Secret Items!",
 	"29 Pages of Code!",
-	"35MB of Pure Gold!",
-	"Over 100 items!",
+	"20MB of Pure Gold!",
+	"Over 100 Items!",
 	"Rings!",
 	"Sorcery!",
 	"Mana!",
@@ -50,8 +49,6 @@ local S={
 	"Techniques!",
 	"Energy!",
 	"Limited Shops!",
-	"RSS Feeds!",
-	"Version Checks!",
 	"Fatigue!",
 	"Quests!",
 	"Now with back story!",
@@ -60,17 +57,18 @@ local S={
 	"Fog of war!",
 	"Optimization!",
 	"Overhauls!",
-	"Now more greek!",
-	"Splashes perfectly measured to fit!",
 	"Weight!",
 	"Now with more death!",
 	"Lazy-compatible combat!",
 	"Rooms!",
 	"Blocked portals!",
-	"Ceci n'est pas un splash!",
+	"Now with more contrast!",
+	"Expandable maps!",
+	"Now with less files!",
+	"Runes!",
 }
+
 local T={
---	{"Change your class for a different","stat bonus."},
 	{"Spend your stat points wisely!"},
 	{"Dexterity increases your chance of","hitting an enemy."},
 	{"Stamina increases your health."},
@@ -90,20 +88,19 @@ local T={
 	{"Never forget to take the key."},
 	{"The game is currently loading."},
 	{"These tips are sometimes helpful."},
---	{"You can change your character's class","in the options menu."},
 	{"The map's looks can be changed","in the options menu."},
-	{"The map's size can be changed","in the options menu."},
 	{"You can check your highest scores","in the options menu."},
 	{"You can change the volume in the","options menu."},
+	{"The game auto-saves every so often."},
 }
 
 function GetSplash()
 	local chooser=math.random(1,table.maxn(S))
 	Splash=S[chooser]
-	Splashtxt = display.newEmbossedText((Splash),0,0,"MoolBoran", 75 )
+	Splashtxt = display.newEmbossedText((Splash),0,0,"MoolBoran", 65 )
 	Splashtxt.x=display.contentCenterX
 	Splashtxt.y=310
-	Splashtxt:setTextColor( 255, 255, 0)
+	Splashtxt:setFillColor( 1, 1, 0)
 	Splashtxt:toFront()
 	return Splashtxt
 end
@@ -116,14 +113,14 @@ function GetTip()
 	Tiptxt = display.newEmbossedText(("Tip: "..Tip[1]),0,0,"MoolBoran", 50 )
 	Tiptxt.x=display.contentCenterX
 	Tiptxt.y=100
-	Tiptxt:setTextColor( 200, 200, 200)
+	Tiptxt:setFillColor( 0.8, 0.8, 0.8)
 	Tiptxt:toFront()
 	TGroup:insert( Tiptxt )
 	if (Tip[2]) then
 		Tiptxt2 = display.newEmbossedText((Tip[2]),0,0,"MoolBoran", 50 )
 		Tiptxt2.x=display.contentCenterX
 		Tiptxt2.y=Tiptxt.y+60
-		Tiptxt2:setTextColor( 200, 200, 200)
+		Tiptxt2:setFillColor( 0.8, 0.8, 0.8)
 		Tiptxt2:toFront()
 		TGroup:insert( Tiptxt2 )
 	end

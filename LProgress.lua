@@ -4,22 +4,19 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local builder=require("Lmapbuilder")
+local builder=require("Lbuilder")
 local players=require("Lplayers")
-local m=require("Lmenu")
-local mob=require("Lmobai")
-local handler=require("Lmaphandler")
-local mov=require("Lmovement")
-local col=require("Ltileevents")
 local audio=require("Laudio")
-local gp=require("Lgold")
-local inv=require("Lwindow")
-local ui=require("Lui")
-local com=require("Lcombat")
+-- local com=require("Lcombat")
 local sav=require("Lsaving")
-local shp=require("Lshop")
-local q=require("Lquest")
 local su=require("Lstartup")
+local mob=require("Lmobai")
+local col=require("Levents")
+local shp=require("Lshop")
+local gp=require("Lgold")
+local q=require("Lquest")
+local m=require("Lmenu")
+local ui=require("Lui")
 local RoundTax=5
 local HighCard
 local Level
@@ -51,21 +48,21 @@ function FloorSign()
 		if proftransp<20 then
 			proftransp=0
 		end
-		profbkg:setFillColor(proftransp,proftransp,proftransp,proftransp)
-		profbkg2:setTextColor(255,255,255,proftransp)
+		profbkg:setFillColor(proftransp/255,proftransp/255,proftransp/255,proftransp/255)
+		profbkg2:setFillColor(1,1,1,proftransp/255)
 		floorcount:toFront()
 		timer.performWithDelay(20,FloorSign)
 	else
 		proftransp=255
 		floorcount=display.newGroup()
-		profbkg=display.newImageRect("floorcount.png", 600, 250)
+		profbkg=display.newImageRect("ui/floorcount.png", 600, 250)
 		profbkg.xScale=0.5
 		profbkg.yScale=profbkg.xScale
-		profbkg:setFillColor(proftransp,proftransp,proftransp,proftransp)
+		profbkg:setFillColor(proftransp/255,proftransp/255,proftransp/255,proftransp/255)
 		profbkg.x, profbkg.y = display.contentCenterX, display.contentCenterY-200
 		
 		profbkg2=display.newText( (Round), 0, 0, "Game Over", 100 )
-		profbkg2:setTextColor(255,255,255,proftransp)
+		profbkg2:setFillColor(1,1,1,proftransp/255)
 		profbkg2.x, profbkg2.y = profbkg.x, profbkg.y+20
 		
 		floorcount:insert(profbkg)
@@ -92,6 +89,7 @@ function FloorPort(up)
 				gpgain=(5*math.sqrt(size))
 			end
 			gp.CallAddCoins(gpgain)
+			players.GrantXP( math.ceil(gpgain/1.5) )
 		end
 		su.Startup(false)
 		builder.Rebuild(false)
@@ -124,10 +122,12 @@ function Win()
 	if Round>HighCard then
 		HighCard=Round
 		local gpgain=Round*((math.sqrt(size)/5)*2)
+		gpgain=math.ceil(gpgain)
 		if gpgain>(5*math.sqrt(size)) then
 			gpgain=(5*math.sqrt(size))
 		end
 		gp.CallAddCoins(gpgain)
+		players.GrantXP( math.ceil(gpgain/1.5) )
 	end
 	su.Startup(false)
 	builder.Rebuild(false)
@@ -150,7 +150,6 @@ function SrsBsns()
 	gp.CleanCounter()
 	builder.WipeMap()
 	m.ShowMenu()
-	m.ReadySetGo()
-	mov.CleanWindow()
+	-- mov.CleanWindow()
 end
 

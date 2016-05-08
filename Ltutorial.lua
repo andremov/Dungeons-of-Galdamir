@@ -8,41 +8,39 @@ local EnergyPadsheet = graphics.newImageSheet("tiles/0/epad.png",{ width=80, hei
 local HealPadsheet = graphics.newImageSheet("tiles/0/hpad.png",{ width=80, height=80, numFrames=30})
 local ManaPadsheet = graphics.newImageSheet("tiles/0/mpad.png",{ width=80, height=80, numFrames=30})
 local watersheet = graphics.newImageSheet("tiles/0/water.png",{ width=80, height=80, numFrames=30})
-local heartnsheet = graphics.newImageSheet("heartemptysprite.png",{ width=25, height=25, numFrames=16})
 local lavasheet = graphics.newImageSheet("tiles/0/lava.png",{ width=80, height=80, numFrames=20})
 local coinsheet = graphics.newImageSheet( "coinsprite.png", { width=32, height=32, numFrames=8 } )
-local energysheet = graphics.newImageSheet("energysprite.png",{ width=60, height=60, numFrames=4})
-local stadef = graphics.newImageSheet( "enemy/stadef.png",{ width=140, height=110, numFrames=15 })
-local heartsheet = graphics.newImageSheet("heartsprite.png",{ width=25, height=25, numFrames=16})
-local timersheet = graphics.newImageSheet( "timer.png",{ width=100, height=100, numFrames=25 })
-local manasheet = graphics.newImageSheet("manasprite.png",{ width=60, height=60, numFrames=3})
-local psheet = graphics.newImageSheet( "player.png", { width=24, height=32, numFrames=24 } )
-local xpsheet = graphics.newImageSheet("xpbar.png",{ width=392, height=40, numFrames=50})
-local hpsheet = graphics.newImageSheet("hp.png",{ width=200, height=30, numFrames=67 })
-local mpsheet = graphics.newImageSheet("mp.png",{ width=200, height=30, numFrames=67 })
-local epsheet = graphics.newImageSheet("ep.png",{ width=200, height=30, numFrames=67 })
-local mh=require("Lmaphandler")
+local energysheet = graphics.newImageSheet("ui/energysprite.png",{ width=60, height=60, numFrames=4})
+local stadef = graphics.newImageSheet( "enemy/stadef.png",{ width=38, height=60, numFrames=30 })
+local heartsheet = graphics.newImageSheet("ui/heartsprite.png",{ width=17, height=17, numFrames=16})
+local timersheet = graphics.newImageSheet( "ui/timer.png",{ width=100, height=100, numFrames=25 })
+local manasheet = graphics.newImageSheet("ui/manasprite.png",{ width=60, height=60, numFrames=3})
+local psheet = graphics.newImageSheet( "player.png", { width=38, height=60, numFrames=60 } )
+local xpsheet = graphics.newImageSheet("ui/xpbar.png",{ width=392, height=40, numFrames=50})
+local hpsheet = graphics.newImageSheet("ui/hp.png",{ width=200, height=30, numFrames=67 })
+local mpsheet = graphics.newImageSheet("ui/mp.png",{ width=200, height=30, numFrames=67 })
+local epsheet = graphics.newImageSheet("ui/ep.png",{ width=200, height=30, numFrames=67 })
 local physics = require "physics"
 local widget = require "widget"
 local menu = require ("Lmenu")
 local a = require("Laudio")
-local interfaceb
+local idletimer=0
 local Narrator={}
+local interfaceb
 local Progress
 local Function
 local eHits={}
 local pHits={}
 local pseqs={
-		{name="stand1", start=1,  count=1, time=1000},
-		{name="stand2", start=2,  count=1, time=1000},
-		{name="stand3", start=3,  count=1, time=1000},
-		{name="stand4", start=4,  count=1, time=1000},
-		{name="walk1",  start=5,  count=4, time=500},
-		{name="walk2",  start=9,  count=4, time=500},
-		{name="walk3",  start=13, count=4, time=500},
-		{name="walk4",  start=17, count=4, time=500},
-		{name="hit",   start=21, count=3, time=1000},
-		{name="hurt",   start=24, count=1, time=1000},
+		{name="stand.right",	start=11, count=4, time=750},
+		{name="stand.left",		start=15, count=4, time=750},
+		{name="run.right",		start=21, count=4, time=500},
+		{name="run.left",		start=25, count=4, time=500},
+		{name="stand.vertical",	start=31, count=4, time=500},
+		{name="run.vertical",	start=35, count=4, time=500},
+		{name="heal.right",		start=41, count=4, time=750},
+		{name="heal.left",		start=45, count=4, time=750},
+		{name="heal.vertical",	start=51, count=4, time=750},
 	}
 
 -- Movement
@@ -64,12 +62,7 @@ function ShowArrows()
 	local size=math.sqrt(mapsize)
 	
 	if not(cwin) then
-		local halfX=display.contentCenterX
-		local halfY=display.contentCenterY
-		cwin=display.newImageRect( "cwindow.png", 653,653 )
-		cwin.x=halfX
-		cwin.y=halfY
-		cwin:addEventListener("touch",Interaction)
+		Runtime:addEventListener("enterFrame",WindowManager)
 	end
 	
 	--Wall Collision Checks
@@ -141,44 +134,90 @@ function ShowArrows()
 	end
 end
 
+function WindowManager()
+	if not(cwin) then
+		wintransp=255
+		cwin=display.newImageRect( "cwindow.png", 653,653 )
+		cwin.x=display.contentCenterX
+		cwin.y=display.contentCenterY
+		cwin:addEventListener("touch",Interaction)
+		cwin:setFillColor(wintransp/255,wintransp/255,wintransp/255,wintransp/255)
+		cwin.state=1
+	end
+	idletimer=idletimer+1
+	if idletimer>20 and idletimer<200 and cwin.state~=0 then
+		wintransp=wintransp-math.ceil(255/100)
+		if wintransp<=0 then
+			wintransp=0.1*255
+			cwin.state=0
+		end
+		cwin:setFillColor(wintransp/255,wintransp/255,wintransp/255,wintransp/255)
+	end
+	if idletimer>1500 then
+		if cwin.state==0 then
+			wintransp=wintransp+math.ceil(255/50)
+			if wintransp>255 then
+				wintransp=255
+				cwin.state=1
+			end
+			cwin:setFillColor(wintransp/255,wintransp/255,wintransp/255,wintransp/255)
+		elseif cwin.state==1 then
+			wintransp=wintransp-math.ceil(255/50)
+			if wintransp<75 then
+				cwin.state=2
+			end
+			cwin:setFillColor(wintransp/255,wintransp/255,wintransp/255,wintransp/255)
+		elseif cwin.state==2 then
+			wintransp=wintransp+math.ceil(255/50)
+			if wintransp>255 then
+				wintransp=255
+				cwin.state=1
+			end
+			cwin:setFillColor(wintransp/255,wintransp/255,wintransp/255,wintransp/255)
+		end
+	end
+end
+
 function MoveMap(x,y)
 	local map=Level
-	if (x) and (y) then
-		if x>0 then
-			--Right
-			SpriteSeq("walk2")
-		elseif x<0 then
-			--Left
-			SpriteSeq("walk4")
-		elseif y>0 then
-			--Up
-			SpriteSeq("walk3")
-		elseif y<0 then
-			--Down
-			SpriteSeq("walk1")
+	if (map) then
+		if (x) and (y) then
+			if x>0 then
+				--Right
+				SpriteSeq("walk2")
+			elseif x<0 then
+				--Left
+				SpriteSeq("walk4")
+			elseif y>0 then
+				--Up
+				SpriteSeq("walk3")
+			elseif y<0 then
+				--Down
+				SpriteSeq("walk1")
+			end
+			targetx=map.x+x
+			targety=map.y+y
+			stepcd=1
 		end
-		targetx=map.x+x
-		targety=map.y+y
-		stepcd=1
-	end
-	stepcd=stepcd-1
-	if (math.ceil((targetx-map.x)/1.5))~=0 then
-		map.x=map.x+math.ceil((targetx-map.x)/1.5)
-	end
-	if (math.ceil((targety-map.y)/1.5))~=0 then
-		map.y=map.y+math.ceil((targety-map.y)/1.5)
-	end
-	if stepcd==0 then
-		stepcd=3
-		a.Step()
-	end
-	if math.ceil((targetx-map.x)/1.5)==0 and math.ceil((targety-map.y)/1.5)==0 then
-		SpriteSeq(false)
-		map.x=targetx
-		map.y=targety
-		ShowArrows()
-	else
-		timer.performWithDelay(50,MoveMap)
+		stepcd=stepcd-1
+		if (math.ceil((targetx-map.x)/1.5))~=0 then
+			map.x=map.x+math.ceil((targetx-map.x)/1.5)
+		end
+		if (math.ceil((targety-map.y)/1.5))~=0 then
+			map.y=map.y+math.ceil((targety-map.y)/1.5)
+		end
+		if stepcd==0 then
+			stepcd=3
+			a.Step()
+		end
+		if math.ceil((targetx-map.x)/1.5)==0 and math.ceil((targety-map.y)/1.5)==0 then
+			SpriteSeq(false)
+			map.x=targetx
+			map.y=targety
+			ShowArrows()
+		else
+			timer.performWithDelay(50,MoveMap)
+		end
 	end
 end
 
@@ -208,6 +247,8 @@ function CleanArrows()
 end
 
 function CleanWindow()
+	Runtime:removeEventListener("enterFrame",WindowManager)
+	idletimer=0
 	display.remove(cwin)
 	cwin=nil
 end
@@ -223,6 +264,7 @@ function Interaction( event )
 		local intY=event.y-halfY
 		local vx=math.abs(intX/dimH)
 		local vy=math.abs(intY/dimH)
+		idletimer=0
 		
 		if intX<(76*0.6) and intX>(-76*0.6) then
 			--X=CENTER
@@ -516,15 +558,15 @@ function ShowStats()
 	
 -- Life
 	if not(LifeDisplay) then
-		transp=0
+		transp=100
 		
 		LifeDisplay = display.newText( (player.HP.."/"..player.MaxHP), 0, 0, "Game Over", 100 )
-		LifeDisplay:setTextColor( 255, 255, 255,transp)
+		LifeDisplay:setFillColor( 1, 1, 1,transp/255)
 		LifeDisplay.x = 160
 		LifeDisplay.y = 35
 		
 		LifeWindow = display.newRect (0,0,#LifeDisplay.text*22,40)
-		LifeWindow:setFillColor( 150, 150, 150,transp/2)
+		LifeWindow:setFillColor( 0.6, 0.6, 0.6,transp/2/255)
 		LifeWindow.x=LifeDisplay.x
 		LifeWindow.y=LifeDisplay.y+5
 		
@@ -537,7 +579,7 @@ function ShowStats()
 		LifeSymbol.x = 50
 		LifeSymbol.y = 40
 		LifeSymbol:play()
-		LifeSymbol:setFillColor(transp,transp,transp,transp)
+		LifeSymbol:setFillColor(transp/255,transp/255,transp/255,transp/255)
 	end
 	
 	if ((player.HP.."/"..player.MaxHP))~=LifeDisplay.text or StrongForce==true then
@@ -546,21 +588,21 @@ function ShowStats()
 		
 		display.remove(LifeWindow)
 		LifeWindow = display.newRect (0,0,#LifeDisplay.text*22,40)
-		LifeWindow:setFillColor( 150, 150, 150,transp/2)
+		LifeWindow:setFillColor( 0.6, 0.6, 0.6,transp/2/255)
 		LifeWindow.x=LifeDisplay.x
 		LifeWindow.y=LifeDisplay.y+5
 		
 		LifeDisplay:toFront()
-		LifeDisplay:setTextColor( 255, 255, 255,transp)
-		LifeSymbol:setFillColor(transp,transp,transp,transp)
+		LifeDisplay:setFillColor( 1, 1, 1,transp/255)
+		LifeSymbol:setFillColor(transp/255,transp/255,transp/255,transp/255)
 	elseif ((player.HP.."/"..player.MaxHP))==LifeDisplay.text and transp~=0 and player.HP==player.MaxHP and StrongForce~=true then
 		transp=transp-(255/50)
 		if transp<20 then
 			transp=0
 		end
-		LifeWindow:setFillColor( 150, 150, 150,transp/2)
-		LifeDisplay:setTextColor( 255, 255, 255,transp)
-		LifeSymbol:setFillColor(transp,transp,transp,transp)
+		LifeWindow:setFillColor( 0.6, 0.6, 0.6,transp/2/255)
+		LifeDisplay:setFillColor( 1, 1, 1,transp/255)
+		LifeSymbol:setFillColor(transp/255,transp/255,transp/255,transp/255)
 	end
 	
 	if player.HP==0 then
@@ -571,7 +613,7 @@ function ShowStats()
 		LifeSymbol.x = 50
 		LifeSymbol.y = display.contentHeight-170
 		LifeSymbol:play()
-		LifeSymbol:setFillColor(transp,transp,transp,transp)
+		LifeSymbol:setFillColor(transp/255,transp/255,transp/255,transp/255)
 	end
 	
 -- Mana
@@ -579,12 +621,12 @@ function ShowStats()
 		transp3=0
 		
 		ManaDisplay = display.newText( (player.MP.."/"..player.MaxMP), 0, 0, "Game Over", 100 )
-		ManaDisplay:setTextColor( 255, 255, 255,transp3)
+		ManaDisplay:setFillColor( 1, 1, 1,transp3/255)
 		ManaDisplay.x = LifeDisplay.x
 		ManaDisplay.y = LifeDisplay.y+60
 		
 		ManaWindow = display.newRect (0,0,#ManaDisplay.text*22,40)
-		ManaWindow:setFillColor( 150, 150, 150,transp3/2)
+		ManaWindow:setFillColor( 0.6, 0.6, 0.6,transp3/2/255)
 		ManaWindow.x=ManaDisplay.x
 		ManaWindow.y=ManaDisplay.y+5
 		
@@ -597,7 +639,7 @@ function ShowStats()
 		ManaSymbol.x = LifeSymbol.x
 		ManaSymbol.y = LifeSymbol.y+60
 		ManaSymbol:play()
-		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
+		ManaSymbol:setFillColor(transp3/255,transp3/255,transp3/255,transp3/255)
 	end
 	
 	if ((player.MP.."/"..player.MaxMP))~=ManaDisplay.text or StrongForce==true then
@@ -606,33 +648,33 @@ function ShowStats()
 		
 		display.remove(ManaWindow)
 		ManaWindow = display.newRect (0,0,#ManaDisplay.text*22,40)
-		ManaWindow:setFillColor( 150, 150, 150,transp3/2)
+		ManaWindow:setFillColor( 0.6, 0.6, 0.6,transp3/2/255)
 		ManaWindow.x=ManaDisplay.x
 		ManaWindow.y=ManaDisplay.y+5
 		
 		ManaDisplay:toFront()
-		ManaDisplay:setTextColor( 255, 255, 255,transp3)
-		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
+		ManaDisplay:setFillColor( 1, 1, 1,transp3/255)
+		ManaSymbol:setFillColor(transp3/255,transp3/255,transp3/255,transp3/255)
 	elseif ((player.MP.."/"..player.MaxMP))==ManaDisplay.text and transp3~=0 and player.MP==player.MaxMP and StrongForce~=true then
 		transp3=transp3-(255/50)
 		if transp3<20 then
 			transp3=0
 		end
-		ManaWindow:setFillColor( 150, 150, 150,transp3/2)
-		ManaDisplay:setTextColor( 255, 255, 255,transp3)
-		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
+		ManaWindow:setFillColor( 0.6, 0.6, 0.6,transp3/2/255)
+		ManaDisplay:setFillColor( 1, 1, 1,transp3/255)
+		ManaSymbol:setFillColor(transp3/255,transp3/255,transp3/255,transp3/255)
 	end
 	
 -- Energy
 	if not(EnergyDisplay) then
 		transp5=0
 		EnergyDisplay = display.newText( (player.EP.."/"..player.MaxEP), 0, 0, "Game Over", 100 )
-		EnergyDisplay:setTextColor( 255, 255, 255,transp5)
+		EnergyDisplay:setFillColor( 1, 1, 1,transp5/255)
 		EnergyDisplay.x = ManaDisplay.x
 		EnergyDisplay.y = ManaDisplay.y+60
 		
 		EnergyWindow = display.newRect (0,0,#EnergyDisplay.text*22,40)
-		EnergyWindow:setFillColor( 150, 150, 150,transp5/2)
+		EnergyWindow:setFillColor( 0.6, 0.6, 0.6,transp5/2/255)
 		EnergyWindow.x=EnergyDisplay.x
 		EnergyWindow.y=EnergyDisplay.y+5
 		
@@ -646,7 +688,7 @@ function ShowStats()
 		EnergySymbol.x = ManaSymbol.x
 		EnergySymbol.y = ManaSymbol.y+60
 		EnergySymbol:play()
-		EnergySymbol:setFillColor(transp5,transp5,transp5,transp5)
+		EnergySymbol:setFillColor(transp5/255,transp5/255,transp5/255,transp5/255)
 	end
 	
 	if ((player.EP.."/"..player.MaxEP))~=EnergyDisplay.text or StrongForce==true then
@@ -655,21 +697,21 @@ function ShowStats()
 		
 		display.remove(EnergyWindow)
 		EnergyWindow = display.newRect (0,0,#EnergyDisplay.text*22,40)
-		EnergyWindow:setFillColor( 150, 150, 150,transp5/2)
+		EnergyWindow:setFillColor( 0.6, 0.6, 0.6,transp5/2/255)
 		EnergyWindow.x=EnergyDisplay.x
 		EnergyWindow.y=EnergyDisplay.y+5
 		
 		EnergyDisplay:toFront()
-		EnergyDisplay:setTextColor( 255, 255, 255,transp5)
-		EnergySymbol:setFillColor(transp5,transp5,transp5,transp5)
+		EnergyDisplay:setFillColor( 1, 1, 1,transp5/255)
+		EnergySymbol:setFillColor(transp5/255,transp5/255,transp5/255,transp5/255)
 	elseif ((player.EP.."/"..player.MaxEP))==EnergyDisplay.text and transp5~=0 and player.EP==player.MaxEP and StrongForce~=true then
 		transp5=transp5-(255/50)
 		if transp5<20 then
 			transp5=0
 		end
-		EnergyWindow:setFillColor( 150, 150, 150,transp5/2)
-		EnergyDisplay:setTextColor( 255, 255, 255,transp5)
-		EnergySymbol:setFillColor(transp5,transp5,transp5,transp5)
+		EnergyWindow:setFillColor( 0.6, 0.6, 0.6,transp5/2/255)
+		EnergyDisplay:setFillColor( 1, 1, 1,transp5/255)
+		EnergySymbol:setFillColor(transp5/255,transp5/255,transp5/255,transp5/255)
 	end
 end
 
@@ -688,7 +730,18 @@ function Essentials()
 	mbounds={}
 	walls={}
 	map2={}
-	map={}
+	map={
+		"b","b","b","b","b","b","b","b","b","b",
+		"b","x","x","x","x","l","x","x","x","b",
+		"b","o","o","o","o","o","o","o","h","b",
+		"b","x","x","o","x","x","x","o","o","b",
+		"b","x","o","o","x","o","o","o","o","b",
+		"b","x","o","o","x","o","x","j","i","b",
+		"b","x","x","x","x","o","x","o","x","b",
+		"b","#","o","o","o","o","x","o","x","b",
+		"b","x","x","x","w","x","x","o","z","b",
+		"b","b","b","b","b","b","b","b","b","b",
+	}
 	TSet=0
 end
 
@@ -697,8 +750,6 @@ function BuildMap()
 		Essentials()
 		count=0
 	end
-	mh.CallingZones()
-	map=mh.GetCMap(-1)
 	mapsize=table.maxn( map )
 	
 	BuildTile()
@@ -892,7 +943,7 @@ function DisplayTile()
 		end
 		
 		if(map2[count]=="h")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -909,7 +960,7 @@ function DisplayTile()
 		end
 		
 		if(map2[count]=="i")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -926,7 +977,7 @@ function DisplayTile()
 		end
 		
 		if(map2[count]=="j")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -943,7 +994,7 @@ function DisplayTile()
 		end
 		
 		if(map2[count]=="k")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -968,7 +1019,7 @@ function DisplayTile()
 		end	
 		
 		if(map2[count]=="m")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -984,7 +1035,7 @@ function DisplayTile()
 		end
 		
 		if(map2[count]=="n")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -1000,7 +1051,7 @@ function DisplayTile()
 		end
 	
 		if(map2[count]=="ñ")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -1032,7 +1083,7 @@ function DisplayTile()
 		end
 		
 		if(map2[count]=="q")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -1047,7 +1098,7 @@ function DisplayTile()
 		end
 		
 		if(map2[count]=="s")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -1061,7 +1112,7 @@ function DisplayTile()
 		end
 		
 		if(map2[count]=="t")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -1076,7 +1127,7 @@ function DisplayTile()
 		end
 		
 		if(map2[count]=="u") then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -1092,7 +1143,7 @@ function DisplayTile()
 		end
 		
 		if(map2[count]=="w")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -1108,7 +1159,7 @@ function DisplayTile()
 		end
 		
 		if(map2[count]=="x")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -1116,7 +1167,7 @@ function DisplayTile()
 		end	
 		
 		if(map2[count]=="#")then
-			walls[count]=display.newImageRect( "tiles/"..TSet.."/walkable.png", 80, 80)
+			walls[count]=display.newImageRect( "tiles/"..TSet.."/walk1.png", 80, 80)
 			walls[count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espaciox)
 			walls[count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacioy)
 			walls[count].isVisible=false
@@ -1253,6 +1304,14 @@ function BasicCombat()
 	local espaciox=64
 	local espacioy=64
 	player.isVisible=false
+	cwin.isVisible=false
+	
+	local bkg=display.newImage("bkgs/bkg1.png",480,272)
+	bkg.xScale = 1.5
+	bkg.yScale = 1.5
+	bkg.x = display.contentCenterX
+	bkg.y = 146
+	gcm:insert(bkg)
 	
 	window2=display.newImage("window2.png",171,43)
 	window2.x=display.contentWidth-192
@@ -1295,7 +1354,7 @@ end
 function Hits(damage,target)
 	local hitmax=table.maxn(hits)
 	hits[hitmax+1]=display.newText( ("-"..damage), 0, 0, "MoolBoran", 60 )
-	hits[hitmax+1]:setTextColor( 255, 50, 50)
+	hits[hitmax+1]:setFillColor( 1, 0.20, 0.20)
 	physics.addBody(hits[hitmax+1], "dynamic", { friction=0.5,} )
 	hits[hitmax+1].isFixedRotation = true
 	if target==false then
@@ -1362,7 +1421,7 @@ function CAttackBtn()
 	if not(AttackBtn)then
 		AttackBtn=  widget.newButton{
 			label="Attack",
-			labelColor = { default={255,255,255}, over={0,0,0} },
+			labelColor = { default={0,0,0}, over={255,255,255} },
 			font="MoolBoran",
 			fontSize=50,
 			labelYOffset=10,
@@ -1370,7 +1429,6 @@ function CAttackBtn()
 			overFile="combataction2.png",
 			width=342, height=86,
 			onRelease = PAttack}
-		AttackBtn:setReferencePoint( display.CenterReferencePoint )
 		AttackBtn.x = timersprite.x-172
 		AttackBtn.y = timersprite.y-44
 		gcm:insert( AttackBtn )
@@ -1389,8 +1447,8 @@ function MobSprite(value)
 		esprite=display.newSprite( stadef, eseqs  )
 		esprite:setSequence( "walk" )
 		esprite.x=(display.contentWidth/2)+50
-		esprite.y=170
-		esprite.xScale=3.5
+		esprite.y=230
+		esprite.xScale=2.0
 		esprite.yScale=esprite.xScale
 		esprite:play()
 		gcm:insert(esprite)
@@ -1420,21 +1478,14 @@ function P1Sprite(value)
 		psprite=display.newSprite( psheet, pseqs  )
 		psprite:setSequence( "stance" )
 		psprite.x=(display.contentWidth/2)-50
-		psprite.y=170
-		psprite.xScale=4.0
+		psprite.y=230
+		psprite.xScale=3.0
 		psprite.yScale=psprite.xScale
 		psprite:play()
 		gcm:insert(psprite)
 	end
 	if (value)==(2) then--Change to Hit
-		local hat=math.random(1,3)
-		if hat==1 then
-			psprite:setSequence( "hit1" )
-		elseif hat==2 then
-			psprite:setSequence( "hit2" )
-		else
-			psprite:setSequence( "hit3" )
-		end
+		psprite:setSequence( "melee" )
 		psprite:play()
 	end
 	if (value)==(3) then--Change to Hurt
@@ -1442,7 +1493,11 @@ function P1Sprite(value)
 		psprite:play()
 	end
 	if (value)==(4) then--Set to Casting
-		psprite:setSequence( "hit" )
+		psprite:setSequence( "magic" )
+		psprite:play()
+	end
+	if (value)==(5) then--Set to Recover
+		psprite:setSequence( "recover" )
 		psprite:play()
 	end
 	if (value~=1)and(value~=2)and(value~=3)and(value~=4) then--Go Default
@@ -1489,7 +1544,7 @@ function UpdateStats(value)
 		gcm:insert(LifeSymbol3)
 		
 		LifeDisplay3 = display.newText( (eHPcnt.."/"..enemy.MaxHP), 0, 0, "Game Over", 75 )
-		LifeDisplay3:setTextColor( 0, 0, 0)
+		LifeDisplay3:setFillColor( 0, 0, 0)
 		LifeDisplay3.x = LifeSymbol3.x+140
 		LifeDisplay3.y = LifeSymbol3.y-5
 		LifeDisplay3:toFront()
@@ -1499,7 +1554,7 @@ function UpdateStats(value)
 	-- Level
 		
 		classdisplay= display.newText( (enemy.classname), 0, 0, "MoolBoran", 55 )
-		classdisplay:setTextColor( 0, 0, 0)
+		classdisplay:setFillColor( 0, 0, 0)
 		classdisplay.x = LifeDisplay.x-150
 		classdisplay.y = LifeDisplay.y+50
 		gcm:insert(classdisplay)
@@ -1526,7 +1581,7 @@ function UpdateStats(value)
 		gcm:insert(LifeSymbol2)
 		
 		LifeDisplay2 = display.newText( (pHPcnt.."/"..p1.MaxHP), 0, 0, "Game Over", 75 )
-		LifeDisplay2:setTextColor( 0, 0, 0)
+		LifeDisplay2:setFillColor( 0, 0, 0)
 		LifeDisplay2.x = LifeSymbol2.x-140
 		LifeDisplay2.y = LifeSymbol2.y-5
 		LifeDisplay2:toFront()
@@ -1554,7 +1609,7 @@ function UpdateStats(value)
 		gcm:insert(EnergySymbol2)
 		
 		EnergyDisplay2 = display.newText( (pEPcnt.."/"..p1.MaxEP), 0, 0, "Game Over", 75 )
-		EnergyDisplay2:setTextColor( 0, 0, 0)
+		EnergyDisplay2:setFillColor( 0, 0, 0)
 		EnergyDisplay2.x = EnergySymbol2.x-140
 		EnergyDisplay2.y = EnergySymbol2.y-5
 		EnergyDisplay2:toFront()
@@ -1582,7 +1637,7 @@ function UpdateStats(value)
 		gcm:insert(ManaSymbol2)
 		
 		ManaDisplay2 = display.newText( (pMPcnt.."/"..p1.MaxMP), 0, 0, "Game Over", 75 )
-		ManaDisplay2:setTextColor( 0, 0, 0)
+		ManaDisplay2:setFillColor( 0, 0, 0)
 		ManaDisplay2.x = ManaSymbol2.x-140
 		ManaDisplay2.y = ManaSymbol2.y-5
 		ManaDisplay2:toFront()
@@ -1806,36 +1861,55 @@ function EAttack()
 end
 
 function PMagic()
+	local yinvicial=display.contentHeight-180
+	local xinvicial=100
+	local espacio=64
 	CHideActions()
 	Continue()
-	local SorcIniX=display.contentCenterX-(300)
-	local SorcIniY=display.contentHeight-120
-	Sorcery[#Sorcery+1]=display.newText( "Fireball  10 MP  7 EP", SorcIniX, (SorcIniY-((#Sorcery-1)*50)), "Viner Hand ITC", 40)
-	Sorcery[#Sorcery]:setTextColor(50,50,50)
-	Sorcery[#Sorcery]:addEventListener("tap",CastSorcery)
-	Sorcery[#Sorcery].isVisible=false
 	
-	function finishSpells()
-		for i=1,table.maxn(Sorcery) do
-			Sorcery[i].isVisible=true
-			Sorcery[i]:toFront()
-		end
+	gspl=display.newGroup()
+	spells={}
+	spellframes={}
+	spellsep={}
+	spellsmp={}
+	
+	function Hoo()
+		CastSorcery()
 	end
-			
-	SorceryUI=display.newImageRect("scrollui4.png", 460, 600)
-	SorceryUI.x, SorceryUI.y = display.contentCenterX-90, display.contentHeight+300
-	transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y-(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=finishSpells})
+	spellframes[#spellframes+1]=display.newImageRect("itemframe.png",64,64)
+	spellframes[#spellframes].xScale=1.5
+	spellframes[#spellframes].yScale=spellframes[#spellframes].xScale
+	spellframes[#spellframes].x = xinvicial+ (((#spellframes-1)%4)*((espacio*spellframes[#spellframes].xScale)+4))
+	spellframes[#spellframes].y = yinvicial+(((espacio*spellframes[#spellframes].xScale)+4)*(math.floor((#spellframes-1)/4)))
+	gspl:insert( spellframes[#spellframes] )
+	
+	spells[#spells+1]=display.newImageRect( "spells/Fireball.png" ,80,80)
+	spells[#spells].xScale=1.2
+	spells[#spells].yScale=spells[#spells].xScale
+	spells[#spells].x = spellframes[#spellframes].x
+	spells[#spells].y = spellframes[#spellframes].y
+	gspl:insert( spells[#spells] )
+	
+	spellframes[#spellframes]:addEventListener("tap",Hoo)
+	spellframes[#spellframes]:toFront()
+	
+	gspl:toFront()
 end
 
 function CleanSorcery()
-	function deletion()
-		display.remove(SorceryUI)
+	for i=table.maxn(spells),1,-1 do
+		display.remove(spells[i])
+		spells[i]=nil
+		display.remove(spellframes[i])
+		spellframes[i]=nil
 	end
-	transition.to(SorceryUI, {time=(100*(#Sorcery)), y=(SorceryUI.y+(50+((#Sorcery)*44))),transition = easing.inExpo,onComplete=deletion})
-	for i=table.maxn(Sorcery),1,-1 do
-		display.remove(Sorcery[i])
-		Sorcery[i]=nil
+	spells=nil
+	spellframes=nil
+	for i=gspl.numChildren,1,-1 do
+		display.remove(gspl[i])
+		gspl[i]=nil
 	end
+	gspl=nil
 end
 
 function CastSorcery(name)
@@ -1857,7 +1931,7 @@ function CMagicBtn()
 	if not(MagicBtn)then
 		MagicBtn=  widget.newButton{
 			label="Spellbook",
-			labelColor = { default={255,255,255}, over={0,0,0} },
+			labelColor = { default={0,0,0}, over={255,255,255} },
 			font="MoolBoran",
 			fontSize=50,
 			labelYOffset=10,
@@ -1865,7 +1939,6 @@ function CMagicBtn()
 			overFile="combataction2.png",
 			width=342, height=86,
 			onRelease = PMagic}
-		MagicBtn:setReferencePoint( display.CenterReferencePoint )
 		MagicBtn.x = timersprite.x+172
 		MagicBtn.y = AttackBtn.y
 		gcm:insert( MagicBtn )
@@ -1881,7 +1954,7 @@ function CItemBtn()
 	if not(ItemBtn)then
 		ItemBtn=  widget.newButton{
 			label="Inventory",
-			labelColor = { default={255,255,255}, over={0,0,0} },
+			labelColor = { default={0,0,0}, over={255,255,255} },
 			font="MoolBoran",
 			fontSize=50,
 			labelYOffset=10,
@@ -1889,7 +1962,6 @@ function CItemBtn()
 			overFile="combataction2.png",
 			width=342, height=86,
 			onRelease = ShowBag}
-		ItemBtn:setReferencePoint( display.CenterReferencePoint )
 		ItemBtn.x = AttackBtn.x
 		ItemBtn.y = timersprite.y+44
 		gcm:insert( ItemBtn )
@@ -1899,8 +1971,7 @@ end
 
 function ShowBag()
 	local xinvicial=100
-	local espaciox=64
-	local espacioy=64
+	local espacio=64
 	
 	Continue()
 	CHideActions()
@@ -1910,15 +1981,15 @@ function ShowBag()
 	items2={}
 	
 	items2[#items2+1]=display.newRect(0,0,65,65)
-	items2[#items2]:setFillColor(50,50,50)
+	items2[#items2]:setFillColor(0.20,0.20,0.20)
 	items2[#items2].xScale=1.25
 	items2[#items2].yScale=1.25
-	items2[#items2].x = xinvicial+ (((#items2-1)%8)*((espaciox*items2[#items2].xScale)+4))
+	items2[#items2].x = xinvicial+ (((#items2-1)%8)*((espacio*items2[#items2].xScale)+4))
 	items2[#items2].y = display.contentHeight-120
 	items[#items+1]=display.newImageRect( "items/SuperPotion.png" ,64,64)
 	items[#items].xScale=1.25
 	items[#items].yScale=1.25
-	items[#items].x = xinvicial+ (((#items-1)%8)*((espaciox*items[#items].xScale)+4))
+	items[#items].x = xinvicial+ (((#items-1)%8)*((espacio*items[#items].xScale)+4))
 	items[#items].y = display.contentHeight-120
 	
 	items2[#items2]:addEventListener("tap",UseItem)
@@ -1952,7 +2023,6 @@ function UseItem()
 	Continue()
 	UpdateStats()
 end
-
 
 -- Story
 function FromTheTop()
@@ -1989,12 +2059,12 @@ function One()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2011,12 +2081,12 @@ function Two()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2031,12 +2101,12 @@ function Three()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-120
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2055,12 +2125,12 @@ function Four()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2077,12 +2147,12 @@ function Five()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2101,12 +2171,12 @@ function Six()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 
@@ -2123,12 +2193,12 @@ function Seven()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 
@@ -2147,12 +2217,12 @@ function Eight()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap inside the square to move",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-170
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -2168,12 +2238,12 @@ function Nine()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Continue down the path",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -2188,12 +2258,12 @@ function Ten()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Walk on the lava",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -2226,12 +2296,12 @@ function Eleven()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Get off the lava",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -2264,12 +2334,12 @@ function Twelve()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Continue down the path",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -2284,12 +2354,12 @@ function Thirteen()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Heal yourself on the healing pad",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-190
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -2336,12 +2406,12 @@ function Fourteen()
 	Narrator[3].y=Narrator[2].y+45
 	
 	Narrator[4]=display.newText("Wait for your wounds to heal",0, 0,"MoolBoran",40)
-	Narrator[4]:setTextColor(70,255,70)
+	Narrator[4]:setFillColor(0.28,1,0.28)
 	Narrator[4].x=display.contentWidth-170
 	Narrator[4].y=display.contentHeight-40
 	
 	Narrator[5]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[5]:setTextColor(255,255,70)
+	Narrator[5]:setFillColor(1,1,0.28)
 	Narrator[5].x=120
 	Narrator[5].y=display.contentHeight-250
 end
@@ -2355,7 +2425,7 @@ function Fifteen()
 	boundary[39]=1
 	mbounds[39]=1
 	display.remove(walls[39])
-	walls[39]=display.newImageRect( "tiles/0/walkable.png", 80, 80)
+	walls[39]=display.newImageRect( "tiles/0/walk1.png", 80, 80)
 	walls[39].x=xinicial+((((39-1)%math.sqrt(mapsize)))*espaciox)--+Level.x
 	walls[39].y=yinicial+(math.floor((39-1)/math.sqrt(mapsize))*espacioy)--+Level.y
 	walls[39].isVisible=true
@@ -2365,7 +2435,7 @@ function Fifteen()
 	boundary[38]=1
 	mbounds[38]=1
 	display.remove(walls[38])
-	walls[38]=display.newImageRect( "tiles/0/walkable.png", 80, 80)
+	walls[38]=display.newImageRect( "tiles/0/walk1.png", 80, 80)
 	walls[38].x=xinicial+((((38-1)%math.sqrt(mapsize)))*espaciox)--+Level.x
 	walls[38].y=yinicial+(math.floor((38-1)/math.sqrt(mapsize))*espacioy)--+Level.y
 	walls[38].isVisible=true
@@ -2382,12 +2452,12 @@ function Fifteen()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Continue down the path",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -2423,12 +2493,12 @@ function Sixteen()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Continue down the path",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -2447,12 +2517,12 @@ function Seventeen()
 	Narrator[3].y=Narrator[2].y+90
 	
 	Narrator[4]=display.newText("Find the guard",0, 0,"MoolBoran",40)
-	Narrator[4]:setTextColor(70,255,70)
+	Narrator[4]:setFillColor(0.28,1,0.28)
 	Narrator[4].x=display.contentWidth-120
 	Narrator[4].y=display.contentHeight-40
 	
 	Narrator[5]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[5]:setTextColor(255,255,70)
+	Narrator[5]:setFillColor(1,1,0.28)
 	Narrator[5].x=120
 	Narrator[5].y=display.contentHeight-250
 end
@@ -2492,12 +2562,12 @@ function Eighteen()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Find the guard",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -2512,12 +2582,12 @@ function Twenty()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-120
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[3]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 	
@@ -2530,12 +2600,12 @@ function TwentyOne()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-120
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[3]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 	
@@ -2548,12 +2618,12 @@ function TwentyTwo()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-120
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[3]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 	
@@ -2566,12 +2636,12 @@ function TwentyThree()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-120
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[3]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 	
@@ -2594,12 +2664,12 @@ function TwentyFour()
 	Narrator[3].y=Narrator[2].y+45
 	
 	Narrator[4]=display.newText("Tap the Attack button",0, 0,"MoolBoran",40)
-	Narrator[4]:setTextColor(70,255,70)
+	Narrator[4]:setFillColor(0.28,1,0.28)
 	Narrator[4].x=display.contentWidth-130
 	Narrator[4].y=display.contentHeight-40
 	
 	Narrator[5]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[5]:setTextColor(255,255,70)
+	Narrator[5]:setFillColor(1,1,0.28)
 	Narrator[5].x=120
 	Narrator[5].y=display.contentHeight-250
 end
@@ -2612,12 +2682,12 @@ function TwentyFive()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-120
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[3]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 	
@@ -2639,12 +2709,12 @@ function TwentySix()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2661,12 +2731,12 @@ function TwentySeven()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2683,7 +2753,7 @@ function TwentyEight()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2707,12 +2777,12 @@ function TwentyNine()
 	Narrator[3].y=Narrator[2].y+45
 	
 	Narrator[4]=display.newText("Wait for your turn",0, 0,"MoolBoran",40)
-	Narrator[4]:setTextColor(70,255,70)
+	Narrator[4]:setFillColor(0.28,1,0.28)
 	Narrator[4].x=display.contentWidth-120
 	Narrator[4].y=display.contentHeight-40
 	
 	Narrator[5]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[5]:setTextColor(255,255,70)
+	Narrator[5]:setFillColor(1,1,0.28)
 	Narrator[5].x=120
 	Narrator[5].y=display.contentHeight-250
 	
@@ -2730,12 +2800,12 @@ function Thirty()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-120
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[3]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 
@@ -2750,12 +2820,12 @@ function ThirtyOne()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap the Spellbook button",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-160
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[3]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 end
@@ -2766,12 +2836,12 @@ function ThirtyTwo()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap on Fireball",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-120
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[3]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 end
@@ -2789,12 +2859,12 @@ function ThirtyThree()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2817,12 +2887,12 @@ function ThirtyFour()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2835,12 +2905,12 @@ function ThirtyFive()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-120
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[3]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 	
@@ -2860,12 +2930,12 @@ function ThirtySix()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Wait for your turn",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2886,12 +2956,12 @@ function ThirtySeven()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2908,12 +2978,12 @@ function ThirtyEight()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2928,12 +2998,12 @@ function ThirtyNine()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap on the Items button",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-160
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[3]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 end
@@ -2945,12 +3015,12 @@ function Forty()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap on the potion",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-140
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[3]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 end
@@ -2966,12 +3036,12 @@ function FortyOne()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -2989,12 +3059,12 @@ function FortyTwo()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -3015,12 +3085,12 @@ function FortyThree()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Apply what you've learned",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-150
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -3035,12 +3105,12 @@ function FortyFour()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-120
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -3060,6 +3130,7 @@ function FortyFive()
 	display.remove(Mob)
 	Mob=nil
 	player.isVisible=true
+	cwin.isVisible=true
 	ShowArrows()
 	
 	Narrator[1]=display.newText("Let's carry on.",0, 0,"MoolBoran",60)
@@ -3071,12 +3142,12 @@ function FortyFive()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Continue down the path",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -3104,12 +3175,12 @@ function FortySix()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Go back for the key",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -3132,12 +3203,12 @@ function FortySeven()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Open the gate",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -3158,12 +3229,12 @@ function FortyEight()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Continue down the path",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -3207,12 +3278,12 @@ function FortyNine()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Continue down the path",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -3229,12 +3300,12 @@ function Fifty()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -3255,12 +3326,12 @@ function FiftyOne()
 	Narrator[3].y=Narrator[2].y+45
 	
 	Narrator[4]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[4]:setTextColor(70,255,70)
+	Narrator[4]:setFillColor(0.28,1,0.28)
 	Narrator[4].x=display.contentWidth-140
 	Narrator[4].y=display.contentHeight-40
 	
 	Narrator[5]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[5]:setTextColor(255,255,70)
+	Narrator[5]:setFillColor(1,1,0.28)
 	Narrator[5].x=120
 	Narrator[5].y=display.contentHeight-250
 	
@@ -3281,12 +3352,12 @@ function FiftyTwo()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Walk on the water",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -3303,12 +3374,12 @@ function FiftyThree()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Continue down the path",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 end
@@ -3337,12 +3408,12 @@ function FiftyFour()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Continue down the path",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-140
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[3]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 	
@@ -3351,7 +3422,7 @@ end
 
 function FiftyFive()
 	Narrator[1]=display.newText("Continue down the path",0, 0,"MoolBoran",40)
-	Narrator[1]:setTextColor(70,255,70)
+	Narrator[1]:setFillColor(0.28,1,0.28)
 	Narrator[1].x=display.contentWidth-140
 	Narrator[1].y=display.contentHeight-40
 end
@@ -3359,6 +3430,7 @@ end
 function FiftySix()
 	Runtime:removeEventListener("enterFrame",ShowStats)
 	CleanArrows()
+	CleanWindow()
 	for i=Level.numChildren,1,-1 do
 		display.remove(Level[i])
 		Level[i]=nil
@@ -3380,12 +3452,12 @@ function FiftySix()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -3402,12 +3474,12 @@ function FiftySeven()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -3424,12 +3496,12 @@ function FiftyEight()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -3446,12 +3518,12 @@ function FiftyNine()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -3468,12 +3540,12 @@ function Sixty()
 	Narrator[2].y=Narrator[1].y+45
 	
 	Narrator[3]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[3]:setTextColor(70,255,70)
+	Narrator[3]:setFillColor(0.28,1,0.28)
 	Narrator[3].x=display.contentWidth-140
 	Narrator[3].y=display.contentHeight-40
 	
 	Narrator[4]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[4]:setTextColor(255,255,70)
+	Narrator[4]:setFillColor(1,1,0.28)
 	Narrator[4].x=120
 	Narrator[4].y=display.contentHeight-250
 	
@@ -3486,12 +3558,12 @@ function SixtyOne()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-140
 	Narrator[2].y=display.contentHeight-40
 	
 	Narrator[3]=display.newText("??? :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 	
@@ -3504,12 +3576,12 @@ function SixtyTwo()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-140
 	Narrator[2].y=display.contentHeight-40
 	
-	Narrator[3]=display.newText("Gal'Darah :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]=display.newText("Galdamir :",0, 0,"MoolBoran",70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 	
@@ -3522,12 +3594,12 @@ function SixtyThree()
 	Narrator[1].y=display.contentHeight-200
 	
 	Narrator[2]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-	Narrator[2]:setTextColor(70,255,70)
+	Narrator[2]:setFillColor(0.28,1,0.28)
 	Narrator[2].x=display.contentWidth-140
 	Narrator[2].y=display.contentHeight-40
 	
-	Narrator[3]=display.newText("Gal'Darah :",0, 0,"MoolBoran",70)
-	Narrator[3]:setTextColor(255,255,70)
+	Narrator[3]=display.newText("Galdamir :",0, 0,"MoolBoran",70)
+	Narrator[3]:setFillColor(1,1,0.28)
 	Narrator[3].x=120
 	Narrator[3].y=display.contentHeight-250
 	
@@ -3545,7 +3617,6 @@ function SixtyFour()
 	physics.addBody(boundary, "static", { friction=0.5} )
 	
 	titleLogo = display.newImageRect( "titleW.png", 477, 254 )
-	titleLogo:setReferencePoint( display.CenterReferencePoint )
 	titleLogo.x = display.contentWidth * 0.5
 	titleLogo.y = -500
 	physics.addBody(titleLogo, "dynamic", { friction=0.5} )
@@ -3591,7 +3662,7 @@ function titleCheck()
 	
 	if titleLogo.isAwake==false and not (player) then
 		Narrator[1]=display.newText("Tap to continue",0, 0,"MoolBoran",40)
-		Narrator[1]:setTextColor(70,255,70)
+		Narrator[1]:setFillColor(0.28,1,0.28)
 		Narrator[1].x=display.contentWidth-140
 		Narrator[1].y=display.contentHeight-40
 		

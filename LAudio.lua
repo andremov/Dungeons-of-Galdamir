@@ -9,39 +9,46 @@ local Music
 local soundboard
 local musicboard
 local bkgMus=true
-local Loaded
 local curMusic
+local Loaded
 local mChannel=20
 local didChange=false
+local shutup=false
 
 function LoadSounds()
 	if not (soundboard)then
-		Sound=0.5
-		Music=0.5
+		if ( "simulator" == system.getInfo("environment") ) then
+			Sound=0.0
+			Music=0.0
+			devstartup= audio.loadSound("sounds/level.mp3")
+			-- audio.play( devstartup, {channel=1} )
+			devstartup=nil
+		else
+			Sound=0.5
+			Music=0.5
+		end
 		soundboard={}
 		musicboard={}
-		soundboard[1] = audio.loadSound		("sounds/gold.wav")
+		soundboard[1] = audio.loadSound		("sounds/gold.mp3")
 		if (soundboard[1])then
-			soundboard[2] = audio.loadSound		("sounds/gate.wav")
-			soundboard[3] = audio.loadSound		("sounds/open.wav")
-			soundboard[4] = audio.loadSound		("sounds/close.wav")
-			soundboard[5] = audio.loadSound		("sounds/heal.wav")
-			soundboard[6] = audio.loadSound		("sounds/portal.wav")
-			soundboard[7] = audio.loadSound		("sounds/rock.wav")
-			soundboard[8] = audio.loadSound		("sounds/equip.wav")
-			soundboard[9] = audio.loadSound		("sounds/level.wav")
-			soundboard[10] = audio.loadSound	("sounds/melee.wav")
-			soundboard[11] = audio.loadSound	("sounds/magic.wav")
-			soundboard[12] = audio.loadSound	("sounds/click.wav")
-			soundboard[13] = audio.loadSound	("sounds/hit.wav")
-			soundboard[14] = audio.loadSound	("sounds/step1.wav")
-			soundboard[15] = audio.loadSound	("sounds/step2.wav")
-			soundboard[16] = audio.loadSound	("sounds/step3.wav")
-			soundboard[17] = audio.loadSound	("sounds/step4.wav")
+			soundboard[2] = audio.loadSound	("sounds/gate.mp3")
+			soundboard[3] = audio.loadSound	("sounds/open.mp3")
+			soundboard[4] = audio.loadSound	("sounds/close.mp3")
+			soundboard[5] = audio.loadSound	("sounds/heal.mp3")
+			soundboard[6] = audio.loadSound	("sounds/portal.mp3")
+			soundboard[7] = audio.loadSound	("sounds/rock.mp3")
+			soundboard[8] = audio.loadSound	("sounds/equip.mp3")
+			soundboard[9] = audio.loadSound	("sounds/level.mp3")
+			soundboard[10] = audio.loadSound	("sounds/melee.mp3")
+			soundboard[11] = audio.loadSound	("sounds/magic.mp3")
+			soundboard[12] = audio.loadSound	("sounds/click.mp3")
+			soundboard[13] = audio.loadSound	("sounds/hit.mp3")
+			soundboard[14] = audio.loadSound	("sounds/step1.mp3")
+			soundboard[15] = audio.loadSound	("sounds/step2.mp3")
+			soundboard[16] = audio.loadSound	("sounds/step3.mp3")
+			soundboard[17] = audio.loadSound	("sounds/step4.mp3")
+			soundboard[18] = audio.loadSound	("sounds/click2.mp3")
 			--
-			musicboard[1] = audio.loadSound		("sounds/menu.wav")
-			musicboard[2] = audio.loadSound		("sounds/music.wav")
-			musicboard[3] = audio.loadSound		("sounds/battle.wav")
 			--
 			Loaded=true
 		else
@@ -52,7 +59,7 @@ function LoadSounds()
 end
 
 function Play(id)
-	if Loaded==true then
+	if Loaded==true and shutup==false then
 		local check=audio.isChannelPlaying(id)
 		if check==false then
 		else
@@ -74,7 +81,7 @@ function Play(id)
 end
 
 function Step()
-	if Loaded==true then
+	if Loaded==true and shutup==false then
 		local check=audio.isChannelPlaying(14)
 		if check==false then
 			if Sound~=0.0 then
@@ -92,14 +99,17 @@ function Step()
 end
 
 function PlayMusic()
-	if Loaded==true then
+	if Loaded==true and shutup==false then
 		local check=audio.isChannelPlaying(mChannel)
 		if check==false then
 			if curMusic==1 then
+				musicboard[1] = audio.loadStream	("sounds/menu.mp3")
 				audio.setVolume( 0.5*Music, { channel=mChannel  })
 			elseif curMusic==2 then
-				audio.setVolume( 0.2*Music, { channel=mChannel  })
+				musicboard[2] = audio.loadStream	("sounds/music.mp3")
+				audio.setVolume( 0.7*Music, { channel=mChannel  })
 			elseif curMusic==3 then
+				musicboard[3] = audio.loadStream	("sounds/battle.mp3")
 				audio.setVolume( 0.5*Music, { channel=mChannel  })
 			end
 			bkgmusic=audio.play( musicboard[curMusic], {channel=mChannel, onComplete=RepeatBkg} )
@@ -122,20 +132,16 @@ function changeMusic(data)
 	end
 end
 
-function Stopbkg()
-	audio.fadeOut({ bkg, 100 })
-end
-
 function RepeatBkg()
 	if didChange==true then
 		didChange=false
+		for i in pairs (musicboard) do
+			audio.dispose(musicboard[i])
+			musicboard[i]=nil
+		end
 		timer.performWithDelay(3000,PlayMusic)
 	else
-		if curMusic==3 then
-			PlayMusic()
-		else
-			timer.performWithDelay(10000,PlayMusic)
-		end
+		timer.performWithDelay(15000,PlayMusic)
 	end
 end
 

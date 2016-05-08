@@ -4,12 +4,11 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local builder=require("Lmapbuilder")
-local handler=require("Lmaphandler")
+local builder=require("Lbuilder")
+local o=require("Loptions")
 local p=require("Lplayers")
 local ui=require("Lui")
-local c=require("Lcombat")
-local mov=require("Lmovement")
+-- local c=require("Lcombat")
 local isDead
 local mobs
 local CanGoUp
@@ -122,7 +121,7 @@ function DoTurns()
 				CanMove[i]==true then
 			--	Before movement, mob is in contact with player.
 				function closure()
-					c.Attacked(mobs[i])
+					-- c.Attacked(mobs[i])
 				end
 				timer.performWithDelay(100,closure)
 				CanMove[i]=false
@@ -133,7 +132,7 @@ function DoTurns()
 			--	Before movement, player is in attack range
 				MoveRight(i)
 				function closure()
-					c.Attacked(mobs[i])
+					-- c.Attacked(mobs[i])
 				end
 				
 				timer.performWithDelay(100,closure)
@@ -156,7 +155,7 @@ function DoTurns()
 			--	Before movement, player is in attack range
 				MoveUp(i)
 				function closure()
-					c.Attacked(mobs[p1.room][i])
+					-- c.Attacked(mobs[p1.room][i])
 				end
 				timer.performWithDelay(100,closure)
 				CanMove[i]=false
@@ -167,7 +166,7 @@ function DoTurns()
 			--	Before movement, player is in attack range
 				MoveDown(i)
 				function closure()
-					c.Attacked(mobs[p1.room][i])
+					-- c.Attacked(mobs[p1.room][i])
 				end
 				timer.performWithDelay(100,closure)
 				CanMove[i]=false
@@ -184,7 +183,7 @@ function DoTurns()
 				mobs[p1.room][i].loc==p1.loc+(math.sqrt(size)) then
 				--	After movement, mob is in contact with player.
 				function closure()
-					c.Attacked(mobs[p1.room][i])
+					-- c.Attacked(mobs[p1.room][i])
 				end
 				timer.performWithDelay(100,closure)
 				DidSomething=true
@@ -193,7 +192,7 @@ function DoTurns()
 	end
 	MobSpawn()
 	if DidSomething==false then
-		timer.performWithDelay(200,mov.Visibility)
+		-- timer.performWithDelay(200,mov.Visibility)
 	end
 end
 
@@ -249,7 +248,7 @@ function MobDied(data)
 end
 
 function LifeOverDeath(id,room)
-	local TSet=handler.GetTiles()
+	local TSet=o.GetTiles()
 	local level=builder.GetData(3)
 	local zergOff=false
 	for m=1,size do
@@ -391,8 +390,17 @@ function LocationCheck(loc2check,room2check)
 end
 
 function DelayMobs()
+	p1=p.GetPlayer()
 	local MS=builder.GetMSpawner()
 	if (MS) and (MS.cd==0) then
 		MS.cd=math.random(1,3)
+		local sometypeofmana=p1.stats[4]-MS.req
+		if p1.MP>=math.ceil(sometypeofmana*2.5) then
+			p1.MP=p1.MP-math.ceil(sometypeofmana*2.5)
+		else
+			local penitence=math.ceil(sometypeofmana*2.5)-p1.MP
+			p1.MP=0
+			p.ReduceHP(math.floor(penitence*1.5))
+		end
 	end
 end

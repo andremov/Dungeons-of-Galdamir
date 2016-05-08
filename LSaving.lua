@@ -4,13 +4,12 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local b=require("Lmapbuilder")
-local m=require("Lmaphandler")
+local b=require("Lbuilder")
 local WD=require("Lprogress")
 local su=require("Lstartup")
 local v=require("Lversion")
 local p=require("Lplayers")
-local i=require("Lwindow")
+local ui=require("Lui")
 local it=require("Litems")
 local gp=require("Lgold")
 local canMap=false
@@ -21,7 +20,7 @@ local SplStrt
 local SplEnd
 local Sve
 local OKVers={
-		"GAMMA 1.2.1",
+		"RELEASE 1.3.0",
 	}
 
 function Load()
@@ -37,8 +36,8 @@ function Load()
 	end
 	
 	local saveok=false
-	for i=1,table.maxn(OKVers) do
-		if Sve[1]==OKVers[i] then
+	for ui=1,table.maxn(OKVers) do
+		if Sve[1]==OKVers[ui] then
 			saveok=true
 		end
 	end
@@ -60,7 +59,7 @@ function Load()
 				WD.RoundChange(Sve[l+1])
 			
 			elseif (Sve[l])=="Size" then
-				m.Size(Sve[l+1])
+				b.Expand(false,Sve[l+1])
 			
 			elseif (Sve[l])=="Player" then
 				-- Player Load 1 - Class & Char
@@ -95,11 +94,11 @@ function Load()
 			elseif l>InvStrt and l<EqpStrt then
 				if (l-InvStrt)%2==1 then
 					local stacks=it.ReturnInfo(Sve[l],"stacks")
-					i.AddItem(Sve[l],stacks,Sve[l+1])
+					ui.AddItem(Sve[l],stacks,Sve[l+1])
 				end
 			
 			elseif l>EqpStrt and (Sve[l])~=nil then
-				i.SilentQuip(Sve[l])
+				ui.SilentQuip(Sve[l])
 			end
 		end
 	--	print "Save loaded successfully."
@@ -127,11 +126,12 @@ function CheckSave(slot)
 					Sve[#Sve+1]=n
 				end
 			end
-			for i=1,table.maxn(OKVers) do
-				if Sve[1]==OKVers[i] then
+			for ui=1,table.maxn(OKVers) do
+				if Sve[1]==OKVers[ui] then
 					okSave=true
 				end
 			end
+			io.close(fh)
 			if okSave==true then
 				return Sve[27]
 			else
@@ -139,6 +139,7 @@ function CheckSave(slot)
 				return false
 			end
 		else
+			io.close(fh)
 			WipeSave(slot)
 			return false
 		end
@@ -158,7 +159,7 @@ function Save(doMap)
 	local Round=WD.Circle()
 	fh:write( "Round\n",Round,"\n")
 	
-	local Size=m.GetSize()
+	local Size=b.Expand(true)
 	fh:write( "Size\n",Size,"\n")
 	
 	local P1=p.GetPlayer()
@@ -188,16 +189,16 @@ function Save(doMap)
 	end
 	
 	fh:write( "Inv\n")
-	for i=1,table.maxn(P1.inv) do
-		if (P1.inv[i]) then
-			fh:write( P1.inv[i][1],"\n")
-			fh:write( P1.inv[i][2],"\n")
+	for ui=1,table.maxn(P1.inv) do
+		if (P1.inv[ui]) then
+			fh:write( P1.inv[ui][1],"\n")
+			fh:write( P1.inv[ui][2],"\n")
 		end
 	end
 	fh:write( "Eqp\n")
-	for i=1,table.maxn(P1.eqp) do
-		if (P1.eqp[i]) then
-			fh:write( P1.eqp[i][1],"\n")
+	for ui=1,table.maxn(P1.eqp) do
+		if (P1.eqp[ui]) then
+			fh:write( P1.eqp[ui][1],"\n")
 		end
 	end
 	io.close( fh )
@@ -212,16 +213,19 @@ function WipeSave(slot)
 	if not(slot)then
 		local path = system.pathForFile(  "DoGSave"..saveSlot..".sav", system.DocumentsDirectory )
 		local fh, errStr = io.open( path, "w+" )
-		fh:write("")
-		io.close( fh )
-		
-		local path = system.pathForFile(  "DoGMapSave"..saveSlot..".sav", system.DocumentsDirectory )
-		local fh, errStr = io.open( path, "w+" )
-		fh:write("")
-		io.close( fh )
+		if (fh) then
+			fh:write("")
+			io.close( fh )
+			
+			local path = system.pathForFile(  "DoGMapSave"..saveSlot..".sav", system.DocumentsDirectory )
+			local fh, errStr = io.open( path, "w+" )
+			fh:write("")
+			io.close( fh )
+		end
 	else
 		local path = system.pathForFile(  "DoGSave"..slot..".sav", system.DocumentsDirectory )
 		local fh, errStr = io.open( path, "w+" )
+		
 		fh:write("")
 		io.close( fh )
 		
@@ -244,8 +248,8 @@ function SaveMap()
 			fh:write("--\n")
 			fh:write(r.."\n")
 			if type(map[r])~="boolean" then
-				for i in pairs(map[r]) do
-					fh:write( map[r][i],"\n")
+				for ui in pairs(map[r]) do
+					fh:write( map[r][ui],"\n")
 				end
 			else
 			end
@@ -270,16 +274,16 @@ function LoadMap()
 			firststop[#firststop+1]=n
 		end
 	end
-	for i=1,table.maxn(firststop) do
-		if firststop[i]=="--" then
+	for ui=1,table.maxn(firststop) do
+		if firststop[ui]=="--" then
 			if (var[#var]) then
-				var[#var].endloc=i-1
+				var[#var].endloc=ui-1
 			end
-			if i~=table.maxn(firststop) then
+			if ui~=table.maxn(firststop) then
 				var[#var+1]={}
-				var[#var].roomnum=firststop[i+1]
-				var[#var].startloc=i+2
-				Map[firststop[i+1]]={}
+				var[#var].roomnum=firststop[ui+1]
+				var[#var].startloc=ui+2
+				Map[firststop[ui+1]]={}
 			end
 		end
 	end

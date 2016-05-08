@@ -4,27 +4,23 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local loadsheet = graphics.newImageSheet( "spriteload.png", { width=50, height=50, numFrames=8 } )
-local handler=require("Lmaphandler")
-local gp=require("Lgold")
-local builder=require("Lmapbuilder")
+local loadsheet = graphics.newImageSheet( "ui/spriteload.png", { width=50, height=50, numFrames=8 } )
+local builder=require("Lbuilder")
 local players=require("Lplayers")
-local audio=require("Laudio")
-local col=require("Ltileevents")
-local com=require("Lcombat")
-local ui=require("Lui")
-local q=require("Lquest")
-local inv=require("Lwindow")
-local itm=require("Litems")
 local WD=require("Lprogress")
+local audio=require("Laudio")
+-- local com=require("Lcombat")
 local s=require("Lsplashes")
-local m=require("Lmovement")
 local sav=require("Lsaving")
-local menu=require("Lmenu")
-local Round
+local col=require("Levents")
+local itm=require("Litems")
+local gp=require("Lgold")
+local q=require("Lquest")
+local ui=require("Lui")
+local DoLoad=false
 local Loading
 local DoStuff
-local DoLoad=false
+local Round
 
 function Startup(val)
 	--	print "Game loading..."
@@ -34,15 +30,10 @@ function Startup(val)
 		DoStuff=false
 	end
 	Loading=display.newGroup()
-	menu.FindMe(8)
-	loadbkg = display.newImage("bkgs/bkg_leveldark.png", true)
-	loadbkg.x = display.contentWidth/2
-	loadbkg.y = display.contentHeight/2
-	Loading:insert( loadbkg )
 	
 	load1 = display.newSprite( loadsheet, { name="load", start=1, count=8, time=600,}  )
 	load1.x = display.contentWidth-50
-	load1.y = display.contentHeight-50
+	load1.y = display.contentHeight-100
 	load1:play()
 	Loading:insert( load1 )
 	
@@ -82,87 +73,54 @@ function Startup(val)
 		end
 	end
 end
-
-function ShowContinue()
-	Runtime:addEventListener( "touch", Continue )
 	
-	display.remove( loadtxt )
-	loadtxt=nil
-	display.remove( load1 )
-	load1=nil
-	display.remove( load2 )
-	load2=nil
-	display.remove( load3 )
-	load3=nil
-	
-	contxt = display.newText("Tap to continue", 0,0,"MoolBoran",60)
-	contxt:setTextColor(70,255,70)
-	contxt.x = display.contentCenterX
-	contxt.y = display.contentHeight*.75
-	Loading:insert( contxt )
-end
-	
-function Continue( event )
-	if event.phase=="ended" then
-		Runtime:removeEventListener( "touch", Continue )
-		if DoStuff==true then
-			Runtime:addEventListener("enterFrame", gp.GoldDisplay)
+function Continue()
+	if DoStuff==true then
+		Runtime:addEventListener("enterFrame", gp.GoldDisplay)
+	end
+	for i=Loading.numChildren,1,-1 do
+		if (Loading[i]) then
+			display.remove(Loading[i])
+			Loading[i]=nil
 		end
-		for i=Loading.numChildren,1,-1 do
-			if (Loading[i]) then
-				display.remove(Loading[i])
-				Loading[i]=nil
-			end
+	end
+	loadsheet=nil
+	Loading=nil
+	if DoStuff==true then
+		ui.BaseUI(true)
+		if DoLoad==true then
+			DoLoad=false
+			-- m.Visibility()
+		else
+			ui.OpenInfo()
+			ui.SwapInfo(false)
+			ui.Ready()
 		end
-		Loading=nil
-		if DoStuff==true then
-			ui.UI(true)
-			if DoLoad==true then
-				DoLoad=false
-				m.Visibility()
-			else
-				ui.Pause(true)
-				inv.ToggleInfo()
-			end
-			players.CalmDownCowboy(true)
-			audio.changeMusic(2)
-			menu.FindMe(6)
-		elseif DoStuff==false then
-			m.Visibility()
-		end
+		audio.changeMusic(2)
+	elseif DoStuff==false then
+		-- m.Visibility()
 	end
 end
 	
 function Operations(name)
-	players.CalmDownCowboy(false)
 	q.Essentials()
 	WD.Essentials()
-	handler.CallingZones()
 	players.CreatePlayers(name)
 	gp.Essentials()
-	com.Essentials()
+	-- com.Essentials()
 	itm.Essentials()
-	inv.Essentials()
 --	players.WhosYourDaddy()
 	ui.CleanSlate()
-	ui.UI(false)
+	ui.BaseUI(false)
 	if DoLoad==true then
 		timer.performWithDelay(100, (sav.Load) )
 	else
-		builder.BuildMap()
+		-- builder.BuildMap()
+		builder.Progress()
 	end
 	
 	Runtime:addEventListener("enterFrame", col.removeOffscreenItems)
 --	print "Game loaded successfully."
-	Round=WD.Circle()
+	-- Round=WD.Circle()
 --	print ("Floor: "..Round)
-end
-
-function Operations2()
-	gp.Essentials()
-	inv.Essentials()
-end
-
-function FrontNCenter()
-	Loading:toFront()
 end

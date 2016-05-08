@@ -4,59 +4,104 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
+local egg=math.random(1,1000000)
 local widget = require "widget"
+local group=display.newGroup()
 local s=require("Lsplashes")
-local a=require("Laudio")
 local v=require("Lversion")
-local p=require("Lplay")
 local o=require("Loptions")
 local sc=require("Lscore")
 local c=require("Lchars")
-local m=require("Lmaphandler")
+local a=require("Laudio")
+local p=require("Lplay")
 local ui=require("Lui")
-local inv=require("Lwindow")
-local group=display.newGroup()
+local VDisplay2
+local VDisplay
 local GVersion
 local PlayBtn
 local OptnBtn
-local VDisplay
-local VDisplay2
 local RSplash
-local sign
+local text={}
 local Sounds
 local Splash
-local OffScreen
-local canGo
-local egg=math.random(1,1000000)
+local sign
+local asd={}
+local runes={}
+local runegroup=display.newGroup()
+local words={"love","hate","dragon","mystery","quest","penis","skill","adventure","death","betrayal","vengeance","fuck"}
+local numofwords=30
+
+function getWord()
+	if (runes[numofwords]) then
+	else
+		runes[numofwords]=display.newText(words[math.random(1,table.maxn(words))],math.random(50,700),math.random(50,1000),"Runes of Galdamir",math.random(5,10)*10)
+		runes[numofwords].red=1
+		runes[numofwords].blue=1
+		runes[numofwords].green=1
+		runes[numofwords].alpha=0.5
+		runes[numofwords].process=0
+		runes[numofwords]:toBack()
+		runegroup:insert(runes[numofwords])
+		if runes[numofwords].x>display.contentCenterX then
+			runes[numofwords].xplus=-1
+		else
+			runes[numofwords].xplus=1
+		end
+	end
+	numofwords=numofwords-1
+	if numofwords==0 then
+		numofwords=30
+	end
+	timer.performWithDelay(500,getWord)
+end
+
+function Glow()
+	for i in pairs (runes) do
+		if runes[i].green<=0 then
+			runes[i].process=1
+		elseif runes[i].green>=1 then
+			runes[i].process=0
+		end
+		if runes[i].process==0 then
+			runes[i].green=runes[i].green-.25
+			runes[i].red=runes[i].red+.5
+			runes[i].blue=runes[i].blue+.55
+		else
+			runes[i].green=runes[i].green+.25
+			runes[i].red=runes[i].red+.5
+			runes[i].blue=runes[i].blue+.5
+		end
+		runes[i].x=runes[i].x+(runes[i].xplus*2)
+		runes[i].alpha=runes[i].alpha-.002
+		runes[i]:setFillColor(runes[i].red,runes[i].green,runes[i].blue,runes[i].alpha)
+		if runes[i].alpha<=0 then
+			display.remove(runes[i])
+			runes[i]=nil
+		end
+	end
+	runegroup:toBack()
+	timer.performWithDelay(100,Glow)
+end
+
+function FirstMenu()
+	getWord()
+	Glow()
+
+	Sounds=a.sfx()
+	
+	if (Sounds) then
+	else
+		a.LoadSounds()
+	end
+end
 
 function ShowMenu()
-	function FrontNCenter2()
-		OffScreen:toFront()
-	end
-	if not (OffScreen) then
-		OffScreen = display.newImage("bkgs/bkg_leveldark2.png", 1536,2048)
-		OffScreen.x = display.contentWidth/2
-		OffScreen.y = display.contentHeight/2
-		Runtime:addEventListener("enterFrame",FrontNCenter2)
-	end
-	
-	CurMenu=0
-	GVersion=v.HowDoIVersion(true)
-	canGo=false
-	
-	--[[
-	local background = display.newImageRect( "bkgs/background.png", display.contentWidth, display.contentHeight )
-	background:setReferencePoint( display.TopLeftReferencePoint )
-	background.x, background.y = 0, 0
-	group:insert(background)
-	]]
 	
 	if egg==1 then
-		titleLogo = display.newImageRect( "title2.png", 477, 254 )
+		titleLogo = display.newImageRect( "ui/title2.png", 477, 254 )
 	else
-		titleLogo = display.newImageRect( "titleW.png", 477, 254 )
+		titleLogo = display.newImageRect( "ui/titleW.png", 477, 254 )
 	end
-	titleLogo:setReferencePoint( display.CenterReferencePoint )
 	titleLogo.x = display.contentWidth * 0.5
 	titleLogo.y = 150
 	titleLogo:addEventListener("tap",SplashChange)
@@ -68,12 +113,11 @@ function ShowMenu()
 		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		defaultFile="cbutton.png",
-		overFile="cbutton-over.png",
+		defaultFile="ui/cbutton.png",
+		overFile="ui/cbutton-over.png",
 		width=290, height=90,
 		onRelease = onPlayBtnRelease
 	}
-	PlayBtn:setReferencePoint( display.CenterReferencePoint )
 	PlayBtn.x = display.contentWidth*0.5
 	PlayBtn.y = display.contentCenterY-20
 	group:insert(PlayBtn)
@@ -84,73 +128,77 @@ function ShowMenu()
 		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		defaultFile="cbutton.png",
-		overFile="cbutton-over.png",
+		defaultFile="ui/cbutton.png",
+		overFile="ui/cbutton-over.png",
 		width=290, height=90,
 		onRelease = onOptnBtnRelease
 	}
-	OptnBtn:setReferencePoint( display.CenterReferencePoint )
 	OptnBtn.x = display.contentWidth*0.5
 	OptnBtn.y = PlayBtn.y+100
 	group:insert(OptnBtn)
 	
-	logo=display.newImageRect("Symbol3W.png",206,206)
+	--[[
+	langBtn=display.newImageRect("lang.png",430,350)
+	langBtn.xScale=0.2
+	langBtn.yScale=langBtn.xScale
+	langBtn.x=70
+	langBtn.y=display.contentHeight-70
+	langBtn:addEventListener("tap",doThing)
+	group:insert(langBtn)
+	
+	if hieroglyphics=="EN" then
+		langTxt=display.newText("English",0,0,"MoolBoran",40)
+		langTxt:setFillColor(80,1,80)
+		langTxt.x=langBtn.x
+		langTxt.y=langBtn.y+50
+		group:insert(langTxt)
+	elseif hieroglyphics=="ES" then
+		langTxt=display.newText("Espanol",0,0,"MoolBoran",40)
+		langTxt:setFillColor(80,1,80)
+		langTxt.x=langBtn.x
+		langTxt.y=langBtn.y+50
+		group:insert(langTxt)
+	end
+	--]]
+	
+	logo=display.newImageRect("ui/Symbol3W.png",206,206)
 	logo.xScale=0.75
 	logo.yScale=logo.xScale
-	logo.x=100
+	logo.x=display.contentCenterX
 	logo.y=display.contentHeight-130
+	logo:addEventListener("touch",Credits)
 	group:insert(logo)
 	
 	if ( "simulator" == system.getInfo("environment") ) then
 		print "Hello, developer!"
+	
+		GVersion=v.HowDoIVersion(true)
+		print ("Version: "..GVersion)
 		
-		sign=display.newImageRect("sign.png", 95, 70)
+		sign=display.newImageRect("ui/sign.png", 95, 70)
 		sign.xScale=2.3
 		sign.yScale=2.3
-		sign.x=(display.contentWidth-130)
+		sign.x=display.contentWidth/4*3+50
 		sign.y=(display.contentHeight-90)
 		group:insert(sign)
 		
 		VerDisplay = display.newText(("Version:"),0,0,"MoolBoran", 70 )
-		VerDisplay:setTextColor( 0, 0, 0)
+		VerDisplay:setFillColor( 0, 0, 0)
 		VerDisplay.x=sign.x
 		VerDisplay.y=sign.y-30
 		group:insert(VerDisplay)
 		
 		VDisplay = display.newText((GVersion),0,0,"MoolBoran", 45 )
-		VDisplay:setTextColor( 0, 0, 0)
+		VDisplay:setFillColor( 0, 0, 0)
 		VDisplay.x=VerDisplay.x
 		VDisplay.y=VerDisplay.y+40
 		group:insert(VDisplay)
 	end
-	--[[
-	ad1=display.newImageRect("ad1.png",57,57)
-	ad1.x=logo.x+160
-	ad1.y=logo.y+30
-	ad1.xScale=2.0
-	ad1.yScale=ad1.xScale
-	ad1:addEventListener("touch",openAd1)
-	group:insert(ad1)
 	
-	ad2=display.newImageRect("ad2.png",57,57)
-	ad2.x=ad1.x+(70*ad1.xScale)
-	ad2.y=ad1.y
-	ad2.xScale=ad1.xScale
-	ad2.yScale=ad1.xScale
-	ad2:addEventListener("touch",openAd2)
-	group:insert(ad2)
-	--]]
 	Splash=s.GetSplash()
 	group:insert(Splash)
 	
-	Sounds=a.sfx()
-	
-	if Sounds==true or Sounds==false then
-	else
-		a.LoadSounds()
-	end
 	a.changeMusic(1)
-	Runtime:addEventListener( "key", onKeyEvent )
 end
 
 function SplashChange()
@@ -164,52 +212,23 @@ function SplashChange()
 end
 
 function onPlayBtnRelease()
-	if canGo==true then
-		a.Play(12)
-		for i=group.numChildren,1,-1 do
-			local child = group[i]
-			child.parent:remove( child )
-		end
-		VDisplay=nil
-		p.Display()
+	a.Play(12)
+	for i=group.numChildren,1,-1 do
+		local child = group[i]
+		child.parent:remove( child )
 	end
-end
-
-function ReadySetGo()
-	canGo=true
-end
-
-function onUpdateBtnRelease( event )
-	if canGo==true and event.phase=="ended" then
-		a.Play(12)
-		system.openURL( "tinyurl.com/dogcub3d" )
-	end
-end
-
-function openAd1( event )
-	if canGo==true and event.phase=="ended" then
-		a.Play(12)
-		system.openURL( "tinyurl.com/togcub3d" )
-	end
-end
-
-function openAd2( event )
-	if canGo==true and event.phase=="ended" then
-		a.Play(12)
-		system.openURL( "tinyurl.com/mogcub3d" )
-	end
+	VDisplay=nil
+	p.Display()
 end
 
 function onOptnBtnRelease()
-	if canGo==true then
-		a.Play(12)
-		for i=group.numChildren,1,-1 do
-			local child = group[i]
-			child.parent:remove( child )
-		end
-		VDisplay=nil
-		o.DisplayOptions()
+	a.Play(12)
+	for i=group.numChildren,1,-1 do
+		local child = group[i]
+		child.parent:remove( child )
 	end
+	VDisplay=nil
+	o.DisplayOptions()
 end
 
 function isVersion(val)
@@ -218,94 +237,153 @@ function isVersion(val)
 	end
 	if val==true then
 		if (VDisplay) then
-			if canGo==true then
-				VDisplay2 = display.newText(("Up to date."),0,0,"MoolBoran", 60 )
-				VDisplay2:setTextColor( 0, 150, 0)
-				VDisplay2.x=VDisplay.x
-				VDisplay2.y=VDisplay.y+55
-				group:insert(VDisplay2)
-			else
-				function Closure1()
-					isVersion(true)
-				end
-				timer.performWithDelay(10,Closure1)
-			end
+			VDisplay2 = display.newText(("Up to date."),0,0,"MoolBoran", 60 )
+			VDisplay2:setFillColor( 0, 0.6, 0)
+			VDisplay2.x=VDisplay.x
+			VDisplay2.y=VDisplay.y+55
+			group:insert(VDisplay2)
 		end
 	elseif val==false then
 		if (VDisplay) then
-			if canGo==true then
 			VDisplay2 = display.newText(("Update available!"),0,0,"MoolBoran", 45 )
-			VDisplay2:setTextColor( 150, 0, 0)
+			VDisplay2:setFillColor( 0.6, 0, 0)
 			VDisplay2.x=VDisplay.x
 			VDisplay2.y=VDisplay.y+45
 			group:insert(VDisplay2)
-			sign:addEventListener("touch",onUpdateBtnRelease)
-			else
-				function Closure2()
-					isVersion(false)
-				end
-				timer.performWithDelay(10,Closure2)
-			end
 		end
 	elseif val==nil then
 		if (VDisplay) then
-			if canGo==true then
-				VDisplay2 = display.newText(("Update check failed."),0,0,"MoolBoran", 45 )
-				VDisplay2:setTextColor( 150, 0, 0)
-				VDisplay2.x=VDisplay.x
-				VDisplay2.y=VDisplay.y+50
-				group:insert(VDisplay2)
-			else
-				function Closure2()
-					isVersion(nil)
-				end
-				timer.performWithDelay(10,Closure2)
-			end
+			VDisplay2 = display.newText(("Update check failed."),0,0,"MoolBoran", 45 )
+			VDisplay2:setFillColor( 0.6, 0, 0)
+			VDisplay2.x=VDisplay.x
+			VDisplay2.y=VDisplay.y+50
+			group:insert(VDisplay2)
 		end
 	end
 end
 
-function FindMe(value)
-	CurMenu=value
+-- Credits
+function Credits( event )
+	if event.phase=="ended" then
+		a.Play(12)
+		for i=group.numChildren,1,-1 do
+			local child = group[i]
+			child.parent:remove( child )
+		end
+		VDisplay=nil
+		
+		title=display.newText("Credits",0,0,"MoolBoran",100)
+		title.x = display.contentWidth*0.5
+		title.y = 100
+		title:setFillColor(0.5,1,0.5)
+		group:insert(title)
+		
+		function One()
+			CreditsTab(1)
+		end
+		
+		coding=display.newText("Coding",0,0,"MoolBoran",65)
+		coding.x=display.contentWidth/5
+		coding.y=display.contentHeight-100
+		coding:addEventListener("tap",One)
+		coding:setFillColor(0.5,0.5,1)
+		group:insert(coding)
+		
+		function Two()
+			CreditsTab(2)
+		end
+		
+		sound=display.newText("Sound",0,0,"MoolBoran",65)
+		sound.x=display.contentWidth/5*2
+		sound.y=display.contentHeight-100
+		sound:addEventListener("tap",Two)
+		sound:setFillColor(0.5,0.5,1)
+		group:insert(sound)
+		
+		function Three()
+			CreditsTab(3)
+		end
+		
+		graphic=display.newText("Graphic",0,0,"MoolBoran",65)
+		graphic.x=display.contentWidth/5*3
+		graphic.y=display.contentHeight-100
+		graphic:addEventListener("tap",Three)
+		graphic:setFillColor(0.5,0.5,1)
+		group:insert(graphic)
+		
+		function Four()
+			Credone()
+		end
+		
+		back=display.newText("Back",0,0,"MoolBoran",65)
+		back.x=display.contentWidth/5*4
+		back.y=display.contentHeight-100
+		back:addEventListener("tap",Four)
+		back:setFillColor(0.5,0.5,1)
+		group:insert(back)
+	end
 end
 
-function onKeyEvent( event )
-	local phase = event.phase
-	local keyName = event.keyName
-
-	if ( "back" == keyName and phase == "up" ) then
-		if CurMenu==0 then
-		elseif CurMenu==1 then
-			p.onBackRelease()
-		elseif CurMenu==2 then
-			o.onBackRelease()
-		elseif CurMenu==3 then
-			m.onBackRelease()
-		elseif CurMenu==4 then
-			c.onBackRelease()
-		elseif CurMenu==5 then
-			sc.onBackBtn()
-		elseif CurMenu==6 then
-			ui.ForcePause()
-			inv.ToggleExit()
-		elseif CurMenu==7 then
-			inv.ToggleExit()
-		elseif CurMenu==8 then
-			
-		elseif CurMenu==9 then
-			native.requestExit()
-		end
-		return true
+function CreditsTab(tab)
+	for t=table.maxn(text),1,-1 do
+		display.remove(text[t])
+		text[t]=nil
 	end
-
-	if ( "menu" == keyName and phase == "up" ) then
-		if CurMenu==6 then
-			ui.Pause()
-		elseif CurMenu==7 then
-			ui.Pause()
+		coding:setFillColor(0.5,0.5,1)
+		sound:setFillColor(0.5,0.5,1)
+		graphic:setFillColor(0.5,0.5,1)
+		if tab==1 then
+			coding:setFillColor(1,0.5,0.5)
+		elseif tab==2 then
+			sound:setFillColor(1,0.5,0.5)
+		elseif tab==3 then
+			graphic:setFillColor(1,0.5,0.5)
 		end
-		return true
+		--[[
+			TO DO:
+				SOUNDS
+				- GOLD FREESOUND
+				- ROCK FREESOUND
+				- GATE FREESOUND
+				CHARACTER
+				ENEMIES
+		--]]
+	local executives={
+		"Andres Movilla","- Developer",
+		"Mauricio Movilla","- Publisher",
+	}
+	local sfx={
+		"HorrorPen from OpenGameArt.org","- Composer of \"No More Magic\"",
+		"Kevin Macleod from Incompetech.com","- Composer of \"Gagool\"",
+		"Mekathros from OpenGameArt.org","- Composer of \"Gran Batalla\"",
+		"bart from OpenGameArt.org","- Composer of the level up fanfare",
+		"qubodup from OpenGameArt.org","- Composer of the buttons and clicks",
+		"artisticdude from OpenGameArt.org","- Composer of the combat hits",
+		"Fantozzi from OpenGameArt.org","- Composer of the different steps",
+	}
+	local gfx={
+		"Ashiroxzer from OpenGameArt.org","- Artist of the user interface",
+		"VWolfDog from OpenGameArt.org","- Artist of some items",
+		"Clint Bellanger from OpenGameArt.org","- Artist of several items",
+		"Mumu from OpenGameArt.org","- Artist of some items",
+		"Blarumyrran from OpenGameArt.org","- Artist of some items",
+		"Lorc from OpenGameArt.org","- Artist of most UI icons",
+		"Chilvence from DHTP","- Artist of most Default Tileset textures",
+	}
+	local tables={executives,sfx,gfx}
+	
+	for s=1,table.maxn(tables[tab]) do
+		text[s]=display.newText(tables[tab][s],0,0,"MoolBoran",45)
+		text[s].anchorX=0
+		text[s].anchorY=0
+		text[s].x=130+(-100*(s%2))
+		text[s].y=125+(-30*((s%2)+1))+(100*math.ceil(s/2))
+		group:insert(text[s])
+	--	print (s.."x-"..text[s].x)
+	--	print (s.."y-"..text[s].y)
 	end
+end
 
-	return false
+function Credone()
+	Runtime:addEventListener("tap",NextStep)
 end

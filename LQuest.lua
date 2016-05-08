@@ -5,8 +5,8 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local coinsheet = graphics.newImageSheet( "bluecoinsprite.png", { width=32, height=32, numFrames=8 } )
-local qsheet = graphics.newImageSheet( "quest.png", { width=447, height=80, numFrames=7 } )
-local b=require("Lmapbuilder")
+local qsheet = graphics.newImageSheet( "ui/quest.png", { width=447, height=80, numFrames=7 } )
+local b=require("Lbuilder")
 local gp=require("Lgold")
 local WD=require("Lprogress")
 local mob=require("Lmobai")
@@ -20,6 +20,8 @@ local NumItem
 local QUpdate
 local CurItem
 local AmCoins
+local locaX
+local locaY
 local coins={}
 local ItemName
 local ItemNames={
@@ -37,18 +39,23 @@ end
 
 function CreateQuest()
 	if HasQuest==false then
-		local roll=math.random(1,10)
+	--	local roll=math.random(1,10)
+		roll=6
 		if roll>=6 then
 	--		print "Quest get."
 			HasQuest=true
-			QWindow=display.newSprite( qsheet, { name="quest", start=1, count=7, time=1000,loopCount=1}  )
+			QWindow=display.newSprite( qsheet, { name="quest", start=1, count=7, time=1000}  )
 			QWindow.x= display.contentWidth-225
 			QWindow.y= 40
 			QWindow:play()
 			gqm:insert(QWindow)
 			
-			QTitle=display.newText("Current Quest:",display.contentWidth-380,-5,"MoolBoran",40)
-			QTitle:setTextColor( 255, 255, 255)
+			QTitle=display.newText("Current Quest:",0,0,"MoolBoran",40)
+			QTitle.anchorX=0
+			QTitle.anchorY=0
+			QTitle.x=QWindow.x-155
+			QTitle.y=QWindow.y-35,
+			QTitle:setFillColor( 1, 1, 1)
 			gqm:insert(QTitle)
 			
 			QuestType=math.random(1,3)
@@ -65,8 +72,13 @@ function CreateQuest()
 				if mobcount>=mobPerc then
 					CurKills=0
 					NumKills=math.random(1,math.floor(mobcount/mobPerc))
-					QText=display.newText(("Defeat "..NumKills.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+8,"MoolBoran",40)
-					QText:setTextColor( 255, 255, 255)
+					
+					QText=display.newText(("Defeat "..NumKills.." mobs. ("..CurKills.."/"..NumKills..")"),0,0,"MoolBoran",40)
+					QText.anchorX=0
+					QText.anchorY=1.0
+					QText.x=QWindow.x-155
+					QText.y=QWindow.y+55
+					QText:setFillColor( 1, 1, 1)
 					gqm:insert(QText)
 					if NumKills==0 then
 	--					print "Quest Error. Wiping quest..."
@@ -81,10 +93,14 @@ function CreateQuest()
 			
 				CurItem=0
 				ItemName=(math.random(1,table.maxn(ItemNames)))
-				NumItem=math.ceil(ItemName/2)
+				NumItem=math.random(1,4)
 				
-				QText=display.newText((ItemNames[ItemName].."s: ("..CurItem.."/"..NumItem..")"),display.contentWidth-380,QTitle.y+8,"MoolBoran",40)
-				QText:setTextColor( 255, 255, 255)
+				QText=display.newText((ItemNames[ItemName].."s: ("..CurItem.."/"..NumItem..")"),0,0,"MoolBoran",40)
+				QText.anchorX=0
+				QText.anchorY=1.0
+				QText.x=QWindow.x-155
+				QText.y=QWindow.y+55
+				QText:setFillColor( 1, 1, 1)
 				gqm:insert(QText)
 			end
 			if QuestType==3 then
@@ -104,8 +120,12 @@ function CreateQuest()
 					local round=WD.Circle()
 					MobLvl=(math.random(1,zonas)+(zonas*(round-1)))
 					
-					QText=display.newText(("Defeat "..NumKills.." level "..MobLvl.." mobs. ("..CurKills.."/"..NumKills..")"),display.contentWidth-380,QTitle.y+8,"MoolBoran",40)
-					QText:setTextColor( 255, 255, 255)
+					QText=display.newText(("Defeat "..NumKills.." level "..MobLvl.." mobs. ("..CurKills.."/"..NumKills..")"),0,0,"MoolBoran",40)
+					QText.anchorX=0
+					QText.anchorY=1.0
+					QText.x=QWindow.x-155
+					QText.y=QWindow.y+55
+					QText:setFillColor( 1, 1, 1)
 					gqm:insert(QText)
 					if NumKills==0 then
 	--					print "Quest Error. Wiping quest..."
@@ -144,7 +164,7 @@ function UpdateQuest(val,val2)
 				Runtime:addEventListener("enterFrame",HandleIt)
 				
 				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
-				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
 				QUpdate:toFront()
@@ -165,7 +185,7 @@ function UpdateQuest(val,val2)
 				Runtime:addEventListener("enterFrame",HandleIt)
 				
 				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
-				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
 				QUpdate:toFront()
@@ -192,7 +212,7 @@ function UpdateQuest(val,val2)
 				Runtime:addEventListener("enterFrame",HandleIt)
 				
 				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
-				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
 				QUpdate:toFront()
@@ -213,7 +233,7 @@ function UpdateQuest(val,val2)
 				Runtime:addEventListener("enterFrame",HandleIt)
 				
 				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
-				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
 				QUpdate:toFront()
@@ -237,11 +257,11 @@ function UpdateQuest(val,val2)
 				QUpdate=display.newText(("Quest complete!"),0,0,"MoolBoran",70)
 				QUpdate.x=display.contentCenterX
 				QUpdate.y=display.contentHeight*.25
-				QUpdate:setTextColor( transp, transp, transp, transp)
+				QUpdate:setFillColor( transp/255, transp/255, transp/255, transp/255)
 				Runtime:addEventListener("enterFrame",HandleIt)
 				
 				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
-				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
 				QUpdate:toFront()
@@ -262,7 +282,7 @@ function UpdateQuest(val,val2)
 				Runtime:addEventListener("enterFrame",HandleIt)
 				
 				QUWindow=display.newRect (0,0,#QUpdate.text*22,60)
-				QUWindow:setFillColor( 0, 0, 0,transp/2)
+				QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 				QUWindow.x=QUpdate.x
 				QUWindow.y=QUpdate.y-15
 				QUpdate:toFront()
@@ -278,9 +298,9 @@ function HandleIt()
 		transp=transp-(255/350)
 	end
 	QUWindow:toFront()
-	QUWindow:setFillColor( 0, 0, 0,transp/2)
+	QUWindow:setFillColor( 0, 0, 0,transp/2/255)
 	QUpdate:toFront()
-	QUpdate:setTextColor( transp, transp, transp, transp)
+	QUpdate:setFillColor( transp/255, transp/255, transp/255, transp/255)
 	if transp==0 then
 		Runtime:removeEventListener("enterFrame",HandleIt)
 		display.remove(QUpdate)
