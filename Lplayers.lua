@@ -9,7 +9,7 @@ local energysheet = graphics.newImageSheet( "energysprite.png", { width=60, heig
 local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height=25, numFrames=16 } )
 local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 } )
 local xpsheet = graphics.newImageSheet( "xpbar.png", { width=392, height=40, numFrames=50 } )
-local psheet = graphics.newImageSheet( "player.png", { width=24, height=32, numFrames=24 } )
+local psheet = graphics.newImageSheet( "player.png", { width=24, height=32, numFrames=56 } )
 local b=require("Lmapbuilder")
 local WD=require("Lprogress")
 local su=require("Lstartup")
@@ -32,16 +32,23 @@ local player
 local transp
 local Map
 local pseqs={
-		{name="stand1", start=1,  count=1, time=1000},
-		{name="stand2", start=2,  count=1, time=1000},
-		{name="stand3", start=3,  count=1, time=1000},
-		{name="stand4", start=4,  count=1, time=1000},
-		{name="walk1",  start=5,  count=4, time=500},
-		{name="walk2",  start=9,  count=4, time=500},
-		{name="walk3",  start=13, count=4, time=500},
-		{name="walk4",  start=17, count=4, time=500},
-		{name="hit",   start=21, count=3, time=1000},
-		{name="hurt",   start=24, count=1, time=1000},
+		{name="stand1",		start=1,  count=1, time=1000},
+		{name="stand2",		start=2,  count=1, time=1000},
+		{name="stand3",		start=3,  count=1, time=1000},
+		{name="stand4",		start=4,  count=1, time=1000},
+		{name="walk1",		start=5,  count=4, time=500},
+		{name="walk2",		start=9,  count=4, time=500},
+		{name="walk3",		start=13, count=4, time=500},
+		{name="walk4",		start=17, count=4, time=500},
+		{name="stance",		start=21, count=4, time=1000},
+		{name="melee",		start=25, count=4, time=600,loopCount=1},
+		{name="magic",		start=29, count=4, time=600,loopCount=1},
+		{name="recover",	start=33, count=4, time=750},
+		{name="hurt",		start=37, count=4, time=750},
+		{name="heal1",		start=41, count=4, time=750},
+		{name="heal2",		start=45, count=4, time=750},
+		{name="heal3",		start=49, count=4, time=750},
+		{name="heal4",		start=53, count=4, time=750},
 	}
 local names={
 		"Nameless",
@@ -147,6 +154,20 @@ function SpriteSeq(value)
 			player:play()
 		elseif player.sequence=="walk4" then
 			player:setSequence("stand4")
+			player:play()
+		end
+	elseif value==true then
+		if player.sequence=="stand1" then
+			player:setSequence("heal1")
+			player:play()
+		elseif player.sequence=="stand2" then
+			player:setSequence("heal2")
+			player:play()
+		elseif player.sequence=="stand3" then
+			player:setSequence("heal3")
+			player:play()
+		elseif player.sequence=="stand4" then
+			player:setSequence("heal4")
 			player:play()
 		end
 	else

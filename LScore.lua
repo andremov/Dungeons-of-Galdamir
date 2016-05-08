@@ -13,10 +13,7 @@ local ghs=display.newGroup()
 local Score
 local GVersion
 local OKVers={
-		"GAMMA 1.0.1",
-		"GAMMA 1.0.2",
-		"GAMMA 1.1.0",
-		"GAMMA 1.2.0",
+		"GAMMA 1.2.1",
 	}
 local Default={
 		"Brownie S.",10000,
@@ -128,12 +125,15 @@ function HighScores()
 	title.x = display.contentWidth*0.5
 	title.y = 100
 	title:setTextColor(125,250,125)
+	title:addEventListener("tap",ConfirmWipe)
 	ghs:insert(title)
 	
-	BackBtn = widget.newButton{
+	BackBtn =  widget.newButton{
 		label="Back",
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
+		font="MoolBoran",
+		fontSize=70,
+		labelYOffset=10,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -264,3 +264,75 @@ function CheckScore()
 	end
 end
 
+function ConfirmWipe()
+	audio.Play(12)
+	title.text=("Wipe scores?")
+	BackBtn.isVisible=false
+	
+	YesBtn =  widget.newButton{
+		label="Yes",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		font="MoolBoran",
+		fontSize=70,
+		labelYOffset=10,
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
+		onRelease = WipeScores
+	}
+	YesBtn:setReferencePoint( display.CenterReferencePoint )
+	YesBtn.x = (display.contentWidth/4)
+	YesBtn.y = display.contentHeight-100
+	ghs:insert(YesBtn)
+	
+	NoBtn =  widget.newButton{
+		label="No",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		font="MoolBoran",
+		fontSize=70,
+		labelYOffset=10,
+		defaultFile="cbutton.png",
+		overFile="cbutton-over.png",
+		width=290, height=90,
+		onRelease = CancelWipe
+	}
+	NoBtn:setReferencePoint( display.CenterReferencePoint )
+	NoBtn.x = (display.contentWidth/4)*3
+	NoBtn.y = display.contentHeight-100
+	ghs:insert(NoBtn)
+end
+
+function CancelWipe()
+	audio.Play(12)
+	display.remove( NoBtn )
+	NoBtn=nil
+	display.remove( YesBtn )
+	YesBtn=nil
+
+	title.text=("High Scores")
+	BackBtn.isVisible=true
+end
+
+function WipeScores()
+	audio.Play(12)
+	if (Text) then
+		for i=table.maxn(Text),1,-1 do
+			local child = Text[i]
+			child.parent:remove( child )
+			Text[i]=nil
+		end
+		Text=nil
+	end
+	if (Sve) then
+		for i=table.maxn(Sve),1,-1 do
+			Sve[i]=nil
+		end
+		Sve=nil
+	end
+	for i=ghs.numChildren,1,-1 do
+		local child = ghs[i]
+		child.parent:remove( child )
+	end
+	CleanScores()
+	HighScores()
+end

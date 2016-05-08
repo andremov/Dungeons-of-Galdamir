@@ -69,7 +69,7 @@ function onChestCollision()
 				bounds[l]=1
 				display.remove(Chests[r][l])
 				Chests[r][l]=nil
-				gold.CallCoins(Round)
+				gold.CallCoins(math.ceil(Round/2))
 				builder.ModMap(l)
 				Dropped=item.ItemDrop()
 				return Dropped
@@ -181,10 +181,12 @@ function onKeyCollision()
 			lolname2.y=(display.contentHeight/2)-50
 			gum:insert( lolname2 )
 			
-			local backbtn= widget.newButton{
+			local backbtn=  widget.newButton{
 				label="Accept",
 				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
+				font="MoolBoran",
+				fontSize=70,
+				labelYOffset=10,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
 				width=200, height=55,
@@ -244,6 +246,7 @@ function LayOnHands()
 	if inCombat==true or isPaused==true then
 	elseif (Heal) then
 		if (Heal.loc==P1.loc) and (Heal.room==P1.room) then
+			player.SpriteSeq(true)
 			if P1.HP<P1.MaxHP then
 				twinkles[#twinkles+1]=display.newSprite( healthsheet, { name="twinkle", start=1, count=14, time=1000, loopCount=1 }  )
 				twinkles[#twinkles].x=P1.x+(math.random(-30,30))
@@ -272,6 +275,7 @@ function LayOnFeet()
 	if inCombat==true or isPaused==true then
 	elseif (Energy) then
 		if (Energy.loc==P1.loc) and (Energy.room==P1.room) then
+			player.SpriteSeq(true)
 			if P1.EP<P1.MaxEP then
 				twinkles[#twinkles+1]=display.newSprite( energysheet, { name="twinkle", start=1, count=14, time=1000, loopCount=1 }  )
 				twinkles[#twinkles].x=P1.x+(math.random(-30,30))
@@ -300,6 +304,7 @@ function LayOnHead()
 	if inCombat==true or isPaused==true then
 	elseif (Mana) then
 		if (Mana.loc==P1.loc) and (Mana.room==P1.room) then
+			player.SpriteSeq(true)
 			if P1.MP<P1.MaxMP then
 				twinkles[#twinkles+1]=display.newSprite( manasheet, { name="twinkle", start=1, count=14, time=1000, loopCount=1 }  )
 				twinkles[#twinkles].x=P1.x+(math.random(-30,30))

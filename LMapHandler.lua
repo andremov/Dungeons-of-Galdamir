@@ -133,10 +133,10 @@ function MapSizeMenu()
 		CurTile.text=("Current Tileset: Notebook")
 	end
 	
-	function RealTSet()
+	function SimpleTSet()
 		audio.Play(12)
 		SetTile(2)
-		CurTile.text=("Current Tileset: Realistic")
+		CurTile.text=("Current Tileset: Simple")
 	end
 	
 	function BWTSet()
@@ -152,10 +152,12 @@ function MapSizeMenu()
 	end
 	
 	
-	local TinyBtn = widget.newButton{
+	local TinyBtn =  widget.newButton{
 		label="Tiny Map",
+		font="MoolBoran",
+		fontSize=70,
+		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -166,10 +168,12 @@ function MapSizeMenu()
 	TinyBtn.y = display.contentHeight*0.3
 	opt:insert(TinyBtn)
 	
-	local SmallBtn = widget.newButton{
+	local SmallBtn =  widget.newButton{
 		label="Small Map",
+		font="MoolBoran",
+		fontSize=70,
+		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -180,10 +184,12 @@ function MapSizeMenu()
 	SmallBtn.y = TinyBtn.y+100
 	opt:insert(SmallBtn)
 	
-	local MedBtn = widget.newButton{
+	local MedBtn =  widget.newButton{
 		label="Medium Map",
+		font="MoolBoran",
+		fontSize=70,
+		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -194,10 +200,12 @@ function MapSizeMenu()
 	MedBtn.y = SmallBtn.y+100
 	opt:insert(MedBtn)
 	
-	local LargeBtn = widget.newButton{
+	local LargeBtn =  widget.newButton{
 		label="Large Map",
+		font="MoolBoran",
+		fontSize=70,
+		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -208,10 +216,12 @@ function MapSizeMenu()
 	LargeBtn.y = MedBtn.y+100
 	opt:insert(LargeBtn)
 	
-	local DefaultTS = widget.newButton{
+	local DefaultTS =  widget.newButton{
 		label="Default Tileset",
+		font="MoolBoran",
+		fontSize=70,
+		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -222,10 +232,12 @@ function MapSizeMenu()
 	DefaultTS.y = display.contentHeight*0.3
 	opt:insert(DefaultTS)
 	
-	local NotebookTS = widget.newButton{
+	local NotebookTS =  widget.newButton{
 		label="Notebook Tileset",
+		font="MoolBoran",
+		fontSize=70,
+		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -235,25 +247,30 @@ function MapSizeMenu()
 	NotebookTS.x = DefaultTS.x
 	NotebookTS.y = DefaultTS.y+100
 	opt:insert(NotebookTS)
-	--[[
-	local RealTS = widget.newButton{
-		label="Realistic Tileset",
+	
+	local SimpleTS =  widget.newButton{
+		label="Simple Tileset",
+		font="MoolBoran",
+		fontSize=70,
+		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
-		onRelease = RealTSet
+		onRelease = SimpleTSet
 	}
-	RealTS:setReferencePoint( display.CenterReferencePoint )
-	RealTS.x = NotebookTS.x
-	RealTS.y = NotebookTS.y+100
-	opt:insert(RealTS)
+	SimpleTS:setReferencePoint( display.CenterReferencePoint )
+	SimpleTS.x = NotebookTS.x
+	SimpleTS.y = NotebookTS.y+100
+	opt:insert(SimpleTS)
+	--[[
 	
-	local BWTS = widget.newButton{
+	local BWTS =  widget.newButton{
 		label="Black & White Tileset",
+		font="MoolBoran",
+		fontSize=70,
+		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -271,10 +288,12 @@ function MapSizeMenu()
 	title:addEventListener("tap",Secret)
 	opt:insert(title)
 	
-	local BackBtn = widget.newButton{
+	local BackBtn =  widget.newButton{
 		label="Back",
+		font="MoolBoran",
+		fontSize=70,
+		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		fontSize=30,
 		defaultFile="cbutton.png",
 		overFile="cbutton-over.png",
 		width=290, height=90,
@@ -323,7 +342,7 @@ function MapSizeMenu()
 		CurTile.y=CurSize.y+80
 		opt:insert(CurTile)
 	elseif TileID==2 then
-		CurTile = display.newText( ("Current Tileset: Realistic"), 0, 0, "MoolBoran", 75 )
+		CurTile = display.newText( ("Current Tileset: Simple"), 0, 0, "MoolBoran", 75 )
 		CurTile.x=display.contentCenterX
 		CurTile.y=CurSize.y+80
 		opt:insert(CurTile)

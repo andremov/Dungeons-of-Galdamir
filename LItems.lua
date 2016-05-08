@@ -100,10 +100,12 @@ function ItemDrop(boost)
 			lolname2:setTextColor( 180, 180, 180)
 			gum:insert( lolname2 )
 			
-			local backbtn= widget.newButton{
+			local backbtn=  widget.newButton{
 				label="Accept",
+				font="MoolBoran",
+				fontSize=70,
+				labelYOffset=10,
 				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
 				width=200, height=55,
@@ -139,7 +141,7 @@ function ItemDrop(boost)
 					child.parent:remove( child )
 				end
 				ui.Pause()
-				inv.ToggleBag()
+				inv.ToggleBag(false)
 			end
 			
 			local lolname=display.newText( ("Item Get!") ,0,0,"MoolBoran",90)
@@ -153,10 +155,12 @@ function ItemDrop(boost)
 			lolname2.y=(display.contentHeight/2)-50
 			gum:insert( lolname2 )
 			
-			local backbtn= widget.newButton{
+			local backbtn=  widget.newButton{
 				label="Accept",
+				font="MoolBoran",
+				fontSize=70,
+				labelYOffset=10,
 				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
 				width=200, height=55,
@@ -166,10 +170,12 @@ function ItemDrop(boost)
 			backbtn.y = (display.contentHeight/2)+30
 			gum:insert( backbtn )
 			
-			local bagbtn= widget.newButton{
+			local bagbtn=  widget.newButton{
 				label="Open Bag",
+				font="MoolBoran",
+				fontSize=70,
+				labelYOffset=10,
 				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
 				width=200, height=55,

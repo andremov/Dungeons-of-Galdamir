@@ -16,8 +16,10 @@ local didChange=false
 
 function LoadSounds()
 	if not (soundboard)then
-		Sound=1.0
-		Music=1.0
+	--	Sound=0.5
+	--	Music=0.5
+		Sound=0.0
+		Music=0.0
 		soundboard={}
 		musicboard={}
 		soundboard[1] = audio.loadSound		("sounds/gold.wav")

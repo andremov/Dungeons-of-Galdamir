@@ -1360,10 +1360,12 @@ function CAttackBtn()
 	end
 	
 	if not(AttackBtn)then
-		AttackBtn= widget.newButton{
+		AttackBtn=  widget.newButton{
 			label="Attack",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=35,
+			font="MoolBoran",
+			fontSize=70,
+			labelYOffset=10,
 			defaultFile="combataction.png",
 			overFile="combataction2.png",
 			width=342, height=86,
@@ -1853,10 +1855,12 @@ function CMagicBtn()
 		MagicBtn=nil
 	end
 	if not(MagicBtn)then
-		MagicBtn= widget.newButton{
+		MagicBtn=  widget.newButton{
 			label="Spellbook",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=35,
+			font="MoolBoran",
+			fontSize=70,
+			labelYOffset=10,
 			defaultFile="combataction.png",
 			overFile="combataction2.png",
 			width=342, height=86,
@@ -1875,10 +1879,12 @@ function CItemBtn()
 		ItemBtn=nil
 	end
 	if not(ItemBtn)then
-		ItemBtn= widget.newButton{
+		ItemBtn=  widget.newButton{
 			label="Inventory",
 			labelColor = { default={255,255,255}, over={0,0,0} },
-			fontSize=35,
+			font="MoolBoran",
+			fontSize=70,
+			labelYOffset=10,
 			defaultFile="combataction.png",
 			overFile="combataction2.png",
 			width=342, height=86,

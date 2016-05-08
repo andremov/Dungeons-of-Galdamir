@@ -12,7 +12,7 @@ local dexatt = graphics.newImageSheet( "enemy/dexatt.png",{ width=64, height=64,
 local mgcint = graphics.newImageSheet( "enemy/mgcint.png",{ width=90, height=80, numFrames=12 })
 local statussheet = graphics.newImageSheet( "status.png", { width=80, height=80, numFrames=8 })
 local timersheet = graphics.newImageSheet( "timer.png",{ width=100, height=100, numFrames=25})
-local psheet = graphics.newImageSheet( "player.png", { width=24, height=32, numFrames=24 } )
+local psheet = graphics.newImageSheet( "player.png", { width=24, height=32, numFrames=56 } )
 local hpsheet = graphics.newImageSheet("hp.png",{ width=200, height=30, numFrames=67 })
 local mpsheet = graphics.newImageSheet("mp.png",{ width=200, height=30, numFrames=67 })
 local epsheet = graphics.newImageSheet("ep.png",{ width=200, height=30, numFrames=67 })
@@ -46,17 +46,23 @@ local hits
 local gcm
 local gom
 local pseqs={
-		{name="stand1", start=1,  count=1, time=1000},
-		{name="stand2", start=2,  count=1, time=1000},
-		{name="stand3", start=3,  count=1, time=1000},
-		{name="stand4", start=4,  count=1, time=1000},
-		{name="walk1",  start=5,  count=4, time=1000},
-		{name="walk2",  start=9,  count=4, time=1000},
-		{name="walk3",  start=13, count=4, time=1000},
-		{name="walk4",  start=17, count=4, time=1000},
-		{name="stance",   start=21, count=2, time=1000},
-		{name="hit",   start=23, count=1, time=1000},
-		{name="hurt",   start=24, count=1, time=1000},
+		{name="stand1",		start=1,  count=1, time=1000},
+		{name="stand2",		start=2,  count=1, time=1000},
+		{name="stand3",		start=3,  count=1, time=1000},
+		{name="stand4",		start=4,  count=1, time=1000},
+		{name="walk1",		start=5,  count=4, time=500},
+		{name="walk2",		start=9,  count=4, time=500},
+		{name="walk3",		start=13, count=4, time=500},
+		{name="walk4",		start=17, count=4, time=500},
+		{name="stance",		start=21, count=4, time=1000},
+		{name="melee",		start=25, count=4, time=600,loopCount=1},
+		{name="magic",		start=29, count=4, time=600,loopCount=1},
+		{name="recover",	start=33, count=4, time=750},
+		{name="hurt",		start=37, count=4, time=750},
+		{name="heal1",		start=41, count=4, time=750},
+		{name="heal2",		start=45, count=4, time=750},
+		{name="heal3",		start=49, count=4, time=750},
+		{name="heal4",		start=53, count=4, time=750},
 	}
 
 function InTrouble()
@@ -121,7 +127,7 @@ function DisplayCombat()
 	bkgdark.y=display.contentCenterY
 	gcm:insert(bkgdark)
 	
-	local bkg=display.newImage("bkgs/bkg"..math.random(1,3)..".png",480,272)
+	local bkg=display.newImage("bkgs/bkg1.png",480,272)
 	bkg.xScale = 1.5
 	bkg.yScale = 1.5
 	bkg.x = display.contentCenterX
@@ -149,7 +155,6 @@ function DisplayCombat()
 	
 	--Sprites
 	P1Sprite(1)
-	MoveSprites()
 	
 	--Timers
 	timersprite=display.newSprite( timersheet, { name="timerid", start=1, count=25, loopCount=1, time=1000+(1500*p1.SPD)}  )
@@ -212,22 +217,10 @@ function CreateMobStats()
 		enemy.pnts=(4.5*enemy.lvl)
 		enemy.pnts=math.floor(enemy.pnts+1)
 		for i=1,enemy.pnts do
-			enemy.min=math.min(enemy.stats[1],enemy.stats[2],enemy.stats[3],enemy.stats[4],enemy.stats[5],enemy.stats[6])
-			local astats={}
-			for i=1,6 do
-				if enemy.stats[i]>enemy.min+5 then
-					astats[i]=0
-				else
-					astats[i]=1
-				end
-			end
+			local astats={1,2,3,3,4,5,5,6,6}
 			function DoneIt()
-				local statroll=math.random(1,6)
-				if astats[statroll]==1 then
-					enemy.stats[statroll]=enemy.stats[statroll]+1
-				else
-					DoneIt()
-				end
+				local statroll=math.random(1,table.maxn(astats))
+				enemy.stats[astats[statroll]]=enemy.stats[astats[statroll]]+1
 			end
 			DoneIt()
 		end
@@ -427,10 +420,12 @@ function ShowActions()
 		end
 		
 		if not(AttackBtn)then
-			AttackBtn= widget.newButton{
+			AttackBtn=  widget.newButton{
 				label="Melee Attack",
+				font="MoolBoran",
+				fontSize=70,
+				labelYOffset=10,
 				labelColor = { default={0,0,0}, over={255,255,255} },
-				fontSize=35,
 				defaultFile="combataction.png",
 				overFile="combataction2.png",
 				width=342, height=86,
@@ -448,10 +443,12 @@ function ShowActions()
 		end
 	
 		if not(MagicBtn)then
-			MagicBtn= widget.newButton{
+			MagicBtn=  widget.newButton{
 				label="Magic Attack",
+				font="MoolBoran",
+				fontSize=70,
+				labelYOffset=10,
 				labelColor = { default={0,0,0}, over={255,255,255} },
-				fontSize=35,
 				defaultFile="combataction.png",
 				overFile="combataction2.png",
 				width=342, height=86,
@@ -469,10 +466,12 @@ function ShowActions()
 		end
 		
 		if not(ItemBtn)then
-			ItemBtn= widget.newButton{
+			ItemBtn=  widget.newButton{
 				label="Inventory",
+				font="MoolBoran",
+				fontSize=70,
+				labelYOffset=10,
 				labelColor = { default={0,0,0}, over={255,255,255} },
-				fontSize=35,
 				defaultFile="combataction.png",
 				overFile="combataction2.png",
 				width=342, height=86,
@@ -490,10 +489,12 @@ function ShowActions()
 		end
 		
 		if not(SpellBtn)then
-			SpellBtn= widget.newButton{
+			SpellBtn=  widget.newButton{
 				label="Spellbook",
+				font="MoolBoran",
+				fontSize=70,
+				labelYOffset=10,
 				labelColor = { default={0,0,0}, over={255,255,255} },
-				fontSize=35,
 				defaultFile="combataction.png",
 				overFile="combataction2.png",
 				width=342, height=86,
@@ -511,10 +512,12 @@ function ShowActions()
 		end
 		
 		if not(RecoverBtn)then
-			RecoverBtn= widget.newButton{
+			RecoverBtn=  widget.newButton{
 				label="Recover",
+				font="MoolBoran",
+				fontSize=70,
+				labelYOffset=10,
 				labelColor = { default={0,0,0}, over={255,255,255} },
-				fontSize=35,
 				defaultFile="combataction.png",
 				overFile="combataction2.png",
 				width=342, height=86,
@@ -532,10 +535,12 @@ function ShowActions()
 		end
 		
 		if not(BackBtn)then
-			BackBtn= widget.newButton{
+			BackBtn=  widget.newButton{
 				label="Retreat",
+				font="MoolBoran",
+				fontSize=70,
+				labelYOffset=10,
 				labelColor = { default={0,0,0}, over={255,255,255} },
-				fontSize=35,
 				defaultFile="combataction.png",
 				overFile="combataction2.png",
 				width=342, height=86,
@@ -586,64 +591,6 @@ function ShowActions()
 	timersprite:toFront()
 end
 
-function MoveSprites()
-	if inCombat==true then
-		if movcd==nil then
-			movcd=0
-		end
-		--Enemy
-		if (esprite.y==70) then
-			esprite.y=esprite.y+1
-		elseif (esprite.y==180) then
-			esprite.y=esprite.y-1
-		elseif movcd==0 then
-			if psprite.y+10>esprite.y and psprite.y-10<esprite.y then
-				movcd=math.random(100,350)
-				movetar=math.random(71,179)
-				movptar=math.random(71,179)
-			elseif psprite.y>esprite.y then
-				esprite.y=esprite.y+1
-			elseif psprite.y<esprite.y then
-				esprite.y=esprite.y-1
-			end
-		else
-			if esprite.y>movetar then
-				esprite.y=esprite.y-1
-			elseif esprite.y<movetar then
-				esprite.y=esprite.y+1
-			end
-		end
-		
-		--Player
-		if (psprite.y==70) then
-			psprite.y=psprite.y+1
-		elseif (psprite.y==180) then
-			psprite.y=psprite.y-1
-		elseif movcd==0 then
-			if psprite.y+10>esprite.y and psprite.y-10<esprite.y then
-				movcd=math.random(20,50)
-				movetar=math.random(71,179)
-				movptar=math.random(71,179)
-			elseif psprite.y<esprite.y then
-				psprite.y=psprite.y+1
-			elseif psprite.y>esprite.y then
-				psprite.y=psprite.y-1
-			end
-		else
-			movcd=movcd-1
-			if psprite.y>movptar then
-				psprite.y=psprite.y-1
-			elseif psprite.y<movptar then
-				psprite.y=psprite.y+1
-			end
-		end
-		if (block) then
-			block.y=psprite.y+(256/5)
-		end
-		movtimer=timer.performWithDelay(20,MoveSprites)
-	end
-end
-
 function MobSprite(value)
 	if inCombat==true then
 		if (value)==(1) then--Create
@@ -657,7 +604,7 @@ function MobSprite(value)
 				esprite=display.newSprite( stadef, eseqs  )
 				esprite:setSequence( "walk" )
 				esprite.x=(display.contentWidth/2)+50
-				esprite.y=170
+				esprite.y=230
 				esprite.xScale=2.0
 				esprite.yScale=esprite.xScale
 				esprite:play()
@@ -672,7 +619,7 @@ function MobSprite(value)
 				esprite=display.newSprite( dexatt, eseqs  )
 				esprite:setSequence( "walk" )
 				esprite.x=(display.contentWidth/2)+50
-				esprite.y=170
+				esprite.y=230
 				esprite.xScale=2.5
 				esprite.yScale=esprite.xScale
 				esprite:play()
@@ -687,7 +634,7 @@ function MobSprite(value)
 				esprite=display.newSprite( mgcint, eseqs  )
 				esprite:setSequence( "walk" )
 				esprite.x=(display.contentWidth/2)+50
-				esprite.y=170
+				esprite.y=230
 				esprite.xScale=2.0
 				esprite.yScale=esprite.xScale
 				esprite:play()
@@ -721,14 +668,14 @@ function P1Sprite(value)
 			psprite=display.newSprite( psheet, pseqs  )
 			psprite:setSequence( "stance" )
 			psprite.x=(display.contentWidth/2)-50
-			psprite.y=170
+			psprite.y=230
 			psprite.xScale=3.0
 			psprite.yScale=psprite.xScale
 			psprite:play()
 			gcm:insert(psprite)
 		end
 		if (value)==(2) then--Change to Hit
-			psprite:setSequence( "hit" )
+			psprite:setSequence( "melee" )
 			psprite:play()
 		end
 		if (value)==(3) then--Change to Hurt
@@ -737,7 +684,12 @@ function P1Sprite(value)
 		end
 		if (value)==(4) then--Set to Casting
 			audio.Play(11)
-			psprite:setSequence( "hit" )
+			psprite:setSequence( "magic" )
+			psprite:play()
+		end
+		if (value)==(5) then--Set to Recover
+			audio.Play(5)
+			psprite:setSequence( "recover" )
 			psprite:play()
 		end
 		if (value~=1)and(value~=2)and(value~=3)and(value~=4) then--Go Default
@@ -789,7 +741,7 @@ function Recover()
 		p1.MP=p1.MaxMP
 	end
 	
-	P1Sprite(3)
+	P1Sprite(5)
 	p1.stats[3]=p1.stats[3]*0.75
 	isRecover=true
 	if Automatic==3 and p1.MP==p1.MaxMP and p1.EP==p1.MaxEP  then
@@ -1366,9 +1318,11 @@ function EndCombat(outcome)
 		Runtime:addEventListener("enterFrame", players.ShowStats)
 		--------------------------------------------
 		if outcome=="Loss" then
-			for i=gom.numChildren,1,-1 do
-				local child = gom[i]
-				child.parent:remove( child )
+			if (gom) then
+				for i=gom.numChildren,1,-1 do
+					local child = gom[i]
+					child.parent:remove( child )
+				end
 			end
 		--------------------------------------------
 		elseif (outcome)=="Win" then
@@ -1380,10 +1334,12 @@ function EndCombat(outcome)
 			OMenu.x,OMenu.y = display.contentWidth*0.5, 450
 			gom:insert(OMenu)
 			
-			local OKBtn= widget.newButton{
+			local OKBtn=  widget.newButton{
 				label="Okay",
 				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
+				font="MoolBoran",
+				fontSize=70,
+				labelYOffset=10,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
 				width=290, height=80,
@@ -1480,10 +1436,12 @@ function EndCombat(outcome)
 				end
 			end
 			
-			local OKBtn= widget.newButton{
+			local OKBtn=  widget.newButton{
 				label="Okay",
 				labelColor = { default={255,255,255}, over={0,0,0} },
-				fontSize=30,
+				font="MoolBoran",
+				fontSize=70,
+				labelYOffset=10,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
 				width=290, height=80,
@@ -1761,10 +1719,12 @@ function ShowBag()
 		display.remove(BackBtn)
 		BackBtn=nil
 		
-		BackBtn=widget.newButton{
+		BackBtn= widget.newButton{
 			label="Close",
 			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=70,
+			labelYOffset=10,
 			defaultFile="combataction.png",
 			overFile="combataction2.png",
 			width=342, height=86,
@@ -1914,10 +1874,12 @@ function ShowSorcery()
 		display.remove(BackBtn)
 		BackBtn=nil
 		
-		BackBtn=widget.newButton{
+		BackBtn= widget.newButton{
 			label="Close",
 			labelColor = { default={0,0,0}, over={255,255,255} },
-			fontSize=30,
+			font="MoolBoran",
+			fontSize=70,
+			labelYOffset=10,
 			defaultFile="combataction.png",
 			overFile="combataction2.png",
 			width=342, height=86,
@@ -2152,7 +2114,7 @@ function DamageCalc(tar,crit,cmd,atkstat)
 	local Damage
 	if tar=="p1" then
 		Damage=(
-			((enemy.stats[atkstat]*(math.random(15,20)/10))-p1.stats[3])
+			(((enemy.stats[atkstat]+enemy.stats[6]-2)*(math.random(15,20)/10))-p1.stats[3])
 		)
 		Damage=(
 			((Damage*cmd/16)*crit)
@@ -2176,7 +2138,7 @@ function EvadeCalc(tar,cmd)
 	local Chance
 	if tar=="p1" then
 		Chance=(
-			((enemy.stats[5]*1.5)-p1.stats[5])
+			(((enemy.stats[5]+enemy.stats[6]-2)*1.5)-p1.stats[5])
 		)
 		Chance=(
 			(Chance*cmd/16)
