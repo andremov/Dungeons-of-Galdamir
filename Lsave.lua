@@ -546,29 +546,34 @@ function Load:getMap(mapx,mapy)
 		
 		if found==true then
 			local parsed={}
-			local mapinfo=Save["DATA"].maps[counter]
-			mapinfo=string.sub(mapinfo,7)
+			local mapinfo=string.sub(Save["DATA"].maps[counter],7)
 			for i=1,#mapinfo/6 do
 				local stringpos=(i*6)
 				parsed[i]=string.sub(mapinfo,stringpos-5, stringpos)
 			end
 			mapinfo=nil
-			local parseagain={}
-			local count=0
 			for i=1,table.maxn(parsed) do
 				parsed[i]=BaseToDecimal(62,parsed[i])
 				parsed[i]=DecimalToBase(5,parsed[i])
 				for j=#parsed[i],13 do
 					parsed[i]="0"..parsed[i]
 				end
+				local estacol={}
 				for j=1,#parsed[i] do
-					count=count+1
-					parseagain[count]=tonumber(string.sub(parsed[i],j, j))
+					estacol[j]=tonumber(string.sub(parsed[i],j, j))
 				end
-				
+				parsed[i]=estacol
 			end
 			
-			return parseagain
+			for i=1,table.maxn(parsed) do
+				for j=i,table.maxn(parsed[i]) do
+					local temp=parsed[i][j]
+					parsed[i][j]=parsed[j][i]
+					parsed[j][i]=temp
+				end
+			end
+		
+			return parsed
 		end
 	end
 	return nil

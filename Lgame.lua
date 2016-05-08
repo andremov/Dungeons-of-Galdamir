@@ -102,7 +102,7 @@ function Initial:Continue()
 	view:add(p1,35,true)
 	view:setBounds(false)
 	view:track()
-	Initial:firstSave()
+	-- Initial:firstSave()
 	-- HandleEnemies:start()
 	-- Runtime:addEventListener("enterFrame",HandleEnemies.removeCheck)
 	-- Runtime:addEventListener("enterFrame",HandleEnemies.enemyHits)
@@ -134,7 +134,7 @@ HandleMaps={}
 function HandleMaps:findSpot()
 	local spot=1
 	local found=false
-	while spot<=1 and found==false do
+	while spot<=4 and found==false do
 		if displayedMaps[spot]==nil then
 			found=true
 		else

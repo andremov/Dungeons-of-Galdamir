@@ -151,8 +151,8 @@ function Create:Walls()
 			Map["MAP"][i].class="CORNER"
 			Map["MAP"][i].wall=true
 			if ( Create["loadinfo"] ) then
-				Map["MAP"][i].open=( Create["loadinfo"][i]==0 )
-				Map["PLAIN"][plainrow][plaincol]=Create["loadinfo"][i]
+				Map["MAP"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
+				Map["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
 			else
 				Map["PLAIN"][plainrow][plaincol]=1
 				Map["MAP"][i].open=false
@@ -161,8 +161,8 @@ function Create:Walls()
 			Map["MAP"][i].class="WALLX"
 			Map["MAP"][i].wall=true
 			if ( Create["loadinfo"] ) then
-				Map["MAP"][i].open=( Create["loadinfo"][i]==0 )
-				Map["PLAIN"][plainrow][plaincol]=Create["loadinfo"][i]
+				Map["MAP"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
+				Map["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
 			else
 				Map["MAP"][i].open=math.random(0,1)
 				Map["PLAIN"][plainrow][plaincol]=Map["MAP"][i].open
@@ -172,8 +172,8 @@ function Create:Walls()
 			Map["MAP"][i].class="WALLY"
 			Map["MAP"][i].wall=true
 			if ( Create["loadinfo"] ) then
-				Map["MAP"][i].open=( Create["loadinfo"][i]==0 )
-				Map["PLAIN"][plainrow][plaincol]=Create["loadinfo"][i]
+				Map["MAP"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
+				Map["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
 			else
 				Map["MAP"][i].open=math.random(0,1)
 				Map["PLAIN"][plainrow][plaincol]=Map["MAP"][i].open
@@ -183,8 +183,8 @@ function Create:Walls()
 			Map["MAP"][i].class="TILE"
 			Map["MAP"][i].wall=false
 			if ( Create["loadinfo"] ) then
-				Map["MAP"][i].open=( Create["loadinfo"][i]==0 )
-				Map["PLAIN"][plainrow][plaincol]=Create["loadinfo"][i]
+				Map["MAP"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
+				Map["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
 			else
 				Map["MAP"][i].open=true
 				Map["PLAIN"][plainrow][plaincol]=0
@@ -485,10 +485,10 @@ end
 function Create:Progress()
 	local game=require("Lgame")
 	local funcs={
-		Create.sheet,Create.Template,Create.Walls,Create.Pathfinding,Create.Visualize--,Create.Join,
+		Create.sheet,Create.Template,Create.Walls,Create.Pathfinding,Create.Visualize
 	}
 	local funcnames={
-		"Sheet","Template","Walls","Pathfinding","Visualize"--,"Join",
+		"Sheet","Template","Walls","Pathfinding","Visualize"
 	}
 	if not (Create.progress) then
 		Create.progress=0
@@ -500,9 +500,6 @@ function Create:Progress()
 	if Create.progress>table.maxn(funcs) then
 		-- print "Done."
 		
-			-- local str
-			-- str=""
-			-- Map["MAP"].open
 		Create.progress=0
 		game.HandleMaps:getMap(Map)
 	else
