@@ -85,18 +85,18 @@ function CreatePlayer(name)
 	if not(player) then
 		local physics = require "physics"
 		local names={
-				-- "Nameless",
-				-- "Orphan",
-				-- "Smith",
-				-- "Slave",
-				-- "Hctib",
-				"Barry"
-			}
+			-- "Nameless",
+			-- "Orphan",
+			-- "Smith",
+			-- "Slave",
+			-- "Hctib",
+			"Barry"
+		}
 		
 		-- Essentials
 		player=display.newGroup()
 		player.x, player.y = display.contentWidth/2, display.contentHeight/2
-		-- player.name="TEST NAME FOR TESTING"
+		player.name="TEST NAME FOR TESTING"
 		
 		-- Map Essentials
 		player["MAPX"]=0
@@ -399,6 +399,8 @@ function CreatePlayer(name)
 		local shade={ -51,-8, 51,-8, 51,8, -51,8}
 		physics.addBody(player["shadow"],"dynamic",{shape=shade,filter={categoryBits=2,maskBits=7}})
 		player["shadow"].isFixedRotation=true
+		player["shadow"].parent=player
+		player["shadow"].name="shadow"
 		player:insert(player["shadow"])
 		
 		player["HitBox"]=display.newRect(0,-75,90,150)
@@ -408,7 +410,7 @@ function CreatePlayer(name)
 		-- Trackables
 		player["GOLD"]=0
 		player["EQUIPMENT"]={  }
-		player["INVENTORY"]={ { ID=1,AMOUNT=10},{ ID=33,AMOUNT=1},{ ID=41,AMOUNT=1},}--{33,1},{41,1} }
+		player["INVENTORY"]={ { ID=1,AMOUNT=10},{ ID=33,AMOUNT=1},{ ID=41,AMOUNT=1},}
 		player["INVENTORY"]["SLOTS"]=12
 		-- player.weapon="unarmed"
 		-- player.keys=0

@@ -99,14 +99,12 @@ function Initial:Continue()
 	
 	ui.Essentials()
 	ui.Controls:show()
+	-- view:add(p1.shadow,35,true)
 	view:add(p1,35,true)
 	view:setBounds(false)
 	view:track()
-	-- Initial:firstSave()
 	-- HandleEnemies:start()
-	-- Runtime:addEventListener("enterFrame",HandleEnemies.removeCheck)
-	-- Runtime:addEventListener("enterFrame",HandleEnemies.enemyHits)
-	-- Runtime:addEventListener("enterFrame",HandleEnemies.coordsCheck)
+	-- Initial:firstSave()
 	Runtime:addEventListener("enterFrame",HandleEnemies.frameChecks)
 	Controls:Move(0,0)
 end
@@ -588,7 +586,6 @@ function HandleEnemies:findSpot()
 end
 
 function HandleEnemies:spawn()
-	local enemy=require("Lenemy")
 	local result=HandleEnemies:findSpot()
 	if (result) then
 		local angle=math.random(0,359)
@@ -599,7 +596,9 @@ function HandleEnemies:spawn()
 		local y=radius*( math.sin(angle) )
 		x=x+p1.x
 		y=y+p1.y
+		local enemy=require('Lenemy')
 		spawnedEnemies[result]=enemy.Spawn(x,y)
+		view:add(spawnedEnemies[result].shadow,36,false)
 		view:add(spawnedEnemies[result],36,false)
 	end
 end
@@ -837,6 +836,8 @@ function Controls:Move(px,py)
 		local cruisecontrol=40
 		p1["shadow"].x=p1["shadow"].x+(px*p1["STATS"]["Speed"]/cruisecontrol)
 		p1["shadow"].y=p1["shadow"].y+(py*p1["STATS"]["Speed"]/cruisecontrol)
+		-- p1.x=p1.x+(px*p1["STATS"]["Speed"]/cruisecontrol)
+		-- p1.y=p1.y+(py*p1["STATS"]["Speed"]/cruisecontrol)
 		
 		HandleMaps:movementEvents()
 		
