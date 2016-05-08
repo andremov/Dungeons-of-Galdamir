@@ -16,10 +16,8 @@ local didChange=false
 
 function LoadSounds()
 	if not (soundboard)then
-	--	Sound=0.5
-	--	Music=0.5
-		Sound=0.0
-		Music=0.0
+		Sound=0.5
+		Music=0.5
 		soundboard={}
 		musicboard={}
 		soundboard[1] = audio.loadSound		("sounds/gold.wav")
@@ -133,7 +131,11 @@ function RepeatBkg()
 		didChange=false
 		timer.performWithDelay(3000,PlayMusic)
 	else
-		timer.performWithDelay(10000,PlayMusic)
+		if curMusic==3 then
+			PlayMusic()
+		else
+			timer.performWithDelay(10000,PlayMusic)
+		end
 	end
 end
 

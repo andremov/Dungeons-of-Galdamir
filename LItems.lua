@@ -103,7 +103,7 @@ function ItemDrop(boost)
 			local backbtn=  widget.newButton{
 				label="Accept",
 				font="MoolBoran",
-				fontSize=70,
+				fontSize=50,
 				labelYOffset=10,
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				defaultFile="cbutton.png",
@@ -158,7 +158,7 @@ function ItemDrop(boost)
 			local backbtn=  widget.newButton{
 				label="Accept",
 				font="MoolBoran",
-				fontSize=70,
+				fontSize=50,
 				labelYOffset=10,
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				defaultFile="cbutton.png",
@@ -173,7 +173,7 @@ function ItemDrop(boost)
 			local bagbtn=  widget.newButton{
 				label="Open Bag",
 				font="MoolBoran",
-				fontSize=70,
+				fontSize=50,
 				labelYOffset=10,
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				defaultFile="cbutton.png",

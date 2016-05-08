@@ -91,7 +91,7 @@ function CharMenu()
 	BackBtn =  widget.newButton{
 		label="Back",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",

@@ -423,7 +423,7 @@ function ShowActions()
 			AttackBtn=  widget.newButton{
 				label="Melee Attack",
 				font="MoolBoran",
-				fontSize=70,
+				fontSize=50,
 				labelYOffset=10,
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				defaultFile="combataction.png",
@@ -446,7 +446,7 @@ function ShowActions()
 			MagicBtn=  widget.newButton{
 				label="Magic Attack",
 				font="MoolBoran",
-				fontSize=70,
+				fontSize=50,
 				labelYOffset=10,
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				defaultFile="combataction.png",
@@ -469,7 +469,7 @@ function ShowActions()
 			ItemBtn=  widget.newButton{
 				label="Inventory",
 				font="MoolBoran",
-				fontSize=70,
+				fontSize=50,
 				labelYOffset=10,
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				defaultFile="combataction.png",
@@ -492,7 +492,7 @@ function ShowActions()
 			SpellBtn=  widget.newButton{
 				label="Spellbook",
 				font="MoolBoran",
-				fontSize=70,
+				fontSize=50,
 				labelYOffset=10,
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				defaultFile="combataction.png",
@@ -515,7 +515,7 @@ function ShowActions()
 			RecoverBtn=  widget.newButton{
 				label="Recover",
 				font="MoolBoran",
-				fontSize=70,
+				fontSize=50,
 				labelYOffset=10,
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				defaultFile="combataction.png",
@@ -538,7 +538,7 @@ function ShowActions()
 			BackBtn=  widget.newButton{
 				label="Retreat",
 				font="MoolBoran",
-				fontSize=70,
+				fontSize=50,
 				labelYOffset=10,
 				labelColor = { default={0,0,0}, over={255,255,255} },
 				defaultFile="combataction.png",
@@ -729,16 +729,25 @@ function Recover()
 		p1.EP=p1.EP+grant
 		epHits(grant)
 	end
+	if p1.EP>p1.MaxEP then
+		p1.EP=p1.MaxEP
+	end
 	if p1.MP~=p1.MaxMP then
 		local grant=(math.ceil((p1.stats[1])/1.5))
 		p1.MP=p1.MP+grant
 		mpHits(grant)
 	end
-	if p1.EP>p1.MaxEP then
-		p1.EP=p1.MaxEP
-	end
 	if p1.MP>p1.MaxMP then
 		p1.MP=p1.MaxMP
+	end
+	local hAttempt=(math.random(1,10))
+	if hAttempt>=9 and p1.HP~=p1.MaxHP then
+		local grant=(math.ceil((p1.stats[1])/1.5))
+		p1.HP=p1.HP+grant
+		hpHits(grant,false,true)
+	end
+	if p1.HP>p1.MaxHP then
+		p1.HP=p1.MaxHP
 	end
 	
 	P1Sprite(5)
@@ -1260,16 +1269,25 @@ function EndTurn()
 				p1.EP=p1.EP+grant
 				epHits(grant)
 			end
+			if p1.EP>p1.MaxEP then
+				p1.EP=p1.MaxEP
+			end
 			if p1.MP~=p1.MaxMP then
 				local grant=(math.ceil((p1.stats[1])/2.5))
 				p1.MP=p1.MP+grant
 				mpHits(grant)
 			end
-			if p1.EP>p1.MaxEP then
-				p1.EP=p1.MaxEP
-			end
 			if p1.MP>p1.MaxMP then
 				p1.MP=p1.MaxMP
+			end
+			local hAttempt=(math.random(1,10))
+			if hAttempt>=9 and p1.HP~=p1.MaxHP then
+				local grant=(math.ceil((p1.stats[1])/1.5))
+				p1.HP=p1.HP+grant
+				hpHits(grant,false,true)
+			end
+			if p1.HP>p1.MaxHP then
+				p1.HP=p1.MaxHP
 			end
 			UpdateStats(true)
 		end
@@ -1338,7 +1356,7 @@ function EndCombat(outcome)
 				label="Okay",
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				font="MoolBoran",
-				fontSize=70,
+				fontSize=50,
 				labelYOffset=10,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
@@ -1440,7 +1458,7 @@ function EndCombat(outcome)
 				label="Okay",
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				font="MoolBoran",
-				fontSize=70,
+				fontSize=50,
 				labelYOffset=10,
 				defaultFile="cbutton.png",
 				overFile="cbutton-over.png",
@@ -1558,15 +1576,15 @@ function hpHits(amount,crit,special)
 	if special==true then
 		-- Heal
 		hits[hpos]=display.newText( ("+"..amount), 0, 0, "MoolBoran", size )
-		hits[hpos]:setTextColor( 0, 100, 0)
+		hits[hpos]:setTextColor( 100, 0, 0)
 	elseif special=="BRN" then
 		-- BRN over time
 		hits[hpos]=display.newText( ("-"..amount), 0, 0, "MoolBoran", size )
-		hits[hpos]:setTextColor( 100, 0, 0)
+		hits[hpos]:setTextColor( 180, 0, 0)
 	elseif special=="BLD" then
 		-- BLD over time
 		hits[hpos]=display.newText( ("-"..amount), 0, 0, "MoolBoran", size )
-		hits[hpos]:setTextColor( 100, 0, 0)
+		hits[hpos]:setTextColor( 180, 0, 0)
 	elseif special=="PSN" then
 		-- PSN over time
 		hits[hpos]=display.newText( ("-"..amount), 0, 0, "MoolBoran", size )
@@ -1723,7 +1741,7 @@ function ShowBag()
 			label="Close",
 			labelColor = { default={0,0,0}, over={255,255,255} },
 			font="MoolBoran",
-			fontSize=70,
+			fontSize=50,
 			labelYOffset=10,
 			defaultFile="combataction.png",
 			overFile="combataction2.png",
@@ -1878,7 +1896,7 @@ function ShowSorcery()
 			label="Close",
 			labelColor = { default={0,0,0}, over={255,255,255} },
 			font="MoolBoran",
-			fontSize=70,
+			fontSize=50,
 			labelYOffset=10,
 			defaultFile="combataction.png",
 			overFile="combataction2.png",

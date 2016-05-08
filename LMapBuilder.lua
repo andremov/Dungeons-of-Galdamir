@@ -1340,6 +1340,41 @@ function DisplayTile()
 			Destructibles[curroom][count].xScale=scale
 			Destructibles[curroom][count].yScale=Destructibles[curroom][count].xScale
 			Level:insert( Destructibles[curroom][count] )
+			
+			local size=mapsize
+			local col=(math.floor(count%(math.sqrt(size))))
+			local row=(math.floor(count/(math.sqrt(size))))+1
+			local zonas=math.ceil((math.sqrt(size))/10)
+			local round=WD.Circle()
+			if round%2==0 then
+				for z=1, zonas do
+					if col>((math.sqrt(size)/zonas)*(zonas-z)) and col<=((math.sqrt(size)/zonas)*((zonas+1)-z)) and row>=((math.sqrt(size)/zonas)*(zonas-z)) then
+						Destructibles[curroom][count].req=(z+(zonas*(round-1)))
+					elseif row>((math.sqrt(size)/zonas)*(zonas-z)) and row<=((math.sqrt(size)/zonas)*((zonas+1)-z)) and col>=((math.sqrt(size)/zonas)*((zonas+1)-z)) then
+						Destructibles[curroom][count].req=(z+(zonas*(round-1)))
+					end
+				end
+			else
+				for z=1, zonas do
+					if col>((math.sqrt(size)/zonas)*(z-1)) and col<=((math.sqrt(size)/zonas)*z) and row<=((math.sqrt(size)/zonas)*z) then
+						Destructibles[curroom][count].req=(z+(zonas*(round-1)))
+					elseif row>((math.sqrt(size)/zonas)*(z-1)) and row<=((math.sqrt(size)/zonas)*z) and col<=((math.sqrt(size)/zonas)*z) then
+						Destructibles[curroom][count].req=(z+(zonas*(round-1)))
+					end
+				end
+			end
+			if curroom~=1 then
+				local roomx=math.floor((curroom-1)%5)
+				local roomy=math.floor((curroom-1)/5)
+				local maxroom
+				if roomx>roomy then
+					maxroom=roomx
+				else
+					maxroom=roomy
+				end
+				Destructibles[curroom][count].req=Destructibles[curroom][count].req+(zonas*maxroom)
+			end
+			Destructibles[curroom][count].req=Destructibles[curroom][count].req+(math.random(-3,3))
 		end
 		
 		if(room[curroom][count]=="s")then

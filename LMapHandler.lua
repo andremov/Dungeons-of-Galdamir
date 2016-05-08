@@ -13,7 +13,6 @@ local b=require("Lmapbuilder")
 local m = require("Lmenu")
 local currentmap
 local Round
-local HowRed=0
 local mapsT={}
 local mapsS={}
 local mapsM={}
@@ -155,7 +154,7 @@ function MapSizeMenu()
 	local TinyBtn =  widget.newButton{
 		label="Tiny Map",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",
@@ -171,7 +170,7 @@ function MapSizeMenu()
 	local SmallBtn =  widget.newButton{
 		label="Small Map",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",
@@ -187,7 +186,7 @@ function MapSizeMenu()
 	local MedBtn =  widget.newButton{
 		label="Medium Map",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",
@@ -203,7 +202,7 @@ function MapSizeMenu()
 	local LargeBtn =  widget.newButton{
 		label="Large Map",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",
@@ -219,7 +218,7 @@ function MapSizeMenu()
 	local DefaultTS =  widget.newButton{
 		label="Default Tileset",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",
@@ -235,7 +234,7 @@ function MapSizeMenu()
 	local NotebookTS =  widget.newButton{
 		label="Notebook Tileset",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",
@@ -251,7 +250,7 @@ function MapSizeMenu()
 	local SimpleTS =  widget.newButton{
 		label="Simple Tileset",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",
@@ -268,7 +267,7 @@ function MapSizeMenu()
 	local BWTS =  widget.newButton{
 		label="Black & White Tileset",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",
@@ -291,7 +290,7 @@ function MapSizeMenu()
 	local BackBtn =  widget.newButton{
 		label="Back",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",

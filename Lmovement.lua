@@ -302,39 +302,79 @@ function ShowArrows()
 		end
 		
 		if CanMoveUp==true then
-			mup=display.newImageRect("moveu.png",80,80)
-			mup.x=xinicial
-			mup.y=yinicial-espacio
-			mup.xScale=scale
-			mup.yScale=mup.xScale
-			mup:toFront()
+			local check=coll.RockCheck(p1.loc-size)
+			if check==2 then
+				mup=display.newImageRect("interact9.png",80,80)
+				mup.x=xinicial
+				mup.y=yinicial-espacio
+				mup.xScale=scale
+				mup.yScale=mup.xScale
+				mup:toFront()
+			elseif check==0 then
+				mup=display.newImageRect("moveu.png",80,80)
+				mup.x=xinicial
+				mup.y=yinicial-espacio
+				mup.xScale=scale
+				mup.yScale=mup.xScale
+				mup:toFront()
+			end
 		end
 
 		if CanMoveDown==true then
-			mdown=display.newImageRect("moved.png",80,80)
-			mdown.x=xinicial
-			mdown.y=yinicial+espacio
-			mdown.xScale=scale
-			mdown.yScale=mdown.xScale
-			mdown:toFront()
+			local check=coll.RockCheck(p1.loc+size)
+			if check==2 then
+				mdown=display.newImageRect("interact9.png",80,80)
+				mdown.x=xinicial
+				mdown.y=yinicial+espacio
+				mdown.xScale=scale
+				mdown.yScale=mdown.xScale
+				mdown:toFront()
+			elseif check==0 then
+				mdown=display.newImageRect("moved.png",80,80)
+				mdown.x=xinicial
+				mdown.y=yinicial+espacio
+				mdown.xScale=scale
+				mdown.yScale=mdown.xScale
+				mdown:toFront()
+			end
 		end
 		
 		if CanMoveLeft==true then
-			mleft=display.newImageRect("movel.png",80,80)
-			mleft.x=xinicial-espacio
-			mleft.y=yinicial
-			mleft.xScale=scale
-			mleft.yScale=mleft.xScale
-			mleft:toFront()
+			local check=coll.RockCheck(p1.loc-1)
+			if check==2 then
+				mleft=display.newImageRect("interact9.png",80,80)
+				mleft.x=xinicial-espacio
+				mleft.y=yinicial
+				mleft.xScale=scale
+				mleft.yScale=mleft.xScale
+				mleft:toFront()
+			elseif check==0 then
+				mleft=display.newImageRect("movel.png",80,80)
+				mleft.x=xinicial-espacio
+				mleft.y=yinicial
+				mleft.xScale=scale
+				mleft.yScale=mleft.xScale
+				mleft:toFront()
+			end
 		end
 		
 		if CanMoveRight==true then
-			mright=display.newImageRect("mover.png",80,80)
-			mright.x=xinicial+espacio
-			mright.y=yinicial
-			mright.xScale=scale
-			mright.yScale=mright.xScale
-			mright:toFront()
+			local check=coll.RockCheck(p1.loc+1)
+			if check==2 then
+				mright=display.newImageRect("interact9.png",80,80)
+				mright.x=xinicial+espacio
+				mright.y=yinicial
+				mright.xScale=scale
+				mright.yScale=mright.xScale
+				mright:toFront()
+			elseif check==0 then
+				mright=display.newImageRect("mover.png",80,80)
+				mright.x=xinicial+espacio
+				mright.y=yinicial
+				mright.xScale=scale
+				mright.yScale=mright.xScale
+				mright:toFront()
+			end
 		end
 	end
 end

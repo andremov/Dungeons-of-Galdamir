@@ -36,7 +36,7 @@ function DisplayOptions()
 	BackBtn =  widget.newButton{
 		label="Back",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",
@@ -52,7 +52,7 @@ function DisplayOptions()
 	Char =  widget.newButton{
 		label="Character",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",
@@ -68,7 +68,7 @@ function DisplayOptions()
 	Map =  widget.newButton{
 		label="Map",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",
@@ -84,7 +84,7 @@ function DisplayOptions()
 	ScreBtn =  widget.newButton{
 		label="High Scores",
 		font="MoolBoran",
-		fontSize=70,
+		fontSize=50,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
 		defaultFile="cbutton.png",
@@ -93,8 +93,8 @@ function DisplayOptions()
 		onRelease = onScreBtnRelease
 	}
 	ScreBtn:setReferencePoint( display.CenterReferencePoint )
-	ScreBtn.x = display.contentCenterX
-	ScreBtn.y = Map.y-100
+	ScreBtn.x = display.contentWidth*0.25
+	ScreBtn.y = display.contentHeight*0.5+210
 	optionz:insert(ScreBtn)
 	
 	scroll=display.newImageRect("scroll.png",600,50)
