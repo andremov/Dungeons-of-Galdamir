@@ -72,7 +72,7 @@ S["EN"]={
 }
 
 S["ES"]={
-	"Ahora en Español!",
+	"Ahora en Espanol!",
 	"Mapas Aleatorios!",
 	"Ahora Disponible al Publico!",
 	"Finalmente!",
@@ -158,16 +158,16 @@ T["ES"]={
 	{"Gasta tus puntos de estadisticas","sabiamente!"},
 	{"La destreza incrementa la probabilidad","de pegarle a un enemigo."},
 	{"El aguante incrementa tu vida."},
-	{"La magia incrementa el daño que tus","ataques magicos causan."},
-	{"El ataque incrementa el daño que tus","ataques fisicos causan."},
+	{"La magia incrementa el dano que tus","ataques magicos causan."},
+	{"El ataque incrementa el dano que tus","ataques fisicos causan."},
 	{"La defensa reduce el dano que","recibes."},
 	{"El intelecto incrementa tu mana y","energia."},
 	{"El aspecto y clase de un enemigo depende","de su estadistica mas alta."},
-	{"Atacar con baja energia o baja mana","puede reducir el daño que causas."},
+	{"Atacar con baja energia o baja mana","puede reducir el dano que causas."},
 	{"Estas tips son aleatorias."},
 	{"El agua te retarda, permitiendo a","enemigos a moverse mas rapido."},
 	{"Manten pociones de vida a la mano."},
-	{"La hechiceria causa mas daño que ataques","regulares, pero requiere ambos recursos."},
+	{"La hechiceria causa mas dano que ataques","regulares, pero requiere ambos recursos."},
 	{"En el menu de pausa puedes ver las","caractericas de tu piso actual."},
 	{"Algo acecha en la niebla."},
 	{"Evita moverte cerca a un creador de","enemigos."},
@@ -198,14 +198,14 @@ function GetTip()
 	Tip=T[lang][chooser]
 	local TGroup=display.newGroup()
 	
-	Tiptxt = display.newEmbossedText(("Tip: "..Tip[lang][1]),0,0,"MoolBoran", 50 )
+	Tiptxt = display.newEmbossedText(("Tip: "..Tip[1]),0,0,"MoolBoran", 50 )
 	Tiptxt.x=display.contentCenterX
 	Tiptxt.y=100
 	Tiptxt:setTextColor( 200, 200, 200)
 	Tiptxt:toFront()
 	TGroup:insert( Tiptxt )
 	if (Tip[2]) then
-		Tiptxt2 = display.newEmbossedText((Tip[lang][2]),0,0,"MoolBoran", 50 )
+		Tiptxt2 = display.newEmbossedText((Tip[2]),0,0,"MoolBoran", 50 )
 		Tiptxt2.x=display.contentCenterX
 		Tiptxt2.y=Tiptxt.y+60
 		Tiptxt2:setTextColor( 200, 200, 200)

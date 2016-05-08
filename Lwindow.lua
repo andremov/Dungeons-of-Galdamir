@@ -10,6 +10,7 @@ local item=require("Litems")
 local mov=require("Lmoves")
 local b=require("Lbuilder")
 local p=require("Lplayers")
+local lc=require("Llocale")
 local sc=require("Lscore")
 local s=require("Lsaving")
 local c=require("Lcombat")
@@ -28,7 +29,8 @@ local gbk
 local gdm
 local gum
 local swg
-local DeathMessages={
+local DeathMessages={}
+DeathMessages["EN"]={
 	-- Lava
 	{
 		"Roasted by lava.",
@@ -70,6 +72,50 @@ local DeathMessages={
 		"Should've kept some energy drinks handy.",
 		"So is having energy a priority to you now?",
 		"Should've gotten a good night's sleep.",
+	},
+}
+DeathMessages["ES"]={
+	-- Lava
+	{
+		"Asado por lava.",
+		"Nadando en lava.",
+		"Hipertermia.",
+		"Piel derretida.",
+		"¿Huelo barbacoa?",
+	},
+	-- Mob
+	{
+		"Luchando contra un enemigo.",
+		"Cara aplastada", 
+		"Interiores esparcidos por el piso.",
+		"Pro-tip: Manten tus extremidades juntas.",
+		"Desangramiento.",
+		"No te metas con los monstruos.",
+		"No alimentes a tus enemigos.",
+	},
+	-- Poison
+	{
+		"Bueno, ahora lo sabes.",
+		"Buen movimiento.",
+		"Muy buena, listillo.",
+		"Eso fue veneno.",
+		"Tenias tanto potencial...",
+	},
+	-- Portal
+	{
+		"Desmembramiento portal.",
+		"Creo que tu pierna esta alla.",
+		"Tu sangre no se teletransporto...",
+		"Permanece en el interior del portal en todo momento.",
+		"No es tu mejor intento.",
+		"¿Encontraste el nivel de vaca secreto?",
+	},
+	-- Energy
+	{
+		"Inconsciente en un calabozo.",
+		"Debiste haber mantenido algunas bebidas energeticas a mano.",
+		"Entonces, ¿Tener energia es una prioridad para ti ahora?", 
+		"Debiste de haber conseguido una buena noche de sueño.",
 	},
 }
 
@@ -365,7 +411,7 @@ function ToggleSound(sound)
 		scrollind.yScale=scrollind.xScale
 		swg:insert(scrollind)
 		
-		musicind=display.newText( ("Music Volume: "..(m*10).."%"),0,0,"MoolBoran",50 )
+		musicind=display.newText( (lc.giveText("LOC003").." "..(m*10).."%"),0,0,"MoolBoran",50 )
 		musicind.x=scroll.x
 		musicind.y=scroll.y+10
 		swg:insert(musicind)
@@ -387,7 +433,7 @@ function ToggleSound(sound)
 		scrollind2.yScale=scrollind.xScale
 		swg:insert(scrollind2)
 		
-		soundind=display.newText( ("Sound Volume: "..(s*10).."%"),0,0,"MoolBoran",50 )
+		soundind=display.newText( (lc.giveText("LOC004").." "..(s*10).."%"),0,0,"MoolBoran",50 )
 		soundind.x=scroll2.x
 		soundind.y=scroll2.y+10
 		swg:insert(soundind)
@@ -418,25 +464,41 @@ function ToggleExit(sound)
 		window.x,window.y = display.contentWidth/2, 450
 		gexui:insert( window )
 		
-		lolname=display.newText( ("You pressed the exit button.") ,0,0,"MoolBoran",70)
+		local lang=lc.giveLang()
+		local text
+		if lang=="EN" then
+			text="You pressed the exit button."
+		elseif lang=="ES" then
+			text="Undiste el boton de salida."
+		end
+		lolname=display.newText( (text) ,0,0,"MoolBoran",70)
 		lolname.x=display.contentCenterX
 		lolname.y=(display.contentHeight/2)-140
 		gexui:insert( lolname )
 		
-		lolname2=display.newText( ("Are you sure you want to exit?") ,0,0,"MoolBoran",55)
+		if lang=="EN" then
+			text="Are you sure you want to exit?"
+		elseif lang=="ES" then
+			text="¿Seguro quieres salir?"
+		end
+		lolname2=display.newText( (text) ,0,0,"MoolBoran",55)
 		lolname2.x=display.contentCenterX
 		lolname2.y=lolname.y+50
 		gexui:insert(lolname2)
 		
-
-		lolname3=display.newText( ("\(Unsaved progress will be lost.\)") ,0,0,"MoolBoran",40)
+		if lang=="EN" then
+			text="\(Unsaved progress will be lost.\)"
+		elseif lang=="ES" then
+			text="\(Progreso no guardado sera perdido.\)"
+		end
+		lolname3=display.newText( (text) ,0,0,"MoolBoran",40)
 		lolname3:setTextColor(180,180,180)
 		lolname3.x=display.contentCenterX
 		lolname3.y=lolname2.y+50
 		gexui:insert(lolname3)
 		
 		AcceptBtn=  widget.newButton{
-			label="Yes",
+			label=lc.giveText("LOC019"),
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			font="MoolBoran",
 			fontSize=50,
@@ -451,7 +513,7 @@ function ToggleExit(sound)
 		gexui:insert( AcceptBtn )
 		
 		BackBtn=  widget.newButton{
-			label="No",
+			label=lc.giveText("LOC018"),
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			font="MoolBoran",
 			fontSize=50,
@@ -614,8 +676,15 @@ function SpellInfo( event )
 		spellshown[4]:setTextColor(70,180,70)
 		gbk:insert(spellshown[4])
 	else
+		local lang=lc.giveLang()
+		local text
+		if lang=="EN" then
+			text="You haven't learned this spell."
+		elseif lang=="ES" then
+			text="No has aprendido este hechizo."
+		end
 		spellshown[1]=display.newText(
-			("You haven't learned this spell."),
+			(text),
 			((display.contentWidth/4)*3)-240,
 			150,
 			420,0,"MoolBoran",45
@@ -709,18 +778,31 @@ function StatChange()
 	swapInfoImg.yScale=swapInfoImg.xScale
 	ginf:insert(swapInfoImg)
 	
+	local lang=lc.giveLang()
+	local text
+	if lang=="EN" then
+		text="Stat Management"
+	elseif lang=="ES" then
+		text="Gestion de estadisticas"
+	end
 	info[#info+1]=display.newText(
 		(
-			"Stat Management"
+			text
 		),
-		display.contentCenterX/2,10,"MoolBoran",80
+		0,10,"MoolBoran",80
 	)
+	info[#info].x=display.contentCenterX
 	info[#info]:setTextColor(125,250,125)
 	ginf:insert(info[#info])
 	
+	if lang=="EN" then
+		text="Stat Points:"
+	elseif lang=="ES" then
+		text="Puntos:"
+	end
 	info[#info+1]=display.newText(
 		(
-			"Stat Points: "..p1.pnts
+			text.." "..p1.pnts
 		),
 		0,700,"MoolBoran",60
 	)
@@ -845,9 +927,16 @@ function StatInfo()
 	ginf:insert(info[#info])
 	--]]
 	
+	local lang=lc.giveLang()
+	local text
+	if lang=="EN" then
+		text="Level:"
+	elseif lang=="ES" then
+		text="Nivel:"
+	end
 	info[#info+1]=display.newText(
 		(
-			"Level: "..p1.lvl
+			text.." "..p1.lvl
 		),
 		baseX,baseY+(SpacingY*2),"MoolBoran",60
 	)
@@ -879,26 +968,44 @@ function StatInfo()
 	info[#info]:setTextColor(secundary,secundary,primary)
 	ginf:insert(info[#info])
 	
+	if lang=="EN" then
+		text="Floor:"
+	elseif lang=="ES" then
+		text="Piso:"
+	end
 	local flr=WD.Circle()
 	info[#info+1]=display.newText(
 		(
-			"Floor: "..flr
+			text.." "..flr
 		),
 		baseX,baseY+(SpacingY*3),"MoolBoran",60
 	)
 	ginf:insert(info[#info])
 	
+	local text2
+	if lang=="EN" then
+		text="Gold:"
+		text2="coins"
+	elseif lang=="ES" then
+		text="Oro:"
+		text2="monedas"
+	end
 	info[#info+1]=display.newText(
 		(
-			"Gold: "..p1.gp.." coins"
+			text.." "..p1.gp.." "..text2
 		),
 		baseX+SpacingX,baseY+(SpacingY*3),"MoolBoran",60
 	)
 	ginf:insert(info[#info])
 	
+	if lang=="EN" then
+		text="Statistics:"
+	elseif lang=="ES" then
+		text="Estadisticas:"
+	end
 	info[#info+1]=display.newText(
 		(
-			"Statistics:"
+			text
 		),
 		baseX-20,350,"MoolBoran",70
 	)
@@ -914,9 +1021,14 @@ function StatInfo()
 		ginf:insert(info[#info])
 	end
 	
+	if lang=="EN" then
+		text="Stat Points:"
+	elseif lang=="ES" then
+		text="Puntos:"
+	end
 	info[#info+1]=display.newText(
 		(
-			"Stat Points: "..p1.pnts
+			text.." "..p1.pnts
 		),
 		baseX,690,"MoolBoran",60
 	)
@@ -1054,18 +1166,18 @@ function MusicScroll( event )
 	if event.x>display.contentCenterX+(290*scroll.xScale) then
 		scrollind.x=display.contentCenterX+(290*scroll.xScale)
 		a.MusicVol(1.0)
-		musicind.text=("Music Volume: "..(1.0*100).."%")
+		musicind.text=(lc.giveText("LOC003").." "..(1.0*100).."%")
 	elseif event.x<display.contentCenterX-(290*scroll.xScale) then
 		scrollind.x=display.contentCenterX-(290*scroll.xScale)
 		a.MusicVol(0.0)
-		musicind.text=("Music Volume: "..(0.0*100).."%")
+		musicind.text=(lc.giveText("LOC003").." "..(0.0*100).."%")
 	else
 		for s=1,11 do
 			local x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*58 )
 			if event.x>x-(290*scroll.xScale)/10 and event.x<x+(290*scroll.xScale)/10 then
 				scrollind.x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*(290*scroll.xScale)/5 )
 				a.MusicVol((s-1)/10)
-				musicind.text=("Music Volume: "..((s-1)*10).."%")
+				musicind.text=(lc.giveText("LOC003").." "..((s-1)*10).."%")
 			end
 		end
 	end
@@ -1075,18 +1187,18 @@ function SoundScroll( event )
 	if event.x>display.contentCenterX+(290*scroll.xScale) then
 		scrollind2.x=display.contentCenterX+(290*scroll.xScale)
 		a.SoundVol(1.0)
-		soundind.text=("Sound Volume: "..(1.0*100).."%")
+		soundind.text=(lc.giveText("LOC004").." "..(1.0*100).."%")
 	elseif event.x<display.contentCenterX-(290*scroll.xScale) then
 		scrollind2.x=display.contentCenterX-(290*scroll.xScale)
 		a.SoundVol(0.0)
-		soundind.text=("Sound Volume: "..(0.0*100).."%")
+		soundind.text=(lc.giveText("LOC004").." "..(0.0*100).."%")
 	else
 		for s=1,11 do
 			local x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*58 )
 			if event.x>x-(290*scroll.xScale)/10 and event.x<x+(290*scroll.xScale)/10 then
 				scrollind2.x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*(290*scroll.xScale)/5 )
 				a.SoundVol((s-1)/10)
-				soundind.text=("Sound Volume: "..((s-1)*10).."%")
+				soundind.text=(lc.giveText("LOC004").." "..((s-1)*10).."%")
 			end
 		end
 	end
@@ -1142,23 +1254,30 @@ function DeathMenu(cause)
 		Dthtxt:insert( Deathmsg2 )
 		
 		if cause=="Lava" then
-			Deathmsg2.text=(DeathMessages[1][math.random(1,table.maxn(DeathMessages[1]))])
+			Deathmsg2.text=(DeathMessages[lc.giveLang()][1][math.random(1,table.maxn(DeathMessages[1]))])
 		end
 		if cause=="Mob" then
-			Deathmsg2.text=(DeathMessages[2][math.random(1,table.maxn(DeathMessages[1]))])
+			Deathmsg2.text=(DeathMessages[lc.giveLang()][2][math.random(1,table.maxn(DeathMessages[1]))])
 		end
 		if cause=="Poison" then
-			Deathmsg2.text=(DeathMessages[3][math.random(1,table.maxn(DeathMessages[1]))])
+			Deathmsg2.text=(DeathMessages[lc.giveLang()][3][math.random(1,table.maxn(DeathMessages[1]))])
 		end
 		if cause=="Portal" then
-			Deathmsg2.text=(DeathMessages[4][math.random(1,table.maxn(DeathMessages[1]))])
+			Deathmsg2.text=(DeathMessages[lc.giveLang()][4][math.random(1,table.maxn(DeathMessages[1]))])
 		end
 		if cause=="Energy" then
-			Deathmsg2.text=(DeathMessages[5][math.random(1,table.maxn(DeathMessages[1]))])
+			Deathmsg2.text=(DeathMessages[lc.giveLang()][5][math.random(1,table.maxn(DeathMessages[1]))])
 		end
 		
+		local lang=lc.giveLang()
+		local text
+		if lang=="EN" then
+			text="Back to Menu"
+		elseif lang=="ES" then
+			text="Volver al Menu"
+		end
 		ToMenuBtn =  widget.newButton{
-			label="Back To Menu",
+			label=text,
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			font="MoolBoran",
 			fontSize=50,
@@ -1180,7 +1299,12 @@ function DeathMenu(cause)
 		GCount=tostring(p1.gp)
 		GInfoTxt=display.newGroup()
 		
-		InfoTxt1=display.newText("You got to floor ",0,0,"MoolBoran", 60 )
+		if lang=="EN" then
+			text="You got to floor "
+		elseif lang=="ES" then
+			text="Llegaste al piso "
+		end
+		InfoTxt1=display.newText(text,0,0,"MoolBoran", 60 )
 		InfoTxt1.x=225
 		InfoTxt1.y=Deathmsg2.y+100
 		GInfoTxt:insert( InfoTxt1 )
@@ -1190,7 +1314,12 @@ function DeathMenu(cause)
 		InfoTxt2.y=InfoTxt1.y
 		GInfoTxt:insert( InfoTxt2 )
 		
-		InfoTxt3= display.newText(" with ",InfoTxt2.x+25+(25*(#Round-1)),0,"MoolBoran", 60 )
+		if lang=="EN" then
+			text=" with "
+		elseif lang=="ES" then
+			text=" con "
+		end
+		InfoTxt3= display.newText(text,InfoTxt2.x+25+(25*(#Round-1)),0,"MoolBoran", 60 )
 		InfoTxt3.y=InfoTxt1.y
 		GInfoTxt:insert( InfoTxt3 )
 		
@@ -1199,18 +1328,33 @@ function DeathMenu(cause)
 		InfoTxt4:setTextColor(255, 255, 50)
 		GInfoTxt:insert( InfoTxt4 )
 		
+		if lang=="EN" then
+			text=" gold."
+		elseif lang=="ES" then
+			text=" de oro."
+		end
 		InfoTxt5=display.newText(" gold.",InfoTxt4.x+25+(15*(#GCount-1)),0,"MoolBoran", 60 )
 		InfoTxt5.y=InfoTxt1.y
 		GInfoTxt:insert( InfoTxt5 )
 		
 		if hs==true then
-			InfoTxt6=display.newText(("New high score:"),0,0,"MoolBoran", 60 )
+			if lang=="EN" then
+				text="New high score:"
+			elseif lang=="ES" then
+				text="Nuevo puntaje maximo:"
+			end
+			InfoTxt6=display.newText((text),0,0,"MoolBoran", 60 )
 			InfoTxt6:setTextColor(70, 255, 70)
 			InfoTxt6.x=display.contentCenterX
 			InfoTxt6.y=display.contentCenterY-20
 			GInfoTxt:insert( InfoTxt6 )
 		else
-			InfoTxt6=display.newText(("Score:"),0,0,"MoolBoran", 60 )
+			if lang=="EN" then
+				text="Score:"
+			elseif lang=="ES" then
+				text="Puntaje:"
+			end
+			InfoTxt6=display.newText((text),0,0,"MoolBoran", 60 )
 			InfoTxt6:setTextColor(70, 255, 70)
 			InfoTxt6.x=display.contentCenterX
 			InfoTxt6.y=display.contentCenterY-20
@@ -1324,7 +1468,6 @@ function UseMenu(id,slot)
 		end
 		
 		function LearnedIt()
-			
 			isUse=false
 			local watevah=item.ReturnInfo(id,1)
 			p.LearnSorcery(watevah)
@@ -1418,8 +1561,15 @@ function UseMenu(id,slot)
 			end
 		end
 		
+		local lang=lc.giveLang()
+		local text
+		if lang=="EN" then
+			text="Back"
+		elseif lang=="ES" then
+			text="Volver"
+		end
 		local backbtn=  widget.newButton{
-			label="Back",
+			label=text,
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			font="MoolBoran",
 			fontSize=50,
@@ -1433,8 +1583,13 @@ function UseMenu(id,slot)
 		backbtn.y = (display.contentHeight/2)+30
 		gum:insert( backbtn )
 		
+		if lang=="EN" then
+			text="Drop"
+		elseif lang=="ES" then
+			text="Tirar"
+		end
 		local dropbtn=  widget.newButton{
-			label="Drop",
+			label=text,
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			font="MoolBoran",
 			fontSize=50,
@@ -1458,8 +1613,13 @@ function UseMenu(id,slot)
 		gum:insert( lolname )
 		
 		if itemstats[1]==0 then
+			if lang=="EN" then
+				text="Use"
+			elseif lang=="ES" then
+				text="Usar"
+			end
 			local usebtn=  widget.newButton{
-				label="Use",
+				label=text,
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				font="MoolBoran",
 				fontSize=50,
@@ -1481,8 +1641,13 @@ function UseMenu(id,slot)
 			gum:insert( descrip )
 		end	
 		if itemstats[1]==1 then
+			if lang=="EN" then
+				text="Equip"
+			elseif lang=="ES" then
+				text="Equipar"
+			end
 			local equipbtn=  widget.newButton{
-				label="Equip",
+				label=text,
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				font="MoolBoran",
 				fontSize=50,
@@ -1541,7 +1706,12 @@ function UseMenu(id,slot)
 			end
 			
 			if eqpstatchnge==false then
-				stattxts[1]=display.newText( ("No change.") ,0,0,"MoolBoran",55)
+				if lang=="EN" then
+					text="No change."
+				elseif lang=="ES" then
+					text="No hay cambio."
+				end
+				stattxts[1]=display.newText( (text) ,0,0,"MoolBoran",55)
 				stattxts[1]:setTextColor( 180, 180, 180)
 				stattxts[1].y=(display.contentHeight/2)-50
 				stattxts[1].x=display.contentWidth/2
@@ -1550,8 +1720,13 @@ function UseMenu(id,slot)
 		end
 		if itemstats[1]==2 then
 			if itemstats[4]==0 or itemstats[4]==1 then
+				if lang=="EN" then
+					text="Teleport"
+				elseif lang=="ES" then
+					text="Teletransportar"
+				end
 				local usebtn=  widget.newButton{
-					label="Teleport",
+					label=text,
 					labelColor = { default={255,255,255}, over={0,0,0} },
 					font="MoolBoran",
 					fontSize=50,
@@ -1566,8 +1741,13 @@ function UseMenu(id,slot)
 				usebtn.y = (display.contentHeight/2)+30
 				gum:insert( usebtn )
 			elseif itemstats[4]==2 then
+				if lang=="EN" then
+					text="Expand"
+				elseif lang=="ES" then
+					text="Expandir"
+				end
 				local usebtn=  widget.newButton{
-					label="Expand",
+					label=text,
 					labelColor = { default={255,255,255}, over={0,0,0} },
 					font="MoolBoran",
 					fontSize=50,
@@ -1589,10 +1769,14 @@ function UseMenu(id,slot)
 			descrip:setTextColor( 180, 180, 180)
 			gum:insert( descrip )
 		end
-		if itemstats[1]==3 then	
-		
+		if itemstats[1]==3 then
+			if lang=="EN" then
+				text="Learn"
+			elseif lang=="ES" then
+				text="Aprender"
+			end
 			local learnbtn=  widget.newButton{
-				label="Learn",
+				label=text,
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				font="MoolBoran",
 				fontSize=50,
@@ -1614,10 +1798,14 @@ function UseMenu(id,slot)
 			gum:insert( descrip )
 			
 		end
-		if itemstats[1]==4 then	
-		
+		if itemstats[1]==4 then
+			if lang=="EN" then
+				text="Use"
+			elseif lang=="ES" then
+				text="Usar"
+			end
 			local boostbtn=  widget.newButton{
-				label="Use",
+				label=text,
 				labelColor = { default={255,255,255}, over={0,0,0} },
 				font="MoolBoran",
 				fontSize=50,
@@ -1673,8 +1861,13 @@ function CheckMenu(id)
 			end
 		end
 		
+		if lang=="EN" then
+			text="Back"
+		elseif lang=="ES" then
+			text="Volver"
+		end
 		local backbtn=  widget.newButton{
-			label="Back",
+			label=text,
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			font="MoolBoran",
 			fontSize=50,

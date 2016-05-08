@@ -5,15 +5,16 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local handler=require("Ltiles")
-local col=require("Levents")
 local WD=require("Lprogress")
 local bin=require("Lgarbage")
 local wdow=require("Lwindow")
 local su=require("Lstartup")
-local m=require("Lmoves")
+local col=require("Levents")
+local lc=require("Llocale")
 local mob=require("Lmobai")
 local p=require("Lplayers")
 local sv=require("Lsaving")
+local m=require("Lmoves")
 local q=require("Lquest")
 local ui=require("Lui")
 -- Tile Sprite Sheets
@@ -513,11 +514,18 @@ end
 function BuildTile()
 
 	count=count+1
+	local lang=lc.giveLang()
+	local text
+	if lang=="EN" then
+		text="Generating Room"
+	elseif lang=="ES" then
+		text="Generando Cuarto"
+	end
 	if math.floor((count/mapsize)*100)<10 then
-		loadtxt.text=("Generating Room "..curroom.."...\n".."             0"..math.floor((count/mapsize)*100).."%")
+		loadtxt.text=( text.." "..curroom.."...\n".."             0"..math.floor((count/mapsize)*100).."%")
 		loadtxt:toFront()
 	else
-		loadtxt.text=("Generating Room "..curroom.."...\n".."              "..math.floor((count/mapsize)*100).."%")
+		loadtxt.text=(text.." "..curroom.."...\n".."              "..math.floor((count/mapsize)*100).."%")
 		loadtxt:toFront()
 	end
 	
@@ -1160,11 +1168,18 @@ end
 
 function DisplayTile()
 	count=count+1
+	local lang=lc.giveLang()
+	local text
+	if lang=="EN" then
+		text="Displaying Room"
+	elseif lang=="ES" then
+		text="Mostrando Cuarto"
+	end
 	if math.floor((count/mapsize)*100)<10 then
-		loadtxt.text=("Displaying Room "..curroom.."...\n".."            0"..math.floor((count/mapsize)*100).."%")
+		loadtxt.text=(text.." "..curroom.."...\n".."            0"..math.floor((count/mapsize)*100).."%")
 		loadtxt:toFront()
 	else
-		loadtxt.text=("Displaying Room "..curroom.."...\n".."             "..math.floor((count/mapsize)*100).."%")
+		loadtxt.text=(text.." "..curroom.."...\n".."             "..math.floor((count/mapsize)*100).."%")
 		loadtxt:toFront()
 	end
 	
@@ -1579,6 +1594,7 @@ function DisplayTile()
 			walls[curroom][count].x=xinicial+((((count-1)%math.sqrt(mapsize)))*espacio)
 			walls[curroom][count].y=yinicial+(math.floor((count-1)/math.sqrt(mapsize))*espacio)
 			walls[curroom][count].isVisible=false
+			-- walls[curroom][count]
 			walls[curroom][count].xScale=scale
 			walls[curroom][count].yScale=walls[curroom][count].xScale
 			Level:insert( walls[curroom][count] )

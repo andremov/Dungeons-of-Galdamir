@@ -10,11 +10,12 @@ local heartsheet = graphics.newImageSheet( "heartsprite.png", { width=25, height
 local manasheet = graphics.newImageSheet( "manasprite.png", { width=60, height=60, numFrames=3 } )
 local xpsheet = graphics.newImageSheet( "xpbar.png", { width=392, height=40, numFrames=50 } )
 local psheet = graphics.newImageSheet( "player.png", { width=24, height=32, numFrames=56 } )
-local b=require("Lbuilder")
+local set=require("Lsettings")
 local WD=require("Lprogress")
 local su=require("Lstartup")
+local b=require("Lbuilder")
+local lc=require("Llocale")
 local gold=require("Lgold")
-local set=require("Lsettings")
 local w=require("Lwindow")
 local c=require("Lchars")
 local a=require("Laudio")
@@ -52,12 +53,20 @@ local pseqs={
 		{name="heal3",		start=49, count=4, time=750},
 		{name="heal4",		start=53, count=4, time=750},
 	}
-local names={
+local names={}
+names["EN"]={
 		"Nameless",
 		"Orphan",
 		"Smith",
 		"Slave",
 		"Hctib",
+	}
+names["ES"]={
+		"Innombrado",
+		"Huerfano",
+		"Perez",
+		"Esclavo",
+		"Atup",
 	}
 	
 function CreatePlayers(name)
@@ -82,7 +91,7 @@ function CreatePlayers(name)
 	player.yScale=player.xScale
 	--Leveling
 	if name==nil or name=="" or name==" " then
-		player.name=names[math.random(1,table.maxn(names))]
+		player.name=names[lc.giveLang()][math.random(1,table.maxn(names[lc.giveLang()]))]
 	elseif name=="Magus" or name=="MAGUS" or name=="magus" then
 		player.name="Magus"
 	elseif name=="Error" or name=="error" or name=="ERROR" then
@@ -93,7 +102,12 @@ function CreatePlayers(name)
 	player.lvl=1
 	player.MaxXP=50
 	player.XP=0
-	player.clsnames={"Viking","Warrior","Knight","Sorcerer","Thief","Scholar","Freelancer"}
+	local lang=lc.giveLang()
+	if lang=="EN" then
+		player.clsnames={"Viking","Warrior","Knight","Sorcerer","Thief","Scholar","Freelancer"}
+	elseif lang=="ES" then
+		player.clsnames={"Vikingo","Guerrero","Caballero","Hechicero","Ladron","Erudito","Freelancer"}
+	end
 	player.char=char
 	player.class=class
 	--Extras
@@ -102,7 +116,11 @@ function CreatePlayers(name)
 	player.inv={ {1,10}, }
 	player.weight=5
 	--Stats
-	player.statnames=	{"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity",	"Intellect"}
+	if lang=="EN" then
+		player.statnames={"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity",	"Intellect"}
+	elseif lang=="ES" then
+		player.statnames={"Aguante",	"Ataque",	"Defensa",	"Magia",	"Destreza",	"Intelecto"}
+	end
 	player.eqs=			{0,			0,			0,			0,			0,				0}
 	player.nat=			{2,			2,			2,			2,			2,				2}
 	player.bon=			{0,			0,			0,			0,			0,				0}
@@ -117,16 +135,29 @@ function CreatePlayers(name)
 	}
 	player.pnts=7
 	--Spells
-	player.spells={
-		{"Gouge","Place a deep wound on the enemy target.",true,9,13},
-		{"Fireball","Cast a firey ball of death and burn the enemy.",true,16,7},
-		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,5,13},
-		{"Slow","Reduces enemy's dexterity.",false,28,5},
-		{"Poison Blade","Inflicts poison.",false,16,19},
-		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,26,37},
-		{"Healing","Heals for 20% of your maximum Hit Points.",false,58,4},
-		{"Ice Spear","Hits for twice damage and reduces enemy's dexterity.",false,51,46},
-	}
+	if lang=="EN" then
+		player.spells={
+			{"Gouge","Place a deep wound on the enemy target.",true,9,13},
+			{"Fireball","Cast a firey ball of death and burn the enemy.",true,16,7},
+			{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,5,13},
+			{"Slow","Reduces enemy's dexterity.",false,28,5},
+			{"Poison Blade","Inflicts poison.",false,16,19},
+			{"Fire Sword","Hits for twice damage and inflicts a burn.",false,26,37},
+			{"Healing","Heals for 20% of your maximum health.",false,58,4},
+			{"Ice Spear","Hits for twice damage and reduces enemy's dexterity.",false,51,46},
+		}
+	elseif lang=="ES" then
+		player.spells={
+			{"Rajar","Deja una herida profunda en el enemigo.",true,9,13},
+			{"Bola de Fuego","Lanza una bola de fuego y enciende al enemigo.",true,16,7},
+			{"Hender","Pega por el doble de tu daño . No evitable.",false,5,13},
+			{"Alentar","Reduce la destreza de tu enemigo.",false,28,5},
+			{"Cuchilla Venenosa","Inflige veneno.",false,16,19},
+			{"Espada Encendida","Pega por el doble de tu daño y enciende al enemigo.",false,26,37},
+			{"Curacion","Cura por 20% de tu vida maxima.",false,58,4},
+			{"Lanza de Hielo","Pega por el doble de tu  daño  y reduce la destreza de tu enemigo.",false,51,46},
+		}
+	end
 	--Secondary Stats
 	player.portcd=0
 	player.MaxHP=(10*player.lvl)+(player.stats[1]*20)
@@ -205,7 +236,7 @@ function ShowStats()
 		transp=255
 		
 		LifeDisplay = display.newText((player.HP.."/"..player.MaxHP),statinfo[1][1],statinfo[1][2],"Game Over",100)
-		LifeDisplay:setTextColor( 255, 255, 255,transp)
+		-- LifeDisplay:setTextColor( 255, 255, 255,transp)
 		
 		LifeWindow = display.newRect (0,0,#LifeDisplay.text*22,40)
 		LifeWindow:setFillColor( 150, 150, 150,transp/2)
@@ -237,7 +268,7 @@ function ShowStats()
 		
 		LifeSymbol:toFront()
 		LifeDisplay:toFront()
-		LifeDisplay:setTextColor( 255, 255, 255,transp)
+		-- LifeDisplay:setTextColor( 255, 255, 255,transp)
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
 	elseif ((player.HP.."/"..player.MaxHP))==LifeDisplay.text and transp~=0 and player.HP==player.MaxHP and StrongForce~=true then
 		if statinfo[1][3]==0 then
@@ -249,7 +280,7 @@ function ShowStats()
 			transp=255
 		end
 		LifeWindow:setFillColor( 150, 150, 150,transp/2)
-		LifeDisplay:setTextColor( 255, 255, 255,transp)
+		-- LifeDisplay:setTextColor( 255, 255, 255,transp)
 		LifeSymbol:setFillColor(transp,transp,transp,transp)
 	end
 	
@@ -270,7 +301,7 @@ function ShowStats()
 		transp3=255
 		
 		ManaDisplay = display.newText((player.MP.."/"..player.MaxMP),statinfo[2][1],statinfo[2][2],"Game Over",100)
-		ManaDisplay:setTextColor( 255, 255, 255,transp3)
+		-- ManaDisplay:setTextColor( 255, 255, 255,transp3)
 		
 		ManaWindow = display.newRect (0,0,#ManaDisplay.text*22,40)
 		ManaWindow:setFillColor( 150, 150, 150,transp3/2)
@@ -301,7 +332,7 @@ function ShowStats()
 		
 		ManaSymbol:toFront()
 		ManaDisplay:toFront()
-		ManaDisplay:setTextColor( 255, 255, 255,transp3)
+		-- ManaDisplay:setTextColor( 255, 255, 255,transp3)
 		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
 	elseif ((player.MP.."/"..player.MaxMP))==ManaDisplay.text and transp3~=0 and player.MP==player.MaxMP and StrongForce~=true then
 		if statinfo[1][3]==0 then
@@ -313,7 +344,7 @@ function ShowStats()
 			transp3=255
 		end
 		ManaWindow:setFillColor( 150, 150, 150,transp3/2)
-		ManaDisplay:setTextColor( 255, 255, 255,transp3)
+		-- ManaDisplay:setTextColor( 255, 255, 255,transp3)
 		ManaSymbol:setFillColor(transp3,transp3,transp3,transp3)
 	end
 	
@@ -353,7 +384,7 @@ function ShowStats()
 		
 		EnergySymbol:toFront()
 		EnergyDisplay:toFront()
-		EnergyDisplay:setTextColor( 255, 255, 255,transp5)
+		-- EnergyDisplay:setTextColor( 255, 255, 255,transp5)
 		EnergySymbol:setFillColor(transp5,transp5,transp5,transp5)
 	elseif ((player.EP.."/"..player.MaxEP))==EnergyDisplay.text and transp5~=0 and player.EP==player.MaxEP and StrongForce~=true then
 		if statinfo[3][3]==0 then
@@ -365,7 +396,7 @@ function ShowStats()
 			transp5=255
 		end
 		EnergyWindow:setFillColor( 150, 150, 150,transp5/2)
-		EnergyDisplay:setTextColor( 255, 255, 255,transp5)
+		-- EnergyDisplay:setTextColor( 255, 255, 255,transp5)
 		EnergySymbol:setFillColor(transp5,transp5,transp5,transp5)
 	end
 	
@@ -669,13 +700,9 @@ function ModStats(sta,att,def,mgc,dex,int)
 	StatCheck()
 end
 
-function LearnSorcery(name)
-	for m=1,table.maxn(player.spells) do
-		if player.spells[m][1]==name then
-			player.spells[m][3]=true
-	--		print ("Player learned: "..player.spells[m][1])
-		end
-	end
+function LearnSorcery(id)
+	player.spells[id][3]=true
+	--print ("Player learned: "..player.spells[id][1])
 end
 
 function Load1(cls,chr)
@@ -734,8 +761,17 @@ function Load5(hitp,manp,enep,neim,golp)
 end
 
 function FinishLoading()
-	player.statnames={"Stamina","Attack","Defense","Magic","Dexterity","Intellect"}
-	player.clsnames={"Viking","Warrior","Knight","Sorcerer","Thief","Scholar","Freelancer"}
+	local lang=lc.giveLang()
+	if lang=="EN" then
+		player.statnames={"Stamina",	"Attack",	"Defense",	"Magic",	"Dexterity",	"Intellect"}
+	elseif lang=="ES" then
+		player.statnames={"Aguante",	"Ataque",	"Defensa",	"Magia",	"Destreza",	"Intelecto"}
+	end
+	if lang=="EN" then
+		player.clsnames={"Viking","Warrior","Knight","Sorcerer","Thief","Scholar","Freelancer"}
+	elseif lang=="ES" then
+		player.clsnames={"Vikingo","Guerrero","Caballero","Hechicero","Ladron","Erudito","Freelancer"}
+	end
 	player.eqs={0,0,0,0,0,0}
 	player.bon={0,0,0,0,0,0}
 	player.weight=5
@@ -743,16 +779,29 @@ function FinishLoading()
 	player.stats={}
 	player.inv={}
 	player.eqp={}
-	player.spells={
-		{"Gouge","Place a deep wound on the enemy target.",true,9,13},
-		{"Fireball","Cast a firey ball of death and burn the enemy.",true,16,7},
-		{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,5,13},
-		{"Slow","Reduces enemy's dexterity.",false,28,5},
-		{"Poison Blade","Inflicts poison.",false,16,19},
-		{"Fire Sword","Hits for twice damage and inflicts a burn.",false,26,37},
-		{"Healing","Heals for 20% of maximum Hit Points.",false,58,4},
-		{"Ice Sword","Hits for twice damage and reduces enemy's dexterity.",false,46,51},
-	}
+	if lang=="EN" then
+		player.spells={
+			{"Gouge","Place a deep wound on the enemy target.",true,9,13},
+			{"Fireball","Cast a firey ball of death and burn the enemy.",true,16,7},
+			{"Cleave","Hits for twice maximum damage. Can't be evaded.",false,5,13},
+			{"Slow","Reduces enemy's dexterity.",false,28,5},
+			{"Poison Blade","Inflicts poison.",false,16,19},
+			{"Fire Sword","Hits for twice damage and inflicts a burn.",false,26,37},
+			{"Healing","Heals for 20% of your maximum health.",false,58,4},
+			{"Ice Spear","Hits for twice damage and reduces enemy's dexterity.",false,51,46},
+		}
+	elseif lang=="ES" then
+		player.spells={
+			{"Rajar","Deja una herida profunda en el enemigo.",true,9,13},
+			{"Bola de Fuego","Lanza una bola de fuego y enciende al enemigo.",true,16,7},
+			{"Hender","Pega por el doble de tu daño . No evitable.",false,5,13},
+			{"Alentar","Reduce la destreza de tu enemigo.",false,28,5},
+			{"Cuchilla Venenosa","Inflige veneno.",false,16,19},
+			{"Espada Encendida","Pega por el doble de tu daño y enciende al enemigo.",false,26,37},
+			{"Curacion","Cura por 20% de tu vida maxima.",false,58,4},
+			{"Lanza de Hielo","Pega por el doble de tu  daño  y reduce la destreza de tu enemigo.",false,51,46},
+		}
+	end
 	if (player) then
 		check=119
 		Runtime:addEventListener("enterFrame",ShowStats)

@@ -37,13 +37,20 @@ settings = {
 			"android.permission.INTERNET",
 		}
   	},
-	--[[
+	
     plugins =
     {
-        ["CoronaProvider.ads.inmobi"] =
+		--[[
+		["plugin.adbuddiz"] = { publisherId = "com.adbuddiz" }
+       
+	   
+	   
+		["CoronaProvider.ads.inmobi"] =
         {
             publisherId = "com.coronalabs",
         },
-    },  
-	--]]	
+		--]]
+		
+    }, 
+	
 }

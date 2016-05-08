@@ -401,8 +401,8 @@ function WindowManager()
 	idletimer=idletimer+1
 	if idletimer>20 and idletimer<200 and cwin.state~=0 then
 		wintransp=wintransp-math.ceil(255/100)
-		if wintransp<0 then
-			wintransp=0
+		if wintransp<10 then
+			wintransp=10
 			cwin.state=0
 		end
 		cwin:setFillColor(wintransp,wintransp,wintransp,wintransp)

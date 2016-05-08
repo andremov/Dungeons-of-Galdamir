@@ -14,7 +14,7 @@ function Load()
 		-- Menu (2)
 		"Jugar","Opciones",
 		-- Options (6)
-		"Volumen de Musica","Volumen de Efectos","Posiciones de UI","Puntajes","Sets de Baldosas","Atras",
+		"Volumen de Musica","Volumen de Efectos","Posiciones de UI","Puntajes","Sets de Baldosas","Volver",
 		-- UI Positions - Names (8)
 		"Contador de Oro","Vida","Mana","Energia","Puntos sin usar","Barra de Experiencia","Mision Actual",
 		"Boton de Pausa",

@@ -100,7 +100,7 @@ function GoldDisplay()
 		
 		GCDisplay:toFront()
 		CDisplay:toFront()
-		GCDisplay:setTextColor( 255, 255, 50, transp)
+		-- GCDisplay:setTextColor( 255, 255, 50, transp)
 		CDisplay:setFillColor( transp, transp, transp, transp)
 	else
 		if GoldCount<P1.gp then
@@ -117,7 +117,7 @@ function GoldDisplay()
 		
 		GCDisplay:toFront()
 		CDisplay:toFront()
-		GCDisplay:setTextColor( 255, 255, 50, transp)
+		-- GCDisplay:setTextColor( 255, 255, 50, transp)
 		CDisplay:setFillColor( transp, transp, transp, transp)
 	end
 end

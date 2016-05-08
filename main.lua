@@ -17,7 +17,11 @@ local GVersion=v.HowDoIVersion(false)
 local loadbkg
 local load1
 local loadtxt
-
+--[[
+local AdBuddiz = require "plugin.adbuddiz"
+AdBuddiz.setAndroidPublisherKey( "6c7e651b-851d-4ab9-923d-a557d77d4a6a" )
+AdBuddiz.cacheAds()
+--]]
 --	print "C U B 3 D :  DUNGEONS OF GAL'DARAH"
 	print "C U B 3 D :  DUNGEONS OF GALDAMIR"
 	print ("Version: "..GVersion)

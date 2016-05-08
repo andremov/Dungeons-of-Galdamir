@@ -368,14 +368,15 @@ end
 function Save()
 	local path = system.pathForFile(  "DoGSettings.stn", system.DocumentsDirectory )
 	local fh, errStr = io.open( path, "w+" )
-	
-	for p=1,table.maxn(positions) do
-		for i=1,table.maxn(positions[p]) do
-			fh:write(positions[p][i],"\n")
+	if (fh) then
+		for p=1,table.maxn(positions) do
+			for i=1,table.maxn(positions[p]) do
+				fh:write(positions[p][i],"\n")
+			end
 		end
+		
+		io.close( fh )
 	end
-	
-	io.close( fh )
 end
 
 function WipeSave()

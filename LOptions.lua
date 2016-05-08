@@ -212,18 +212,18 @@ function MusicScroll( event )
 	if event.x>display.contentCenterX+(290*scroll.xScale) then
 		scrollind.x=display.contentCenterX+(290*scroll.xScale)
 		a.MusicVol(1.0)
-		musicind.text=("Music Volume: "..(1.0*100).."%")
+		musicind.text=(lc.giveText("LOC003").." "..(1.0*100).."%")
 	elseif event.x<display.contentCenterX-(290*scroll.xScale) then
 		scrollind.x=display.contentCenterX-(290*scroll.xScale)
 		a.MusicVol(0.0)
-		musicind.text=("Music Volume: "..(0.0*100).."%")
+		musicind.text=(lc.giveText("LOC003").." "..(0.0*100).."%")
 	else
 		for s=1,11 do
 			local x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*58 )
 			if event.x>x-(290*scroll.xScale)/10 and event.x<x+(290*scroll.xScale)/10 then
 				scrollind.x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*(290*scroll.xScale)/5 )
 				a.MusicVol((s-1)/10)
-				musicind.text=("Music Volume: "..((s-1)*10).."%")
+				musicind.text=(lc.giveText("LOC003").." "..((s-1)*10).."%")
 			end
 		end
 	end
@@ -233,18 +233,18 @@ function SoundScroll( event )
 	if event.x>display.contentCenterX+(290*scroll.xScale) then
 		scrollind2.x=display.contentCenterX+(290*scroll.xScale)
 		a.SoundVol(1.0)
-		soundind.text=("Sound Volume: "..(1.0*100).."%")
+		soundind.text=(lc.giveText("LOC004").." "..(1.0*100).."%")
 	elseif event.x<display.contentCenterX-(290*scroll.xScale) then
 		scrollind2.x=display.contentCenterX-(290*scroll.xScale)
 		a.SoundVol(0.0)
-		soundind.text=("Sound Volume: "..(0.0*100).."%")
+		soundind.text=(lc.giveText("LOC004").." "..(0.0*100).."%")
 	else
 		for s=1,11 do
 			local x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*58 )
 			if event.x>x-(290*scroll.xScale)/10 and event.x<x+(290*scroll.xScale)/10 then
 				scrollind2.x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*(290*scroll.xScale)/5 )
 				a.SoundVol((s-1)/10)
-				soundind.text=("Sound Volume: "..((s-1)*10).."%")
+				soundind.text=(lc.giveText("LOC004").." "..((s-1)*10).."%")
 			end
 		end
 	end
