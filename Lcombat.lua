@@ -604,7 +604,7 @@ function MobSprite(value)
 				esprite=display.newSprite( stadef, eseqs  )
 				esprite:setSequence( "walk" )
 				esprite.x=(display.contentWidth/2)+50
-				esprite.y=230
+				esprite.y=190
 				esprite.xScale=2.0
 				esprite.yScale=esprite.xScale
 				esprite:play()
@@ -634,7 +634,7 @@ function MobSprite(value)
 				esprite=display.newSprite( mgcint, eseqs  )
 				esprite:setSequence( "walk" )
 				esprite.x=(display.contentWidth/2)+50
-				esprite.y=230
+				esprite.y=210
 				esprite.xScale=2.0
 				esprite.yScale=esprite.xScale
 				esprite:play()

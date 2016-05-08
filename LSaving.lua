@@ -24,6 +24,7 @@ local OKVers={
 		"RELEASE 1.0.0",
 		"RELEASE 1.0.1",
 		"RELEASE 1.1.0",
+		"RELEASE 1.1.1",
 	}
 
 function Load()

@@ -124,6 +124,7 @@ function Continue( event )
 			else
 				ui.Pause(true)
 				inv.ToggleInfo()
+				inv.SwapInfo(false)
 			end
 			players.CalmDownCowboy(true)
 			audio.changeMusic(2)

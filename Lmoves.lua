@@ -454,10 +454,10 @@ function CleanArrows()
 end
 
 function CleanWindow()
-	display.remove(cwin)
-	cwin=nil
 	Runtime:removeEventListener("enterFrame",WindowManager)
 	idletimer=0
+	display.remove(cwin)
+	cwin=nil
 end
 
 function Visibility()

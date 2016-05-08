@@ -391,8 +391,17 @@ function LocationCheck(loc2check,room2check)
 end
 
 function DelayMobs()
+	p1=p.GetPlayer()
 	local MS=builder.GetMSpawner()
 	if (MS) and (MS.cd==0) then
 		MS.cd=math.random(1,3)
+		local sometypeofmana=p1.stats[4]-MS.req
+		if p1.MP>=math.ceil(sometypeofmana*2.5) then
+			p1.MP=p1.MP-math.ceil(sometypeofmana*2.5)
+		else
+			local penitence=math.ceil(sometypeofmana*2.5)-p1.MP
+			p1.MP=0
+			p.ReduceHP(math.floor(penitence*1.5))
+		end
 	end
 end

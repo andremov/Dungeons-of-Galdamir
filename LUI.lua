@@ -172,31 +172,40 @@ end
 function OpenBag( event )
 	if event.phase=="ended" and isPaused==true then
 		inv.ToggleBag()
+		pwg.isVisible=false
 	end
 end
 
 function OpenExit( event )
 	if event.phase=="ended" and isPaused==true then
 		inv.ToggleExit()
+		pwg.isVisible=false
 	end
 end
 
 function OpenSnd( event )
 	if event.phase=="ended" and isPaused==true then
 		inv.ToggleSound()
+		pwg.isVisible=false
 	end
 end
 
 function OpenInfo( event )
 	if event.phase=="ended" and isPaused==true then
 		inv.ToggleInfo()
+		pwg.isVisible=false
 	end
 end
 
 function OpenBook( event )
 	if event.phase=="ended" and isPaused==true then
 		inv.ToggleSpells()
+		pwg.isVisible=false
 	end
+end
+
+function ShowPwg()
+	pwg.isVisible=true
 end
 
 function MapIndicators(val)

@@ -204,10 +204,8 @@ function ShowStats()
 	if not(LifeDisplay) then
 		transp=255
 		
-		LifeDisplay = display.newText( (player.HP.."/"..player.MaxHP), 0, 0, "Game Over", 100 )
+		LifeDisplay = display.newText((player.HP.."/"..player.MaxHP),statinfo[1][1],statinfo[1][2],"Game Over",100)
 		LifeDisplay:setTextColor( 255, 255, 255,transp)
-		LifeDisplay.x = statinfo[1][1]
-		LifeDisplay.y = statinfo[1][2]
 		
 		LifeWindow = display.newRect (0,0,#LifeDisplay.text*22,40)
 		LifeWindow:setFillColor( 150, 150, 150,transp/2)
@@ -271,10 +269,8 @@ function ShowStats()
 	if not(ManaDisplay) then
 		transp3=255
 		
-		ManaDisplay = display.newText( (player.MP.."/"..player.MaxMP), 0, 0, "Game Over", 100 )
+		ManaDisplay = display.newText((player.MP.."/"..player.MaxMP),statinfo[2][1],statinfo[2][2],"Game Over",100)
 		ManaDisplay:setTextColor( 255, 255, 255,transp3)
-		ManaDisplay.x = statinfo[2][1]
-		ManaDisplay.y = statinfo[2][2]
 		
 		ManaWindow = display.newRect (0,0,#ManaDisplay.text*22,40)
 		ManaWindow:setFillColor( 150, 150, 150,transp3/2)
@@ -324,10 +320,8 @@ function ShowStats()
 -- Energy
 	if not(EnergyDisplay) then
 		transp5=255
-		EnergyDisplay = display.newText( (player.EP.."/"..player.MaxEP), 0, 0, "Game Over", 100 )
+		EnergyDisplay = display.newText((player.EP.."/"..player.MaxEP),statinfo[3][1],statinfo[3][2],"Game Over",100)
 		EnergyDisplay:setTextColor( 255, 255, 255,transp5)
-		EnergyDisplay.x = statinfo[3][1]
-		EnergyDisplay.y = statinfo[3][2]
 		
 		EnergyWindow = display.newRect (0,0,#EnergyDisplay.text*22,40)
 		EnergyWindow:setFillColor( 150, 150, 150,transp5/2)
@@ -428,6 +422,7 @@ function openStats( event )
 	if event.phase=="ended" and DisplayCan==true then
 		ui.Pause()
 		w.ToggleInfo(false)
+		w.SwapInfo(false)
 	end
 end
 

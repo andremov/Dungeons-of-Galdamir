@@ -7,6 +7,8 @@ module(..., package.seeall)
 local o=require("Loptions")
 local gsm
 local curname=1
+local window
+local snap=1
 local names={
 		"Gold Counter","Health Display","Mana Display",
 		"Energy Display","Stat Points Notice","Experience Bar",
@@ -14,13 +16,13 @@ local names={
 	}
 local info={
 		-- Gold
-		{"demowindow.png",140,50},
+		{"demogold.png",140,50},
 		-- HP
-		{"demowindow.png",140,50},
+		{"demohealth.png",140,50},
 		-- MP
-		{"demowindow.png",140,50},
+		{"demomana.png",140,50},
 		-- EP
-		{"demowindow.png",140,50},
+		{"demoenergy.png",140,50},
 		-- Unspent point
 		{"unspent.png",240,80},
 		-- XP Bar
@@ -28,17 +30,17 @@ local info={
 		-- Quest
 		{"demoquest.png",447,80},
 		-- Pause Button
-		{"pauseon.png",50,50},
+		{"pauseon.png",84.5,84.5},
 	}
 local positions={
 		-- Gold
 		{75,10,0},
 		-- HP
-		{160,display.contentHeight-175,0},
+		{100,display.contentHeight-180,0},
 		-- MP
-		{160,display.contentHeight-115,0},
+		{100,display.contentHeight-120,0},
 		-- EP
-		{160,display.contentHeight-55,0},
+		{100,display.contentHeight-60,0},
 		-- Unspent point
 		{display.contentWidth-210,display.contentHeight-45},
 		-- XP Bar
@@ -52,11 +54,11 @@ local defaults={
 		-- Gold
 		{75,10,0},
 		-- HP
-		{160,display.contentHeight-175,0},
+		{100,display.contentHeight-180,0},
 		-- MP
-		{160,display.contentHeight-115,0},
+		{100,display.contentHeight-120,0},
 		-- EP
-		{160,display.contentHeight-55,0},
+		{100,display.contentHeight-60,0},
 		-- Unspent point
 		{display.contentWidth-210,display.contentHeight-45},
 		-- XP Bar
@@ -74,16 +76,7 @@ end
 function Start()
 	Runtime:addEventListener("touch",Moved)
 	gsm=display.newGroup()
-	
-	local exists=false
-	local path = system.pathForFile(  "DoGSettings.stn", system.DocumentsDirectory )
-	local fh, errStr = io.open( path, "r" )
-	if (fh) then
-		exists=true
-	end
-	if exists==true then
-		Load()
-	end
+	window={}
 	
 	block=display.newImageRect("cblocked.png",653,653)
 	block.x=display.contentCenterX
@@ -118,6 +111,22 @@ function Start()
 	nexttxt:setTextColor(125,125,250)
 	gsm:insert(nexttxt)
 	
+	for s=1,table.maxn(names) do
+		window[s]=display.newImageRect(info[s][1],info[s][2],info[s][3])
+		window[s].x=positions[s][1]
+		if s>=1 and s<=4 then
+			window[s].y=positions[s][2]+30
+		else
+			window[s].y=positions[s][2]
+		end
+		if curname~=s then
+			window[s]:setFillColor(100,100,100,100)
+		end
+		gsm:insert(window[s])
+	end
+	
+	Windows()
+	
 	Interface()
 end
 
@@ -138,8 +147,34 @@ function doPrev()
 end
 
 function doReset()
-	positions[curname]=defaults[curname]
+	local thex=defaults[curname][1]
+	local they=defaults[curname][2]
+	local thez=defaults[curname][3]
+	positions[curname][1]=thex
+	positions[curname][2]=they
+	positions[curname][3]=thez
+	Windows()
 	Interface()
+end
+
+function Windows()
+	for s=table.maxn(names),1,-1 do	
+		display.remove(window[s])
+		window[s]=nil
+	end
+	for s=1,table.maxn(names) do
+		window[s]=display.newImageRect(info[s][1],info[s][2],info[s][3])
+		window[s].x=positions[s][1]
+		if s>=1 and s<=4 then
+			window[s].y=positions[s][2]+30
+		else
+			window[s].y=positions[s][2]
+		end
+		if curname~=s then
+			window[s]:setFillColor(100,100,100,100)
+		end
+		gsm:insert(window[s])
+	end
 end
 
 function doBack()
@@ -155,8 +190,18 @@ end
 function Interface()
 	display.remove(selected)
 	selected=nil
-	display.remove(window)
-	window=nil
+	display.remove(alwaysV)
+	alwaysV=nil
+	display.remove(alwaysV2)
+	alwaysV2=nil
+	display.remove(alwaysV3)
+	alwaysV3=nil
+	display.remove(snap1)
+	snap1=nil
+	display.remove(snap2)
+	snap2=nil
+	display.remove(snap3)
+	snap3=nil
 	
 	selected=display.newText((names[curname]),0,0,"MoolBoran",70)
 	selected.x=display.contentCenterX
@@ -164,47 +209,154 @@ function Interface()
 	selected:setTextColor(230,230,230)
 	gsm:insert(selected)
 	
-	window=display.newImageRect(info[curname][1],info[curname][2],info[curname][3])
-	window.x=positions[curname][1]
-	if curname>=1 and curname<=4 then
-		window.y=positions[curname][2]+20
-	else
-		window.y=positions[curname][2]
+	if curname==1 or curname==2 or curname==3 or curname==4 or curname==6 then
+		alwaysV3=display.newRect(0,0,400,50)
+		alwaysV3.x=display.contentCenterX
+		alwaysV3.y=display.contentCenterY-60
+		alwaysV3:setFillColor(255,255,255,0)
+		alwaysV3:addEventListener("tap",doVisible)
+		gsm:insert(alwaysV3)
+		
+	
+		alwaysV=display.newText("Always visible?",0,0,"MoolBoran",60)
+		alwaysV.x=display.contentCenterX-45
+		alwaysV.y=display.contentCenterY-50
+		alwaysV:setTextColor(180,180,180)
+		gsm:insert(alwaysV)
+		
+		if positions[curname][3]==0 then
+			alwaysV2=display.newText("No",0,0,"MoolBoran",60)
+			alwaysV2.x=display.contentCenterX+120
+			alwaysV2.y=alwaysV.y
+			alwaysV2:setTextColor(255,125,125)
+			gsm:insert(alwaysV2)
+		else
+			alwaysV2=display.newText("Yes",0,0,"MoolBoran",60)
+			alwaysV2.x=display.contentCenterX+120
+			alwaysV2.y=alwaysV.y
+			alwaysV2:setTextColor(125,255,125)
+			gsm:insert(alwaysV2)
+		end
 	end
-	gsm:insert(window)
+	
+	snap3=display.newRect(0,0,400,50)
+	snap3.x=display.contentCenterX
+	snap3.y=display.contentCenterY+100
+	snap3:setFillColor(255,255,255,0)
+	snap3:addEventListener("tap",doSnap)
+	gsm:insert(snap3)
+	
+	snap1=display.newText("Snapping?",0,0,"MoolBoran",60)
+	snap1.x=display.contentCenterX-45
+	snap1.y=display.contentCenterY+110
+	snap1:setTextColor(180,180,180)
+	gsm:insert(snap1)
+	
+	if snap==0 then
+		snap2=display.newText("No",0,0,"MoolBoran",60)
+		snap2.x=display.contentCenterX+120
+		snap2.y=snap1.y
+		snap2:setTextColor(255,125,125)
+		gsm:insert(snap2)
+	else
+		snap2=display.newText("Yes",0,0,"MoolBoran",60)
+		snap2.x=display.contentCenterX+120
+		snap2.y=snap1.y
+		snap2:setTextColor(125,255,125)
+		gsm:insert(snap2)
+	end
+	
+	for s=1,table.maxn(names) do
+		if curname~=s then
+			window[s]:setFillColor(100,100,100,100)
+		else
+			window[s]:setFillColor(255,255,255,255)
+		end
+	end
 	
 end
 
+function doVisible()
+	if positions[curname][3]==1 then
+		positions[curname][3]=0
+	else
+		positions[curname][3]=1
+	end
+	Interface()
+end
+
+function doSnap()
+	if snap==1 then
+		snap=0
+	else
+		snap=1
+	end
+	Interface()
+end
+
 function Moved( event )
-	if (window) then
-	--	print (event.x..","..event.y)
+	if (window[curname]) then
 		if event.y>750 or event.y<350 then
-			window.x=event.x
-			positions[curname][1]=event.x
-			if event.y+(info[curname][3]/2)<(display.contentCenterY-(653/2)) or event.y-(info[curname][3]/2)>(display.contentCenterY+(653/2)) then
-				window.y=event.y
-				if curname>=1 and curname<=4 then
-					window.y=event.y+20
-				else
-					window.y=event.y
+			window[curname].x=event.x
+			if snap==1 then
+				for s=1,table.maxn(names) do
+					if curname~=s then
+						if window[curname].x+10>window[s].x and window[curname].x-10<window[s].x then
+							window[curname].x=window[s].x
+						end
+					end
 				end
-				positions[curname][2]=event.y
+				if window[curname].x+10>display.contentCenterX and window[curname].x-10<display.contentCenterX then
+					window[curname].x=display.contentCenterX
+				end
+			end
+			positions[curname][1]=window[curname].x
+			local uno=(info[curname][3]/2)
+			if event.y+uno<(display.contentCenterY-(610/2)) or event.y-uno>(display.contentCenterY+(610/2)) then
+				window[curname].y=event.y
+				if curname>=1 and curname<=4 then
+					window[curname].y=event.y+30
+				else
+					window[curname].y=event.y
+				end
+				if snap==1 then
+					for s=1,table.maxn(names) do
+						if curname~=s then
+							if window[curname].y+10>window[s].y and window[curname].y-10<window[s].y then
+								window[curname].y=window[s].y
+							end
+						end
+					end
+				end
+				if curname>=1 and curname<=4 then
+					positions[curname][2]=window[curname].y-30
+				else
+					positions[curname][2]=window[curname].y
+				end
 			end
 		end
 	end	
 end
 
 function Load()
-	local Sve={}
+	local exists=false
 	local path = system.pathForFile(  "DoGSettings.stn", system.DocumentsDirectory )
-	for line in io.lines( path ) do
-		Sve[#Sve+1]=line
+	local fh, errStr = io.open( path, "r" )
+	if (fh) then
+		exists=true
 	end
-	local count=0
-	for p=1,table.maxn(positions) do
-		for i=1,table.maxn(positions[p]) do
-			count=count+1
-			positions[p][i]=Sve[count]
+	if exists==true then
+		local Sve={}
+		local path = system.pathForFile(  "DoGSettings.stn", system.DocumentsDirectory )
+		for line in io.lines( path ) do
+			Sve[#Sve+1]=line
+		end
+		local count=0
+		for p=1,table.maxn(positions) do
+			for i=1,table.maxn(positions[p]) do
+				count=count+1
+				positions[p][i]=Sve[count]
+			end
 		end
 	end
 end
@@ -227,4 +379,4 @@ function WipeSave()
 	local fh, errStr = io.open( path, "w+" )
 	fh:write("")
 	io.close( fh )
-end
+end 

@@ -21,13 +21,14 @@ local xpsheet = graphics.newImageSheet("xpbar.png",{ width=392, height=40, numFr
 local hpsheet = graphics.newImageSheet("hp.png",{ width=200, height=30, numFrames=67 })
 local mpsheet = graphics.newImageSheet("mp.png",{ width=200, height=30, numFrames=67 })
 local epsheet = graphics.newImageSheet("ep.png",{ width=200, height=30, numFrames=67 })
-local mh=require("Lhandler")
 local physics = require "physics"
 local widget = require "widget"
 local menu = require ("Lmenu")
+local mh=require("Lhandler")
 local a = require("Laudio")
-local interfaceb
+local idletimer=0
 local Narrator={}
+local interfaceb
 local Progress
 local Function
 local eHits={}
@@ -71,12 +72,7 @@ function ShowArrows()
 	local size=math.sqrt(mapsize)
 	
 	if not(cwin) then
-		local halfX=display.contentCenterX
-		local halfY=display.contentCenterY
-		cwin=display.newImageRect( "cwindow.png", 653,653 )
-		cwin.x=halfX
-		cwin.y=halfY
-		cwin:addEventListener("touch",Interaction)
+		Runtime:addEventListener("enterFrame",WindowManager)
 	end
 	
 	--Wall Collision Checks
@@ -145,6 +141,50 @@ function ShowArrows()
 		mright.xScale=scale
 		mright.yScale=mright.xScale
 		mright:toFront()
+	end
+end
+
+function WindowManager()
+	if not(cwin) then
+		wintransp=255
+		cwin=display.newImageRect( "cwindow.png", 653,653 )
+		cwin.x=display.contentCenterX
+		cwin.y=display.contentCenterY
+		cwin:addEventListener("touch",Interaction)
+		cwin:setFillColor(wintransp,wintransp,wintransp,wintransp)
+		cwin.state=1
+	end
+	idletimer=idletimer+1
+	if idletimer>20 and idletimer<200 and cwin.state~=0 then
+		wintransp=wintransp-math.ceil(255/100)
+		if wintransp<0 then
+			wintransp=0
+			cwin.state=0
+		end
+		cwin:setFillColor(wintransp,wintransp,wintransp,wintransp)
+	end
+	if idletimer>1500 then
+		if cwin.state==0 then
+			wintransp=wintransp+math.ceil(255/50)
+			if wintransp>255 then
+				wintransp=255
+				cwin.state=1
+			end
+			cwin:setFillColor(wintransp,wintransp,wintransp,wintransp)
+		elseif cwin.state==1 then
+			wintransp=wintransp-math.ceil(255/50)
+			if wintransp<75 then
+				cwin.state=2
+			end
+			cwin:setFillColor(wintransp,wintransp,wintransp,wintransp)
+		elseif cwin.state==2 then
+			wintransp=wintransp+math.ceil(255/50)
+			if wintransp>255 then
+				wintransp=255
+				cwin.state=1
+			end
+			cwin:setFillColor(wintransp,wintransp,wintransp,wintransp)
+		end
 	end
 end
 
@@ -217,6 +257,8 @@ function CleanArrows()
 end
 
 function CleanWindow()
+	Runtime:removeEventListener("enterFrame",WindowManager)
+	idletimer=0
 	display.remove(cwin)
 	cwin=nil
 end
@@ -1379,7 +1421,7 @@ function CAttackBtn()
 	if not(AttackBtn)then
 		AttackBtn=  widget.newButton{
 			label="Attack",
-			labelColor = { default={255,255,255}, over={0,0,0} },
+			labelColor = { default={0,0,0}, over={255,255,255} },
 			font="MoolBoran",
 			fontSize=50,
 			labelYOffset=10,
@@ -1890,7 +1932,7 @@ function CMagicBtn()
 	if not(MagicBtn)then
 		MagicBtn=  widget.newButton{
 			label="Spellbook",
-			labelColor = { default={255,255,255}, over={0,0,0} },
+			labelColor = { default={0,0,0}, over={255,255,255} },
 			font="MoolBoran",
 			fontSize=50,
 			labelYOffset=10,
@@ -1914,7 +1956,7 @@ function CItemBtn()
 	if not(ItemBtn)then
 		ItemBtn=  widget.newButton{
 			label="Inventory",
-			labelColor = { default={255,255,255}, over={0,0,0} },
+			labelColor = { default={0,0,0}, over={255,255,255} },
 			font="MoolBoran",
 			fontSize=50,
 			labelYOffset=10,

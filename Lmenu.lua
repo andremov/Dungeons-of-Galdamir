@@ -7,9 +7,10 @@ module(..., package.seeall)
 local egg=math.random(1,1000000)
 local widget = require "widget"
 local group=display.newGroup()
-local m=require("Lhandler")
-local s=require("Lsplashes")
+local set=require("Lsettings")
 local inv=require("Lwindow")
+local s=require("Lsplashes")
+local m=require("Lhandler")
 local v=require("Lversion")
 local o=require("Loptions")
 local sc=require("Lscore")
@@ -33,6 +34,8 @@ function ShowMenu()
 	function FrontNCenter2()
 		OffScreen:toFront()
 	end
+	
+	set.Load()
 	
 	CurMenu=0
 	GVersion=v.HowDoIVersion(true)

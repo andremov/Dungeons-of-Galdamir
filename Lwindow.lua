@@ -109,6 +109,7 @@ function CloseErrthang()
 		if (gbk) then
 			ToggleSpells(false)
 		end
+		ui.ShowPwg()
 		return true
 	else
 		return false
@@ -733,8 +734,11 @@ end
 function StatInfo()
 	local baseX=50
 	local baseY=90
-	local SpacingX=300
+	local SpacingX=350
 	local SpacingY=50
+	local symLength=18
+	local primary=250
+	local secundary=75
 	if p1.name=="Error" then
 		info[1]=display.newText(
 			(
@@ -755,7 +759,7 @@ function StatInfo()
 	
 	info[#info+1]=display.newText(
 		(
-			"HP: "..p1.HP.."/"..p1.MaxHP
+			"HP:"
 		),
 		baseX,baseY,"MoolBoran",60
 	)
@@ -763,7 +767,25 @@ function StatInfo()
 	
 	info[#info+1]=display.newText(
 		(
-			"MP: "..p1.MP.."/"..p1.MaxMP
+			p1.HP.."/"..p1.MaxHP
+		),
+		baseX+(#(info[#info].text)*symLength)+symLength,baseY,"MoolBoran",60
+	)
+	info[#info]:setTextColor(primary,secundary,secundary)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"("..(p1.HP/p1.MaxHP*100).."%"..")"
+		),
+		baseX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25),baseY,"MoolBoran",60
+	)
+	info[#info]:setTextColor(primary,secundary,secundary)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"MP:"
 		),
 		baseX+SpacingX,baseY,"MoolBoran",60
 	)
@@ -771,7 +793,25 @@ function StatInfo()
 	
 	info[#info+1]=display.newText(
 		(
-			"EP: "..p1.EP.."/"..p1.MaxEP
+			p1.MP.."/"..p1.MaxMP
+		),
+		baseX+SpacingX+(#(info[#info].text)*symLength)+symLength,baseY,"MoolBoran",60
+	)
+	info[#info]:setTextColor(primary,secundary,primary)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"("..(p1.MP/p1.MaxMP*100).."%"..")"
+		),
+		baseX+SpacingX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25),baseY,"MoolBoran",60
+	)
+	info[#info]:setTextColor(primary,secundary,primary)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"EP:"
 		),
 		baseX,baseY+SpacingY,"MoolBoran",60
 	)
@@ -779,11 +819,31 @@ function StatInfo()
 	
 	info[#info+1]=display.newText(
 		(
-			"Gold: "..p1.gp
+			p1.EP.."/"..p1.MaxEP
 		),
-		baseX+SpacingX,baseY+SpacingY,"MoolBoran",60
+		baseX+(#(info[#info].text)*symLength)+symLength,baseY+SpacingY,"MoolBoran",60
+	)
+	info[#info]:setTextColor(secundary,primary,secundary)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"("..(p1.EP/p1.MaxEP*100).."%"..")"
+		),
+		baseX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25),baseY+SpacingY,"MoolBoran",60
+	)
+	info[#info]:setTextColor(secundary,primary,secundary)
+	ginf:insert(info[#info])
+	
+	--[[
+	info[#info+1]=display.newText(
+		(
+			"Class: "..p1.clsnames[p1.class+1]
+		),
+		baseX+SpacingX,baseY+(SpacingY*3),"MoolBoran",60
 	)
 	ginf:insert(info[#info])
+	--]]
 	
 	info[#info+1]=display.newText(
 		(
@@ -795,10 +855,28 @@ function StatInfo()
 	
 	info[#info+1]=display.newText(
 		(
-			"XP: "..p1.XP.."/"..p1.MaxXP
+			"XP:"
 		),
 		baseX+SpacingX,baseY+(SpacingY*2),"MoolBoran",60
 	)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			p1.XP.."/"..p1.MaxXP
+		),
+		baseX+SpacingX+(#(info[#info].text)*symLength)+symLength,baseY+(SpacingY*2),"MoolBoran",60
+	)
+	info[#info]:setTextColor(secundary,secundary,primary)
+	ginf:insert(info[#info])
+	
+	info[#info+1]=display.newText(
+		(
+			"("..(p1.XP/p1.MaxXP*100).."%"..")"
+		),
+		baseX+SpacingX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25),baseY+(SpacingY*2),"MoolBoran",60
+	)
+	info[#info]:setTextColor(secundary,secundary,primary)
 	ginf:insert(info[#info])
 	
 	local flr=WD.Circle()
@@ -812,12 +890,11 @@ function StatInfo()
 	
 	info[#info+1]=display.newText(
 		(
-			"Class: "..p1.clsnames[p1.class+1]
+			"Gold: "..p1.gp.." coins"
 		),
 		baseX+SpacingX,baseY+(SpacingY*3),"MoolBoran",60
 	)
 	ginf:insert(info[#info])
-	
 	
 	info[#info+1]=display.newText(
 		(

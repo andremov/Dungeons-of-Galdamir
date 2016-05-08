@@ -683,7 +683,7 @@ function SpawnerCheck()
 	local P1=players.GetPlayer()
 	local info=false
 	if (MS) then
-		if (P1) and (MS.loc==P1.loc) and (MS.room==P1.room) and (MS.cd==0) then
+		if (P1) and (MS.loc==P1.loc) and (MS.room==P1.room) and (MS.cd==0) and (P1.stats[4]>=MS.req) then
 			info=true
 		end
 	end
