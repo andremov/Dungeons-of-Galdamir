@@ -4,17 +4,21 @@
 --
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
-local loadsheet = graphics.newImageSheet( "ui/spriteload.png", { width=50, height=50, numFrames=8 } )
+local loadsheet = graphics.newImageSheet( "spriteload.png", { width=50, height=50, numFrames=8 } )
+local handler=require("Ltiles")
 local builder=require("Lbuilder")
 local players=require("Lplayers")
 local WD=require("Lprogress")
 local audio=require("Laudio")
--- local com=require("Lcombat")
+local com=require("Lcombat")
+local inv=require("Lwindow")
 local s=require("Lsplashes")
 local sav=require("Lsaving")
 local col=require("Levents")
 local itm=require("Litems")
+local menu=require("Lmenu")
 local gp=require("Lgold")
+local m=require("Lmoves")
 local q=require("Lquest")
 local ui=require("Lui")
 local DoLoad=false
@@ -30,10 +34,16 @@ function Startup(val)
 		DoStuff=false
 	end
 	Loading=display.newGroup()
+	menu.FindMe(8)
+	
+	loadbkg = display.newImage("bkgs/bkg_leveldark.png", true)
+	loadbkg.x = display.contentWidth/2
+	loadbkg.y = display.contentHeight/2
+	Loading:insert( loadbkg )
 	
 	load1 = display.newSprite( loadsheet, { name="load", start=1, count=8, time=600,}  )
 	load1.x = display.contentWidth-50
-	load1.y = display.contentHeight-100
+	load1.y = display.contentHeight-50
 	load1:play()
 	Loading:insert( load1 )
 	
@@ -73,54 +83,87 @@ function Startup(val)
 		end
 	end
 end
+
+function ShowContinue()
+	Runtime:addEventListener( "touch", Continue )
 	
-function Continue()
-	if DoStuff==true then
-		Runtime:addEventListener("enterFrame", gp.GoldDisplay)
-	end
-	for i=Loading.numChildren,1,-1 do
-		if (Loading[i]) then
-			display.remove(Loading[i])
-			Loading[i]=nil
+	display.remove( loadtxt )
+	loadtxt=nil
+	display.remove( load1 )
+	load1=nil
+	display.remove( load2 )
+	load2=nil
+	display.remove( load3 )
+	load3=nil
+	
+	contxt = display.newText("Tap to continue", 0,0,"MoolBoran",60)
+	contxt:setTextColor(70,255,70)
+	contxt.x = display.contentCenterX
+	contxt.y = display.contentHeight*.75
+	Loading:insert( contxt )
+end
+	
+function Continue( event )
+	if event.phase=="ended" then
+		Runtime:removeEventListener( "touch", Continue )
+		if DoStuff==true then
+			Runtime:addEventListener("enterFrame", gp.GoldDisplay)
 		end
-	end
-	loadsheet=nil
-	Loading=nil
-	if DoStuff==true then
-		ui.BaseUI(true)
-		if DoLoad==true then
-			DoLoad=false
-			-- m.Visibility()
-		else
-			ui.OpenInfo()
-			ui.SwapInfo(false)
-			ui.Ready()
+		for i=Loading.numChildren,1,-1 do
+			if (Loading[i]) then
+				display.remove(Loading[i])
+				Loading[i]=nil
+			end
 		end
-		audio.changeMusic(2)
-	elseif DoStuff==false then
-		-- m.Visibility()
+		Loading=nil
+		if DoStuff==true then
+			ui.UI(true)
+			if DoLoad==true then
+				DoLoad=false
+				m.Visibility()
+			else
+				ui.Pause(true)
+				inv.ToggleInfo()
+				inv.SwapInfo(false)
+			end
+			players.CalmDownCowboy(true)
+			audio.changeMusic(2)
+			menu.FindMe(6)
+		elseif DoStuff==false then
+			m.Visibility()
+		end
 	end
 end
 	
 function Operations(name)
+	players.CalmDownCowboy(false)
 	q.Essentials()
 	WD.Essentials()
 	players.CreatePlayers(name)
 	gp.Essentials()
-	-- com.Essentials()
+	com.Essentials()
 	itm.Essentials()
+	inv.Essentials()
 --	players.WhosYourDaddy()
 	ui.CleanSlate()
-	ui.BaseUI(false)
+	ui.UI(false)
 	if DoLoad==true then
 		timer.performWithDelay(100, (sav.Load) )
 	else
-		-- builder.BuildMap()
-		builder.Progress()
+		builder.BuildMap()
 	end
 	
 	Runtime:addEventListener("enterFrame", col.removeOffscreenItems)
 --	print "Game loaded successfully."
-	-- Round=WD.Circle()
+	Round=WD.Circle()
 --	print ("Floor: "..Round)
+end
+
+function Operations2()
+	gp.Essentials()
+	inv.Essentials()
+end
+
+function FrontNCenter()
+	Loading:toFront()
 end

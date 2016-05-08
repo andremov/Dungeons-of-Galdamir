@@ -7,6 +7,7 @@ module(..., package.seeall)
 local widget = require "widget"
 local o=require("Loptions")
 local a=require("Laudio")
+local m = require("Lmenu")
 local charname
 local charclass
 local charmenu
@@ -45,6 +46,7 @@ function ClassChoose( event )
 end
 
 function CharMenu()
+	m.FindMe(4)
 	if (charname) then
 		ClassMenu()
 	end
@@ -74,6 +76,7 @@ function CharMenu()
 			width=80, height=90,
 			onRelease = CharChoose
 		}
+		btns[i]:setReferencePoint( display.CenterReferencePoint )
 		btns[i].x = display.contentWidth*(0.2*i)
 		btns[i].y = display.contentHeight*0.3
 		charmenu:insert(btns[i])
@@ -82,7 +85,7 @@ function CharMenu()
 	title=display.newText("Character Customization",0,0,"MoolBoran",100)
 	title.x = display.contentWidth*0.5
 	title.y = 100
-	title:setFillColor(0.5,1,0.5)
+	title:setTextColor(125,250,125)
 	charmenu:insert(title)
 	
 	BackBtn =  widget.newButton{
@@ -96,6 +99,7 @@ function CharMenu()
 		width=290, height=90,
 		onRelease = onBackRelease
 	}
+	BackBtn:setReferencePoint( display.CenterReferencePoint )
 	BackBtn.x = display.contentWidth*0.5
 	BackBtn.y = display.contentHeight-100
 	charmenu:insert(BackBtn)
@@ -147,6 +151,7 @@ function ClassMenu()
 			width=80, height=90,
 			onRelease = ClassChoose
 		}
+		btns2[i]:setReferencePoint( display.CenterReferencePoint )
 		btns2[i].x = info[i].x
 		btns2[i].y = imgs2[i].y
 		classmenu:insert(btns2[i])

@@ -6,17 +6,20 @@
 module(..., package.seeall)
 local builder=require("Lbuilder")
 local players=require("Lplayers")
-local audio=require("Laudio")
--- local com=require("Lcombat")
-local sav=require("Lsaving")
-local su=require("Lstartup")
-local mob=require("Lmobai")
-local col=require("Levents")
-local shp=require("Lshop")
-local gp=require("Lgold")
-local q=require("Lquest")
 local m=require("Lmenu")
+local mob=require("Lmobai")
+local handler=require("Ltiles")
+local mov=require("Lmoves")
+local col=require("Levents")
+local audio=require("Laudio")
+local gp=require("Lgold")
+local inv=require("Lwindow")
 local ui=require("Lui")
+local com=require("Lcombat")
+local sav=require("Lsaving")
+local shp=require("Lshop")
+local q=require("Lquest")
+local su=require("Lstartup")
 local RoundTax=5
 local HighCard
 local Level
@@ -48,21 +51,21 @@ function FloorSign()
 		if proftransp<20 then
 			proftransp=0
 		end
-		profbkg:setFillColor(proftransp/255,proftransp/255,proftransp/255,proftransp/255)
-		profbkg2:setFillColor(1,1,1,proftransp/255)
+		profbkg:setFillColor(proftransp,proftransp,proftransp,proftransp)
+		profbkg2:setTextColor(255,255,255,proftransp)
 		floorcount:toFront()
 		timer.performWithDelay(20,FloorSign)
 	else
 		proftransp=255
 		floorcount=display.newGroup()
-		profbkg=display.newImageRect("ui/floorcount.png", 600, 250)
+		profbkg=display.newImageRect("floorcount.png", 600, 250)
 		profbkg.xScale=0.5
 		profbkg.yScale=profbkg.xScale
-		profbkg:setFillColor(proftransp/255,proftransp/255,proftransp/255,proftransp/255)
+		profbkg:setFillColor(proftransp,proftransp,proftransp,proftransp)
 		profbkg.x, profbkg.y = display.contentCenterX, display.contentCenterY-200
 		
 		profbkg2=display.newText( (Round), 0, 0, "Game Over", 100 )
-		profbkg2:setFillColor(1,1,1,proftransp/255)
+		profbkg2:setTextColor(255,255,255,proftransp)
 		profbkg2.x, profbkg2.y = profbkg.x, profbkg.y+20
 		
 		floorcount:insert(profbkg)
@@ -89,7 +92,6 @@ function FloorPort(up)
 				gpgain=(5*math.sqrt(size))
 			end
 			gp.CallAddCoins(gpgain)
-			players.GrantXP( math.ceil(gpgain/1.5) )
 		end
 		su.Startup(false)
 		builder.Rebuild(false)
@@ -127,7 +129,6 @@ function Win()
 			gpgain=(5*math.sqrt(size))
 		end
 		gp.CallAddCoins(gpgain)
-		players.GrantXP( math.ceil(gpgain/1.5) )
 	end
 	su.Startup(false)
 	builder.Rebuild(false)
@@ -150,6 +151,6 @@ function SrsBsns()
 	gp.CleanCounter()
 	builder.WipeMap()
 	m.ShowMenu()
-	-- mov.CleanWindow()
+	mov.CleanWindow()
 end
 

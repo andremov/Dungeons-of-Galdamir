@@ -39,7 +39,7 @@ function Perspective.createView(numLayers)
 
 
 	--Check for manual layer count
-	numLayers=(type(numLayers)=="number" and numLayers) or 8
+	numLayers=(type(numLayers)=="number" and numLayers) or 100
 
 
 	--Variables
@@ -88,6 +88,7 @@ function Perspective.createView(numLayers)
 			if layer[newLayer] then
 				layer[newLayer]:insert(obj)
 				obj._perspectiveLayer=newLayer
+				obj.layer=obj._perspectiveLayer
 			end
 		end
 		
@@ -96,6 +97,7 @@ function Perspective.createView(numLayers)
 			if layer[obj._perspectiveLayer+1] then
 				layer[obj._perspectiveLayer+1]:insert(obj)
 				obj._perspectiveLayer=obj.layer+1
+				obj.layer=obj._perspectiveLayer
 			end
 		end
 			
@@ -104,6 +106,7 @@ function Perspective.createView(numLayers)
 			if layer[obj._perspectiveLayer-1] then
 				layer[obj._perspectiveLayer-1]:insert(obj)
 				obj._perspectiveLayer=obj.layer-1
+				obj.layer=obj._perspectiveLayer
 			end
 		end
 		
@@ -111,6 +114,7 @@ function Perspective.createView(numLayers)
 		function obj:toCameraFront()
 			layer[1]:insert(obj)
 			obj._perspectiveLayer=1
+			obj.layer=obj._perspectiveLayer
 			obj:toFront()
 		end
 
@@ -118,6 +122,7 @@ function Perspective.createView(numLayers)
 		function obj:toCameraBack()
 			layer[numLayers]:insert(obj)
 			obj._perspectiveLayer=numLayers
+			obj.layer=obj._perspectiveLayer
 			obj:toBack()
 		end
 	end
@@ -262,8 +267,9 @@ function Perspective.createView(numLayers)
 	function view:remove(obj)
 		if obj~=nil and layer[obj._perspectiveLayer]~=nil then
 			layer[obj._perspectiveLayer]:remove(obj)
-    end
-  end
+			obj.layer=nil
+		end
+	end
 	
 
 	--Destroy the camera

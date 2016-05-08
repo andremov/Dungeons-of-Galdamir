@@ -1,12 +1,11 @@
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 --
 -- Items.lua
 --
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 module(..., package.seeall)
 local widget = require "widget"
-local WD=require("Lprogress")
-local p=require("Lplayers")
+local p=require("Lplayer")
 local b=require("Lbuilder")
 local q=require("Lquest")
 local ui=require("Lui")
@@ -277,6 +276,7 @@ function OneHundredPercent()
 	return itemlist, equips, items
 end
 
+--[[
 function Essentials()
 	gum=display.newGroup()
 	items={
@@ -4037,3 +4037,4 @@ function Essentials()
 		--
 	}
 end
+--]]

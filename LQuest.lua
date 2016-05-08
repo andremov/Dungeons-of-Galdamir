@@ -1,16 +1,12 @@
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 --
 -- Quest.lua
 --
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 module(..., package.seeall)
 local coinsheet = graphics.newImageSheet( "bluecoinsprite.png", { width=32, height=32, numFrames=8 } )
 local qsheet = graphics.newImageSheet( "ui/quest.png", { width=447, height=80, numFrames=7 } )
 local b=require("Lbuilder")
-local gp=require("Lgold")
-local WD=require("Lprogress")
-local mob=require("Lmobai")
-local HasQuest
 local gqm
 local QuestType
 local NumKills
@@ -24,6 +20,7 @@ local locaX
 local locaY
 local coins={}
 local ItemName
+local HasQuest=false
 local ItemNames={
 		"Magical Trinket",
 		"Guard Insignia",
@@ -32,17 +29,13 @@ local ItemNames={
 		"Dragon Claw",
 	}
 
-function Essentials()
-	HasQuest=false
-	gqm=display.newGroup()
-end
-
 function CreateQuest()
 	if HasQuest==false then
 	--	local roll=math.random(1,10)
 		roll=6
 		if roll>=6 then
 	--		print "Quest get."
+			gqm=display.newGroup()
 			HasQuest=true
 			QWindow=display.newSprite( qsheet, { name="quest", start=1, count=7, time=1000}  )
 			QWindow.x= display.contentWidth-225

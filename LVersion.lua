@@ -15,16 +15,19 @@ Font2: Game Over
 Font3: Viner Hand ITC
 Font4: Adobe Devanagari
 Font5: MoolBoran
-Font5: Runes of Galdamir
 
 AdBuddiz:
 6c7e651b-851d-4ab9-923d-a557d77d4a6a
+
+TO DO
+	COD-LIKE DAMAGE GFX
+	LOW HEALTH SFX
 --]]
 
 local RSS
 local shSuffix="RLSE"
 local loSuffix="RELEASE"
-local verNum="1.3.0"
+local verNum="1.1.3"
 local cVersion=(shSuffix.." "..verNum)
 local gVersion=(loSuffix.." "..verNum)
 
@@ -51,12 +54,16 @@ function VListen( event )
 			count=count+1
 			if count==1 then
 				RSS=string.sub(word,7,16)
-				if RSS==cVersion then
-					m.isVersion(true)
-				else
-					m.isVersion(false)
-				end
+				VConclusions()
 			end
 		end
+	end
+end
+
+function VConclusions()
+	if RSS==cVersion then
+		m.isVersion(true)
+	else
+		m.isVersion(false)
 	end
 end

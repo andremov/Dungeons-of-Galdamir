@@ -8,9 +8,13 @@ local coinsheet = graphics.newImageSheet( "coinsprite.png", { width=32, height=3
 local players = require("Lplayers")
 local physics = require "physics"
 local builder=require("Lbuilder")
+local set=require("Lsettings")
 local a=require("Laudio")
 local ui=require("Lui")
 local DisplayS=1.25
+local Displayx
+local Displayy
+local alwaysV
 local GoldCount
 local CoinGroup=display.newGroup()
 local coins={}
@@ -19,13 +23,14 @@ local GCDisplay
 local CDisplay
 local DaCoins
 local Handbrake
-local gShown=true
-local gwg
-local showncd
 
 function Essentials()
 	P1=players.GetPlayer()
 	GoldCount=0
+	local info=set.Get(0)
+	Displayx=info[1]
+	Displayy=info[2]
+	alwaysV=info[3]
 end
 
 function Coins()
@@ -49,80 +54,79 @@ function GetCoinGroup()
 end
 
 function GoldDisplay()
-	if not (gwg) then
-		gwg=display.newGroup()
-		showncd=1
+	if not (GCDisplay) then
+		if alwaysV==0 then
+			transp=0
+		else
+			transp=255
+		end
 		
-		GWindow = ui.CreateWindow(200,70)
-		GWindow.x=display.contentWidth-80
-		GWindow.y=145
-		gwg:insert(GWindow)
+		GCDisplay = display.newText( (GoldCount), Displayx, Displayy, "Game Over", 100 )
+		GCDisplay:setTextColor( 255, 255, 50, transp)
 		
+		GWindow = display.newRect (0,0,#GCDisplay.text*23,40)
+		GWindow:setFillColor( 150, 150, 150,transp/2)
+		GWindow.y=GCDisplay.y+5
+		GWindow.x=GCDisplay.x
+		
+		GCDisplay:toFront()
+	end
+	if not (CDisplay) then
 		CDisplay=display.newSprite( coinsheet, { name="coin", start=1, count=8, time=750}  )
-		CDisplay.anchorX=0
-		CDisplay.anchorY=0
-		CDisplay.x, CDisplay.y = GWindow.x-80, GWindow.y-20
+		CDisplay:setFillColor( 0, 0, 0, 0)
+		CDisplay:setReferencePoint( display.CenterRightReferencePoint )
+		CDisplay.x, CDisplay.y = GCDisplay.x-30, GCDisplay.y+5
 		CDisplay.xScale=DisplayS
 		CDisplay.yScale=DisplayS
 		CDisplay:toFront()
 		CDisplay:play()
-		gwg:insert(CDisplay)
+	end
+	GCDisplay.text=(GoldCount)
+	if GoldCount==P1.gp and Handbrake~=true then
+		if alwaysV==0 then
+			if transp<20 then
+				transp=0
+			else
+				transp=transp-(255/100)
+			end
+		else
+			transp=255
+		end
+		display.remove(GWindow)
+		GWindow = display.newRect (0,0,#GCDisplay.text*23,40)
+		GWindow:setFillColor( 150, 150, 150,transp/2)
+		GWindow.x=GCDisplay.x
+		GWindow.y=GCDisplay.y+5
 		
-		GCDisplay = display.newText( (GoldCount),0,0, "Game Over", 100 )
-		GCDisplay.anchorX=0
-		GCDisplay.anchorY=0
-		GCDisplay.x,GCDisplay.y=CDisplay.x+60,CDisplay.y-10
-		GCDisplay:setFillColor( 1, 1, 0.2)
-		gwg:insert(GCDisplay)
+		GCDisplay:toFront()
+		CDisplay:toFront()
+		GCDisplay:setTextColor( 255, 255, 50, transp)
+		CDisplay:setFillColor( transp, transp, transp, transp)
+	else
+		if GoldCount<P1.gp then
+			GoldCount=GoldCount+1
+		elseif GoldCount>P1.gp then
+			GoldCount=GoldCount-1
+		end
+		transp=255
+		display.remove(GWindow)
+		GWindow = display.newRect (0,0,#GCDisplay.text*23,40)
+		GWindow:setFillColor( 150, 150, 150,transp/2)
+		GWindow.x=GCDisplay.x
+		GWindow.y=GCDisplay.y+5
 		
-		Runtime:addEventListener("enterFrame",MoveWindow)
+		GCDisplay:toFront()
+		CDisplay:toFront()
+		GCDisplay:setTextColor( 255, 255, 50, transp)
+		CDisplay:setFillColor( transp, transp, transp, transp)
 	end
 end
 
-function MoveWindow()
-	if (gwg) then
-		local shownx=0
-		local hiddenx=200
-		if gShown==true and gwg.x~=shownx then
-			-- print ("SHOWN; NOT IN POSITION")
-			if gwg.x<shownx then
-				gwg.x=gwg.x+2
-			elseif gwg.x>shownx then
-				gwg.x=gwg.x-2
-			end
-		elseif gShown==true and gwg.x==shownx then
-			-- print ("SHOWN; IN POSITION")
-			if GoldCount~=P1.gp then
-				-- print ("UPDATING COUNT")
-				if GoldCount<P1.gp then
-					GoldCount=GoldCount+1
-				elseif GoldCount>P1.gp then
-					GoldCount=GoldCount-1
-				end
-				GCDisplay.text=(GoldCount)
-				
-				GCDisplay:setFillColor( 1, 1, 0.20)
-				showncd=60
-			else
-				-- print ("COUNT UPDATED")
-				showncd=showncd-1
-				if showncd==0 then
-					gShown=false
-				end
-			end
-		elseif gShown==false and gwg.x~=hiddenx then
-			-- print ("HIDDEN; NOT IN POSITION")
-			if gwg.x<hiddenx then
-				gwg.x=gwg.x+2
-			elseif gwg.x>hiddenx then
-				gwg.x=gwg.x-2
-			end
-		elseif gShown==false and gwg.x==hiddenx and P1.gp~=GoldCount then
-			-- print ("HIDDEN; IN POSITION; GP ISNT COUNT")
-			gShown=true
-		elseif gShown==false and gwg.x==hiddenx then
-			-- print ("HIDDEN; IN POSITION; GP IS COUNT")
-		end
+function ShowGCounter()
+	if Handbrake==true then
+		Handbrake=false
+	else
+		Handbrake=true
 	end
 end
 

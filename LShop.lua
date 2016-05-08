@@ -1,18 +1,15 @@
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 --
 -- Shop.lua
 --
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 module(..., package.seeall)
 local widget = require "widget"
 local ui=require("Lui")
 local b=require("Lbuilder")
-local WD=require("Lprogress")
 local it=require("Litems")
-local gp=require("Lgold")
-local p=require("Lplayers")
-local a=require("Laudio")
-local sav=require("Lsaving")
+local p=require("Lplayer")
+local sav=require("Lsave")
 local swg
 local gbm
 local gsm

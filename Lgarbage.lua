@@ -8,22 +8,22 @@ function Font()
 	
 	for i,fontname in ipairs(fonts) do
 		count = count+1
-		j, k = string.find(fontname, "Runes")
+		j, k = string.find(fontname, "Mool")
 		if (j ~= nil) then
 			found_count = found_count + 1
 			print("found font: \""..fontname.."\"")
-			local obj = display.newText(fontname, 0, 50+((found_count-1)*40), fontname, 48)
+			local obj = display.newText(fontname, 0, (found_count - 1) * 40, fontname, 48)
 			g:insert(obj)
-			obj:setFillColor(1, 1, 1)
+			obj:setTextColor(255, 255, 255)
 			obj.x=display.contentWidth/2
 		end
 	end
 	print ("Font count: " .. count)
-	local count_text = display.newText("Found " .. count .. " fonts.", 0, 50+((found_count)*40), fontname, 32)
+	local count_text = display.newText("Found " .. count .. " fonts.", 0, (found_count) * 40, fontname, 32)
 			count_text.x=display.contentWidth/2
 	g:insert(count_text)
 	g:toFront()
-	count_text:setFillColor(1, 1, 1)
+	count_text:setTextColor(255, 255, 255)
 	--	
 end
 
@@ -224,94 +224,5 @@ function animate(level)
 		return false
 	else
 		return true
-	end
-end
-
-
-function test()
-
-xpsheet = graphics.newImageSheet( "ui/xpbar.png", { width=392, height=40, numFrames=50 } )
-	curXP=0
-	maxXP=50
-	lvl=1
-	transp2=0
-	XPSymbol=display.newSprite( xpsheet, { name="xpbar", start=1, count=50, time=(2000) }  )
-	XPSymbol.x = display.contentCenterX
-	XPSymbol.y = display.contentCenterY
-	XPSymbol.yScale=2.0
-	XPSymbol.xScale=2.0
-	XPSymbol:toFront()
-	XPSymbol:setFillColor(1,1,1,transp2/255)
-	
-	XPDisplay=display.newText( ((XPSymbol.frame*2).."%"), 0, 0, "Game Over", 85 )
-	XPDisplay.x = XPSymbol.x
-	XPDisplay.y = XPSymbol.y
-	XPDisplay:toFront()
-	XPDisplay:setFillColor( 0, 0, 0,transp2/255)
-
-	timer.performWithDelay(5000,test2)
-end
-
-function test2()
-	print "!!!"
-	GrantXP(20)
-end
-
-function GrantXP(orbs)
-	curXP=curXP+(orbs)
-	if math.floor(curXP)==0 then
-		XPSymbol:setFrame( 1 )
-	else
-		timer.performWithDelay(50,OhCrap)
-	end
-end
-
-function LvlUp()
-	lvl=lvl+1
-	local profit=curXP-maxXP
-	curXP=0+profit
-	maxXP=lvl*50
-	
-	if math.floor(curXP)==0 then
-		xpSymbol:setFrame( 1 )
-	else
-		timer.performWithDelay(50,OhCrap)
-	end
-end
-
-function OhCrap()
-	print "!!"
-	XPSymbol:toFront()
-	XPDisplay:toFront()
-	if XPSymbol.frame==50 and curXP>maxXP then
-		print "!1"
-		LvlUp()
-	elseif XPSymbol.frame>math.floor((curXP/maxXP)*50) then
-		print "!2"
-		XPSymbol:setFrame(1)
-		transp2=255
-		XPSymbol:setFillColor(1,1,1,transp2/255)
-		XPDisplay:setFillColor( 0, 0, 0,transp2/255)
-		XPDisplay.text=((XPSymbol.frame*2).."%")
-		timer.performWithDelay(50,OhCrap)
-	elseif XPSymbol.frame<math.floor((curXP/maxXP)*50) then
-		print "!3"
-		XPSymbol:setFrame(XPSymbol.frame+1)
-		transp2=255
-		XPSymbol:setFillColor(1,1,1,transp2/255)
-		XPDisplay:setFillColor( 0, 0, 0,transp2/255)
-		XPDisplay.text=((XPSymbol.frame*2).."%")
-		timer.performWithDelay(50,OhCrap)
-	elseif XPSymbol.frame==math.floor((curXP/maxXP)*50) and transp2~=0 then
-		print "!4"
-		transp2=transp2-(255/50)
-		if transp2<20 then
-			transp2=0
-		end
-		XPSymbol:setFillColor(1,1,1,transp2/255)
-		XPDisplay:setFillColor( 0, 0, 0,transp2/255)
-		timer.performWithDelay(50,OhCrap)
-	else
-		timer.performWithDelay(5000,test2)
 	end
 end

@@ -13,32 +13,23 @@ local curMusic
 local Loaded
 local mChannel=20
 local didChange=false
-local shutup=false
 
 function LoadSounds()
 	if not (soundboard)then
-		if ( "simulator" == system.getInfo("environment") ) then
-			Sound=0.0
-			Music=0.0
-			devstartup= audio.loadSound("sounds/level.mp3")
-			-- audio.play( devstartup, {channel=1} )
-			devstartup=nil
-		else
-			Sound=0.5
-			Music=0.5
-		end
+		Sound=0.5
+		Music=0.5
 		soundboard={}
 		musicboard={}
 		soundboard[1] = audio.loadSound		("sounds/gold.mp3")
 		if (soundboard[1])then
-			soundboard[2] = audio.loadSound	("sounds/gate.mp3")
-			soundboard[3] = audio.loadSound	("sounds/open.mp3")
-			soundboard[4] = audio.loadSound	("sounds/close.mp3")
-			soundboard[5] = audio.loadSound	("sounds/heal.mp3")
-			soundboard[6] = audio.loadSound	("sounds/portal.mp3")
-			soundboard[7] = audio.loadSound	("sounds/rock.mp3")
-			soundboard[8] = audio.loadSound	("sounds/equip.mp3")
-			soundboard[9] = audio.loadSound	("sounds/level.mp3")
+			soundboard[2] = audio.loadSound		("sounds/gate.mp3")
+			soundboard[3] = audio.loadSound		("sounds/open.mp3")
+			soundboard[4] = audio.loadSound		("sounds/close.mp3")
+			soundboard[5] = audio.loadSound		("sounds/heal.mp3")
+			soundboard[6] = audio.loadSound		("sounds/portal.mp3")
+			soundboard[7] = audio.loadSound		("sounds/rock.mp3")
+			soundboard[8] = audio.loadSound		("sounds/equip.mp3")
+			soundboard[9] = audio.loadSound		("sounds/level.mp3")
 			soundboard[10] = audio.loadSound	("sounds/melee.mp3")
 			soundboard[11] = audio.loadSound	("sounds/magic.mp3")
 			soundboard[12] = audio.loadSound	("sounds/click.mp3")
@@ -47,8 +38,10 @@ function LoadSounds()
 			soundboard[15] = audio.loadSound	("sounds/step2.mp3")
 			soundboard[16] = audio.loadSound	("sounds/step3.mp3")
 			soundboard[17] = audio.loadSound	("sounds/step4.mp3")
-			soundboard[18] = audio.loadSound	("sounds/click2.mp3")
 			--
+			musicboard[1] = audio.loadStream	("sounds/menu.mp3")
+			musicboard[2] = audio.loadStream	("sounds/music.mp3")
+			musicboard[3] = audio.loadStream	("sounds/battle.mp3")
 			--
 			Loaded=true
 		else
@@ -59,7 +52,7 @@ function LoadSounds()
 end
 
 function Play(id)
-	if Loaded==true and shutup==false then
+	if Loaded==true then
 		local check=audio.isChannelPlaying(id)
 		if check==false then
 		else
@@ -81,7 +74,7 @@ function Play(id)
 end
 
 function Step()
-	if Loaded==true and shutup==false then
+	if Loaded==true then
 		local check=audio.isChannelPlaying(14)
 		if check==false then
 			if Sound~=0.0 then
@@ -99,17 +92,14 @@ function Step()
 end
 
 function PlayMusic()
-	if Loaded==true and shutup==false then
+	if Loaded==true then
 		local check=audio.isChannelPlaying(mChannel)
 		if check==false then
 			if curMusic==1 then
-				musicboard[1] = audio.loadStream	("sounds/menu.mp3")
 				audio.setVolume( 0.5*Music, { channel=mChannel  })
 			elseif curMusic==2 then
-				musicboard[2] = audio.loadStream	("sounds/music.mp3")
-				audio.setVolume( 0.7*Music, { channel=mChannel  })
+				audio.setVolume( 0.2*Music, { channel=mChannel  })
 			elseif curMusic==3 then
-				musicboard[3] = audio.loadStream	("sounds/battle.mp3")
 				audio.setVolume( 0.5*Music, { channel=mChannel  })
 			end
 			bkgmusic=audio.play( musicboard[curMusic], {channel=mChannel, onComplete=RepeatBkg} )
@@ -132,16 +122,20 @@ function changeMusic(data)
 	end
 end
 
+function Stopbkg()
+	audio.fadeOut({ bkg, 100 })
+end
+
 function RepeatBkg()
 	if didChange==true then
 		didChange=false
-		for i in pairs (musicboard) do
-			audio.dispose(musicboard[i])
-			musicboard[i]=nil
-		end
 		timer.performWithDelay(3000,PlayMusic)
 	else
-		timer.performWithDelay(15000,PlayMusic)
+		if curMusic==3 then
+			PlayMusic()
+		else
+			timer.performWithDelay(10000,PlayMusic)
+		end
 	end
 end
 

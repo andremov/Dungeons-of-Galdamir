@@ -1,35 +1,21 @@
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 --
 -- menu.lua
 --
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------
+-- GLOBAL
+---------------------------------------------------------------------------------------
+
 module(..., package.seeall)
-local egg=math.random(1,1000000)
 local widget = require "widget"
-local group=display.newGroup()
-local s=require("Lsplashes")
-local v=require("Lversion")
-local o=require("Loptions")
-local sc=require("Lscore")
-local c=require("Lchars")
-local a=require("Laudio")
-local p=require("Lplay")
-local ui=require("Lui")
-local VDisplay2
-local VDisplay
-local GVersion
-local PlayBtn
-local OptnBtn
-local RSplash
-local text={}
-local Sounds
-local Splash
-local sign
-local asd={}
-local runes={}
-local runegroup=display.newGroup()
-local words={"love","hate","dragon","mystery","quest","penis","skill","adventure","death","betrayal","vengeance","fuck"}
-local numofwords=30
+local score=require("Lscore")
+local save=require("Lsave")
+local shSuffix="RLSE"
+local loSuffix="RELEASE"
+local verNum="1.3.0"
 
 function getWord()
 	if (runes[numofwords]) then
@@ -83,6 +69,7 @@ function Glow()
 	timer.performWithDelay(100,Glow)
 end
 
+--[[
 function FirstMenu()
 	getWord()
 	Glow()
@@ -94,115 +81,110 @@ function FirstMenu()
 		a.LoadSounds()
 	end
 end
+--]]
 
-function ShowMenu()
+
+
+---------------------------------------------------------------------------------------
+-- MAIN MENU
+---------------------------------------------------------------------------------------
+
+local splash=require("Lsplashes")
+local ui=require("Lui")
+
+local mmg
+MainMenu={}
+-- local PlayBtn
+-- local OptnBtn
+-- local RSplash
+-- local text={}
+-- local Sounds
+-- local Splash
+-- local runes={}
+-- local runegroup=display.newGroup()
+-- local words={"love", "hate", "dragon", "mystery", "quest", "penis", "skill", "adventure", "death", "betrayal", "vengeance", "fuck"}
+-- local numofwords=30
+
+function MainMenu:show()
 	
-	if egg==1 then
-		titleLogo = display.newImageRect( "ui/title2.png", 477, 254 )
-	else
-		titleLogo = display.newImageRect( "ui/titleW.png", 477, 254 )
-	end
-	titleLogo.x = display.contentWidth * 0.5
-	titleLogo.y = 150
-	titleLogo:addEventListener("tap",SplashChange)
-	group:insert(titleLogo)
+	mmg=display.newGroup()
 	
-	PlayBtn =  widget.newButton{
+	local bkg=ui.CreateWindow(660,280,3)
+	bkg.y = 150
+	bkg:setFillColor(0.2,0.2,1)
+	mmg:insert(bkg)
+	
+	local title1 = display.newImageRect( "ui/DUNGEONS.png", 605, 109 )
+	title1.x = display.contentWidth * 0.5
+	title1.y = 80
+	title1:setFillColor(0.8,0.2,0.2)
+	mmg:insert(title1)
+	
+	local title2 = display.newImageRect( "ui/GALDAMIR.png", 618, 109 )
+	title2.x = display.contentWidth * 0.5
+	title2.y = 220
+	title2:setFillColor(0.8,0.2,0.2)
+	mmg:insert(title2)
+	
+	local title3 = display.newImageRect( "ui/of.png", 450, 106 )
+	title3.x = display.contentWidth * 0.5
+	title3.y = 150
+	-- title3:setFillColor(0.8,0.2,0.2)
+	mmg:insert(title3)
+	
+	
+	local PlayBtn =  widget.newButton{
 		label="Play",
 		font="MoolBoran",
-		fontSize=50,
+		fontSize=80,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		defaultFile="ui/cbutton.png",
-		overFile="ui/cbutton-over.png",
-		width=290, height=90,
-		onRelease = onPlayBtnRelease
+		defaultFile="ui/button.png",
+		overFile="ui/button_hold.png",
+		width=350, height=150,
+		onRelease = function()
+			MainMenu:clear()
+			SaveGame:show()
+		end
 	}
-	PlayBtn.x = display.contentWidth*0.5
-	PlayBtn.y = display.contentCenterY-20
-	group:insert(PlayBtn)
+	PlayBtn:setFillColor(0.6,1.0,0.6)
+	PlayBtn.x = display.contentWidth*0.25
+	PlayBtn.y = display.contentCenterY+40
+	mmg:insert(PlayBtn)
 	
-	OptnBtn =  widget.newButton{
+	
+	local OptnBtn =  widget.newButton{
 		label="Options",
 		font="MoolBoran",
-		fontSize=50,
+		fontSize=80,
 		labelYOffset=10,
 		labelColor = { default={255,255,255}, over={0,0,0} },
-		defaultFile="ui/cbutton.png",
-		overFile="ui/cbutton-over.png",
-		width=290, height=90,
-		onRelease = onOptnBtnRelease
+		defaultFile="ui/button.png",
+		overFile="ui/button_hold.png",
+		width=350, height=150,
+		onRelease = function()
+			MainMenu:clear()
+			Options:show()
+		end
 	}
-	OptnBtn.x = display.contentWidth*0.5
-	OptnBtn.y = PlayBtn.y+100
-	group:insert(OptnBtn)
+	OptnBtn.x = display.contentWidth*0.75
+	OptnBtn.y = PlayBtn.y
+	mmg:insert(OptnBtn)
 	
-	--[[
-	langBtn=display.newImageRect("lang.png",430,350)
-	langBtn.xScale=0.2
-	langBtn.yScale=langBtn.xScale
-	langBtn.x=70
-	langBtn.y=display.contentHeight-70
-	langBtn:addEventListener("tap",doThing)
-	group:insert(langBtn)
-	
-	if hieroglyphics=="EN" then
-		langTxt=display.newText("English",0,0,"MoolBoran",40)
-		langTxt:setFillColor(80,1,80)
-		langTxt.x=langBtn.x
-		langTxt.y=langBtn.y+50
-		group:insert(langTxt)
-	elseif hieroglyphics=="ES" then
-		langTxt=display.newText("Espanol",0,0,"MoolBoran",40)
-		langTxt:setFillColor(80,1,80)
-		langTxt.x=langBtn.x
-		langTxt.y=langBtn.y+50
-		group:insert(langTxt)
-	end
-	--]]
-	
-	logo=display.newImageRect("ui/Symbol3W.png",206,206)
-	logo.xScale=0.75
+	local logo=display.newImageRect("ui/Logo Gris.png",641,538)
+	logo.xScale=0.3
 	logo.yScale=logo.xScale
 	logo.x=display.contentCenterX
 	logo.y=display.contentHeight-130
-	logo:addEventListener("touch",Credits)
-	group:insert(logo)
+	-- logo:addEventListener("touch",Credits)
+	mmg:insert(logo)
 	
-	if ( "simulator" == system.getInfo("environment") ) then
-		print "Hello, developer!"
-	
-		GVersion=v.HowDoIVersion(true)
-		print ("Version: "..GVersion)
-		
-		sign=display.newImageRect("ui/sign.png", 95, 70)
-		sign.xScale=2.3
-		sign.yScale=2.3
-		sign.x=display.contentWidth/4*3+50
-		sign.y=(display.contentHeight-90)
-		group:insert(sign)
-		
-		VerDisplay = display.newText(("Version:"),0,0,"MoolBoran", 70 )
-		VerDisplay:setFillColor( 0, 0, 0)
-		VerDisplay.x=sign.x
-		VerDisplay.y=sign.y-30
-		group:insert(VerDisplay)
-		
-		VDisplay = display.newText((GVersion),0,0,"MoolBoran", 45 )
-		VDisplay:setFillColor( 0, 0, 0)
-		VDisplay.x=VerDisplay.x
-		VDisplay.y=VerDisplay.y+40
-		group:insert(VDisplay)
-	end
-	
-	Splash=s.GetSplash()
-	group:insert(Splash)
-	
-	a.changeMusic(1)
+	-- Splash=s.GetSplash()
+	-- group:insert(Splash)
 end
 
+--[[
 function SplashChange()
-	a.Play(12)
 	if (Splash) then
 		display.remove(Splash)
 		Splash=nil
@@ -210,62 +192,717 @@ function SplashChange()
 	Splash=s.GetSplash()
 	group:insert(Splash)
 end
+--]]
 
-function onPlayBtnRelease()
+function MainMenu:clear()
+	for i=mmg.numChildren,1,-1 do
+		local child = mmg[i]
+		mmg.parent:remove( child )
+		display.remove( child )
+	end
+	mmg=nil
+end
+
+
+
+---------------------------------------------------------------------------------------
+-- SAVE GAME
+---------------------------------------------------------------------------------------
+
+local game=require("Lgame")
+local save=require("Lsave")
+local sgg
+local slotg
+SaveGame={}
+
+function SaveGame:show()
+
+	sgg=display.newGroup()
+	
+	local title=display.newText("Save Game",0,0,"MoolBoran",100)
+	title.x = display.contentWidth*0.3
+	title.y = 80
+	-- title:setFillColor(0.5,1,0.5)
+	sgg:insert(title)
+	
+	--[[
+		TutBtn =  widget.newButton{
+			label="Tutorial",
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			font="MoolBoran",
+			fontSize=50,
+			labelYOffset=10,
+			defaultFile="ui/cbutton.png",
+			overFile="ui/cbutton-over.png",
+			width=308, height=90,
+			onRelease = onTutBtnRelease
+		}
+		TutBtn.x = display.contentWidth*0.5
+		TutBtn.y = display.contentHeight*0.3
+		sgg:insert(TutBtn)
+	--]]
+	local SlotBtn={}
+	for btn=1,3 do
+		local name=save.Load:getName(btn) or "No Data"
+		SlotBtn[btn] =  widget.newButton{
+			label=name,
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			font="MoolBoran",
+			fontSize=70,
+			labelYOffset=10,
+			defaultFile="ui/button.png",
+			overFile="ui/button_hold.png",
+			width=350, height=130,
+			onRelease = function()
+				for a=1,3 do
+					SlotBtn[a]:setFillColor(0.1,0.5,0.1)
+				end
+				SlotBtn[btn]:setFillColor(0.5,1.0,0.5)
+				SaveGame:slotClear()
+				SaveGame["SLOT"]=btn
+				SaveGame["NAME"]=name
+				SaveGame:slotInfo()
+			end
+		}
+		SlotBtn[btn].x = 200
+		SlotBtn[btn].y = (title.y+110)+(140*(btn-1))
+		SlotBtn[btn]:setFillColor(0.5,1.0,0.5)
+		sgg:insert(SlotBtn[btn])
+	end
+	
+	BackBtn =  widget.newButton{
+		label="Back",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		font="MoolBoran",
+		fontSize=60,
+		labelYOffset=10,
+		defaultFile="ui/button.png",
+		overFile="ui/button_hold.png",
+		width=300, height=100,
+		onRelease = function()
+			SaveGame:clear()
+			MainMenu:show()
+		end
+	}
+	BackBtn.x = 200
+	BackBtn.y = display.contentHeight-100
+	BackBtn:setFillColor(1.0,0.4,0.4)
+	sgg:insert(BackBtn)
+end
+
+function SaveGame:slotInfo()
+	slotg=display.newGroup()
+	
+	local gold, level=save.Load:getExtraInfo(SaveGame["SLOT"])
+	gold=gold or 0
+	level=level or 0
+	
+	local bkg=ui.CreateWindow(590,620,2)
+	bkg.x=display.contentCenterX+180
+	bkg.y=display.contentCenterY+30
+	bkg:setFillColor( 0.91, 0.67, 0.33 )
+	slotg:insert(bkg)
+	
+	local name=display.newText(SaveGame["NAME"],0,0,"MoolBoran",100)
+	name.x = bkg.x
+	name.y = bkg.y-225
+	slotg:insert(name)
+	
+	local playlabel
+	if (SaveGame["NAME"]=="No Data") then
+		playlabel="New Game"
+	else
+		playlabel="Load Game"
+		
+		local playervisual=display.newImage( "Save"..SaveGame["SLOT"]..".png", system.DocumentsDirectory)
+		playervisual.x=display.contentWidth-120
+		playervisual.y=bkg.y+70
+		playervisual.xScale=0.75
+		playervisual.yScale=0.75
+		slotg:insert(playervisual)
+		
+		local DeleteBtn =  widget.newButton{
+			label="Delete",
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			font="MoolBoran",
+			fontSize=60,
+			labelYOffset=10,
+			defaultFile="ui/button.png",
+			overFile="ui/button_hold.png",
+			width=200, height=100,
+			onRelease = function()
+				SaveGame:deleteSlot(slot)
+				SaveGame:refresh()
+			end
+		}
+		DeleteBtn.x = name.x-150
+		DeleteBtn.y = bkg.y+225
+		DeleteBtn:setFillColor(1,0,0)
+		slotg:insert(DeleteBtn)
+	end
+	
+	local leveldisplay1=display.newText("Level:",0,0,"MoolBoran",70)
+	leveldisplay1.x = bkg.x-175
+	leveldisplay1.y = bkg.y-120
+	slotg:insert(leveldisplay1)
+	
+	local leveldisplay2=display.newText(level,0,0,"MoolBoran",80)
+	leveldisplay2.x = leveldisplay1.x+110
+	leveldisplay2.y = leveldisplay1.y+45
+	leveldisplay2.anchorX=1.0
+	leveldisplay2:setFillColor(0.6,1,0.6)
+	slotg:insert(leveldisplay2)
+	
+	local golddisplay1=display.newText("Gold:",0,0,"MoolBoran",70)
+	golddisplay1.x = leveldisplay1.x
+	golddisplay1.y = bkg.y+50
+	slotg:insert(golddisplay1)
+	
+	local golddisplay2=display.newText(gold,0,0,"MoolBoran",80)
+	golddisplay2.x = leveldisplay2.x
+	golddisplay2.y = golddisplay1.y+45
+	golddisplay2:setFillColor(1,1,0.6)
+	golddisplay2.anchorX=1.0
+	slotg:insert(golddisplay2)
+	
+	local PlayBtn =  widget.newButton{
+		label=playlabel,
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		font="MoolBoran",
+		fontSize=60,
+		labelYOffset=10,
+		defaultFile="ui/button.png",
+		overFile="ui/button_hold.png",
+		width=200, height=100,
+		onRelease = SaveGame.loadSlot
+	}
+	PlayBtn.x = name.x+150
+	PlayBtn.y = bkg.y+225
+	PlayBtn:setFillColor(0,1,0)
+	slotg:insert(PlayBtn)
+	
+end
+
+function SaveGame:loadSlot()
+	SaveGame:clear()
+	if ( SaveGame["NAME"]=="No Data" ) then
+		Keyboard:show()
+	else
+		game.Initial:create(SaveGame["SLOT"])
+	end
+end
+
+function SaveGame:deleteSlot()
+	save.Erase:clearSave(SaveGame["SLOT"])
+end
+
+function SaveGame:refresh()
+	SaveGame:clear()
+	SaveGame:show()
+end
+
+function SaveGame:slotClear()
+	if (slotg) then
+		for i=slotg.numChildren,1,-1 do
+			local child = slotg[i]
+			slotg.parent:remove( child )
+			display.remove( child )
+		end
+		slotg=nil
+	end
+end
+
+function SaveGame:clear()
+	SaveGame:slotClear()
+	for i=sgg.numChildren,1,-1 do
+		local child = sgg[i]
+		sgg.parent:remove( child )
+		display.remove( child )
+	end
+	sgg=nil
+end
+
+
+
+---------------------------------------------------------------------------------------
+-- KEYBOARD
+---------------------------------------------------------------------------------------
+
+local kg
+Keyboard={}
+Keyboard.letters={}
+Keyboard.trackerchars={}
+
+function Keyboard:show()
+	kg=display.newGroup()
+	
+	local alphabet={"q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x","c","v","b","n","m"}
+	letters={}
+	letters["Y1"]=490
+	letters["Y2"]=letters["Y1"]+90
+	letters["Y3"]=letters["Y2"]+90
+	
+	-- local trackercount=1
+	local tracker=ui.CreateWindow(890,170,1)
+	tracker.y=150
+	tracker:setFillColor(0.85, 0.64, 0.12)
+	kg:insert(tracker)
+	local CCx=display.contentCenterX
+	
+	local trackerchars={}
+	for i=1,9 do
+		trackerchars[i]=display.newText("__",0,0,"MoolBoran",120)
+		trackerchars[i].x=CCx+((i-5)*80)
+		trackerchars[i].y=tracker.y+50
+		kg:insert(trackerchars[i])
+	end
+	Keyboard.trackerchars=trackerchars
+	
+	local backdrop=ui.CreateWindow(1000,310,1)
+	backdrop.y=570
+	kg:insert(backdrop)
+	
+	for i=1,10 do
+		local warever=table.maxn(letters)+1
+		
+		letters[warever] =  widget.newButton{
+			label=alphabet[warever],
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			font="MoolBoran",
+			fontSize=60,
+			labelYOffset=10,
+			defaultFile="ui/button.png",
+			overFile="ui/button_hold.png",
+			width=80, height=80,
+			onRelease = function()
+				Keyboard:addToName(letters[warever]:getLabel())
+			end
+		}
+		letters[warever].x = CCx+(((i-0.5)-5)*90)
+		letters[warever].y = letters["Y1"]
+		letters[warever]:setFillColor(0.4,0.4,1)
+		kg:insert(letters[warever])
+	end
+	
+	for i=1,9 do
+		local warever=table.maxn(letters)+1
+		
+		letters[warever] =  widget.newButton{
+			label=alphabet[warever],
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			font="MoolBoran",
+			fontSize=60,
+			labelYOffset=10,
+			defaultFile="ui/button.png",
+			overFile="ui/button_hold.png",
+			width=80, height=80,
+			onRelease = function()
+				Keyboard:addToName(letters[warever]:getLabel())
+			end
+		}
+		letters[warever].x = CCx+((i-5)*90)
+		letters[warever].y = letters["Y2"]
+		letters[warever]:setFillColor(0.4,0.4,1)
+		kg:insert(letters[warever])
+	end
+	
+	for i=1,7 do
+		local warever=table.maxn(letters)+1
+		
+		letters[warever] =  widget.newButton{
+			label=alphabet[warever],
+			labelColor = { default={255,255,255}, over={0,0,0} },
+			font="MoolBoran",
+			fontSize=60,
+			labelYOffset=10,
+			defaultFile="ui/button.png",
+			overFile="ui/button_hold.png",
+			width=80, height=80,
+			onRelease = function()
+				Keyboard:addToName(letters[warever]:getLabel())
+			end
+		}
+		letters[warever].x = CCx+((i-4)*90)
+		letters[warever].y = letters["Y3"]
+		letters[warever]:setFillColor(0.4,0.4,1)
+		kg:insert(letters[warever])
+	end
+	
+	Keyboard.letters=letters
+	
+	local shiftbtn =  widget.newButton{
+		label="Shift",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		font="MoolBoran",
+		fontSize=60,
+		labelYOffset=10,
+		defaultFile="ui/button.png",
+		overFile="ui/button_hold.png",
+		width=160, height=80,
+		onRelease = Keyboard.Shift
+	}
+	shiftbtn.x = 110
+	shiftbtn.y = letters["Y3"]
+	shiftbtn:setFillColor(0.4,0.4,1)
+	kg:insert(shiftbtn)
+	
+	local shiftbtn2 =  widget.newButton{
+		label="Shift",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		font="MoolBoran",
+		fontSize=60,
+		labelYOffset=10,
+		defaultFile="ui/button.png",
+		overFile="ui/button_hold.png",
+		width=160, height=80,
+		onRelease = Keyboard.Shift
+	}
+	shiftbtn2.x = display.contentWidth-110
+	shiftbtn2.y = letters["Y3"]
+	shiftbtn2:setFillColor(0.4,0.4,1)
+	kg:insert(shiftbtn2)
+	
+	local deletebtn =  widget.newButton{
+		label="Delete",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		font="MoolBoran",
+		fontSize=60,
+		labelYOffset=10,
+		defaultFile="ui/button.png",
+		overFile="ui/button_hold.png",
+		width=160, height=80,
+		onRelease = Keyboard.delete
+	}
+	deletebtn.x = 580
+	deletebtn.y = 330
+	deletebtn:setFillColor(0.5,0.5,0.5)
+	kg:insert(deletebtn)
+	
+	local endbtn =  widget.newButton{
+		label="End",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		font="MoolBoran",
+		fontSize=60,
+		labelYOffset=10,
+		defaultFile="ui/button.png",
+		overFile="ui/button_hold.png",
+		width=160, height=80,
+		onRelease = function()
+			Keyboard:clear()
+			game.Initial:create( SaveGame["SLOT"],Keyboard:consolidate() )
+		end
+	}
+	endbtn.x = 900
+	endbtn.y = 330
+	endbtn:setFillColor(0.4,1,0.4)
+	kg:insert(endbtn)
+	
+	local backbtn =  widget.newButton{
+		label="Back",
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		font="MoolBoran",
+		fontSize=60,
+		labelYOffset=10,
+		defaultFile="ui/button.png",
+		overFile="ui/button_hold.png",
+		width=160, height=80,
+		onRelease = function()
+			Keyboard:clear()
+			SaveGame:show()
+		end
+	}
+	backbtn.x = 160
+	backbtn.y = 330
+	backbtn:setFillColor(1,0.2,0.2)
+	kg:insert(backbtn)
+	
+	Keyboard:Shift()
+end
+
+function Keyboard:consolidate()
+	local str=""
+	for i=1,table.maxn(Keyboard.trackerchars) do
+		if Keyboard.trackerchars[i].text~="__" then
+			str=str..Keyboard.trackerchars[i].text
+		end
+	end
+	return str
+end
+
+function Keyboard:Shift()
+	local letters=Keyboard.letters
+	if letters[1]:getLabel()=="q" then
+		for i=1,table.maxn(letters) do
+			letters[i]:setLabel(string.upper( letters[i]:getLabel() ))
+		end
+	elseif letters[1]:getLabel()=="Q" then
+		for i=1,table.maxn(letters) do
+			letters[i]:setLabel(string.lower( letters[i]:getLabel() ))
+		end
+	end
+end
+
+function Keyboard:getTrackerCount()
+	local trackerchars=Keyboard.trackerchars
+	local trackercount=false
+	local counter=1
+	while (counter<=table.maxn(trackerchars)) and trackercount==false do
+		if trackerchars[counter].text=="__" then
+			trackercount=counter
+		end
+		counter=counter+1
+	end
+	if trackercount==false then
+		trackercount=table.maxn(trackerchars)
+	end
+	return trackercount
+end
+
+function Keyboard:delete()
+	local trackercount=Keyboard:getTrackerCount()
+	local trackerchars=Keyboard.trackerchars
+	trackercount=trackercount-1
+	if trackercount>=1 then
+		trackerchars[trackercount].text="__"
+	end
+	if trackercount==1 then
+		Keyboard:Shift()
+	end
+	Keyboard.trackerchars=trackerchars
+end
+
+function Keyboard:addToName(var)
+	local trackercount=Keyboard:getTrackerCount()
+	local trackerchars=Keyboard.trackerchars
+	local letters=Keyboard.letters
+	if trackercount<=table.maxn(trackerchars) then
+		trackerchars[trackercount].text=var
+		trackercount=trackercount+1
+		if letters[1]:getLabel()=="Q" then
+			Keyboard:Shift()
+		end
+	end
+	Keyboard.trackerchars=trackerchars
+end
+
+function Keyboard:clear()
+	for i=kg.numChildren,1,-1 do
+		local child = kg[i]
+		kg.parent:remove( child )
+		display.remove( child )
+	end
+	kg=nil
+end
+
+
+
+---------------------------------------------------------------------------------------
+-- OPTIONS
+---------------------------------------------------------------------------------------
+
+local og
+Options={}
+-- local Sound
+-- local Music
+-- local Back
+
+function Options:show()
+
+	og=display.newGroup()
+	
+	local title=display.newText("Options",0,0,"MoolBoran",100)
+	title.x = display.contentWidth*0.5
+	title.y = 100
+	og:insert(title)
+	
+	local BackBtn =  widget.newButton{
+		label="Back",
+		font="MoolBoran",
+		fontSize=50,
+		labelYOffset=10,
+		labelColor = { default={255,255,255}, over={0,0,0} },
+		defaultFile="ui/button.png",
+		overFile="ui/button_hold.png",
+		width=290, height=90,
+		onRelease = function()
+			Options:clear()
+			MainMenu:show()
+		end
+	}
+	BackBtn:setFillColor(1.0,0,0)
+	BackBtn.x = display.contentWidth*0.5
+	BackBtn.y = display.contentHeight-100
+	og:insert(BackBtn)
+	
+	local scroll={}
+	local colors={{0.6,0.2,1.0,"Master"},{0.2,1.0,0.6,"Music"},{0.6,1.0,0.2,"Sound"}}
+	for i=1,3 do
+		scroll[i]=ui.CreateWindow(650,60)
+		scroll[i].x=display.contentCenterX
+		scroll[i].y=display.contentCenterY-150+(150*(i-1))
+		scroll[i].deltaX=scroll[i].width*0.8
+		scroll[i]:setFillColor(colors[i][1],colors[i][2],colors[i][3])
+		local mask = graphics.newMask( "ui/rectmask.png" )
+		scroll[i]:setMask(mask)
+		scroll[i].maskX=0
+		scroll[i].maskScaleX=13
+		scroll[i].movePercent=function( event )
+			local lowX=scroll[i].x-(scroll[i].deltaX/2)
+			local hiX=scroll[i].x+(scroll[i].deltaX/2)
+			if (event.x>lowX) and (event.x<hiX) then
+				scroll[i]["ind"].x=event.x
+				
+				function round2(num, idp)
+					return tonumber(string.format("%." .. (idp or 0) .. "f", num))
+				end
+				scroll[i]["ind"].rawpercent=((event.x-lowX)/scroll[i].deltaX)
+				scroll[i]["ind"].percent=round2(scroll[i]["ind"].rawpercent,1)
+				
+				
+				local text=(colors[i][4].." Volume: "..(scroll[i]["ind"].percent*100).."%")
+				scroll[i]["label"]["text"]=text
+			end
+		end
+		scroll[i]:addEventListener("touch",scroll[i].movePercent)
+		og:insert(scroll[i])
+		
+		
+		scroll[i]["ind"]=ui.CreateWindow(60,125)
+		scroll[i]["ind"].x=scroll[i].x
+		scroll[i]["ind"].y=scroll[i].y
+		scroll[i]["ind"].percent=0.5
+		scroll[i]["ind"]:setFillColor(colors[i][1]+0.3,colors[i][2]+0.3,colors[i][3]+0.3)
+		og:insert(scroll[i]["ind"])
+		
+		local text=(colors[i][4].." Volume: "..(scroll[i]["ind"].percent*100).."%")
+		scroll[i]["label"]=display.newText(text,0,0,"MoolBoran",70)
+		scroll[i]["label"].x=scroll[i].x
+		scroll[i]["label"].y=scroll[i].y+15
+		scroll[i]["label"].percent=0.5
+		og:insert(scroll[i]["label"])
+		
+		scroll[i]["ind"]:toFront()
+	end
+end
+
+function Options:clear()
+	for i=og.numChildren,1,-1 do
+		local child = og[i]
+		og.parent:remove( child )
+		display.remove( child )
+	end
+	og=nil
+end
+
+--[[
+function nextTile()
+	tileID=tileID+1
+	if tileID>table.maxn(tiles)-1 then
+		tileID=0
+	end
+	curtiletext.text=tiles[tileID+1]
+end
+
+function prevTile()
+	tileID=tileID-1
+	if tileID<0 then
+		tileID=table.maxn(tiles)-1
+	end
+	curtiletext.text=tiles[tileID+1]
+end
+
+function onScreBtnRelease()
 	a.Play(12)
-	for i=group.numChildren,1,-1 do
-		local child = group[i]
+	for i=optionz.numChildren,1,-1 do
+		local child = optionz[i]
 		child.parent:remove( child )
 	end
-	VDisplay=nil
-	p.Display()
+	scr.HighScores()
 end
 
-function onOptnBtnRelease()
+function onSettingRelease()
 	a.Play(12)
-	for i=group.numChildren,1,-1 do
-		local child = group[i]
+	for i=optionz.numChildren,1,-1 do
+		local child = optionz[i]
 		child.parent:remove( child )
 	end
-	VDisplay=nil
-	o.DisplayOptions()
+	set.Start()
 end
 
-function isVersion(val)
-	if (VDisplay2) then
-		display.remove(VDisplay2)
+function onBackRelease()
+	a.Play(12)
+	for i=optionz.numChildren,1,-1 do
+		local child = optionz[i]
+		child.parent:remove( child )
 	end
-	if val==true then
-		if (VDisplay) then
-			VDisplay2 = display.newText(("Up to date."),0,0,"MoolBoran", 60 )
-			VDisplay2:setFillColor( 0, 0.6, 0)
-			VDisplay2.x=VDisplay.x
-			VDisplay2.y=VDisplay.y+55
-			group:insert(VDisplay2)
-		end
-	elseif val==false then
-		if (VDisplay) then
-			VDisplay2 = display.newText(("Update available!"),0,0,"MoolBoran", 45 )
-			VDisplay2:setFillColor( 0.6, 0, 0)
-			VDisplay2.x=VDisplay.x
-			VDisplay2.y=VDisplay.y+45
-			group:insert(VDisplay2)
-		end
-	elseif val==nil then
-		if (VDisplay) then
-			VDisplay2 = display.newText(("Update check failed."),0,0,"MoolBoran", 45 )
-			VDisplay2:setFillColor( 0.6, 0, 0)
-			VDisplay2.x=VDisplay.x
-			VDisplay2.y=VDisplay.y+50
-			group:insert(VDisplay2)
+	menu.ShowMenu()
+	timer.performWithDelay(100,menu.ReadySetGo)
+end
+	
+function GetTiles()
+	return tileID
+end
+
+function onCharRelease()
+	a.Play(12)
+	for i=optionz.numChildren,1,-1 do
+		local child = optionz[i]
+		child.parent:remove( child )
+	end
+	char.CharMenu()
+end
+
+function MusicScroll( event )
+	if event.x>display.contentCenterX+(290*scroll.xScale) then
+		scrollind.x=display.contentCenterX+(290*scroll.xScale)
+		a.MusicVol(1.0)
+		musicind.text=("Music Volume".." "..(1.0*100).."%")
+	elseif event.x<display.contentCenterX-(290*scroll.xScale) then
+		scrollind.x=display.contentCenterX-(290*scroll.xScale)
+		a.MusicVol(0.0)
+		musicind.text=("Music Volume".." "..(0.0*100).."%")
+	else
+		for s=1,11 do
+			local x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*58 )
+			if event.x>x-(290*scroll.xScale)/10 and event.x<x+(290*scroll.xScale)/10 then
+				scrollind.x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*(290*scroll.xScale)/5 )
+				a.MusicVol((s-1)/10)
+				musicind.text=("Music Volume".." "..((s-1)*10).."%")
+			end
 		end
 	end
 end
 
--- Credits
+function SoundScroll( event )
+	if event.x>display.contentCenterX+(290*scroll.xScale) then
+		scrollind2.x=display.contentCenterX+(290*scroll.xScale)
+		a.SoundVol(1.0)
+		soundind.text=("Sound Volume".." "..(1.0*100).."%")
+	elseif event.x<display.contentCenterX-(290*scroll.xScale) then
+		scrollind2.x=display.contentCenterX-(290*scroll.xScale)
+		a.SoundVol(0.0)
+		soundind.text=("Sound Volume".." "..(0.0*100).."%")
+	else
+		for s=1,11 do
+			local x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*58 )
+			if event.x>x-(290*scroll.xScale)/10 and event.x<x+(290*scroll.xScale)/10 then
+				scrollind2.x=display.contentCenterX-(290*scroll.xScale)+( (s-1)*(290*scroll.xScale)/5 )
+				a.SoundVol((s-1)/10)
+				soundind.text=("Sound Volume".." "..((s-1)*10).."%")
+			end
+		end
+	end
+end
+--]]
+
+
+
+---------------------------------------------------------------------------------------
+-- CREDITS
+---------------------------------------------------------------------------------------
+
 function Credits( event )
 	if event.phase=="ended" then
-		a.Play(12)
 		for i=group.numChildren,1,-1 do
 			local child = group[i]
 			child.parent:remove( child )
@@ -379,11 +1016,9 @@ function CreditsTab(tab)
 		text[s].x=130+(-100*(s%2))
 		text[s].y=125+(-30*((s%2)+1))+(100*math.ceil(s/2))
 		group:insert(text[s])
-	--	print (s.."x-"..text[s].x)
-	--	print (s.."y-"..text[s].y)
 	end
 end
 
 function Credone()
-	Runtime:addEventListener("tap",NextStep)
+	Runtime:addEventListener("tap",show)
 end

@@ -1,8 +1,8 @@
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 --
 -- Splashes.lua
 --
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 module(..., package.seeall)
 local Splash
 local Splashtxt
@@ -109,20 +109,19 @@ function GetTip()
 	local chooser=math.random(1,table.maxn(T))
 	Tip=T[chooser]
 	local TGroup=display.newGroup()
+	TGroup.x=display.contentCenterX
+	TGroup.y=100
+	
 	
 	Tiptxt = display.newEmbossedText(("Tip: "..Tip[1]),0,0,"MoolBoran", 50 )
-	Tiptxt.x=display.contentCenterX
-	Tiptxt.y=100
-	Tiptxt:setFillColor( 0.8, 0.8, 0.8)
 	Tiptxt:toFront()
 	TGroup:insert( Tiptxt )
 	if (Tip[2]) then
 		Tiptxt2 = display.newEmbossedText((Tip[2]),0,0,"MoolBoran", 50 )
-		Tiptxt2.x=display.contentCenterX
 		Tiptxt2.y=Tiptxt.y+60
-		Tiptxt2:setFillColor( 0.8, 0.8, 0.8)
 		Tiptxt2:toFront()
 		TGroup:insert( Tiptxt2 )
 	end
+	
 	return TGroup
 end

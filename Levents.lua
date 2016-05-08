@@ -1,25 +1,26 @@
-	-----------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 --
--- Collision.lua
+-- events.lua
 --
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 module(..., package.seeall)
 local healthsheet = graphics.newImageSheet( "twinkle1.png", { width=7, height=18, numFrames=14 } )
 local manasheet = graphics.newImageSheet( "twinkle2.png", { width=7, height=18, numFrames=14 } )
 local energysheet = graphics.newImageSheet( "twinkle3.png", { width=7, height=18, numFrames=14 } )
 local tpsheet = graphics.newImageSheet( "portsprite.png", { width=80, height=80, numFrames=16 } )
-local debrimages={"debrissmall1.png", "debrissmall2.png", "debrissmall3.png", "debrismed1.png", "debrismed2.png","golddebrissmall1.png", "golddebrissmall2.png", "golddebrissmall3.png"}
+local coinsheet = graphics.newImageSheet("coinsprite.png", { width=32, height=32, numFrames=8 } )
+coseqs={{ name="stand", start=1, count=8, time=1000 }}
+local debrimages={"debrissmall1.png", "debrissmall2.png", "debrissmall3.png", 
+					"debrismed1.png", "debrismed2.png"
+				}
 local physics = require "physics"
-local players=require("Lplayers")
-local WD=require("Lprogress")
-local builder=require("Lbuilder")
-local ui=require("Lui")
-local player=require("Lplayers")
-local gold=require("Lgold")
-local audio=require("Laudio")
-local item=require("Litems")
-local mob=require("Lmobai")
 local widget = require "widget"
+local CBE = require("CBEffects.Library")
+local builder=require("Lbuilder")
+local players=require("Lplayer")
+local item=require("Litems")
+local ui=require("Lui")
+local PFX=display.newGroup()
 local debris ={}
 local twinkles={}
 local killtxt
@@ -34,7 +35,16 @@ local portcd
 local portxt
 local Dropped
 local interactcd=0
-local iwg
+local iwg	
+local watertiles=0
+local lavatiles=0
+local drops={}
+local vents={}
+local tilevents={}
+
+function getparticles()
+	return PFX
+end
 
 function removeOffscreenItems()
 	for i = 1, table.maxn(debris) do
@@ -45,24 +55,51 @@ function removeOffscreenItems()
  			end
 		end
 	end
-	local gold=gold.GetCoinGroup()
-	for i = 1, gold.numChildren do
-		if (gold[i]) then
-			if gold[i].x<-50 or gold[i].x>display.contentWidth+50 or gold[i].y<-50 or gold[i].y>display.contentHeight+50 then
-				gold[i].parent:remove( gold[i] )
-				gold[i]=nil
- 			end	
-		end
-	end
+	-- local gold=gold.GetCoinGroup()
+	-- for i = 1, gold.numChildren do
+		-- if (gold[i]) then
+			-- if gold[i].x<-50 or gold[i].x>display.contentWidth+50 or gold[i].y<-50 or gold[i].y>display.contentHeight+50 then
+				-- gold[i].parent:remove( gold[i] )
+				-- gold[i]=nil
+ 			-- end	
+		-- end
+	-- end
 end
 
 function Interact( event )
 	local specials=builder.getData(1)
+	local p1=players.GetPlayer()
 	if specials[event.id] then
-		if event.phase=="began" then
-			interactUI(1, specials[event.id])
-		elseif event.phase=="ended" then
-			interactUI(-1, specials[event.id])
+	
+		ExtraFX(specials[event.id].type,event.phase,event.other)
+		
+		if	event.other==p1.shadow then
+			
+			if (specials[event.id].interacts==true) then
+				if event.phase=="began" then
+					interactUI(1, specials[event.id])
+				elseif event.phase=="ended" then
+					interactUI(-1, specials[event.id])
+				end
+			end
+		
+			if specials[event.id].type=="chest" and specials[event.id].sequence=="closed" then
+			
+				specials[event.id]:setSequence("open")
+				doDrops(specials[event.id].x,specials[event.id].y)
+				
+			elseif specials[event.id].type=="breaks" then
+			
+				onRockCollision(specials[event.id].x,specials[event.id].y)
+				display.remove(specials[event.id])
+				specials[event.id]=nil
+				
+			elseif specials[event.id].type=="door" then
+			
+				display.remove(specials[event.id])
+				specials[event.id]=nil
+				
+			end
 		end
 	end
 end
@@ -71,11 +108,13 @@ function interactUI( change, tile )
 	local p1=players.GetPlayer()
 	interactcd=interactcd+change
 	if interactcd==0 then
-		for i=iwg.numChildren,1,-1 do
-			display.remove(iwg[i])
-			iwg[i]=nil
+		if (iwg) then
+			for i=iwg.numChildren,1,-1 do
+				display.remove(iwg[i])
+				iwg[i]=nil
+			end
+			iwg=nil
 		end
-		iwg=nil
 	else
 		if (iwg) then
 			for i=iwg.numChildren,1,-1 do
@@ -92,6 +131,7 @@ function interactUI( change, tile )
 			frame.x=display.contentCenterX
 			frame.y=display.contentHeight-340
 			iwg:insert(frame)
+			
 			if tile.type=="portal" then
 				if p1.portcd==0 then
 					button=display.newImageRect( ("ui/interact".. 3+tile.color ..".png") ,80,80)
@@ -108,9 +148,219 @@ function interactUI( change, tile )
 				button.xScale=1.5
 				button.yScale=button.xScale
 				iwg:insert(button)
-			
 		end
-		
+	end
+end
+
+function ExtraFX(tiletype,phase,obj)
+	local P1=player.GetPlayer()
+	if obj.name=="coinshadow" and phase=="began" then
+		if (vents[obj.id]) then
+			vents[obj.id]:stop()
+			vents[obj.id]:destroy()
+			vents[obj.id] = nil
+		end
+		if tiletype=="water" then
+			vents[obj.id] = CBE.newVent({
+				x=obj.x,
+				y=obj.y,
+				color={ 0.25,0.25,0.75},
+				isActive=0,
+				scaleX=0.5,
+				scaleY=0.5,
+				perEmit=4,
+				parentGroup=PFX,
+				build = function()
+					local size = math.random(10, 15)
+					return display.newRect(0,0, size, size)
+				end,
+				onUpdate = function(particle, vent)
+					
+					vent.isActive=vent.isActive-1
+					if vent.isActive<=0 then
+						vent.isActive=20
+					end
+					if vent.isActive==20 then
+						vent:stop()
+					elseif vent.isActive==10 then
+						vent:start()
+					end
+					particle:setVelocity(0, ((particle.y-20) - particle.y) * 0.03)
+					
+				end,
+			})
+			vents[obj.id]:start()
+		end
+		if tiletype=="lava" then
+			vents[obj.id] = CBE.newVent({
+				x=obj.x,
+				y=obj.y,
+				color={ 1,0,0},
+				isActive=0,
+				scaleX=0.5,
+				scaleY=0.5,
+				perEmit=1,
+				parentGroup=PFX,
+				build = function()
+					local size = math.random(10, 15)
+					return display.newRect(0,0, size, size)
+				end,
+				onUpdate = function(particle, vent)
+					if vent.isActive==50 then
+						vent:stop()
+					elseif vent.isActive==3 then
+						vent:start()
+					end
+					particle:setVelocity(0, ((particle.y-10) - particle.y) * 0.01)
+				end,
+			})
+			vents[obj.id]:start()
+		end
+		if tiletype=="portal" then
+			vents[obj.id] = CBE.newVent({
+				x=obj.x,
+				y=obj.x,
+				color={ 0.75,0.25,0.75,0.5},
+				isActive=0,
+				scaleX=0.5,
+				scaleY=0.5,
+				perEmit=1,
+				parentGroup=PFX,
+				radius = display.contentCenterX * 0.5,
+				innerRadius = display.contentCenterX * 0.48,
+				build = function()
+					local size = math.random(10, 15)
+					return display.newRect(0,0, size, size)
+				end,
+				onCreation = function(p, vent)
+					p:setVelocity((vent.x - p.x) * 0.05, (vent.y - p.y) * 0.05)
+				end,
+			})
+			vents[obj.id]:start()
+		end
+	elseif obj==P1.shadow then
+		if phase=="ended" then
+			-- amountoftiles=amountoftiles-1
+			if tiletype=="water" then
+				watertiles=watertiles-1
+			elseif tiletype=="lava" then
+				lavatiles=lavatiles-1
+			end
+			if watertiles==0 and lavatiles==0 and (playervent) then
+				playervent:stop()
+				playervent:destroy()
+				playervent = nil
+			end
+		elseif phase=="began" then
+			if (playervent) then
+				playervent:stop()
+				playervent:destroy()
+				playervent = nil
+			end
+			if tiletype=="water" then
+				watertiles=watertiles+1
+				playervent = CBE.newVent({
+					x=P1.x,
+					y=P1.y+40,
+					color={ 0.25,0.25,0.75},
+					isActive=0,
+					scaleX=0.5,
+					scaleY=0.5,
+					perEmit=4,
+					parentGroup=PFX,
+					build = function()
+						local size = math.random(10, 15)
+						return display.newRect(0,0, size, size)
+					end,
+					onUpdate = function(particle, vent)
+						vent.x=P1.x
+						vent.y=P1.y+40
+						
+						vent.isActive=vent.isActive-1
+						if vent.isActive<=0 then
+							vent.isActive=20
+						end
+						if vent.isActive==20 then
+							playervent:stop()
+						elseif vent.isActive==10 then
+							playervent:start()
+						end
+						particle:setVelocity(0, ((particle.y-20) - particle.y) * 0.03)
+						
+					end,
+				})
+				playervent.ttype=tiletype
+				playervent:start()
+			end
+			if tiletype=="lava" then
+				lavatiles=lavatiles+1
+				playervent = CBE.newVent({
+					x=P1.x,
+					y=P1.y+40,
+					color={ 1,0,0},
+					isActive=0,
+					scaleX=0.5,
+					scaleY=0.5,
+					perEmit=1,
+					parentGroup=PFX,
+					build = function()
+						local size = math.random(10, 15)
+						return display.newRect(0,0, size, size)
+					end,
+					onUpdate = function(particle, vent)
+						vent.x=P1.x
+						vent.y=P1.y+40
+						
+						vent.isActive=vent.isActive-1
+						if vent.isActive<=0 then
+							vent.isActive=100
+							vent.healthCD=vent.healthCD-1
+							if vent.healthCD==0 then
+								vent.healthCD=5
+								player.ReduceHP(1,"Lava")
+							end
+						end
+						if vent.isActive==50 then
+							playervent:stop()
+						elseif vent.isActive==3 then
+							playervent:start()
+						end
+						particle:setVelocity(0, ((particle.y-10) - particle.y) * 0.01)
+					end,
+				})
+				playervent.ttype=tiletype
+				playervent.healthCD=5
+				playervent:start()
+			end
+			if tiletype=="portal" then
+				playervent = CBE.newVent({
+					x=P1.x,
+					y=P1.y+40,
+					color={ 0.75,0.25,0.75,0.5},
+					isActive=0,
+					scaleX=0.5,
+					scaleY=0.5,
+					perEmit=1,
+					parentGroup=PFX,
+					radius = display.contentCenterX * 0.5,
+					innerRadius = display.contentCenterX * 0.48,
+					build = function()
+						local size = math.random(10, 15)
+						return display.newRect(0,0, size, size)
+					end,
+					onCreation = function(p, vent)
+						p:setVelocity((vent.x - p.x) * 0.05, (vent.y - p.y) * 0.05)
+					end,
+					onUpdate = function(particle, vent)
+						vent.x=P1.x
+						vent.y=P1.y+40
+					end,
+				})
+				playervent.ttype=tiletype
+				playervent:start()
+			end
+		end
+		P1.speed=1.00+(0.75*watertiles)+(1.25*lavatiles)
 	end
 end
 
@@ -135,96 +385,42 @@ function onChestCollision()
 	end
 end
 
-function onRockCollision()
-	local P1=player.GetPlayer()
-	local Rocks=builder.GetData(6)
-	local bounds=builder.GetData(2)
-	for l in pairs(Rocks[P1.room]) do
-		if ((l)==(P1.loc)) and bounds[l]~=1 then
-			bounds[l]=1
-			builder.ModMap(l)
-			local stat
-			if P1.stats[2]>=Rocks[P1.room][l].req and P1.stats[4]>=Rocks[P1.room][l].req then
-				if P1.stats[2]>P1.stats[4] then
-					stat=P1.stats[2]
-				elseif P1.stats[2]<P1.stats[4] then
-					stat=P1.stats[4]
-				else
-					stat=P1.stats[2]
-				end
-			elseif P1.stats[2]<Rocks[P1.room][l].req and P1.stats[4]>=Rocks[P1.room][l].req then
-				stat=P1.stats[4]
-			elseif P1.stats[2]>=Rocks[P1.room][l].req and P1.stats[4]<Rocks[P1.room][l].req then
-				stat=P1.stats[2]
-			end
-			local div=(stat-Rocks[P1.room][l].req)+1
-			local enreq=(P1.MaxEP*.05)
-			local loss=math.floor(enreq/div)
-			display.remove(Rocks[P1.room][l])
-			Rocks[P1.room][l]=nil
-			if P1.EP>=loss then
-				P1.EP=P1.EP-loss
+function onRockCollision(ex,ey)
+	local v=table.maxn(tilevents)+1
+	tilevents[v] = CBE.newVent({
+		x=ex,
+		y=ey,
+		isActive=math.random(50,100),
+		scaleX=1.5,
+		scaleY=1.5,
+		perEmit=1,
+		parentGroup=PFX,
+		build = function()
+			local rock=math.random(1,10)
+			if rock>9 then
+				rock=math.random(4,5)
+				sizex=28
+				sizey=40
 			else
-				local nope=math.ceil( (loss-P1.EP)/2 )
-				P1.EP=0
-				player.ReduceHP(nope,"Energy")
+				rock=math.random(1,3)
+				sizex=13
+				sizey=13
 			end
-			audio.Play(7)
-			--Small
-			local somuchdebris=math.random(10,15)
-			for i=1, somuchdebris do
-				debris[#debris+1]=display.newImage((debrimages[(math.random(1,3))]), 13, 13)
-				debris[#debris].xScale=1.3
-				debris[#debris].yScale=1.3
-				debris[#debris].x=(P1.x+(math.random(-5,5)))
-				debris[#debris].y=(P1.y+(math.random(-50,-10)))
-				physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=7.0} )
-				debris[#debris]:setLinearVelocity((math.random(-300,300)),-300)
-				debris[#debris]:toFront()
+			return display.newImageRect( debrimages[rock], sizex, 	sizey )
+		end,
+		onCreation = function(p, vent)
+			p.xScale,p.yScale=2.0,2.0
+			physics.addBody(p,"dynamic",{isSensor=true, radius=8, bounce=0.0})
+			p:setVelocity( (p.x*((math.random(0,6)-3)/10) )*0.005, (p.x*((math.random(0,6)-3)/10))*0.005)
+		end,
+		onUpdate = function(particle, vent)
+			vent.isActive=vent.isActive-1
+			if vent.isActive<=0 then
+				vent:stop()
 			end
-			--Medium
-			local somuchdebris=math.random(1,5)
-			for i=1, somuchdebris do
-				debris[#debris+1]=display.newImage((debrimages[(math.random(4,5))]), 28, 40)
-				debris[#debris].x=(P1.x+(math.random(-5,5)))
-				debris[#debris].y=(P1.y+(math.random(-50,-10)))
-				physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=20.0} )
-				debris[#debris]:setLinearVelocity((math.random(-200,200)),-200)
-				debris[#debris]:toFront()
-			end
-			--Gold
-			local somuchdebris=math.random(1,100)
-			if somuchdebris>=80 then
-				local goldgaincount=0
-				for i=1,(math.ceil((somuchdebris-79)/2)) do
-					debris[#debris+1]=display.newImage((debrimages[(math.random(6,8))]), 13, 13)
-					debris[#debris].x=(P1.x+(math.random(-5,5)))
-					debris[#debris].y=(P1.y+(math.random(-50,-10)))
-					physics.addBody(debris[#debris], "dynamic", { friction=0.5, radius=7.0} )
-					debris[#debris]:setLinearVelocity((math.random(-100,100)),-100)
-					debris[#debris]:toFront()
-					goldgaincount=goldgaincount+(math.random(1,3))
-				end
-				gold.CallAddCoins(goldgaincount)
-			end
-		end
-	end
-end
-
-function RockCheck(loc)
-	local P1=player.GetPlayer()
-	local Rocks=builder.GetData(6)
-	local bounds=builder.GetData(2)
-	for l in pairs(Rocks[P1.room]) do
-		if ((l)==(loc)) and bounds[l]~=1 then
-			if P1.stats[2]>=Rocks[P1.room][l].req or P1.stats[4]>=Rocks[P1.room][l].req then
-				return 2
-			else
-				return 1
-			end
-		end
-	end
-	return 0
+		end,
+	})
+	tilevents[v]:start()
 end
 
 function onKeyCollision()
@@ -407,336 +603,45 @@ function LayOnHead()
 	end
 end
 
-function PortCheck()
-	local OP=builder.GetPortal(1)
-	local RP=builder.GetPortal(2)
-	local BP=builder.GetPortal(3)
-	local DP=builder.GetPortal(4)
-	local P1=players.GetPlayer()
-	local info=false
-	if (OP) and (RP) then
-		if (P1) and (OP.loc==P1.loc) and (OP.room==P1.room) then
-			if P1.portcd==0 then
-				local check=mob.LocationCheck(RP.loc,RP.room)
-				if check==false then
-					info="OP"
-				else
-					info="OPB"
-				end
-			else
-				info="OPB"
-			end
-		elseif (P1) and (RP.loc==P1.loc) and (RP.room==P1.room) then
-			if P1.portcd==0 then
-				local check=mob.LocationCheck(OP.loc,OP.room)
-				if check==false then
-					info="RP"
-				else
-					info="RPB"
-				end
-			else
-				info="RPB"
-			end
-		elseif (P1) then
-			P1.portcd=P1.portcd-1
-			if P1.portcd<=0 then
-				P1.portcd=0
-			end
-		end
-	else
-		P1.portcd=P1.portcd-1
-		if P1.portcd<=0 then
-			P1.portcd=0
-		end
-	end
-	if (BP) and (DP) then
-		if (P1) and (BP.loc==P1.loc) and (BP.room==P1.room) then
-			if P1.portcd==0 then
-				local check=mob.LocationCheck(DP.loc,DP.room)
-				if check==false then
-					info="BP"
-				else
-					info="BPB"
-				end
-			else
-				info="BPB"
-			end
-		elseif (P1) and (DP.loc==P1.loc) and (DP.room==P1.room) then
-			if P1.portcd==0 then
-				local check=mob.LocationCheck(BP.loc,BP.room)
-				if check==false then
-					info="DP"
-				else
-					info="DPB"
-				end
-			else
-				info="DPB"
-			end
-		elseif (P1) then
-			P1.portcd=P1.portcd-1
-			if P1.portcd<=0 then
-				P1.portcd=0
-			end
-		end
-	else
-		P1.portcd=P1.portcd-1
-		if P1.portcd<=0 then
-			P1.portcd=0
-		end
-	end
-	return info
-end
-
 function Port( tile )
-	-- local OP=builder.GetPortal(1)
-	-- local RP=builder.GetPortal(2)
-	-- local BP=builder.GetPortal(3)
-	-- local DP=builder.GetPortal(4)
 	local p1=players.GetPlayer()
-	-- local map=builder.GetData(3)
-	-- local msize=builder.GetData(0)
 	local map=builder.getData(0)
 	local msize=table.maxn(map)
-	-- local level=builder.getData(2)
 	local manacost=math.floor(p1.weight/15)
-	-- if (OP) and (RP) then
-		-- if (p1) and (OP.loc==p1.loc) and p1.portcd==0 then
-		local originport=tile.id
-		local destinyport=tile.link
-			audio.Play(6)
-		-- if tile.color==1 then
-			-- originport=
-			-- destinyport=
-		-- elseif tile.color==2 then
-			-- originport=
-			-- destinyport=
-		-- elseif tile.color==3 then
-			-- originport=
-			-- destinyport=
-		-- elseif tile.color==4 then
-			-- originport=
-			-- destinyport=
-		-- end
-			print (p1.x..","..p1.y)
-			-- function OrangePort()
-				twinkles[#twinkles+1]=display.newSprite( tpsheet, { name="twinkle", start=1, count=16, time=300, loopCount=1 }  )
-				twinkles[#twinkles].x=p1.x
-				twinkles[#twinkles].y=p1.y
-				twinkles[#twinkles]:play()
-				p1.MP=p1.MP-manacost
-				if p1.MP>=0 then
-					local xchange=map[tile.link].x-map[tile.id].x
-					local ychange=map[tile.link].y-map[tile.id].y
-					print (xchange..","..ychange)
-					-- level.x=level.x+xchange
-					-- level.y=level.y+ychange
-					-- p1.x=p1.x+xchange
-					-- p1.y=p1.y+ychange
-					p1.x,p1.y=map[tile.link].x,map[tile.link].y
-					-- p1.loc=RP.loc
-					-- p1.room=RP.room
-					p1.portcd=12
-					-- timer.performWithDelay(100,mov.Visibility)
-				else
-					local deficit=math.abs(p1.MP)
-					players.ReduceHP(deficit*2,"Portal")
-					p1.MP=0
-					if p1.HP>0 then
-						local chosentile=math.random(1,msize)
-						-- local chosentile=1
-						if map[chosentile].type=="path" then
-							local xchange=map[chosentile].x-map[tile.id].x
-							local ychange=map[chosentile].y-map[tile.id].y
-							-- level.x=level.x+xchange
-							-- level.y=level.y+ychange
-							-- p1.x=p1.x+xchange
-							-- p1.y=p1.y+ychange
-							p1.x,p1.y=map[tile.link].x,map[tile.link].y
-							-- p1.loc=chosentile
-							-- p1.portcd=12
-							-- timer.performWithDelay(100,mov.Visibility)
-						else
-							local xchange=map[tile.link].x-map[tile.id].x
-							local ychange=map[tile.link].y-map[tile.id].y
-							-- level.x=level.x+xchange
-							-- level.y=level.y+ychange
-							-- p1.x=p1.x+xchange
-							-- p1.y=p1.y+ychange
-							p1.x,p1.y=map[tile.link].x,map[tile.link].y
-							-- p1.loc=RP.loc
-							-- p1.room=RP.room
-							-- p1.portcd=12
-							-- timer.performWithDelay(100,mov.Visibility)
-						end
-					end
-				end
-				print (p1.x..","..p1.y)
-			-- end
-			-- function Closure()
-				-- mov.CleanArrows()
-			-- end
-			-- timer.performWithDelay(10,Closure)
-			-- timer.performWithDelay(300,OrangePort)
-		-- elseif (p1) and (RP.loc==p1.loc) and p1.portcd==0 then
-			-- function RedPort()
-				-- twinkles[#twinkles+1]=display.newSprite( tpsheet, { name="twinkle", start=1, count=16, time=300, loopCount=1 }  )
-				-- twinkles[#twinkles].x=p1.x
-				-- twinkles[#twinkles].y=p1.y
-				-- twinkles[#twinkles]:play()
-				-- if p1.MP>=manacost then
-					-- p1.MP=p1.MP-manacost
-					-- local xchange=RP.x-OP.x
-					-- local ychange=RP.y-OP.y
-					-- map.x=map.x+xchange
-					-- map.y=map.y+ychange
-					-- p1.loc=OP.loc
-					-- p1.room=OP.room
-					-- p1.portcd=12
-					-- timer.performWithDelay(100,mov.Visibility)
-				-- else
-					-- local deficit=manacost-p1.MP
-					-- players.ReduceHP(deficit*2,"Portal")
-					-- p1.MP=0
-					-- if p1.HP>0 then
-					--	local chosentile=math.random(1,msize)
-						-- local chosentile=1
-						-- if boundary[chosentile]==1 then
-							-- local xchange=walls[chosentile].x-OP.x
-							-- local ychange=OP.y-walls[chosentile].y
-							-- map.x=map.x+xchange
-							-- map.y=map.y+ychange
-							-- p1.loc=chosentile
-							-- p1.portcd=12
-							-- timer.performWithDelay(100,mov.Visibility)
-						-- else
-							-- local map=builder.GetData(3)
-							-- local xchange=RP.x-OP.x
-							-- local ychange=RP.y-OP.y
-							-- map.x=map.x+xchange
-							-- map.y=map.y+ychange
-							-- p1.loc=OP.loc
-							-- p1.room=OP.room
-							-- p1.portcd=12
-							-- timer.performWithDelay(100,mov.Visibility)
-						-- end
-					-- end
-				-- end
-			-- end
-			-- audio.Play(6)
-			-- function Closure()
-				-- mov.CleanArrows()
-			-- end
-			-- timer.performWithDelay(10,Closure)
-			-- timer.performWithDelay(300,RedPort)
-	-- elseif tile.color==1 then
-		-- end
-	-- end
-	-- if (BP) and (DP) then
-		-- if (p1) and (BP.loc==p1.loc) and p1.portcd==0 then
-			-- function BluePort()
-				-- twinkles[#twinkles+1]=display.newSprite( tpsheet, { name="twinkle", start=1, count=16, time=300, loopCount=1 }  )
-				-- twinkles[#twinkles].x=p1.x
-				-- twinkles[#twinkles].y=p1.y
-				-- twinkles[#twinkles]:play()
-				-- if p1.MP>=manacost then
-					-- p1.MP=p1.MP-manacost
-					-- local xchange=BP.x-DP.x
-					-- local ychange=BP.y-DP.y
-					-- map.x=map.x+xchange
-					-- map.y=map.y+ychange
-					-- p1.loc=DP.loc
-					-- p1.room=DP.room
-					-- p1.portcd=12
-					-- timer.performWithDelay(100,mov.Visibility)
-				-- else
-					-- local deficit=manacost-p1.MP
-					-- players.ReduceHP(deficit*2,"Portal")
-					-- p1.MP=0
-					-- if p1.HP>0 then
-					--	local chosentile=math.random(1,msize)
-						-- local chosentile=1
-						-- if boundary[chosentile]==1 then
-							-- local xchange=walls[chosentile].x-DP.x
-							-- local ychange=DP.y-walls[chosentile].y
-							-- map.x=map.x+xchange
-							-- map.y=map.y+ychange
-							-- p1.loc=chosentile
-							-- p1.portcd=12
-							-- timer.performWithDelay(100,mov.Visibility)
-						-- else
-							-- local xchange=BP.x-DP.x
-							-- local ychange=BP.y-DP.y
-							-- map.x=map.x+xchange
-							-- map.y=map.y+ychange
-							-- p1.loc=DP.loc
-							-- p1.room=DP.room
-							-- p1.portcd=12
-							-- timer.performWithDelay(100,mov.Visibility)
-						-- end
-					-- end
-				-- end
-			-- end
-			-- audio.Play(6)
-			-- function Closure()
-				-- mov.CleanArrows()
-			-- end
-			-- timer.performWithDelay(10,Closure)
-			-- timer.performWithDelay(300,BluePort)
-		-- elseif tile.color==1 then
-		-- elseif (p1) and (DP.loc==p1.loc) and p1.portcd==0 then
-			-- function DarkPort()
-				-- twinkles[#twinkles+1]=display.newSprite( tpsheet, { name="twinkle", start=1, count=16, time=300, loopCount=1 }  )
-				-- twinkles[#twinkles].x=p1.x
-				-- twinkles[#twinkles].y=p1.y
-				-- twinkles[#twinkles]:play()
-				-- if p1.MP>=manacost then
-					-- p1.MP=p1.MP-manacost
-					-- local xchange=DP.x-BP.x
-					-- local ychange=DP.y-BP.y
-					-- map.x=map.x+xchange
-					-- map.y=map.y+ychange
-					-- p1.loc=BP.loc
-					-- p1.room=BP.room
-					-- p1.portcd=12
-					-- timer.performWithDelay(100,mov.Visibility)
-				-- else
-					-- local deficit=math.abs(p1.MP)
-					-- players.ReduceHP(deficit*2,"Portal")
-					-- p1.MP=0
-					-- if p1.HP>0 then
-						-- local chosentile=math.random(1,msize)
-						-- local chosentile=1
-						-- if boundary[chosentile]==1 then
-							-- local xchange=walls[chosentile].x-BP.x
-							-- local ychange=BP.y-walls[chosentile].y
-							-- map.x=map.x+xchange
-							-- map.y=map.y+ychange
-							-- p1.loc=chosentile
-							-- p1.portcd=12
-							-- timer.performWithDelay(100,mov.Visibility)
-						-- else
-							-- local map=builder.GetData(3)
-							-- local xchange=DP.x-BP.x
-							-- local ychange=DP.y-BP.y
-							-- map.x=map.x+xchange
-							-- map.y=map.y+ychange
-							-- p1.loc=BP.loc
-							-- p1.room=BP.room
-							-- p1.portcd=12
-							-- timer.performWithDelay(100,mov.Visibility)
-						-- end
-					-- end
-				-- end
-			-- end
-			-- audio.Play(6)
-			-- function Closure()
-				-- mov.CleanArrows()
-			-- end
-			-- timer.performWithDelay(10,Closure)
-			-- timer.performWithDelay(300,DarkPort)
-		-- end
-	-- end
-	-- end
+	local originport=tile.id
+	local destinyport=tile.link
+	audio.Play(6)
+	-- print ("PRE: "..p1.x..","..p1.y)
+	-- twinkles[#twinkles+1]=display.newRect( tpsheet, { name="twinkle", start=1, count=16, time=300, loopCount=1 }  )
+	-- twinkles[#twinkles].x=p1.shadow.x
+	-- twinkles[#twinkles].y=p1.shadow.y
+	-- twinkles[#twinkles]:play()
+	Flashbang()
+	p1.MP=p1.MP-manacost
+	if p1.MP>=0 then
+		local xchange=map[tile.link].x-map[tile.id].x
+		local ychange=map[tile.link].y-map[tile.id].y
+		-- print ("CHANGE: "..xchange..","..ychange)
+		p1.shadow.x,p1.shadow.y=map[tile.link].x,map[tile.link].y
+		-- p1.portcd=12
+	else
+		local deficit=math.abs(p1.MP)
+		players.ReduceHP(deficit*2,"Portal")
+		p1.MP=0
+		if p1.HP>0 then
+			local chosentile=math.random(1,msize)
+			if map[chosentile].type=="path" then
+				local xchange=map[chosentile].x-map[tile.id].x
+				local ychange=map[chosentile].y-map[tile.id].y
+				p1.shadow.x,p1.shadow.y=map[tile.link].x,map[tile.link].y
+			else
+				local xchange=map[tile.link].x-map[tile.id].x
+				local ychange=map[tile.link].y-map[tile.id].y
+				p1.shadow.x,p1.shadow.y=map[tile.link].x,map[tile.link].y
+			end
+		end
+	end
+	-- print ("POST: "..p1.x..","..p1.y)
 end
 
 function ShopCheck()
@@ -761,6 +666,127 @@ function SpawnerCheck()
 		end
 	end
 	return info
+end
+
+function Flashbang()
+	if not (theFlash) then
+		theFlash=display.newRect(display.contentCenterX,display.contentCenterY,display.contentWidth+200,display.contentHeight+200)
+		theFlash.transp=1
+		theFlash:setFillColor(1,1,1,theFlash.transp)
+		theFlash:toFront()
+	else
+		theFlash.transp=theFlash.transp-0.03
+		theFlash:setFillColor(1,1,1,theFlash.transp)
+		if theFlash.transp<=0.05 then
+			display.remove(theFlash)
+			theFlash=nil
+		end
+	end
+	if (theFlash) then
+		timer.performWithDelay(1,Flashbang)
+	end
+end
+
+function doDrops(ex,ey)
+	local v=table.maxn(tilevents)+1
+	tilevents[v] = CBE.newVent({
+		x=ex,
+		y=ey,
+		isActive=math.random(10,50),
+		scaleX=0.7,
+		scaleY=0.7,
+		perEmit=1,
+		parentGroup=PFX,
+		build = function()
+			return display.newSprite( coinsheet, coseqs )
+		end,
+		onCreation = function(p, vent)
+			p:setSequence("stand")
+			p:play()
+			p.xScale,p.yScale=1.0,1.0
+			physics.addBody(p,"dynamic",{radius=8, bounce=0.0})
+			p:setVelocity( (p.x*((math.random(0,6)-3)/10) )*0.005, (p.x*((math.random(0,6)-3)/10))*0.005)
+		end,
+		onUpdate = function(particle, vent)
+			vent.isActive=vent.isActive-1
+			if vent.isActive<=0 then
+				vent:stop()
+			end
+		end,
+		onDeath = function(particle, vent)
+			local i=table.maxn(drops)+1
+			drops[i]=display.newSprite( coinsheet, coseqs )
+			drops[i].x=particle.x
+			drops[i].y=particle.y
+			drops[i]:setSequence("stand")
+			drops[i].maxtop=drops[i].y+5
+			drops[i].maxbot=drops[i].y-5
+			drops[i].direction=math.random(0,1)
+			drops[i]:play()
+			PFX:insert(drops[i])
+			function Snoop( event )
+				local p1=players.GetPlayer()
+				if event.other==p1 then
+					display.remove(drops[i].shadow)
+					drops[i].shadow=nil
+					display.remove(drops[i])
+					drops[i]=nil
+					-- print (vents[i])
+					if (vents[i]) then
+						vents[i]:destroy()
+						vents[i]=nil
+					end
+					ui.CallAddCoins()
+				end
+			end
+			drops[i]:addEventListener("collision",Snoop)
+			physics.addBody(drops[i],"dynamic",{isSensor=true,radius=12, bounce=0.0})
+			-- drops[i].xScale,drops[i].yScale=0.5,0.5
+			if table.maxn(drops)==1 then
+				Runtime:addEventListener("enterFrame",Boing)
+			end
+			drops[i].shadow=display.newImageRect("shadow.png",38,7)
+			drops[i].shadow.xScale=0.8
+			drops[i].shadow.yScale=2.0
+			drops[i].shadow.name="coinshadow"
+			drops[i].shadow.id=i
+			drops[i].shadow.x=drops[i].x-1
+			drops[i].shadow.y=drops[i].y+20
+			physics.addBody(drops[i].shadow,"dynamic",{friction=0.3,bounce=0.0,filter={ categoryBits=2, maskBits=1 }})
+			drops[i].shadow.isFixedRotation=true
+			PFX:insert(drops[i].shadow)
+			
+			drops[i].shadow:toFront()
+			drops[i]:toFront()
+		end,
+	})
+	tilevents[v]:start()
+end
+
+function Boing()
+	if table.maxn(drops)==0 then
+		Runtime:removeEventListener("enterFrame",Boing)
+	end
+	for c=1,table.maxn(drops) do
+		if (drops[c]) then
+			if drops[c].x~=drops[c].shadow.x then
+				drops[c].x=drops[c].shadow.x
+			end
+			if not(drops[c].isBodyActive) then
+				physics.addBody(drops[c],"dynamic",{isSensor=true,radius=12, bounce=0.0})
+			end
+			if drops[c].direction==0 then
+				drops[c].y=drops[c].y+((5)*0.02)
+			elseif drops[c].direction==1 then
+				drops[c].y=drops[c].y+((-5)*0.02)
+			end
+			if drops[c].y>=drops[c].maxtop then
+				drops[c].direction=1
+			elseif drops[c].y<=drops[c].maxbot then
+				drops[c].direction=0
+			end
+		end
+	end
 end
 
 

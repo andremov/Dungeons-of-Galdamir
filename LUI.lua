@@ -1,44 +1,37 @@
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 --
 -- UI.lua
 --
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 module(..., package.seeall)
-local energysheet = graphics.newImageSheet( "ui/energysprite.png", { width=60, height=60, numFrames=4 } )
-local heartsheet = graphics.newImageSheet( "ui/heartsprite.png", { width=17, height=17, numFrames=16 } )
-local manasheet = graphics.newImageSheet( "ui/manasprite.png", { width=60, height=60, numFrames=3 } )
-local xpsheet = graphics.newImageSheet( "ui/xpbar.png", { width=392, height=40, numFrames=50 } )
+
+---------------------------------------------------------------------------------------
+-- GLOBAL
+---------------------------------------------------------------------------------------
+
+local coinsheet = graphics.newImageSheet("coinsprite.png", { width=32, height=32, numFrames=8 } )
 local widget = require "widget"
-local WD=require("Lprogress")
-local item=require("Litems")
-local col=require("Levents")
-local mob=require("Lmobai")
-local b=require("Lbuilder")
-local p=require("Lplayers")
-local shp=require("Lshop")
-local sc=require("Lscore")
-local s=require("Lsaving")
-local a=require("Laudio")
-local g=require("Lgold")
-local ui=require("Lui")
-local statcheck=119
-local showncd
-local isOpn	--window open
+-- local b=require("Lbuilder")
+-- local p=require("Lplayer")
+local JSON=require("JSON")
+local game=require("Lgame")
+local isOpn		--window open
 local isPaused	--paused
-local isUse	--using an item
-local p1
-local pwg 	--pause window group
+local isUse		--using an item
 local infwg 	--info window group
-local bkwg 	--book window group
-local dwg 	--death window group
+local bkwg 		--book window group
+local dwg 		--death window group
 local swg		--sound window group
-local exmg	--exit menu group
+local exmg		--exit menu group
 local umg		--use menu group
-local invg	--inv group
-local eqpg	--equip group
-local psg		--player stats group
-local pcg		--player controls group
--- local items
+local invg		--inv group
+local eqpg		--equip group
+local GoldCount=0
+local GCDisplay
+local CDisplay
+local DisplayS=1.25
+local gwg
+local gShown=true
 local DeathMessages={
 	-- Lava
 	{
@@ -84,26 +77,274 @@ local DeathMessages={
 	},
 }
 
+local function readAnims(animname)
+	-- call JSON read func to receive lua table with JSON info
+	-- adapt JSON info for ease of access
+	filename = system.pathForFile( animname )
+	file = assert(io.open(filename, "r"))
+	-- file = assert(love.filesystem.load(animname, "r"))
+	
+	-- use JSON library to decode it to a LUA table
+	-- then return table
+	
+	-- local output = J:decode(file:read("*all"))
+	local output = JSON:decode(file:read("*all"))
+	
+	
+	output=output["Animations"]["Animation"]
+	
+	-- arrange JSON info to a better array
+	-- i used for id of animation
+	-- first name is animation name
+	-- animation subdivision -> parts
+	-- part name is asset name
+	-- for every frame of animation, save asset info
+	-- x, y, scaleX, scaleY, rotation, depth
+	-- depth is layering, who is in front of who
+	-- then arrange color matrix to regular RGBA channels
+	parsed={}
+	local nameofsequence=output["-name"]
+	parsed[nameofsequence] = {}
+	parsed[nameofsequence]["maxframes"]=tonumber(output["-frameCount"])
+	for j=1,table.maxn(output["Part"]) do
+		local nameofasset=output["Part"][j]["-name"]
+		parsed[nameofsequence][nameofasset]={}
+		for k=1,table.maxn(output["Part"][j]["Frame"]) do
+			parsed[nameofsequence][nameofasset][k]={}
+			parsed[nameofsequence][nameofasset][k]["x"]=tonumber(output["Part"][j]["Frame"][k]["-x"])
+			parsed[nameofsequence][nameofasset][k]["y"]=tonumber(output["Part"][j]["Frame"][k]["-y"])
+			parsed[nameofsequence][nameofasset][k]["scaleX"]=tonumber(output["Part"][j]["Frame"][k]["-scaleX"])
+			parsed[nameofsequence][nameofasset][k]["scaleY"]=tonumber(output["Part"][j]["Frame"][k]["-scaleY"])
+			parsed[nameofsequence][nameofasset][k]["rotation"]=tonumber(output["Part"][j]["Frame"][k]["-rotation"])
+			parsed[nameofsequence][nameofasset][k]["depth"]=tonumber(output["Part"][j]["Frame"][k]["-depth"])
+			
+			
+			local b=output["Part"][j]["Frame"][k]["-colorMatrix"]
+			local a={}
+			local cont=0
+			for word in string.gmatch(b,"%d+") do
+				a[cont]=word
+				cont=cont+1
+			end
+			
+			local colorArray={}
+			colorArray[1] = a[00] + a[01] + a[02] + a[03] + a[04]
+			colorArray[2] = a[05] + a[06] + a[07] + a[08] + a[09]
+			colorArray[3] = a[10] + a[11] + a[12] + a[13] + a[14]
+			colorArray[4] = a[15] + a[16] + a[17] + a[18] + a[19]
+			
+			parsed[nameofsequence][nameofasset][k]["colors"]=colorArray
+			
+		end
+	end
+	return parsed
+end
+
+local function readAsset(assname)
+	-- call JSON read function to receive lua table with JSON info
+	
+	filename = system.pathForFile( assname )
+	file = assert(io.open(filename, "r"))
+	
+	-- use JSON library to decode it to a LUA table
+	-- then return table
+	
+	-- local output = J:decode(file:read("*all"))
+	local output = JSON:decode(file:read("*all"))
+	output=output["frames"]
+	
+	-- arrange JSON info to a better array
+	-- i used for id of animation
+	-- first name is animation name
+	-- animation subdivision -> parts
+	-- part name is asset name
+	-- for every frame of animation, save asset info
+	-- x, y, xScale, yScale, rotation, depth
+	-- depth is layering, who is in front of who
+	-- then arrange color matrix to regular RGBA channels
+	
+	step={}
+	for i=1,table.maxn(output) do
+		step[i] = {}
+		step[i]["filename"]=output[i]["filename"]
+		step[i]["width"]=output[i]["frame"]["w"]
+		step[i]["height"]=output[i]["frame"]["h"]
+		step[i]["x"]=output[i]["frame"]["x"]
+		step[i]["y"]=output[i]["frame"]["y"]
+	end
+	parsed={}
+	parsed["frames"]=step
+	return parsed
+end
+
 function isBusy()
 	return isPaused
 end
 
-function BaseUI()
-	p1=p.GetPlayer()
+function CreateWindow(width,height,theme)
+	width=width or 60
+	height=height or 60
+	theme=theme or 0
+	if width>=60 and height>=60 then
+		local WindowGroup=display.newGroup()
+		local WindowElems={}
+		local WindowSheet
+		local itemwidth=49.5
+		local itemheight=49.5
+		local dg=WindowGroup
+		local elm=WindowElems
+		local spacex
+		local spacey
+		
+		-- FIND THEME
+		local totaloptions=readAsset('ui/MoreWindows.json')
+		totaloptions=totaloptions["frames"]
+		totaloptions["frames"]=nil
+		local options={}
+		options["frames"]={}
+		for i=1,table.maxn(totaloptions) do
+			local thisframe=totaloptions[i]
+			local xinicial=thisframe["x"]
+			local yinicial=thisframe["y"]
+			local perframeoptions=readAsset('ui/Windows.json')
+			perframeoptions=perframeoptions["frames"]
+			for j=1,table.maxn(perframeoptions) do
+				
+				perframeoptions[j]["x"]=perframeoptions[j]["x"]+xinicial
+				perframeoptions[j]["y"]=perframeoptions[j]["y"]+yinicial
+				local curoption=(i-1)*(table.maxn(perframeoptions) )+j
+				options["frames"][curoption]=perframeoptions[j]
+			end
+		end
+		WindowSheet=graphics.newImageSheet( "ui/MoreWindows.png", options )
+		
+		local cols=math.ceil(width/(itemwidth))
+		local rows=math.ceil(height/(itemheight))
+		
+		for x=1,cols do
+			elm[x]={}
+			if x==cols then
+				spacex=width-(itemwidth)
+			else
+				spacex=(x-1)*(itemwidth)
+			end
+			for y=1,rows do
+				local index
+				local rot=0
+				local xscale=1
+				local yscale=1
+				if y==rows then
+					spacey=height-(itemheight)
+				else
+					spacey=(y-1)*(itemheight)
+				end
+				if x==1 or x==cols then
+					if y==1 then
+						-- NORTH CORNERS
+						index=3
+					elseif y==rows then
+						-- SOUTH CORNERS
+						index=2
+					else
+						-- LEFT AND RIGHT SIDES
+						index=1
+						rot=90
+					end
+					if x==cols then
+						if rot==90 then
+							yscale=-1
+						else
+							xscale=-1
+						end
+					end
+				else
+					if y==1 then
+						-- NORTH SIDE
+						index=5
+					elseif y==rows then
+						-- SOUTH SIDE
+						index=1
+					else
+						-- IN SIDE
+						index=4
+					end
+				end
+				
+				index=(theme*5)+index
+				
+				elm[x][y]=display.newImage(WindowSheet,index)
+				elm[x][y].x=-(width/2)+25+spacex
+				elm[x][y].y=-(height/2)+25+spacey
+				elm[x][y].rotation=rot
+				elm[x][y].xScale=xscale
+				elm[x][y].yScale=yscale
+				dg:insert(elm[x][y])
+			end
+		end
+		
+		WindowGroup.x=display.contentCenterX
+		WindowGroup.y=display.contentCenterY
+		
+		WindowGroup.setFillColor=function(self,r,g,b,a)
+			a=a or 1
+			local colormatrix={r,g,b,a}
+			for i=1,table.maxn(colormatrix) do
+				if colormatrix[i]<0 then
+					colormatrix[i]=0
+				elseif colormatrix[i]>1 then
+					colormatrix[i]=1
+				end
+			end
+			for i=self.numChildren,1,-1 do
+				local child = self[i]
+				child:setFillColor(colormatrix[1],colormatrix[2],colormatrix[3],colormatrix[4])
+			end
+		end
+		
+		return WindowGroup
+	else
+		assert(false, "Invalid height or width.")
+	end
+end
+
+function Essentials(value)
+	-- p1=value
+	isUse=false
+	isOpn=false
+	isPaused=false
+	
+	Interface:show()
+	-- Runtime:addEventListener("enterFrame", GoldDisplay)
+end
+
+
+---------------------------------------------------------------------------------------
+-- PAUSE MENU
+---------------------------------------------------------------------------------------
+
+local pwg
+PauseMenu={}
+
+function PauseMenu:show()
+
 	scale=1.2
 	espacio=64*scale
 	statchangexs=200
 	statchangey=(display.contentCenterY)-110
 	statchangex=(display.contentCenterX)-statchangexs
-	isUse=false
-	isOpn=false
-	isPaused=true
 	statchange={}
 	pwg=display.newGroup()
 	
-	window=CreateWindow(506,190)
-	window.x,window.y=(display.contentCenterX),20-- 130--20
+	window=CreateWindow(506,210)
+	window.x,window.y=(display.contentCenterX),60
+	window:setFillColor(1,0.2,0.2)
 	pwg:insert(window)
+	
+	pwgtext=display.newText("Game Paused.",0,0,"MoolBoran",80)
+	pwgtext:setTextColor(1,1,1)
+	pwgtext.x=display.contentCenterX
+	pwgtext.y=150
+	pwg:insert(pwgtext)
 	
 	bag=widget.newButton{
 		font=native.systemFont,
@@ -113,7 +354,7 @@ function BaseUI()
 		onRelease=OpenBag
 	}
 	bag.x = window.x-(80*2*1.2)
-	bag.y =window.y+35
+	bag.y =window.y-5
 	bag.xScale = 1.2
 	bag.yScale = bag.xScale
 	pwg:insert(bag)
@@ -188,20 +429,14 @@ function BaseUI()
 	pausebtn.x, pausebtn.y = display.contentWidth-(40*bag.xScale),40*bag.yScale
 	pausebtn.yScale = bag.yScale
 	pausebtn.xScale = bag.xScale
-	-- pwg.x,pwg.y=(display.contentCenterX), (display.contentCenterY)
 	
+	
+	-- pcg.isVisible=true
 	pwg.isVisible=false
-	pausebtn.isVisible=false
+	-- pcg:toFront()
 end
 
-function Ready()
-	pwg.isVisible=true
-	p1.isVisible=true
-	p1.shadow.isVisible=true
-	pausebtn.isVisible=true
-end
-
-function CleanSlate()
+function PauseMenu:clear()
 	if (pwg) then
 		for i=pwg.numChildren,1,-1 do
 			display.remove(pwg[i])
@@ -211,96 +446,24 @@ function CleanSlate()
 	end
 end
 
-function CreateWindow(width,height,theme)
-	width=width or 60
-	height=height or 60
-	theme=theme or 0
-	if width>=60 and height>=60 then
-		WindowGroup=display.newGroup()
-		WindowElems={}
-		WindowDone=false
-		local itemwidth=50
-		local itemheight=50
-		local dg=WindowGroup
-		local elm=WindowElems
-		local spacex
-		local spacey
-		
-		local cols=math.ceil(width/itemwidth)
-		local rows=math.ceil(height/itemheight)
-		
-		for x=1,cols do
-			elm[x]={}
-			if x==cols then
-				spacex=width-50
-			else
-				spacex=(x-1)*50
-			end
-			for y=1,rows do
-				local name
-				if y==rows then
-					spacey=height-50
-				else
-					spacey=(y-1)*50
-				end
-				if x==1 then
-					if y==1 then
-						name="ui/"..theme.."/NWcorner.png"
-					elseif y==rows then
-						name="ui/"..theme.."/SWcorner.png"
-					else
-						name="ui/"..theme.."/Wside.png"
-					end
-				elseif x==cols then
-					if y==1 then
-						name="ui/"..theme.."/NEcorner.png"
-					elseif y==rows then
-						name="ui/"..theme.."/SEcorner.png"
-					else
-						name="ui/"..theme.."/Eside.png"
-					end
-				else
-					if y==1 then
-						name="ui/"..theme.."/Nside.png"
-					elseif y==rows then
-						name="ui/"..theme.."/Sside.png"
-					else
-						name="ui/"..theme.."/inside.png"
-					end
-				end
-				
-				elm[x][y]=display.newImageRect(name,itemwidth,itemheight)
-				elm[x][y].x=-(width/2)+25+spacex
-				elm[x][y].y=-(height/2)+25+spacey
-				dg:insert(elm[x][y])
-			end
-		end
-		
-		WindowDone=true
-		
-		WindowGroup.x=display.contentCenterX
-		WindowGroup.y=display.contentCenterY
-		
-		return WindowGroup
-	else
-		return nil
-	end
-end
 
---All windows manager
+---------------------------------------------------------------------------------------
+-- GENERAL WINDOW MANAGER
+---------------------------------------------------------------------------------------
+
 function toggleState(mute)
 	if isOpn==true then
 		-- m.Visibility()
 		-- m.ShowArrows()
 		isOpn=false
 		if mute~=true then
-			a.Play(3)
+			-- a.Play(3)
 		end
 	elseif isOpn==false then
 		-- m.CleanArrows()
 		isOpn=true
 		if mute~=true then
-			a.Play(4)
+			-- a.Play(4)
 		end
 	end
 	-- g.ShowGCounter()
@@ -354,140 +517,262 @@ function Pause()
 	end
 end
 
---Player HP+MP+EP Display
-function ShowStats()
-	statcheck=statcheck+1
-	if statcheck==120 then
-		p.StatCheck()
-		statcheck=-1
-	end
-	if not(psg) then
-		psg=display.newGroup()
-		psg.isVisible=false
-	end
 
-	if not (statwindow) then
-		statwindow=CreateWindow(300,200)
-		statwindow.x=80
-		statwindow.y=100
-		psg:insert(statwindow)
-	end
--- Life
-	if not(LifeDisplay) then
-		
-		LifeDisplay = display.newText((p1.HP.."/"..p1.MaxHP),0,0,"Game Over",100)
-		LifeDisplay.anchorX=0
-		LifeDisplay.anchorY=0
-		LifeDisplay.x=statwindow.x--40
-		LifeDisplay.y=statwindow.y-90
-		psg:insert(LifeDisplay)
-		
-	end
-	if not(LifeSymbol) then
-		p1.life=0
-		LifeSymbol=display.newSprite( heartsheet, {name="heart",start=1,count=16,time=(1800)} )
-		LifeSymbol.anchorX=0
-		LifeSymbol.anchorY=0
-		LifeSymbol.yScale=3.75
-		LifeSymbol.xScale=3.75
-		LifeSymbol.x = LifeDisplay.x-70
-		LifeSymbol.y = LifeDisplay.y+5
-		LifeSymbol:play()
-		psg:insert(LifeSymbol)
-	end
+---------------------------------------------------------------------------------------
+-- DEFAULT INTERFACE
+---------------------------------------------------------------------------------------
+
+local psg
+Interface={}
+
+function Interface:show()
+	psg=display.newGroup()
+	--[[
+	local statwindow=CreateWindow(300,200)
+	statwindow.x=80
+	statwindow.y=100
+	statwindow:setFillColor(1,0.2,0.2)
+	psg:insert(statwindow)
 	
-	if ((p1.HP.."/"..p1.MaxHP))~=LifeDisplay.text then
-		LifeDisplay.text=((p1.HP.."/"..p1.MaxHP))
-		
-		LifeSymbol:toFront()
-		LifeDisplay:toFront()
-	end
 	
--- Mana
-	if not(ManaDisplay) then -- Text
-		
-		ManaDisplay = display.newText((p1.MP.."/"..p1.MaxMP),0,0,"Game Over",100)
-		ManaDisplay.anchorX=0
-		ManaDisplay.anchorY=0
-		ManaDisplay.x=LifeDisplay.x
-		ManaDisplay.y=LifeDisplay.y+60
-		psg:insert(ManaDisplay)
-		
-	end
-	if not (ManaSymbol) then -- Icon
-		ManaSymbol=display.newSprite( manasheet, {name="mana",start=1,count=3,time=500} )
-		ManaSymbol.anchorX=0
-		ManaSymbol.anchorY=0
-		ManaSymbol.yScale=1.0625
-		ManaSymbol.xScale=1.0625
-		ManaSymbol.x = ManaDisplay.x-70
-		ManaSymbol.y = ManaDisplay.y+5
-		ManaSymbol:play()
-		psg:insert(ManaSymbol)
-	end
 	
-	if ((p1.MP.."/"..p1.MaxMP))~=ManaDisplay.text then -- Text Update
-		ManaDisplay.text=((p1.MP.."/"..p1.MaxMP))
-		
-		ManaSymbol:toFront()
-		ManaDisplay:toFront()
-	end
+	Interface.LifeDisplay = display.newText((p1["STATS"]["Health"].."/"..p1["STATS"]["MaxHealth"]),0,0,"Game Over",100)
+	Interface.LifeDisplay.anchorX=0
+	Interface.LifeDisplay.anchorY=0
+	Interface.LifeDisplay.x=statwindow.x--40
+	Interface.LifeDisplay.y=statwindow.y-90
+	psg:insert(Interface.LifeDisplay)
 	
--- Energy
-	if not(EnergyDisplay) then -- Text
+	local LifeSymbol=display.newSprite( heartsheet, {name="heart",start=1,count=16,time=(1800)} )
+	LifeSymbol.anchorX=0
+	LifeSymbol.anchorY=0
+	LifeSymbol.yScale=3.75
+	LifeSymbol.xScale=3.75
+	LifeSymbol.x = Interface.LifeDisplay.x-70
+	LifeSymbol.y = Interface.LifeDisplay.y+5
+	LifeSymbol:play()
+	psg:insert(LifeSymbol)
 	
-		EnergyDisplay = display.newText((p1.EP.."/"..p1.MaxEP),0,0,"Game Over",100)
-		EnergyDisplay.anchorX=0
-		EnergyDisplay.anchorY=0
-		EnergyDisplay.x=ManaDisplay.x
-		EnergyDisplay.y=ManaDisplay.y+60
-		psg:insert(EnergyDisplay)
-		
-	end
-	if not (EnergySymbol) then -- Icon
-		EnergySymbol=display.newSprite( energysheet, {name="energy",start=1,count=4,time=500} )
-		EnergySymbol.anchorX=0
-		EnergySymbol.anchorY=0
-		EnergySymbol.yScale=1.0625
-		EnergySymbol.xScale=1.0625
-		EnergySymbol.x = EnergyDisplay.x-70
-		EnergySymbol.y = EnergyDisplay.y+5
-		EnergySymbol:play()
-		psg:insert(EnergySymbol)
-	end
 	
-	if ((p1.EP.."/"..p1.MaxEP))~=EnergyDisplay.text then -- Text Update
-		EnergyDisplay.text=((p1.EP.."/"..p1.MaxEP))
-		
-		EnergySymbol:toFront()
-		EnergyDisplay:toFront()
-	end
 	
--- Experience
-	if not (XPSymbol) then
-		xptransp=0
-		showncd=1
-		
-		XPSymbol=display.newSprite( xpsheet, { name="xpbar", start=1, count=50, time=(2000) }  )
-		XPSymbol.x = display.contentCenterX
-		XPSymbol.y = 180
-		XPSymbol:toFront()
-		XPSymbol.shown=false
-		XPSymbol:setFillColor(1,1,1,xptransp)
-		
-		XPDisplay=display.newText( (((XPSymbol.frame-1)*2).."%"), 0, 0, "Game Over", 85 )
-		XPDisplay.x = XPSymbol.x
-		XPDisplay.y = XPSymbol.y
-		XPDisplay:toFront()
-		XPDisplay:setFillColor( 0, 0, 0,xptransp)
-		
-		Runtime:addEventListener("enterFrame",xpTrack)
+	Interface.ManaDisplay = display.newText((p1["STATS"]["Mana"].."/"..p1["STATS"]["MaxMana"]),0,0,"Game Over",100)
+	Interface.ManaDisplay.anchorX=0
+	Interface.ManaDisplay.anchorY=0
+	Interface.ManaDisplay.x=Interface.LifeDisplay.x
+	Interface.ManaDisplay.y=Interface.LifeDisplay.y+60
+	psg:insert(Interface.ManaDisplay)
+
+	local ManaSymbol=display.newSprite( manasheet, {name="mana",start=1,count=3,time=500} )
+	ManaSymbol.anchorX=0
+	ManaSymbol.anchorY=0
+	ManaSymbol.yScale=1.0625
+	ManaSymbol.xScale=1.0625
+	ManaSymbol.x = Interface.ManaDisplay.x-70
+	ManaSymbol.y = Interface.ManaDisplay.y+5
+	ManaSymbol:play()
+	psg:insert(ManaSymbol)
+	
+	
+	
+	Interface.EnergyDisplay = display.newText((p1["STATS"]["Energy"].."/"..p1["STATS"]["MaxEnergy"]),0,0,"Game Over",100)
+	Interface.EnergyDisplay.anchorX=0
+	Interface.EnergyDisplay.anchorY=0
+	Interface.EnergyDisplay.x=Interface.ManaDisplay.x
+	Interface.EnergyDisplay.y=Interface.ManaDisplay.y+60
+	psg:insert(Interface.EnergyDisplay)
+	
+	local EnergySymbol=display.newSprite( energysheet, {name="energy",start=1,count=4,time=500} )
+	EnergySymbol.anchorX=0
+	EnergySymbol.anchorY=0
+	EnergySymbol.yScale=1.0625
+	EnergySymbol.xScale=1.0625
+	EnergySymbol.x = Interface.EnergyDisplay.x-70
+	EnergySymbol.y = Interface.EnergyDisplay.y+5
+	EnergySymbol:play()
+	psg:insert(EnergySymbol)
+	
+	psg.isVisible=false
+	]]
+	--[[
+	local backdrop=CreateWindow(360,200)
+	backdrop.y=display.contentHeight-50
+	psg:insert(backdrop)
+	
+	local bar1=display.newImageRect("ui/bar.png",438,48)
+	bar1.xScale=1.0
+	bar1.yScale=1.2
+	bar1.x=display.contentCenterX
+	bar1.y=display.contentHeight-130
+	bar1:setFillColor(1,0,0)
+	psg:insert(bar1)
+	
+	local bar1fill=display.newRoundedRect(0,0,436,46,17)
+	bar1fill.xScale=bar1.xScale
+	bar1fill.yScale=bar1.yScale
+	bar1fill.x=bar1.x-(bar1fill.width*bar1.xScale/2)
+	bar1fill.y=bar1.y
+	bar1fill:setFillColor(1,0.2,0.2)
+	bar1fill.anchorX=0
+	bar1fill.max=bar1fill.width
+	psg:insert(bar1fill)
+	
+	Interface.bar1fill=bar1fill
+	
+	bar1:toFront()
+	
+	local bar2=display.newImageRect("ui/bar.png",438,48)
+	bar2.xScale=0.9
+	bar2.yScale=bar2.xScale
+	bar2.x=bar1.x
+	bar2.y=bar1.y+55
+	bar2:setFillColor(0.8,0,1)
+	psg:insert(bar2)
+	
+	local bar2fill=display.newRoundedRect(0,0,436,46,17)
+	bar2fill.xScale=bar2.xScale
+	bar2fill.yScale=bar2.yScale
+	bar2fill.x=bar2.x-(bar2fill.width*bar2.xScale/2)
+	bar2fill.y=bar2.y
+	bar2fill:setFillColor(0.6,0.2,0.8)
+	bar2fill.anchorX=0
+	bar2fill.max=bar2fill.width
+	psg:insert(bar2fill)
+	
+	Interface.bar2fill=bar2fill
+	
+	bar2:toFront()
+	
+	local bar3=display.newImageRect("ui/bar.png",438,48)
+	bar3.xScale=0.9
+	bar3.yScale=bar3.xScale
+	bar3.x=bar2.x
+	bar3.y=bar2.y+50
+	bar3:setFillColor(0,1,0)
+	psg:insert(bar3)
+	
+	local bar3fill=display.newRoundedRect(0,0,436,46,17)
+	bar3fill.xScale=bar3.xScale
+	bar3fill.yScale=bar3.yScale
+	bar3fill.x=bar3.x-(bar3fill.width*bar3.xScale/2)
+	bar3fill.y=bar3.y
+	bar3fill:setFillColor(0.2,1,0.2)
+	bar3fill.anchorX=0
+	bar3fill.max=bar3fill.width
+	psg:insert(bar3fill)
+	
+	Interface.bar3fill=bar3fill
+	
+	bar3:toFront()
+	
+	-- EL CORAZONCITO (?)
+	
+	Interface.HeartSymbol={}
+	Interface.HeartSymbol["ANIMATIONS"]=readAnims("ui/HeartAnim.json")
+	Interface.HeartSymbol["CURFRAME"]=1
+	Interface.HeartSymbol["SEQUENCE"]="BEAT"
+	Interface.HeartSymbol["SCALE"]=1
+	
+	
+	Interface.HeartSymbol["ASSETS"]={}
+	Interface.HeartSymbol["ASSETS"][1]=display.newImageRect("ui/Outline.png",112,96)
+	Interface.HeartSymbol["ASSETS"][1].x=bar1fill.x
+	Interface.HeartSymbol["ASSETS"][1].y=bar1fill.y
+	Interface.HeartSymbol["ASSETS"][1].name="Outline"
+	
+	Interface.HeartSymbol["ASSETS"][2]=display.newImageRect("ui/Fill.png",106,91)
+	Interface.HeartSymbol["ASSETS"][2].x=Interface.HeartSymbol["ASSETS"][1].x
+	Interface.HeartSymbol["ASSETS"][2].y=Interface.HeartSymbol["ASSETS"][1].y
+	Interface.HeartSymbol["ASSETS"][2].name="Outline"
+	
+	Interface.HeartSymbol["TIME"]=1.0
+	Interface.HeartSymbol["LASTTIME"]=1.0
+	
+	Interface.HeartSymbol.saturation=function()
+		for i=1,table.maxn(Interface.HeartSymbol["ASSETS"]) do
+			if Interface.HeartSymbol["TIME"]>=2.5 then
+				Interface.HeartSymbol["ASSETS"][i].fill.effect.intensity = -3.75
+			elseif (Interface.HeartSymbol["TIME"]>1) and Interface.HeartSymbol["TIME"]<2.5 then
+				Interface.HeartSymbol["ASSETS"][i].fill.effect.intensity = Interface.HeartSymbol["TIME"]*(1-Interface.HeartSymbol["TIME"])
+			elseif (Interface.HeartSymbol["TIME"]<1) then
+				if (1-Interface.HeartSymbol["TIME"])*2>1 then
+					Interface.HeartSymbol["ASSETS"][i].fill.effect.intensity = 1
+				else
+					Interface.HeartSymbol["ASSETS"][i].fill.effect.intensity = (1-Interface.HeartSymbol["TIME"])*2
+				end
+			else
+				Interface.HeartSymbol["ASSETS"][i].fill.effect.intensity = 0
+			end
+		end
+		Interface.HeartSymbol["LASTTIME"]=Interface.HeartSymbol["TIME"]
 	end
+	Interface.HeartSymbol.refresh=function()
+	Interface.HeartSymbol:refresh()
+	psg:insert(Interface.HeartSymbol["ASSETS"][1])
+	psg:insert(Interface.HeartSymbol["ASSETS"][2])
+	
+	psg.x=psg.x+50
+	
+	Interface.statcheck=-1
+	--]]
+	-- Interface["EXP"]
+	-- Interface.showncd=1
+	
+	-- local XPSymbol=display.newSprite( xpsheet, { name="xpbar", start=1, count=50, time=(2000) }  )
+	-- XPSymbol.x = display.contentCenterX
+	-- XPSymbol.y = 180
+	-- XPSymbol:toFront()
+	-- XPSymbol.shown=false
+	-- XPSymbol:setFillColor(1,1,1,xptransp)
+	
+	-- local XPDisplay=display.newText( (((XPSymbol.frame-1)*2).."%"), 0, 0, "Game Over", 85 )
+	-- XPDisplay.x = XPSymbol.x
+	-- XPDisplay.y = XPSymbol.y
+	-- XPDisplay:toFront()
+	-- XPDisplay:setFillColor( 0, 0, 0,xptransp)
+	
+	-- Runtime:addEventListener("enterFrame",Interface.ExperienceFader)
+	-- Runtime:addEventListener("enterFrame",Interface.refresh)
 end
 
---Player XP
-function LvlFanfare()
-	a.Play(9)
+function Interface:refresh()
+	Interface.statcheck=Interface.statcheck+1
+	if Interface.statcheck==120 then
+		-- p1:checkStats()
+		Interface.statcheck=-1
+	end
+	
+	-- local healthpercentage=(p1["STATS"]["Health"]/p1["STATS"]["MaxHealth"])
+	-- if Interface.bar1fill.width~=Interface.bar1fill.max*healthpercentage then
+		-- Interface.LifeDisplay.text=((p1["STATS"]["Health"].."/"..p1["STATS"]["MaxHealth"]))
+	
+		-- Interface.bar1fill.width=Interface.bar1fill.max*healthpercentage
+	-- end
+	--[[
+	if ((p1["STATS"]["Health"].."/"..p1["STATS"]["MaxHealth"]))~=Interface.LifeDisplay.text then
+		Interface.LifeDisplay.text=((p1["STATS"]["Health"].."/"..p1["STATS"]["MaxHealth"]))
+		
+		-- LifeSymbol:toFront()
+		-- LifeDisplay:toFront()
+	end
+	
+	if ((p1["STATS"]["Mana"].."/"..p1["STATS"]["MaxMana"]))~=Interface.ManaDisplay.text then -- Text Update
+		Interface.ManaDisplay.text=((p1["STATS"]["Mana"].."/"..p1["STATS"]["MaxMana"]))
+		
+		-- ManaSymbol:toFront()
+		-- ManaDisplay:toFront()
+	end
+	
+	if ((p1["STATS"]["Energy"].."/"..p1["STATS"]["MaxEnergy"]))~=Interface.EnergyDisplay.text then -- Text Update
+		Interface.EnergyDisplay.text=((p1["STATS"]["Energy"].."/"..p1["STATS"]["MaxEnergy"]))
+		
+		-- EnergySymbol:toFront()
+		-- EnergyDisplay:toFront()
+	end
+	]]
+end
+
+function Interface:Fanfare()
+	-- a.Play(9)
 	if not (LvlWindow) then
 		lvltransp=255
 		LvlWindow=display.newImageRect("ui/fanfarelevelup.png",330,142)
@@ -512,38 +797,36 @@ function LvlFanfare()
 	end
 end
 
-function xpTrack()
-	if (XPSymbol) and (XPDisplay) then
-		XPSymbol:toFront()
-		XPDisplay:toFront()
-		if XPSymbol.shown==true and xptransp<1 then
-			-- print ("SHOWN; NOT IN POSITION")
+function Interface:ExperienceFader()
+	if XPSymbol.shown==true then
+		-- print "SHOWN"
+		if xptransp<1 then
+			-- print "NOT IN POSITION"
 			xptransp=xptransp+.1
 			XPSymbol:setFillColor(1,1,1,xptransp)
 			XPDisplay:setFillColor( 0, 0, 0,xptransp)
-		elseif XPSymbol.shown==true and xptransp==1 then
-			-- print ("SHOWN; IN POSITION")
-			if XPSymbol.frame<math.ceil((p1.XP/p1.MaxXP)*50) then
-				-- print ("UPDATING COUNT")
-				XPSymbol.frame=XPSymbol.frame+1
-				XPDisplay.text=(((XPSymbol.frame-1)*2).."%")
+		elseif xptransp>=1 then
+			-- print "IN POSITION"
+			-- mpBar2:setFrame(math.floor(( (pMPcnt/p1["STATS"]["MaxMana"])*66 )+1))
+			if XPSymbol.frame<(math.floor(( (p1["STATS"]["Experience"]/p1["STATS"]["MaxExperience"])*49 )+1)) and XPSymbol.frame~=50 then
+				-- print ("ADDING FRAMES")
+				XPSymbol:setFrame(XPSymbol.frame+1)
+				XPDisplay.text=(math.ceil(p1["STATS"]["Experience"]/p1["STATS"]["MaxExperience"]*100).."%")
 				
 				showncd=60
-			elseif XPSymbol.frame>math.ceil((p1.XP/p1.MaxXP)*50) then
-				XPSymbol.frame=1
-				XPDisplay.text=(((XPSymbol.frame-1)*2).."%")
-			elseif XPSymbol.frame==50 and p1.MaxXP<p1.XP then
+			elseif XPSymbol.frame>(math.floor(( (p1["STATS"]["Experience"]/p1["STATS"]["MaxExperience"])*49 )+1)) then
+				-- print ("RESETTING FRAMES")
+				XPSymbol:setFrame(1)
+				XPDisplay.text=(math.ceil(p1["STATS"]["Experience"]/p1["STATS"]["MaxExperience"]*100).."%")
+			elseif XPSymbol.frame>=50 and p1["STATS"]["MaxExperience"]<=p1["STATS"]["Experience"] then
+				-- print ("LEVELING UP")
 				p1.lvl=p1.lvl+1
-				local profit=p1.XP-p1.MaxXP
-				p1.XP=0+profit
-				p1.MaxXP=p1.lvl*50
+				local profit=p1["STATS"]["Experience"]-p1["STATS"]["MaxExperience"]
+				p1["STATS"]["Experience"]=0+profit
+				p1["STATS"]["MaxExperience"]=p1.lvl*50
 				
 				p1.pnts=p1.pnts+4
 				
-				p1.MaxHP=(100*p1.lvl)+(p1.stats[1]*10)
-				p1.MaxMP=(p1.lvl*15)+(p1.stats[6]*10)
-				p1.HP=p1.MaxHP
-				p1.MP=p1.MaxMP
 				LvlFanfare()
 			else
 				-- print ("COUNT UPDATED")
@@ -552,217 +835,231 @@ function xpTrack()
 					XPSymbol.shown=false
 				end
 			end
-		elseif XPSymbol.shown==false and xptransp>0 then
-			-- print ("HIDDEN; NOT IN POSITION")
+		end
+	elseif XPSymbol.shown==false then
+		-- print "HIDDEN"
+		if xptransp>0 then
+			-- print "NOT IN POSITION"
 			xptransp=xptransp-.1
 			XPSymbol:setFillColor(1,1,1,xptransp)
 			XPDisplay:setFillColor( 0, 0, 0,xptransp)
-		elseif XPSymbol.shown==false and xptransp==0 and XPSymbol.frame~=math.ceil((p1.XP/p1.MaxXP)*50) then
+		elseif xptransp<=0 then
+			-- print "IN POSITION"
+			if XPSymbol.frame~=(math.floor(( (p1["STATS"]["Experience"]/p1["STATS"]["MaxExperience"])*49 )+1)) then
+				-- print "XP ISNT COUNT"
+				XPSymbol.shown=true
+			else
+				-- print "XP IS COUNT"
+			end
+		end
+	end
+end
+
+
+---------------------------------------------------------------------------------------
+-- GOLD DISPLAY
+---------------------------------------------------------------------------------------
+
+function CallAddCoins()
+	-- a.Play(1)
+	p1["GOLD"]=p1["GOLD"]+1
+end
+
+function GoldDisplay()
+	if not (gwg) then
+		gwg=display.newGroup()
+		showncd=1
+		
+		GWindow = CreateWindow(200,75)
+		GWindow.x=display.contentWidth-80
+		GWindow.y=145
+		GWindow:setFillColor(1,0.3,0.3)
+		gwg:insert(GWindow)
+		
+		CDisplay=display.newSprite( coinsheet, { name="coin", start=1, count=8, time=750}  )
+		CDisplay.anchorX=0
+		CDisplay.anchorY=0
+		CDisplay.x, CDisplay.y = GWindow.x-80, GWindow.y-20
+		CDisplay.xScale=DisplayS
+		CDisplay.yScale=DisplayS
+		CDisplay:toFront()
+		CDisplay:play()
+		gwg:insert(CDisplay)
+		
+		GCDisplay = display.newText( (GoldCount),0,0, "Game Over", 100 )
+		GCDisplay.anchorX=0
+		GCDisplay.anchorY=0
+		GCDisplay.x,GCDisplay.y=CDisplay.x+60,CDisplay.y-10
+		GCDisplay:setFillColor( 1, 1, 0.2)
+		gwg:insert(GCDisplay)
+		
+		Runtime:addEventListener("enterFrame",MoveWindow)
+	end
+end
+
+function MoveWindow()
+	if (gwg) then
+		local shownx=0
+		local hiddenx=200
+		if gShown==true and gwg.x~=shownx then
+			-- print ("SHOWN; NOT IN POSITION")
+			if gwg.x<shownx then
+				gwg.x=gwg.x+5
+			elseif gwg.x>shownx then
+				gwg.x=gwg.x-5
+			end
+		elseif gShown==true and gwg.x==shownx then
+			-- print ("SHOWN; IN POSITION")
+			if GoldCount~=p1["GOLD"] then
+				-- print ("UPDATING COUNT")
+				if GoldCount<p1["GOLD"] then
+					GoldCount=GoldCount+1
+				elseif GoldCount>p1["GOLD"] then
+					GoldCount=GoldCount-1
+				end
+				GCDisplay.text=(GoldCount)
+				
+				GCDisplay:setFillColor( 1, 1, 0.20)
+				showncd=150
+			else
+				-- print ("COUNT UPDATED")
+				showncd=showncd-1
+				if showncd==0 then
+					gShown=false
+				end
+			end
+		elseif gShown==false and gwg.x~=hiddenx then
+			-- print ("HIDDEN; NOT IN POSITION")
+			if gwg.x<hiddenx then
+				gwg.x=gwg.x+5
+			elseif gwg.x>hiddenx then
+				gwg.x=gwg.x-5
+			end
+		elseif gShown==false and gwg.x==hiddenx and p1["GOLD"]~=GoldCount then
 			-- print ("HIDDEN; IN POSITION; GP ISNT COUNT")
-			XPSymbol.shown=true
-		elseif XPSymbol.shown==false and xptransp==0 then
+			gShown=true
+		elseif gShown==false and gwg.x==hiddenx then
 			-- print ("HIDDEN; IN POSITION; GP IS COUNT")
 		end
 	end
 end
 
---Controls
-function Controls()
-	if (movearrow) then
-		Runtime:removeEventListener("enterFrame",JoyCheck)
-		Runtime:removeEventListener("touch",Joystick)
-		display.remove(movearrow)
-		movearrow=nil
-		display.remove(joy)
-		joy=nil
-		display.remove(joybkg)
-		joybkg=nil
+function CleanCounter()
+	display.remove(CDisplay)
+	CDisplay=nil
+	display.remove(GCDisplay)
+	GCDisplay=nil
+	display.remove(GWindow)
+	GWindow=nil
+end
+
+
+---------------------------------------------------------------------------------------
+-- CONTROLS
+---------------------------------------------------------------------------------------
+
+local pcg
+Controls={}
+
+function Controls:show()
+	pcg=display.newGroup()
+	
+	Controls.joybkg=display.newImageRect("ui/joybkg.png",270,270)
+	Controls.joybkg.x=150
+	Controls.joybkg.y=display.contentHeight-150
+	pcg:insert(Controls.joybkg)
+	Controls.joybkg:setFillColor(1,1,1,0.4)
+	
+	Controls.joy=display.newImageRect("ui/joy.png",100,100)
+	Controls.joy.x=Controls.joybkg.x
+	Controls.joy.y=Controls.joybkg.y
+	Controls.joy:setFillColor(1,1,1,0.6)
+	pcg:insert(Controls.joy)
+	local function wrapper(event)
+		Controls:joystickHandler(event)
 	end
-	if not(pcg) then
-		pcg=display.newGroup()
-	end
-	Runtime:addEventListener("touch",Joystick)
-	Runtime:addEventListener("enterFrame",JoyCheck)
+	Runtime:addEventListener("touch",wrapper)
 	
-	-- local square=display.newRect(150,display.contentHeight-150,300,300)
-	
-	joybkg=display.newImageRect("ui/joybkg.png",270,270)
-	joybkg.x=150
-	joybkg.y=display.contentHeight-150
-	pcg:insert(joybkg)
-	
-	joy=display.newImageRect("ui/joy.png",100,100)
-	joy.x=joybkg.x
-	joy.y=joybkg.y
-	pcg:insert(joy)
-	
-	abutton=widget.newButton{
+	local abutton=widget.newButton{
 		font=native.systemFont,
-		defaultFile="ui/abutton.png",
-		overFile="ui/abutton_hold.png",
+		defaultFile="ui/circlebutton.png",
+		overFile="ui/circlebutton_hold.png",
 		width=80, height=80,
-		onRelease=Button
+		onRelease=game.Controls.buttonPress
 	}
 	abutton.x = display.contentWidth-120
 	abutton.y = display.contentHeight-120
 	abutton.xScale = 2
 	abutton.yScale = abutton.xScale
 	pcg:insert(abutton)
+	abutton:setFillColor(1,0,0,0.6)
 	
-	movearrow=display.newImageRect("ui/movearrow.png",100,100)
-	movearrow.centerX=display.contentCenterX
-	movearrow.centerY=display.contentCenterY
-	movearrow.x=movearrow.centerX
-	movearrow.y=movearrow.centerY
-	pcg:insert(movearrow)
+	Controls.x=0
+	Controls.y=0
 	
-	x=(joy.x-joybkg.x)
-	y=(joy.y-joybkg.y)
+	-- pcg.isVisible=false
 	
-	pcg.isVisible=false
-	movearrow.isVisible=false
+	Controls.joy.isVisible=false
+	-- Controls.joybkg.isVisible=false
+	
+	-- transit=col.getparticles()
+	-- return transit
 end
 
-function Joystick( event )
+function Controls:joystickHandler( event )
 	if isPaused==false then
-		if event.y>display.contentHeight-300 and event.x<300 then
-			if (movearrow) and (joybkg) and (joy) then
+		if event.x>display.contentCenterX then
+			event.phase="ended"
+		end
+		if event.phase=="began" then
+			Runtime:addEventListener("enterFrame",Controls.toGame)
+			Controls.joy.isVisible=true
+			-- Controls.joybkg.isVisible=true
+		end
+		if event.phase~="ended" then
 		
-				x=(event.x-joybkg.x)
-				y=(event.y-joybkg.y)
-				local h=math.sqrt((x^2)+(y^2))
-				local vx=x/h
-				local vy=y/h
-				local vh=math.sqrt((vx^2)+(vy^2))
-				if (h/2)<135 then
-					joy.x=joybkg.x+(vx*(h/2))
-					joy.y=joybkg.y+(vy*(h/2))
-				else
-					joy.x=joybkg.x+(vx*135)
-					joy.y=joybkg.y+(vy*135)
-				end
+			pcg:toFront()
+			
+			Controls.joy.x=event.x
+			Controls.joy.y=event.y
+			
+			Controls.x=Controls.joy.x-Controls.joybkg.x
+			Controls.y=Controls.joy.y-Controls.joybkg.y
+			local h=math.sqrt( (Controls.x^2)+(Controls.y^2) )
+			
+			local r=125
+			if h>r then
+				local vx=Controls.x/h
+				local vy=Controls.y/h
+				Controls.x=vx*r
+				Controls.y=vy*r
 				
-				movearrow.isVisible=true
-				
-				pcg:toFront()
-				-- x=(event.x-movearrow.centerX)
-				-- y=(event.y-movearrow.centerY)
-				
-				local maxspeed=450
-				if x>maxspeed then
-					x=maxspeed
-				elseif x<-maxspeed then
-					x=-maxspeed
-				elseif x>-10 and x<10 then
-					x=0
-				end
-				if y>maxspeed then
-					y=maxspeed
-				elseif y<-maxspeed then
-					y=-maxspeed
-				elseif y>-10 and y<10 then
-					y=0
-				end
-				if x==0 and y==0 then
-					movearrow.x,movearrow.y=movearrow.centerX,movearrow.centerY
-					joy.x,joy.y=joybkg.x,joybkg.y
-					movearrow.isVisible=false
-				else
-					local h=math.sqrt((x^2)+(y^2))
-					local vx=x/h
-					local vy=y/h
-					local vh=math.sqrt((vx^2)+(vy^2))
-					
-					local step1=(math.atan2(y,x))
-					local step2=step1*180
-					local step3=step2/math.pi
-					movearrow.rotation=step3+90
-					
-					movearrow.x=movearrow.centerX+(vx*(maxspeed/3.5))
-					movearrow.y=movearrow.centerY+(vy*(maxspeed/3.5))
-					
-					if (h)<(maxspeed/3) then
-						joy.x=joybkg.x+(vx*(h))
-						joy.y=joybkg.y+(vy*(h))
-					else
-						joy.x=joybkg.x+(vx*(maxspeed/3))
-						joy.y=joybkg.y+(vy*(maxspeed/3))
-					end
-				end
+				Controls.joy.x=Controls.joybkg.x+Controls.x
+				Controls.joy.y=Controls.joybkg.y+Controls.y
 			end
-			if event.phase=="ended" then
-				x=0
-				y=0
-				movearrow.x,movearrow.y=movearrow.centerX,movearrow.centerY
-				joy.x,joy.y=joybkg.x,joybkg.y
-				movearrow.isVisible=false
-			end
-		else
-			x=0
-			y=0
-			movearrow.x,movearrow.y=movearrow.centerX,movearrow.centerY
-			joy.x,joy.y=joybkg.x,joybkg.y
-			movearrow.isVisible=false
+		end
+		if event.phase=="ended" then
+			Controls.joy.isVisible=false
+			-- Controls.joybkg.isVisible=false
+			Runtime:removeEventListener("enterFrame",Controls.toGame)
+			Controls.x=0
+			Controls.y=0
+			Controls.joy.x=Controls.joybkg.x
+			Controls.joy.y=Controls.joybkg.y
+			Controls:toGame()
 		end
 	end
 end
 
-function JoyCheck()
-	if x>10 then
-		if y>10 then
-			if math.abs(x)>math.abs(y) then
-				p.SpriteSeq("run.right")
-			else
-				p.SpriteSeq("run.vertical")
-			end
-		elseif y<-10 then
-			if math.abs(x)>math.abs(y) then
-				p.SpriteSeq("run.right")
-			else
-				p.SpriteSeq("run.vertical")
-			end
-		end
-	elseif x<-10 then
-		if y>10 then
-			if math.abs(x)>math.abs(y) then
-			p.SpriteSeq("run.left")
-			else
-				p.SpriteSeq("run.vertical")
-			end
-		elseif y<-10 then
-			if math.abs(x)>math.abs(y) then
-			p.SpriteSeq("run.left")
-			else
-				p.SpriteSeq("run.vertical")
-			end
-		end
-	else
-		if y>10 then
-			p.SpriteSeq("run.vertical")
-		elseif y<-10 then
-			p.SpriteSeq("run.vertical")
-		else
-			p.SpriteSeq(false)
-		end
-	end
-	Move()
+function Controls:toGame()
+	game.Controls:Check(Controls.x,Controls.y)
 end
 
-function Move()
-	p1.shadow.x=p1.shadow.x+((movearrow.x-movearrow.centerX)/50)
-	p1.shadow.y=p1.shadow.y+((movearrow.y-movearrow.centerY)/50)
-	-- p1.shadow.x=p1.shadow.x+((movearrow.x-movearrow.centerX)/10)
-	-- p1.shadow.y=p1.shadow.y+((movearrow.y-movearrow.centerY)/10)
-	p1.x=p1.shadow.x
-	p1.y=p1.shadow.y
-end
 
-function Button()
-	-- g.CallAddCoins(100)
-	p1.XP=p1.XP+2
-end
+---------------------------------------------------------------------------------------
+-- INVENTORY WINDOW
+---------------------------------------------------------------------------------------
 
---Inventory
 function OpenBag()
 	local approve=canWindowCheck()
 	if approve==true then
@@ -773,15 +1070,19 @@ end
 function ToggleBag(sound)
 	if isOpn==false then
 		if sound~=false then
-			a.Play(3)
+			-- a.Play(3)
 		end
 		invg=display.newGroup()
 		items={}
 		curreqp={}
 		toggleState()
 		
+		bkg=ui.CreateWindow(750,730)
+		bkg.x,bkg.y = display.contentWidth/2, 600
+		invg:insert( bkg )
+		
 		invinterface=display.newImageRect("ui/container.png", 570, 507)
-		invinterface.x,invinterface.y = display.contentCenterX, 600
+		invinterface.x,invinterface.y = bkg.x,bkg.y+27
 		invinterface.xScale,invinterface.yScale=1.28,1.28
 		invg:insert( invinterface )
 		
@@ -796,7 +1097,7 @@ function ToggleBag(sound)
 			onRelease = ForceClose}
 		CloseBtn.xScale,CloseBtn.yScale=0.75,0.75
 		CloseBtn.x = display.contentWidth-50
-		CloseBtn.y = 245
+		CloseBtn.y = bkg.y-326
 		invg:insert( CloseBtn )
 		
 		InvCheck()
@@ -881,7 +1182,7 @@ function ToggleBag(sound)
 		end
 	elseif isOpn==true and (invg) then
 		if sound~=false then
-			a.Play(4)
+			-- a.Play(4)
 		end
 		
 		toggleState()
@@ -961,7 +1262,7 @@ end
 function UseMenu(id,slot)
 	if isUse==false then
 		if id~=false then
-			a.Play(3)
+			-- a.Play(3)
 		end
 	
 		function UsedIt()
@@ -1034,7 +1335,7 @@ function UseMenu(id,slot)
 		end
 		
 		function EquippedIt()
-			a.Play(8)
+			-- a.Play(8)
 			for i=1,table.maxn(p1.eqp) do
 				if (p1.eqp[i]) and (p1.eqp[i][1]) and (p1.eqp[i][2]) and (p1.eqp[i][2]==iteminfo.slot) then
 					p1.inv[#p1.inv+1]={}
@@ -1321,7 +1622,7 @@ function UseMenu(id,slot)
 		
 	elseif isUse==true then
 		if id~=false then
-			a.Play(4)
+			-- a.Play(4)
 		end
 		SpecialUClose()
 		ToggleBag(false)
@@ -1433,7 +1734,11 @@ function SilentQuip(id)
 	p1.eqp[#p1.eqp][2]=itemstats[3]
 end
 
---Character Info
+
+---------------------------------------------------------------------------------------
+-- CHARACTER WINDOW
+---------------------------------------------------------------------------------------
+
 function OpenInfo()
 	local approve=canWindowCheck()
 	if approve==true then
@@ -1444,7 +1749,7 @@ end
 function ToggleInfo(sound)
 	if isOpn==false then
 		if sound~=false then
-			a.Play(3)
+			-- a.Play(3)
 		end
 		
 		toggleState()
@@ -1461,18 +1766,19 @@ function ToggleInfo(sound)
 			labelColor = { default={255,255,255}, over={0,0,0} },
 			fontSize=50,
 			font=native.systemFont,
-			defaultFile="ui/sbutton.png",
-			overFile="ui/sbutton-over.png",
+			defaultFile="ui/button.png",
+			overFile="ui/button_hold.png",
 			width=80, height=80,
 			onRelease = ForceClose}
 		CloseBtn.xScale,CloseBtn.yScale=0.75,0.75
-		CloseBtn.x = display.contentWidth-30
-		CloseBtn.y = 215
+		CloseBtn.x,CloseBtn.y = display.contentWidth-30, bkg.y-390
+		CloseBtn:setFillColor(1.0,0.2,0.2)
+		
 		
 		StatInfo()
 	elseif isOpn==true and (infwg) then
 		if sound~=false then
-			a.Play(4)
+			-- a.Play(4)
 		end
 		display.remove(bkg)
 		bkg=nil
@@ -1503,10 +1809,11 @@ function ToggleInfo(sound)
 end
 
 function StatChange()
+	--[[
 	for s=1,6 do
 		info[#info+1]=display.newText(
 			(
-				p1.statnames[s]
+				p1["STATS"][s]["NAME"]
 			),
 			0,0,"MoolBoran",60
 		)
@@ -1526,7 +1833,6 @@ function StatChange()
 		infwg:insert(info[#info])
 	end
 	for s=1,6 do
-		if p1.pnts>0 and p1.nat[s]<p1.lvl*10 then
 			pli[#pli+1]=  widget.newButton{
 				defaultFile="ui/sbutton.png",
 				overFile="ui/sbutton-over.png",
@@ -1544,10 +1850,13 @@ function StatChange()
 			pli[#pli].xScale = 3.0
 			pli[#pli].yScale = 3.0
 			infwg:insert(pli[#pli])
+		if p1.pnts>0 and p1.nat[s]<p1.lvl*10 then
+		else
+			pli[#pli]:setEnabled(false)
+			pli[#pli]:setFillColor(0.5,0.5,0.5,0.5)
 		end
 	end
 	for s=1,6 do
-		if p1.nat[s]>1 then
 			mini[#mini+1]=  widget.newButton{
 				defaultFile="ui/sbutton.png",
 				overFile="ui/sbutton-over.png",
@@ -1558,18 +1867,10 @@ function StatChange()
 			mini[#mini].x = info[6+s].x-90
 			mini[#mini].y = info[6+s].y-10
 			infwg:insert(mini[#mini])
+		if p1.nat[s]>1 then
 		else
-			mini[#mini+1]=  widget.newButton{
-				defaultFile="ui/sbutton.png",
-				overFile="ui/sbutton-over.png",
-				font=native.systemFont,
-				width=80, height=80,
-				onRelease = Less,
-			}
-			mini[#mini].x = info[6+s].x-90
-			mini[#mini].y = info[6+s].y-10
-			mini[#mini].isVisible=false
-			infwg:insert(mini[#mini])
+			mini[#mini]:setEnabled(false)
+			mini[#mini]:setFillColor(0.5,0.5,0.5,0.5)
 		end
 			
 			mini[#mini+1]=display.newImageRect("ui/-.png",11,11)
@@ -1620,9 +1921,11 @@ function StatChange()
 		info[#info]:setFillColor(0.7,0.7,0.7)
 	end
 	infwg.y=200
+	]]
 end
 
 function StatInfo()
+--[[
 	local baseX=50
 	local baseY=90
 	local SpacingX=350
@@ -1631,7 +1934,7 @@ function StatInfo()
 	local primary=1
 	local secundary=0.30
 	
-	info[1]=display.newText((p1.name),0,0,"MoolBoran",80)
+	info[1]=display.newText((p1["NAME"]),0,0,"MoolBoran",80)
 	info[#info].anchorX=0
 	info[#info].anchorY=0
 	info[#info].x=50
@@ -1645,7 +1948,8 @@ function StatInfo()
 	info[#info].y=baseY
 	infwg:insert(info[#info])
 	
-	info[#info+1]=display.newText((p1.HP.."/"..p1.MaxHP.."  ("..math.ceil(p1.HP/p1.MaxHP*100).."%"..")"),0,0,"MoolBoran",60)
+	local text=(p1["STATS"]["Health"].."/"..p1["STATS"]["MaxHealth"].."  ("..math.ceil(p1["STATS"]["Health"]/p1["STATS"]["MaxHealth"]*100).."%"..")")
+	info[#info+1]=display.newText(text,0,0,"MoolBoran",60)
 	info[#info].anchorX=0
 	info[#info].anchorY=0
 	info[#info].x=baseX+90
@@ -1653,7 +1957,8 @@ function StatInfo()
 	info[#info]:setFillColor(primary,secundary,secundary)
 	infwg:insert(info[#info])
 	
-	info[#info+1]=display.newText(("Weight: ~"..math.ceil(p1.weight).."kg"),0,0,"MoolBoran",60)
+	local text=("Weight: ~"..math.ceil(p1["STATS"]["Weight"]).."kg")
+	info[#info+1]=display.newText(text,0,0,"MoolBoran",60)
 	info[#info].anchorX=0
 	info[#info].anchorY=0
 	info[#info].x=baseX+SpacingX
@@ -1667,7 +1972,8 @@ function StatInfo()
 	info[#info].y=baseY+SpacingY
 	infwg:insert(info[#info])
 	
-	info[#info+1]=display.newText((p1.MP.."/"..p1.MaxMP.."  ("..math.ceil(p1.MP/p1.MaxMP*100).."%"..")"),0,0,"MoolBoran",60)
+	local text=(p1["STATS"]["Mana"].."/"..p1["STATS"]["MaxMana"].."  ("..math.ceil(p1["STATS"]["Mana"]/p1["STATS"]["MaxMana"]*100).."%"..")")
+	info[#info+1]=display.newText(text,0,0,"MoolBoran",60)
 	info[#info].anchorX=0
 	info[#info].anchorY=0
 	info[#info].x=baseX+90
@@ -1682,7 +1988,8 @@ function StatInfo()
 	info[#info].y=baseY+SpacingY
 	infwg:insert(info[#info])
 	
-	info[#info+1]=display.newText((p1.EP.."/"..p1.MaxEP.."  ("..math.ceil(p1.EP/p1.MaxEP*100).."%"..")"),0,0,"MoolBoran",60)
+	local text=(p1["STATS"]["Energy"].."/"..p1["STATS"]["MaxEnergy"].."  ("..math.ceil(p1["STATS"]["Energy"]/p1["STATS"]["MaxEnergy"]*100).."%"..")")
+	info[#info+1]=display.newText(text,0,0,"MoolBoran",60)
 	info[#info].anchorX=0
 	info[#info].anchorY=0
 	info[#info].x=baseX+SpacingX+90
@@ -1690,17 +1997,7 @@ function StatInfo()
 	info[#info]:setFillColor(secundary,primary,secundary)
 	infwg:insert(info[#info])
 	
-	--[[ CLASS
-	info[#info+1]=display.newText(
-		(
-			"Class: "..p1.clsnames[p1.class+1]
-		),
-		baseX+SpacingX,baseY+(SpacingY*3),"MoolBoran",60
-	)
-	infwg:insert(info[#info])
-	--]]
-	
-	info[#info+1]=display.newText(("Level: "..p1.lvl),0,0,"MoolBoran",60)
+	info[#info+1]=display.newText(("Level: "..p1["STATS"]["Level"]),0,0,"MoolBoran",60)
 	info[#info].anchorX=0
 	info[#info].anchorY=0
 	info[#info].x=baseX
@@ -1714,7 +2011,8 @@ function StatInfo()
 	info[#info].y=baseY+(SpacingY*2)
 	infwg:insert(info[#info])
 	
-	info[#info+1]=display.newText((p1.XP.."/"..p1.MaxXP.."  ("..math.ceil(p1.XP/p1.MaxXP*100).."%"..")"),0,0,"MoolBoran",60)
+	local text=(p1["STATS"]["Experience"].."/"..p1["STATS"]["MaxExperience"].."  ("..math.ceil(p1["STATS"]["Experience"]/p1["STATS"]["MaxExperience"]*100).."%"..")")
+	info[#info+1]=display.newText(text,0,0,"MoolBoran",60)
 	info[#info].anchorX=0
 	info[#info].anchorY=0
 	info[#info].x=baseX+SpacingX+90
@@ -1722,15 +2020,7 @@ function StatInfo()
 	info[#info]:setFillColor(secundary,secundary,primary)
 	infwg:insert(info[#info])
 	
-	local flr=WD.Circle()
-	info[#info+1]=display.newText(("Floor: "..flr),0,0,"MoolBoran",60)
-	info[#info].anchorX=0
-	info[#info].anchorY=0
-	info[#info].x=baseX
-	info[#info].y=baseY+(SpacingY*3)
-	infwg:insert(info[#info])
-	
-	info[#info+1]=display.newText(("Gold: "..p1.gp.." coins"),0,0,"MoolBoran",60)
+	info[#info+1]=display.newText(("Gold: "..p1["GOLD"].." coins"),0,0,"MoolBoran",60)
 	info[#info].anchorX=0
 	info[#info].anchorY=0
 	info[#info].x=baseX+SpacingX
@@ -1747,7 +2037,7 @@ function StatInfo()
 	for s=1,6 do
 		info[#info+1]=display.newText(
 			(
-				p1.statnames[s]
+				p1["STATS"][s]["NAME"]
 			),
 			0,0,"MoolBoran",60
 		)
@@ -1758,14 +2048,14 @@ function StatInfo()
 		infwg:insert(info[#info])
 	end
 	
-	info[#info+1]=display.newText(("Armor: "..p1.armor),0,0,"MoolBoran",60)
+	info[#info+1]=display.newText(("Armor: "..p1["STATS"]["Armor"]),0,0,"MoolBoran",60)
 	info[#info].anchorX=0
 	info[#info].anchorY=0
 	info[#info].x=baseX
 	info[#info].y=690
 	infwg:insert(info[#info])
 	
-	info[#info+1]=display.newText(("Stat Points: "..p1.pnts),0,0,"MoolBoran",60)
+	info[#info+1]=display.newText(("Stat Points: "..p1["STATS"]["Free"]),0,0,"MoolBoran",60)
 	info[#info].anchorX=0
 	info[#info].anchorY=0
 	info[#info].x=baseX
@@ -1775,7 +2065,7 @@ function StatInfo()
 	for s=1,6 do
 		info[#info+1]=display.newText(
 			(
-				p1.nat[s]
+				p1["STATS"][s]["NATURAL"]
 			),
 			0,0,"MoolBoran",60
 		)
@@ -1789,7 +2079,7 @@ function StatInfo()
 	for s=1,6 do
 		info[#info+1]=display.newText(
 			(
-			"+"..p1.eqs[s]
+			"+"..p1["STATS"][s]["EQUIP"]
 			),
 			0,0,"MoolBoran",60
 		)
@@ -1797,9 +2087,9 @@ function StatInfo()
 		info[#info].anchorY=0
 		info[#info].x=info[#info-s].x+80
 		info[#info].y=420+(45*(s-1))
-		if p1.eqs[s]>0 then
+		if p1["STATS"][s]["EQUIP"]>0 then
 			info[#info]:setFillColor(0.20,0.8,0.20)
-		elseif p1.eqs[s]<0 then
+		elseif p1["STATS"][s]["EQUIP"]<0 then
 			info[#info]:setFillColor(0.8,0.20,0.20)
 		else
 			info[#info]:setFillColor(0.6,0.6,0.6)
@@ -1810,7 +2100,7 @@ function StatInfo()
 	for s=1,6 do
 		info[#info+1]=display.newText(
 			(
-			"+"..p1.bon[s]+p1.bst[s]
+			"+"..p1["STATS"][s]["BOOST"]
 			),
 			0,0,"MoolBoran",60
 		)
@@ -1818,9 +2108,9 @@ function StatInfo()
 		info[#info].anchorY=0
 		info[#info].x=info[#info-s].x+80
 		info[#info].y=420+(45*(s-1))
-		if p1.bon[s]>0 then
+		if p1["STATS"][s]["BOOST"]>0 then
 			info[#info]:setFillColor(0.20,0.8,0.20)
-		elseif p1.eqs[s]<0 then
+		elseif p1["STATS"][s]["BOOST"]<0 then
 			info[#info]:setFillColor(0.8,0.20,0.20)
 		else
 			info[#info]:setFillColor(0.6,0.6,0.6)
@@ -1831,7 +2121,7 @@ function StatInfo()
 	for s=1,6 do
 		info[#info+1]=display.newText(
 			(
-				"= "..p1.stats[s]
+				"= "..p1["STATS"][s]["TOTAL"]
 			),
 			0,0,"MoolBoran",60
 		)
@@ -1839,9 +2129,9 @@ function StatInfo()
 		info[#info].anchorY=0
 		info[#info].x=info[#info-s].x+80
 		info[#info].y=420+(45*(s-1))
-		if p1.stats[s]>p1.nat[s] then
+		if p1["STATS"][s]["TOTAL"]>p1["STATS"][s]["NATURAL"] then
 			info[#info]:setFillColor(0.20,0.8,0.20)
-		elseif p1.stats[s]<p1.nat[s] then
+		elseif p1["STATS"][s]["TOTAL"]<p1["STATS"][s]["NATURAL"] then
 			info[#info]:setFillColor(0.8,0.20,0.20)
 		else
 		end
@@ -1868,14 +2158,16 @@ function StatInfo()
 	
 	infwg:toFront()
 	infwg.y=200
+	]]
 end
 
 function SwapInfo(sound)
 	if isOpn==true and (infwg) then
 		if sound~=false then
-			a.Play(4)
+			-- a.Play(4)
 		end
-		if swapInfoBtn.state==false then
+		--if swapInfoBtn.state==false then
+		if (true) then
 			for i=table.maxn(info),1,-1 do
 				display.remove(info[i])
 				info[i]=nil
@@ -1916,13 +2208,15 @@ function SwapInfo(sound)
 end
 
 function More( event )
-	local statnum
-	for i=1,12 do
-		if (pli[i]) then
-			if event.y+50>pli[i].y and event.y-50<pli[i].y and event.x+50>pli[i].x and event.x-50<pli[i].x then
-				statnum=math.ceil(i/2)
-			end
-		end
+	local statnum=1
+	if event.x>display.contentCenterX then
+		statnum=statnum+1
+	end
+	if event.y>500 then
+		statnum=statnum+2
+	end
+	if event.y>700 then
+		statnum=statnum+2
 	end
 	p.Natural(statnum,1)
 	SwapInfo(false)
@@ -1930,13 +2224,15 @@ function More( event )
 end
 
 function Less( event )
-	local statnum
-	for i=1,12 do
-		if (mini[i]) then
-			if event.y+50>mini[i].y and event.y-50<mini[i].y and event.x+50>mini[i].x and event.x-50<mini[i].x then
-				statnum=math.ceil(i/2)
-			end
-		end
+	local statnum=1
+	if event.x>display.contentCenterX then
+		statnum=statnum+1
+	end
+	if event.y>500 then
+		statnum=statnum+2
+	end
+	if event.y>700 then
+		statnum=statnum+2
 	end
 	p.Natural(statnum,-1)
 	SwapInfo(false)
@@ -1969,7 +2265,11 @@ function InvCheck() --Checks if items in bag can be stacked together
 	end
 end
 
---Audio Settings
+
+---------------------------------------------------------------------------------------
+-- AUDIO WINDOW
+---------------------------------------------------------------------------------------
+
 function OpenSnd()
 	local approve=canWindowCheck()
 	if approve==true then
@@ -1980,7 +2280,7 @@ end
 function ToggleSound(sound)
 	if isOpn==false then
 		if sound~=false then
-			a.Play(3)
+			-- a.Play(3)
 		end
 		
 		toggleState()
@@ -2051,7 +2351,7 @@ function ToggleSound(sound)
 
 	elseif isOpn==true and (swg) then
 		if sound~=false then
-			a.Play(4)
+			-- a.Play(4)
 		end
 		toggleState()
 		for i=swg.numChildren,1,-1 do
@@ -2104,7 +2404,11 @@ function SoundScroll( event )
 	end
 end
 
---Exit
+
+---------------------------------------------------------------------------------------
+-- EXIT WINDOW
+---------------------------------------------------------------------------------------
+
 function OpenExit()
 	local approve=canWindowCheck()
 	if approve==true then
@@ -2188,7 +2492,11 @@ function DoExit()
 	native.requestExit()
 end
 
---Spellbook
+
+---------------------------------------------------------------------------------------
+-- SPELLBOOK WINDOW
+---------------------------------------------------------------------------------------
+
 function OpenBook()
 	local approve=canWindowCheck()
 	if approve==true then
@@ -2380,7 +2688,11 @@ function SpellInfo( event )
 	end
 end
 
---Death
+
+---------------------------------------------------------------------------------------
+-- DEATH WINDOW
+---------------------------------------------------------------------------------------
+
 function DeathMenu(cause)
 	if isOpn==false then
 		dwg=display.newGroup()
@@ -2434,10 +2746,10 @@ function DeathMenu(cause)
 		
 		Round=WD.Circle()
 		p1=p.GetPlayer()
-		size=b.GetData(0)
-		scre,hs=sc.Scoring( Round , p1 , (math.sqrt(size)) )
+		xsize,ysize=b.getData(2)
+		scre,hs=sc.Scoring( Round , p1 , ((xsize+ysize)/2) )
 		Round=tostring(Round)
-		GCount=tostring(p1.gp)
+		GCount=tostring(p1["GOLD"])
 		GInfoTxt=display.newGroup()
 		
 		InfoTxt1=display.newText("You got to floor ",0,0,"MoolBoran", 60 )

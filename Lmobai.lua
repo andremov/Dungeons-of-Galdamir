@@ -5,10 +5,11 @@
 -----------------------------------------------------------------------------------------
 module(..., package.seeall)
 local builder=require("Lbuilder")
-local o=require("Loptions")
+local handler=require("Ltiles")
 local p=require("Lplayers")
 local ui=require("Lui")
--- local c=require("Lcombat")
+local c=require("Lcombat")
+local mov=require("Lmoves")
 local isDead
 local mobs
 local CanGoUp
@@ -121,7 +122,7 @@ function DoTurns()
 				CanMove[i]==true then
 			--	Before movement, mob is in contact with player.
 				function closure()
-					-- c.Attacked(mobs[i])
+					c.Attacked(mobs[i])
 				end
 				timer.performWithDelay(100,closure)
 				CanMove[i]=false
@@ -132,7 +133,7 @@ function DoTurns()
 			--	Before movement, player is in attack range
 				MoveRight(i)
 				function closure()
-					-- c.Attacked(mobs[i])
+					c.Attacked(mobs[i])
 				end
 				
 				timer.performWithDelay(100,closure)
@@ -155,7 +156,7 @@ function DoTurns()
 			--	Before movement, player is in attack range
 				MoveUp(i)
 				function closure()
-					-- c.Attacked(mobs[p1.room][i])
+					c.Attacked(mobs[p1.room][i])
 				end
 				timer.performWithDelay(100,closure)
 				CanMove[i]=false
@@ -166,7 +167,7 @@ function DoTurns()
 			--	Before movement, player is in attack range
 				MoveDown(i)
 				function closure()
-					-- c.Attacked(mobs[p1.room][i])
+					c.Attacked(mobs[p1.room][i])
 				end
 				timer.performWithDelay(100,closure)
 				CanMove[i]=false
@@ -183,7 +184,7 @@ function DoTurns()
 				mobs[p1.room][i].loc==p1.loc+(math.sqrt(size)) then
 				--	After movement, mob is in contact with player.
 				function closure()
-					-- c.Attacked(mobs[p1.room][i])
+					c.Attacked(mobs[p1.room][i])
 				end
 				timer.performWithDelay(100,closure)
 				DidSomething=true
@@ -192,7 +193,7 @@ function DoTurns()
 	end
 	MobSpawn()
 	if DidSomething==false then
-		-- timer.performWithDelay(200,mov.Visibility)
+		timer.performWithDelay(200,mov.Visibility)
 	end
 end
 
@@ -248,7 +249,7 @@ function MobDied(data)
 end
 
 function LifeOverDeath(id,room)
-	local TSet=o.GetTiles()
+	local TSet=handler.GetTiles()
 	local level=builder.GetData(3)
 	local zergOff=false
 	for m=1,size do
