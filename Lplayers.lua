@@ -515,12 +515,14 @@ function StatCheck()
 	if player.EP>player.MaxEP then
 		player.EP=player.MaxEP
 	end
-	player.weight=5
-	for i=1,table.maxn(player.inv) do
-		player.weight=player.weight+player.inv[i][2]
+	player.weight=50
+	for a=1,table.maxn(player.inv) do
+		local w8=i.ReturnInfo(player.inv[a][1],5)
+		player.weight=player.weight+(w8*player.inv[a][2])
 	end
-	for i=1,table.maxn(player.eqp) do
-		player.weight=player.weight+2
+	for b=1,table.maxn(player.eqp) do
+		local w8=i.ReturnInfo(player.eqp[b][1],5)
+		player.weight=player.weight+w8
 	end
 end
 

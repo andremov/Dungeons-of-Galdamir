@@ -17,6 +17,7 @@ local OKVers={
 		"RELEASE 1.0.1",
 		"RELEASE 1.1.0",
 		"RELEASE 1.1.1",
+		"RELEASE 1.1.2",
 	}
 local Default={
 		"AAA",10000,

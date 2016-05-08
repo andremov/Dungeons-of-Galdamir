@@ -776,7 +776,7 @@ function StatInfo()
 	
 	info[#info+1]=display.newText(
 		(
-			"("..(p1.HP/p1.MaxHP*100).."%"..")"
+			"("..math.ceil(p1.HP/p1.MaxHP*100).."%"..")"
 		),
 		baseX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25),baseY,"MoolBoran",60
 	)
@@ -802,7 +802,7 @@ function StatInfo()
 	
 	info[#info+1]=display.newText(
 		(
-			"("..(p1.MP/p1.MaxMP*100).."%"..")"
+			"("..math.ceil(p1.MP/p1.MaxMP*100).."%"..")"
 		),
 		baseX+SpacingX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25),baseY,"MoolBoran",60
 	)
@@ -828,7 +828,7 @@ function StatInfo()
 	
 	info[#info+1]=display.newText(
 		(
-			"("..(p1.EP/p1.MaxEP*100).."%"..")"
+			"("..math.ceil(p1.EP/p1.MaxEP*100).."%"..")"
 		),
 		baseX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25),baseY+SpacingY,"MoolBoran",60
 	)
@@ -872,7 +872,7 @@ function StatInfo()
 	
 	info[#info+1]=display.newText(
 		(
-			"("..(p1.XP/p1.MaxXP*100).."%"..")"
+			"("..math.ceil(p1.XP/p1.MaxXP*100).."%"..")"
 		),
 		baseX+SpacingX+(#(info[#info-1].text)*symLength)+(#(info[#info].text)*symLength)+(symLength*2.25),baseY+(SpacingY*2),"MoolBoran",60
 	)

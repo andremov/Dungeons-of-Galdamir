@@ -127,7 +127,7 @@ function Start()
 	
 	Windows()
 	
-	Interface()
+	timer.performWithDelay(100,Interface)
 end
 
 function doNext()
@@ -349,7 +349,12 @@ function Load()
 		local Sve={}
 		local path = system.pathForFile(  "DoGSettings.stn", system.DocumentsDirectory )
 		for line in io.lines( path ) do
-			Sve[#Sve+1]=line
+			local n=tonumber(line)
+			if (n) then
+				Sve[#Sve+1]=n
+			else
+				Sve[#Sve+1]=line
+			end
 		end
 		local count=0
 		for p=1,table.maxn(positions) do

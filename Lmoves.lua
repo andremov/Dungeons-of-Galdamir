@@ -882,7 +882,8 @@ function Up()
 	elseif CanMoveUp==true then
 		CleanArrows()
 		P1=p.GetPlayer()
-		local energycost=math.floor(P1.weight/30)
+		local str=(P1.stats[1]*15)+(P1.stats[2]*10)+(P1.stats[4]*10)+(P1.stats[6]*5)
+		local energycost=math.floor(P1.weight/str)
 		if RoomChange=="U" then
 			P1.room=P1.room-5
 			P1.loc=col+(size*(size-1))
@@ -921,7 +922,8 @@ function Down()
 	elseif CanMoveDown==true then
 		CleanArrows()
 		P1=p.GetPlayer()
-		local energycost=math.floor(P1.weight/30)
+		local str=(P1.stats[1]*15)+(P1.stats[2]*10)+(P1.stats[4]*10)+(P1.stats[6]*5)
+		local energycost=math.floor(P1.weight/str)
 		if RoomChange=="D" then
 			P1.room=P1.room+5
 			P1.loc=(col)
@@ -960,7 +962,8 @@ function Left()
 	elseif CanMoveLeft==true then
 		CleanArrows()
 		P1=p.GetPlayer()
-		local energycost=math.floor(P1.weight/30)
+		local str=(P1.stats[1]*15)+(P1.stats[2]*10)+(P1.stats[4]*10)+(P1.stats[6]*5)
+		local energycost=math.floor(P1.weight/str)
 		if RoomChange=="L" then
 			P1.room=P1.room-1
 			P1.loc=p1.loc+(size-1)
@@ -1000,7 +1003,8 @@ function Right()
 	elseif CanMoveRight==true then
 		CleanArrows()
 		P1=p.GetPlayer()
-		local energycost=math.floor(P1.weight/30)
+		local str=(P1.stats[1]*15)+(P1.stats[2]*10)+(P1.stats[4]*10)+(P1.stats[6]*5)
+		local energycost=math.floor(P1.weight/str)
 		if RoomChange=="R" then
 			P1.room=P1.room+1
 			P1.loc=p1.loc-(size-1)

@@ -24,7 +24,7 @@ TO DO
 local RSS
 local shSuffix="RLSE"
 local loSuffix="RELEASE"
-local verNum="1.1.1"
+local verNum="1.1.2"
 local cVersion=(shSuffix.." "..verNum)
 local gVersion=(loSuffix.." "..verNum)
 

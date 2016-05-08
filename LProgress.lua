@@ -150,7 +150,6 @@ function SrsBsns()
 	gp.CleanCounter()
 	builder.WipeMap()
 	m.ShowMenu()
-	m.ReadySetGo()
 	mov.CleanWindow()
 end
 

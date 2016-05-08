@@ -122,12 +122,13 @@ function DisplayCombat()
 	gcm=display.newGroup()
 	hits={}
 	m.FindMe(7)
-	local bkgdark=display.newImageRect("bkgs/bkg_level.png",768,1024)
+	
+	local bkgdark=display.newImage("bkgs/bkg_level.png", true)
 	bkgdark.x=display.contentCenterX
 	bkgdark.y=display.contentCenterY
 	gcm:insert(bkgdark)
 	
-	local bkg=display.newImage("bkgs/bkg1.png",480,272)
+	local bkg=display.newImage("bkgs/bkg1.png",512,272)
 	bkg.xScale = 1.5
 	bkg.yScale = 1.5
 	bkg.x = display.contentCenterX
@@ -1431,7 +1432,7 @@ function EndCombat(outcome)
 			local chance=math.random(1,10)
 			if chance<9 then
 				local RunDmg=math.floor( p1.MaxHP/(10+((math.random(0,4))-2)) )
-				if RunDmg>p1.HP then
+				if RunDmg>=p1.HP then
 					RunDmg=(p1.HP-1)
 					players.ReduceHP(RunDmg,"Mob")
 				else
