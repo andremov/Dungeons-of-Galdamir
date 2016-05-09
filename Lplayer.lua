@@ -85,18 +85,19 @@ function CreatePlayer(name)
 	if not(player) then
 		local physics = require "physics"
 		local names={
-			-- "Nameless",
-			-- "Orphan",
-			-- "Smith",
-			-- "Slave",
-			-- "Hctib",
 			"Barry"
 		}
 		
 		-- Essentials
 		player=display.newGroup()
+		local shade={ -51,-4, 51,-4, 51,12, -51,12}
+		physics.addBody(player,"dynamic",{shape=shade,filter={categoryBits=2,maskBits=7}})
+		player.isFixedRotation=true
 		player.x, player.y = display.contentWidth/2, display.contentHeight/2
-		player.name="TEST NAME FOR TESTING"
+		player["CATEGORY"]="PLAYER"
+		
+		player.textd=display.newText((player.x..", "..player.y),0,50,native.systemFont,30)
+		player:insert(player.textd)
 		
 		-- Map Essentials
 		player["MAPX"]=0
@@ -175,15 +176,12 @@ function CreatePlayer(name)
 			if player["TIME"] ~= player["LASTTIME"] then
 				player:saturation()
 			end
-			-- player.shadow:toBack()
-			player:regeneration()
 			
-			player.x=player["shadow"].x
-			player.y=player["shadow"].y
+			player:regeneration()
+			player.textd.text=(math.floor(player.x)..", "..math.floor(player.y))
 			
 			player["WEAPON"]["basedamage"]=player["STATS"]["Damage"]
 		
-			-- timer.performWithDelay(20,player.refresh)
 		end
 		player.turn=function()
 			if player.xScale==1 then
@@ -393,14 +391,7 @@ function CreatePlayer(name)
 		
 		-- Shadow Essentials
 		player["shadow"]=display.newImageRect("Barry/Shadow.png",103,17)
-		player["shadow"].x,player["shadow"].y=player.x,player.y
 		player["shadow"].anchorY=0.2
-		player["shadow"].category="player"
-		local shade={ -51,-8, 51,-8, 51,8, -51,8}
-		physics.addBody(player["shadow"],"dynamic",{shape=shade,filter={categoryBits=2,maskBits=7}})
-		player["shadow"].isFixedRotation=true
-		player["shadow"].parent=player
-		player["shadow"].name="shadow"
 		player:insert(player["shadow"])
 		
 		player["HitBox"]=display.newRect(0,-75,90,150)

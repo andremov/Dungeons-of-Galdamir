@@ -20,8 +20,6 @@ performance:newPerformanceMeter()
 		AdBuddiz.setTestModeActive()
 	end
 	
-	
-	
 	DUNGEONS OF GAL'DARAH
 
 	DUNGEONS OF GALDAMIR
