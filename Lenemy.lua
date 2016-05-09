@@ -117,6 +117,9 @@ function Spawn(ax,ay)
 	
 	enemy["AIVALS"]["UNIT"]={}
 	enemy["AIVALS"]["UNIT"]["CATEGORY"]=nil
+	enemy["AIVALS"]["UNIT"]["MAP"]={}
+	enemy["AIVALS"]["UNIT"]["MAP"]["X"]=nil
+	enemy["AIVALS"]["UNIT"]["MAP"]["Y"]=nil
 	enemy["AIVALS"]["UNIT"]["POS"]={}
 	enemy["AIVALS"]["UNIT"]["POS"]["X"]=nil
 	enemy["AIVALS"]["UNIT"]["POS"]["Y"]=nil
@@ -256,7 +259,7 @@ function Spawn(ax,ay)
 				enemy["MODE"]="IDLE"
 				enemy["CATEGORY"]=nil
 			else
-				enemy:move(deltaxenemy,deltayenemy)
+				-- enemy:move(deltaxenemy,deltayenemy)
 			end
 		--[[
 			local speedvalue=160
@@ -693,17 +696,22 @@ function Spawn(ax,ay)
 	enemy["radar"].collision = function( self, event )
 		local other=event.other
 		if other.CATEGORY=="PLAYER" then
-			enemy["AIVALS"]["UNIT"]["TILE"]["X"]=other["parent"]["CURX"]
-			enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=other["parent"]["CURY"]
+			enemy["AIVALS"]["UNIT"]["TILE"]["X"]=other["CURX"]
+			enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=other["CURY"]
+			enemy["AIVALS"]["UNIT"]["MAP"]["X"]=other["MAPX"]
+			enemy["AIVALS"]["UNIT"]["MAP"]["Y"]=other["MAPY"]
 			enemy["AIVALS"]["UNIT"]["POS"]["X"]=other.x
 			enemy["AIVALS"]["UNIT"]["POS"]["Y"]=other.y
 			enemy["AIVALS"]["UNIT"]["POS"][1]=other.x-140
 			enemy["AIVALS"]["UNIT"]["POS"][2]=other.x+140
 			enemy["AIVALS"]["UNIT"]["CATEGORY"]=other.CATEGORY
+			
 			local shortx=other.x
 			local shorty=other.y
+			
 			local yCheck=(enemy.y+10>shorty and enemy.y-10<shorty)
 			local xCheck=(enemy.x+165>shortx and enemy.x-165<shortx)
+			
 			if xCheck and yCheck then
 				if enemy["MODE"]~="ATTACK" then
 					-- print "AI FINISHED"
@@ -714,17 +722,22 @@ function Spawn(ax,ay)
 			end
 			enemy["AIVALS"]["CONTACTCD"]=500
 		elseif other.CATEGORY=="ENEMY" and enemy["AIVALS"]["UNIT"]["CATEGORY"]~="PLAYER" and other~=self.parent then
-			enemy["AIVALS"]["UNIT"]["TILE"]["X"]=other["parent"]["CURX"]
-			enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=other["parent"]["CURY"]
+			enemy["AIVALS"]["UNIT"]["TILE"]["X"]=other["CURX"]
+			enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=other["CURY"]
+			enemy["AIVALS"]["UNIT"]["MAP"]["X"]=other["MAPX"]
+			enemy["AIVALS"]["UNIT"]["MAP"]["Y"]=other["MAPY"]
 			enemy["AIVALS"]["UNIT"]["POS"]["X"]=other.x
 			enemy["AIVALS"]["UNIT"]["POS"]["Y"]=other.y
 			enemy["AIVALS"]["UNIT"]["POS"][1]=other.x-140
 			enemy["AIVALS"]["UNIT"]["POS"][2]=other.x+140
 			enemy["AIVALS"]["UNIT"]["CATEGORY"]=other.CATEGORY
+			
 			local shortx=other.x
 			local shorty=other.y
+			
 			local yCheck=(enemy.y+10>shorty and enemy.y-10<shorty)
 			local xCheck=(enemy.x+165>shortx and enemy.x-165<shortx)
+			
 			if xCheck and yCheck then
 				if enemy["MODE"]~="IDLE" then
 					enemy["MODE"]="IDLE"

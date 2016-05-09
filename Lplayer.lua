@@ -96,8 +96,20 @@ function CreatePlayer(name)
 		player.x, player.y = display.contentWidth/2, display.contentHeight/2
 		player["CATEGORY"]="PLAYER"
 		
-		player.textd=display.newText((player.x..", "..player.y),0,50,native.systemFont,30)
+		local asd=
+		{
+			text = "",     
+			x = 0,
+			y = 50,
+			width = 200,     --required for multi-line and alignment
+			font = native.systemFont,   
+			fontSize = 30,
+			align = "center"  --new alignment parameter
+		}
+		player.textd=display.newText(asd)
 		player:insert(player.textd)
+		-- player.textd.width=200
+		-- player.textd.align="center"
 		
 		-- Map Essentials
 		player["MAPX"]=0
@@ -178,7 +190,7 @@ function CreatePlayer(name)
 			end
 			
 			player:regeneration()
-			player.textd.text=(math.floor(player.x)..", "..math.floor(player.y))
+			player.textd.text=(math.floor(player.x)..", "..math.floor(player.y).."\n"..player.MAPX..", "..player.MAPY)
 			
 			player["WEAPON"]["basedamage"]=player["STATS"]["Damage"]
 		

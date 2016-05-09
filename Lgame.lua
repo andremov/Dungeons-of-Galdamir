@@ -102,7 +102,7 @@ function Initial:Continue()
 	view:add(p1,35,true)
 	view:setBounds(false)
 	view:track()
-	HandleEnemies:start()
+	-- HandleEnemies:start()
 	-- Initial:firstSave()
 	Runtime:addEventListener("enterFrame",HandleEnemies.frameChecks)
 	Controls:Move(0,0)
@@ -234,9 +234,71 @@ function HandleMaps:mapDisplay()
 				displayedMaps[m].MapRows[r].isVisible=true
 			end
 		end
+		HandleMaps:buildBoundary()
 		HandleRows:InitialLayering()
 		mapsDone=true
 	end
+end
+
+function HandleMaps:buildBoundary()
+	local order={}
+	if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+		if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+			-- map4 is northwest
+			order={4,3,2,1}
+		else
+			-- map4 is northeast
+			order={3,4,1,2}
+		end
+	else
+		if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+			-- map4 is southwest
+			order={2,1,4,3}
+		else
+			-- map4 is southeast
+			order={1,2,3,4}
+		end
+	end
+	
+	local mapsize=table.maxn(displayedMaps[1]["PLAIN"])
+	if (displayb) then
+		for x=1,mapsize*2 do
+			for y=1,mapsize*2 do
+				display.remove(displayb[x][y])
+			end
+		end
+	end
+	
+	displayb={}
+	local boundary={}
+	for x=1,mapsize*2 do
+		boundary[x]={}
+		displayb[x]={}
+		for y=1,mapsize*2 do
+			local orderpos=1
+			ax=x
+			if ax>mapsize then
+				ax=ax-mapsize
+				orderpos=orderpos+1
+			end
+			local ay=y
+			if ay>mapsize then
+				ay=ay-mapsize
+				orderpos=orderpos+2
+			end
+			
+			displayb[x][y]=display.newRect(x*10,y*10,10,10)
+			
+			boundary[x][y]=displayedMaps[orderpos]["PLAIN"][ay][ax]
+			if boundary[x][y]==1 then
+				displayb[x][y]:setFillColor(1,0,0,0.5)
+			else
+				displayb[x][y]:setFillColor(1,1,1,0.5)
+			end
+		end
+	end
+	displayedMaps["BOUNDS"]=boundary
+	
 end
 
 function HandleMaps:getMap(value)
@@ -540,6 +602,26 @@ function HandleRows:coordsCheck()
 	local deltaX=p1.x-xi
 	deltaX=math.floor(deltaX/270)+1
 	
+	local pastx,pasty=p1["CURX"]*2,p1["CURY"]*2
+	if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+		pastx=pastx+table.maxn(displayedMaps[1]["PLAIN"])
+	end
+	if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+		pasty=pasty+table.maxn(displayedMaps[1]["PLAIN"])
+	end
+	
+	displayb[pastx][pasty]:setFillColor(1,1,1,0.5)
+	
+	local newx,newy=deltaX*2,deltaY*2
+	if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+		newx=newx+table.maxn(displayedMaps[1]["PLAIN"])
+	end
+	if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+		newy=newy+table.maxn(displayedMaps[1]["PLAIN"])
+	end
+	
+	displayb[newx][newy]:setFillColor(0.5,0.5,1,0.5)
+	
 	if p1["CURX"]~=deltaX then
 		p1["CURX"]=deltaX
 	end
@@ -607,6 +689,7 @@ function HandleEnemies:frameChecks()
 			HandleEnemies:coordsCheck(i)
 			HandleEnemies:enemyHits(i)
 			HandleEnemies:removeCheck(i)
+			HandleEnemies:getPath(i)
 		end
 	end
 end
@@ -776,33 +859,39 @@ function HandleEnemies:coordsCheck(i)
 end
 
 function HandleEnemies:getPath(i)
-	local Grid = require ("jumper.grid")
-	local Pathfinder = require ("jumper.pathfinder")
-	
 	local thisEnemy=spawnedEnemies[i]
-	
-	local startx,starty=thisEnemy["CURX"],thisEnemy["CURY"]
-	local endx,endy=thisEnemy["TARGETTILEX"],thisEnemy["TARGETTILEY"]
-	
-	local grid = Grid(displayedMaps[thisEnemy["DMAP"]]["PLAIN"])
-	local wall=1
-	
-	local pather = Pathfinder(grid, 'JPS', wall)
-	pather:setMode("ORTHOGONAL")
-	
-	local path = pather:getPath(startx,starty,endx,endy)
+	if thisEnemy["MODE"]=="PURSUIT" then
+		print "FOUND IN PURSUIT"
+		local walkable = 1
 
-	if path then
-		local firstx, firsty
-		for node, count in path:nodes() do
-			local one,two,three=count, node:getX(), node:getY()
-			if one==2 then
-				firstx=two
-				firsty=three
+		-- Library setup
+		local Grid = require ("jumper.grid") -- The grid class
+		local Pathfinder = require ("jumper.pathfinder") -- The pathfinder class
+
+		
+		local startx,starty=thisEnemy["CURX"],thisEnemy["CURY"]
+		local endx,endy=thisEnemy["AIVALS"]["UNIT"]["TILE"]["X"],thisEnemy["AIVALS"]["UNIT"]["TILE"]["Y"]
+		
+		print (startx,starty,"to",endx,endy)
+		
+		-- Creates a grid object
+		local grid = Grid(displayedMaps[thisEnemy["DMAP"]]["PLAIN"])
+		-- Creates a pathfinder object using Jump Point Search
+		local pather = Pathfinder(grid, 'DIJKSTRA', walkable) -- I like DIJKSTRA, but others work too. Check the pathfinding module for more info on the types of pathfinding algorithm.
+		pather:setMode('ORTHOGONAL')
+		
+		local path = pather:getPath(startx,starty,endx,endy)
+
+		if path then
+			local firstx, firsty
+			for node, count in path:nodes() do
+				local one,two,three=count, node:getX(), node:getY()
+				print (one,two,three)
 			end
+			print "REMOVING LISTENER"
+			Runtime:removeEventListener("enterFrame",HandleEnemies.frameChecks)
 		end
 	end
-	
 end
 
 
