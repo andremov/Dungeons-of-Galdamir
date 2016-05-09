@@ -86,7 +86,14 @@ function Spawn(ax,ay)
 	-- Essentials
 	local enemy=display.newGroup()
 	enemy.x, enemy.y = ax,ay
-	-- enemy.category="enemy"
+	local shade={ -51,-4, 51,-4, 51,12, -51,12}
+	physics.addBody(enemy,"dynamic",{shape=shade,filter={categoryBits=2,maskBits=7}})
+	enemy.isFixedRotation=true
+	enemy["CATEGORY"]="ENEMY"
+	
+	enemy.textd=display.newText((enemy.x..", "..enemy.y),0,50,native.systemFont,30)
+	enemy:insert(enemy.textd)
+	
 	-- Map Essentials
 	enemy["CURX"]=0
 	enemy["CURY"]=0
@@ -106,7 +113,7 @@ function Spawn(ax,ay)
 	enemy["ANIMATIONS"]=readAnims('Barry/BarryAnim.json')
 	
 	enemy["AIVALS"]={}
-	enemy["AIVALS"]["CONTACTCD"]=1000
+	enemy["AIVALS"]["CONTACTCD"]=500
 	
 	enemy["AIVALS"]["UNIT"]={}
 	enemy["AIVALS"]["UNIT"]["CATEGORY"]=nil
@@ -123,9 +130,6 @@ function Spawn(ax,ay)
 	enemy["AIVALS"]["TARGET"]["TILE"]={}
 	enemy["AIVALS"]["TARGET"]["TILE"]["X"]=nil
 	enemy["AIVALS"]["TARGET"]["TILE"]["Y"]=nil
-	-- enemy["AIVALS"]["TARGET"]["POS"]={}
-	-- enemy["AIVALS"]["TARGET"]["POS"]["X"]=nil
-	-- enemy["AIVALS"]["TARGET"]["POS"]["Y"]=nil
 	
 	-- Animation Functions
 	enemy.saturation=function()
@@ -189,14 +193,11 @@ function Spawn(ax,ay)
 		end
 		enemy.shadow:toBack()
 		
-		enemy.x=enemy.shadow.x
-		enemy.y=enemy.shadow.y
-		
+		enemy.textd.text=(math.floor(enemy.x)..", "..math.floor(enemy.y))
 		enemy["WEAPON"]["basedamage"]=enemy["STATS"]["Damage"]
 		
 		enemy:AI()
 		enemy:updateRadar()
-		-- enemy.refreshtimer=timer.performWithDelay(20,enemy.refresh)
 	end
 	enemy.turn=function()
 		if enemy.xScale==1 then
@@ -581,10 +582,13 @@ function Spawn(ax,ay)
 		-- local cruisecontrol=120
 		local cruisecontrol=40
 		
-		self.shadow.x=self.shadow.x+(cx*self["STATS"]["Speed"]/cruisecontrol)
-		self.shadow.y=self.shadow.y+(cy*self["STATS"]["Speed"]/cruisecontrol)
-		self.radar.x=self.shadow.x
-		self.radar.y=self.shadow.y
+		self.x=self.x+(cx*self["STATS"]["Speed"]/cruisecontrol)
+		self.y=self.y+(cy*self["STATS"]["Speed"]/cruisecontrol)
+		
+		-- self.shadow.x=self.shadow.x+(cx*self["STATS"]["Speed"]/cruisecontrol)
+		-- self.shadow.y=self.shadow.y+(cy*self["STATS"]["Speed"]/cruisecontrol)
+		-- self.radar.x=self.shadow.x
+		-- self.radar.y=self.shadow.y
 		
 		local value=0
 		if math.abs(cx)>value or math.abs(cy)>value then
@@ -598,6 +602,7 @@ function Spawn(ax,ay)
 		end
 	end
 	enemy.updateRadar=function()
+		enemy["AIVALS"]["CONTACTCD"]=enemy["AIVALS"]["CONTACTCD"]-1
 		enemy.radar:rotate(1)
 	end
 	
@@ -678,67 +683,25 @@ function Spawn(ax,ay)
 
 	-- Shadow Essentials
 	enemy.shadow=display.newImageRect("Barry/Shadow.png",103,17)
-	enemy.shadow.x,enemy.shadow.y=enemy.x,enemy.y
-	-- enemy.shadow.xScale=1.0
-	-- enemy.shadow.yScale=1.0
 	enemy.shadow.anchorY=0.2
-	enemy.shadow.category="enemy"
-	local shade={ -51,-8, 51,-8, 51,8, -51,8}
-	physics.addBody(
-		enemy.shadow,"dynamic",{shape=shade,filter={categoryBits=2,maskBits=7}}
-		-- {shape={50,10,	50,12,	-50,12,	-50,10},filter={categoryBits=2,maskBits=3},isSensor=true},
-		-- {shape={50,-10,	50,-12,	-50,-12,-50,-10},filter={categoryBits=2,maskBits=3},isSensor=true},
-		-- {shape={-53,-7,	-53,7,	-55,7,	-55,-7},filter={categoryBits=2,maskBits=3},isSensor=true},
-		-- {shape={53,-7,	53,7,	55,7,	55,-7},filter={categoryBits=2,maskBits=3},isSensor=true}
-	)
-	-- enemy["shadow"].collision=function(self,event)
-		-- if (event.phase=="began") then
-			-- if ( event.selfElement == 2 ) then
-				-- enemy["AIVALS"]["S"]=enemy["AIVALS"]["S"]+1
-			-- elseif ( event.selfElement == 3 ) then
-				-- enemy["AIVALS"]["N"]=enemy["AIVALS"]["N"]+1
-			-- elseif ( event.selfElement == 4 ) then
-				-- enemy["AIVALS"]["W"]=enemy["AIVALS"]["W"]+1
-			-- elseif ( event.selfElement == 5 ) then
-				-- enemy["AIVALS"]["E"]=enemy["AIVALS"]["E"]+1
-			-- end
-		-- elseif (event.phase=="ended") then
-			-- if ( event.selfElement == 2 ) then
-				-- enemy["AIVALS"]["S"]=enemy["AIVALS"]["S"]-1
-			-- elseif ( event.selfElement == 3 ) then
-				-- enemy["AIVALS"]["N"]=enemy["AIVALS"]["N"]-1
-			-- elseif ( event.selfElement == 4 ) then
-				-- enemy["AIVALS"]["W"]=enemy["AIVALS"]["W"]-1
-			-- elseif ( event.selfElement == 5 ) then
-				-- enemy["AIVALS"]["E"]=enemy["AIVALS"]["E"]-1
-			-- end
-		-- end
-	-- end
-	enemy.shadow.isFixedRotation=true
-	-- enemy.shadow:addEventListener( "collision", enemy.shadow )
 	enemy:insert(enemy["shadow"])
-	-- enemy.shadow:toBack()
 
 	-- Radar Essentials
-	enemy.radar=display.newRect(enemy.x,enemy.y,600,1)
+	enemy.radar=display.newRect(0,0,600,1)
 	enemy.radar:setFillColor(0,0,0,0)
+	enemy.radar.x,enemy.radar.y=enemy.x,enemy.y
 	enemy["radar"].collision = function( self, event )
-		enemy["AIVALS"]["CONTACTCD"]=enemy["AIVALS"]["CONTACTCD"]-1
-		if event.other.category=="player" then
-			enemy["AIVALS"]["UNIT"]["TILE"]["X"]=event["other"]["parent"]["CURX"]
-			enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=event["other"]["parent"]["CURY"]
-			-- print (enemy["AIVALS"]["UNIT"]["TILE"]["Y"],event["other"]["parent"]["CURY"])
-			-- print (enemy["AIVALS"]["UNIT"]["TILE"]["X"],event["other"]["parent"]["CURX"])
-			print (event["other"]["parent"])
-			print (event["other"]["name"])
-			print (event["other"]["parent"]["name"])
-			enemy["AIVALS"]["UNIT"]["POS"]["X"]=event["other"].x
-			enemy["AIVALS"]["UNIT"]["POS"]["Y"]=event["other"].y
-			enemy["AIVALS"]["UNIT"]["POS"][1]=event["other"].x-140
-			enemy["AIVALS"]["UNIT"]["POS"][2]=event["other"].x+140
-			enemy["AIVALS"]["UNIT"]["CATEGORY"]="player"
-			local shortx=event["other"].x
-			local shorty=event["other"].y
+		local other=event.other
+		if other.CATEGORY=="PLAYER" then
+			enemy["AIVALS"]["UNIT"]["TILE"]["X"]=other["parent"]["CURX"]
+			enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=other["parent"]["CURY"]
+			enemy["AIVALS"]["UNIT"]["POS"]["X"]=other.x
+			enemy["AIVALS"]["UNIT"]["POS"]["Y"]=other.y
+			enemy["AIVALS"]["UNIT"]["POS"][1]=other.x-140
+			enemy["AIVALS"]["UNIT"]["POS"][2]=other.x+140
+			enemy["AIVALS"]["UNIT"]["CATEGORY"]=other.CATEGORY
+			local shortx=other.x
+			local shorty=other.y
 			local yCheck=(enemy.y+10>shorty and enemy.y-10<shorty)
 			local xCheck=(enemy.x+165>shortx and enemy.x-165<shortx)
 			if xCheck and yCheck then
@@ -748,19 +711,18 @@ function Spawn(ax,ay)
 				end
 			elseif enemy["MODE"]~="PURSUIT" then
 				enemy["MODE"]="PURSUIT"
-				-- print (enemy["TARGETTILEX"],enemy["TARGETTILEY"])
 			end
-			enemy["AIVALS"]["CONTACTCD"]=1000
-		elseif event.other.category=="enemy" and enemy["AIVALS"]["UNIT"]["CATEGORY"]~="player" then
-			enemy["AIVALS"]["UNIT"]["TILE"]["X"]=event["other"]["parent"]["CURX"]
-			enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=event["other"]["parent"]["CURY"]
-			enemy["AIVALS"]["UNIT"]["POS"]["X"]=event["other"].x
-			enemy["AIVALS"]["UNIT"]["POS"]["Y"]=event["other"].y
-			enemy["AIVALS"]["UNIT"]["POS"][1]=event["other"].x-140
-			enemy["AIVALS"]["UNIT"]["POS"][2]=event["other"].x+140
-			enemy["AIVALS"]["UNIT"]["CATEGORY"]="enemy"
-			local shortx=event["other"].x
-			local shorty=event["other"].y
+			enemy["AIVALS"]["CONTACTCD"]=500
+		elseif other.CATEGORY=="ENEMY" and enemy["AIVALS"]["UNIT"]["CATEGORY"]~="PLAYER" and other~=self.parent then
+			enemy["AIVALS"]["UNIT"]["TILE"]["X"]=other["parent"]["CURX"]
+			enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=other["parent"]["CURY"]
+			enemy["AIVALS"]["UNIT"]["POS"]["X"]=other.x
+			enemy["AIVALS"]["UNIT"]["POS"]["Y"]=other.y
+			enemy["AIVALS"]["UNIT"]["POS"][1]=other.x-140
+			enemy["AIVALS"]["UNIT"]["POS"][2]=other.x+140
+			enemy["AIVALS"]["UNIT"]["CATEGORY"]=other.CATEGORY
+			local shortx=other.x
+			local shorty=other.y
 			local yCheck=(enemy.y+10>shorty and enemy.y-10<shorty)
 			local xCheck=(enemy.x+165>shortx and enemy.x-165<shortx)
 			if xCheck and yCheck then
@@ -770,7 +732,7 @@ function Spawn(ax,ay)
 			elseif enemy["MODE"]~="PURSUIT" then
 				enemy["MODE"]="PURSUIT"
 			end
-			enemy["AIVALS"]["CONTACTCD"]=1000
+			enemy["AIVALS"]["CONTACTCD"]=500
 		end
 		if enemy["AIVALS"]["CONTACTCD"]<=0 then
 			print "LOST PLAYER"
@@ -784,13 +746,12 @@ function Spawn(ax,ay)
 			enemy["AIVALS"]["TARGET"]["TILE"]["X"]=nil
 			enemy["AIVALS"]["UNIT"]["POS"][1]=nil
 			enemy["AIVALS"]["UNIT"]["POS"][2]=nil
-			enemy["AIVALS"]["CONTACTCD"]=1000
+			enemy["AIVALS"]["CONTACTCD"]=500
 		end
 	end
 	physics.addBody(enemy.radar,"dynamic",{isSensor=true,friction=0.5,filter={categoryBits=4,maskBits=2}})
 	enemy.radar:addEventListener( "collision", enemy["radar"])
 	enemy:insert(enemy["radar"])
-	enemy:updateRadar()
 
 	enemy["HitBox"]=display.newRect(0,-75,90,150)
 	enemy["HitBox"]:setFillColor(1,1,1,0)
