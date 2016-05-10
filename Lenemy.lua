@@ -95,8 +95,8 @@ function Spawn(ax,ay)
 	enemy:insert(enemy.textd)
 	
 	-- Map Essentials
-	enemy["CURX"]=0
-	enemy["CURY"]=0
+	enemy["CURX"]=1
+	enemy["CURY"]=1
 	enemy["MAPX"]=0
 	enemy["MAPY"]=0
 	enemy["DMAP"]=0

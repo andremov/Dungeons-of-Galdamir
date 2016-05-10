@@ -102,7 +102,7 @@ function Initial:Continue()
 	view:add(p1,35,true)
 	view:setBounds(false)
 	view:track()
-	-- HandleEnemies:start()
+	HandleEnemies:start()
 	-- Initial:firstSave()
 	Runtime:addEventListener("enterFrame",HandleEnemies.frameChecks)
 	Controls:Move(0,0)
@@ -269,6 +269,14 @@ function HandleMaps:buildBoundary()
 		end
 	end
 	
+	if (displayb) then
+		if (displayb["MAP"]) then
+			for i=1,4 do
+			display.remove(displayb["MAP"][i])
+			end
+		end
+	end
+	
 	displayb={}
 	local boundary={}
 	for x=1,mapsize*2 do
@@ -289,19 +297,20 @@ function HandleMaps:buildBoundary()
 			
 			displayb[x][y]=display.newRect(x*10,y*10,10,10)
 			
-			boundary[x][y]=displayedMaps[orderpos]["PLAIN"][ay][ax]
+			boundary[x][y]=displayedMaps[order[orderpos]]["PLAIN"][ay][ax]
 			if boundary[x][y]==1 then
-				displayb[x][y]:setFillColor(1,0,0,0.5)
+				displayb[x][y]:setFillColor(0.5,0,0,0.8)
 			else
-				displayb[x][y]:setFillColor(1,1,1,0.5)
+				displayb[x][y]:setFillColor(1,1,1,0.4)
 			end
 		end
 	end
+	
 	displayedMaps["BOUNDS"]=boundary
 	
 end
 
-function HandleMaps:getMap(value)
+function HandleMaps:setMap(value)
 	local result=HandleMaps:findSpot()
 	if (result) then
 		displayedMaps[result]=value
@@ -315,6 +324,18 @@ function HandleMaps:getMap(value)
 		HandleMaps:mapDisplay()
 	end
 end
+
+function HandleMaps:getMap(mapx,mapy)
+	for i=1,table.maxn(displayedMaps) do
+		if (displayedMaps[i]) then
+			if displayedMaps[i]["MAPX"]==mapx and displayedMaps[i]["MAPY"]==mapy then
+				return i,displayedMaps[i]
+			end
+		end
+	end
+	return nil,nil
+end
+
 
 function HandleMaps:cleanMap(victim)
 	if (displayedMaps[victim]["PHYSICS"]) then
@@ -368,8 +389,30 @@ function HandleMaps:cleanMap(victim)
 end
 
 function HandleMaps:movementEvents()
+	
+	local pastx,pasty=p1["CURX"]*2,p1["CURY"]*2
+	if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+		pastx=pastx+table.maxn(displayedMaps[1]["PLAIN"])
+	end
+	if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+		pasty=pasty+table.maxn(displayedMaps[1]["PLAIN"])
+	end
+	
+	displayb[pastx][pasty]:setFillColor(1,1,1,0.4)
+	
 	HandleMaps:mapSwitch()
 	HandleRows:coordsCheck()
+	
+	-- local newx,newy=deltaX*2,deltaY*2
+	local newx,newy=p1["CURX"]*2,p1["CURY"]*2
+	if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+		newx=newx+table.maxn(displayedMaps[1]["PLAIN"])
+	end
+	if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+		newy=newy+table.maxn(displayedMaps[1]["PLAIN"])
+	end
+	
+	displayb[newx][newy]:setFillColor(0,0,1,0.8)
 end
 
 function HandleMaps:mapSwitch()
@@ -602,26 +645,6 @@ function HandleRows:coordsCheck()
 	local deltaX=p1.x-xi
 	deltaX=math.floor(deltaX/270)+1
 	
-	local pastx,pasty=p1["CURX"]*2,p1["CURY"]*2
-	if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
-		pastx=pastx+table.maxn(displayedMaps[1]["PLAIN"])
-	end
-	if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
-		pasty=pasty+table.maxn(displayedMaps[1]["PLAIN"])
-	end
-	
-	displayb[pastx][pasty]:setFillColor(1,1,1,0.5)
-	
-	local newx,newy=deltaX*2,deltaY*2
-	if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
-		newx=newx+table.maxn(displayedMaps[1]["PLAIN"])
-	end
-	if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
-		newy=newy+table.maxn(displayedMaps[1]["PLAIN"])
-	end
-	
-	displayb[newx][newy]:setFillColor(0.5,0.5,1,0.5)
-	
 	if p1["CURX"]~=deltaX then
 		p1["CURX"]=deltaX
 	end
@@ -686,10 +709,50 @@ end
 function HandleEnemies:frameChecks()
 	for i=1,table.maxn(spawnedEnemies) do
 		if (spawnedEnemies[i]) then
+	
+			local pastx,pasty=spawnedEnemies[i]["CURX"]*2,spawnedEnemies[i]["CURY"]*2
+			local mapsize=table.maxn(displayedMaps[1]["PLAIN"])
+			local em=spawnedEnemies[i]["DMAP"]
+			if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+				if em==1 or em==3 then
+					pastx=pastx+mapsize
+				end
+				-- pastx=pastx+table.maxn(displayedMaps[1]["PLAIN"])
+			end
+			if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+				if em==1 or em==2 then
+					pasty=pasty+mapsize
+				end
+				-- pasty=pasty+table.maxn(displayedMaps[1]["PLAIN"])
+			end
+			-- print (pastx,pasty)
+			-- print (spawnedEnemies[i]["CURY"])
+			displayb[pastx][pasty]:setFillColor(1,1,1,0.4)
+	
 			HandleEnemies:coordsCheck(i)
 			HandleEnemies:enemyHits(i)
 			HandleEnemies:removeCheck(i)
 			HandleEnemies:getPath(i)
+			
+			
+			-- local newx,newy=deltaX*2,deltaY*2
+			local newx,newy=spawnedEnemies[i]["CURX"]*2,spawnedEnemies[i]["CURY"]*2
+			local em=spawnedEnemies[i]["DMAP"]
+			if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+				if em==1 or em==3 then
+					newx=newx+mapsize
+				end
+				-- newx=newx+table.maxn(displayedMaps[1]["PLAIN"])
+			end
+			if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+				if em==1 or em==2 then
+					newy=newy+mapsize
+				end
+				-- newy=newy+table.maxn(displayedMaps[1]["PLAIN"])
+			end
+			
+			-- print (newx,newy)
+			displayb[newx][newy]:setFillColor(0.6,0.2,0.8,0.4)
 		end
 	end
 end
@@ -778,19 +841,27 @@ function HandleEnemies:coordsCheck(i)
 	
 	local comp1=p1["CURY"]
 	
+	if (displayedMaps[4]) then
+		if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+			-- deltaY=deltaY+8
+			comp1=comp1+8
+		end
+	end
+	
+	-- if (displayedMaps[4]) then
+		-- if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+			-- deltaX=deltaX+8
+			-- comp1=comp1+8
+		-- end
+	-- end
+		
 	if deltaY>8 then
 		deltaY=deltaY-8
-		map=3
+		map=map+2
 	elseif deltaY<1 then
 		deltaY=deltaY+8
-		map=3
-	else
-		if (displayedMaps[3]) then
-			if displayedMaps[3]["MAPY"]<displayedMaps[1]["MAPY"] then
-				deltaY=deltaY+8
-				comp1=comp1+8
-			end
-		end
+		map=map+2
+	-- else
 	end
 	
 	if deltaX>8 then
@@ -855,41 +926,60 @@ function HandleEnemies:coordsCheck(i)
 			-- end
 		end
 	end
-	--]]
 end
 
 function HandleEnemies:getPath(i)
 	local thisEnemy=spawnedEnemies[i]
 	if thisEnemy["MODE"]=="PURSUIT" then
-		print "FOUND IN PURSUIT"
-		local walkable = 1
+		-- print "FOUND IN PURSUIT"
+
+		local ex,ey=thisEnemy["CURX"]*2,thisEnemy["CURY"]*2
+		local em=thisEnemy["DMAP"]
+		local px,py=thisEnemy["AIVALS"]["UNIT"]["TILE"]["X"]*2,thisEnemy["AIVALS"]["UNIT"]["TILE"]["Y"]*2
+		local pm=HandleMaps:getMap(thisEnemy["AIVALS"]["UNIT"]["MAP"]["X"],thisEnemy["AIVALS"]["UNIT"]["MAP"]["Y"])
+		-- print ( unpack(thisEnemy["AIVALS"]["UNIT"]["MAP"]) )
+		-- print (ex,ey,"to",px,py)
+		local mapsize=table.maxn(displayedMaps[1]["PLAIN"])
+		if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+			px=px+mapsize
+			if em==1 or em==3 then
+				ex=ex+mapsize
+			end
+		end
+		if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+			py=py+mapsize
+			if em==1 or em==2 then
+				ey=ey+mapsize
+			end
+		end
+		
+		print (ex,ey,"to",px,py)
+		
+		
+		-- Runtime:removeEventListener("enterFrame",HandleEnemies.frameChecks)
+		
+		local walkable = 0
 
 		-- Library setup
 		local Grid = require ("jumper.grid") -- The grid class
 		local Pathfinder = require ("jumper.pathfinder") -- The pathfinder class
-
-		
-		local startx,starty=thisEnemy["CURX"],thisEnemy["CURY"]
-		local endx,endy=thisEnemy["AIVALS"]["UNIT"]["TILE"]["X"],thisEnemy["AIVALS"]["UNIT"]["TILE"]["Y"]
-		
-		print (startx,starty,"to",endx,endy)
 		
 		-- Creates a grid object
-		local grid = Grid(displayedMaps[thisEnemy["DMAP"]]["PLAIN"])
+		local grid = Grid(displayedMaps["BOUNDS"])
 		-- Creates a pathfinder object using Jump Point Search
 		local pather = Pathfinder(grid, 'DIJKSTRA', walkable) -- I like DIJKSTRA, but others work too. Check the pathfinding module for more info on the types of pathfinding algorithm.
 		pather:setMode('ORTHOGONAL')
 		
-		local path = pather:getPath(startx,starty,endx,endy)
+		local path = pather:getPath(ex,ey,px,py)
 
 		if path then
-			local firstx, firsty
 			for node, count in path:nodes() do
-				local one,two,three=count, node:getX(), node:getY()
-				print (one,two,three)
+				print (count, node:getX(), node:getY())
 			end
 			print "REMOVING LISTENER"
 			Runtime:removeEventListener("enterFrame",HandleEnemies.frameChecks)
+		else 
+			print "no path found"
 		end
 	end
 end

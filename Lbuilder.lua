@@ -12,12 +12,12 @@ module(..., package.seeall)
 local side=14
 local tile=200
 
-function getColumn(id)
+local function getColumn(id)
 	local column=((id-1)%side)
 	return column
 end
 
-function getRow(id)
+local function getRow(id)
 	local row=math.floor((id-1)/side)
 	return row
 end
@@ -501,7 +501,7 @@ function Create:Progress()
 		-- print "Done."
 		
 		Create.progress=0
-		game.HandleMaps:getMap(Map)
+		game.HandleMaps:setMap(Map)
 	else
 		-- print (funcnames[Create.progress])
 		-- timer.performWithDelay(1,funcs[Create.progress])
