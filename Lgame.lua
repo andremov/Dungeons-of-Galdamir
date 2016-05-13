@@ -735,30 +735,32 @@ function HandleEnemies:frameChecks()
 			
 			HandleEnemies:coordsCheck(i)
 			HandleEnemies:enemyHits(i)
-			HandleEnemies:removeCheck(i)
 			-- HandleEnemies:getPath(i)
+			HandleEnemies:removeCheck(i)
 			
 			
-			-- local newx,newy=deltaX*2,deltaY*2
-			local newx,newy=spawnedEnemies[i]["CURX"]*2,spawnedEnemies[i]["CURY"]*2
-			local em=spawnedEnemies[i]["DMAP"]
-			if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
-				if em==1 or em==3 then
-					newx=newx+mapsize
+			if (spawnedEnemies[i]) then
+				-- local newx,newy=deltaX*2,deltaY*2
+				local newx,newy=spawnedEnemies[i]["CURX"]*2,spawnedEnemies[i]["CURY"]*2
+				local em=spawnedEnemies[i]["DMAP"]
+				if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+					if em==1 or em==3 then
+						newx=newx+mapsize
+					end
+					-- newx=newx+table.maxn(displayedMaps[1]["PLAIN"])
 				end
-				-- newx=newx+table.maxn(displayedMaps[1]["PLAIN"])
-			end
-			if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
-				if em==1 or em==2 then
-					newy=newy+mapsize
+				if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+					if em==1 or em==2 then
+						newy=newy+mapsize
+					end
+					-- newy=newy+table.maxn(displayedMaps[1]["PLAIN"])
 				end
-				-- newy=newy+table.maxn(displayedMaps[1]["PLAIN"])
-			end
-			
-			-- print (newx,newy)
-			if (displayb[newx]) then
-				if (displayb[newx][newy]) then
-					displayb[newx][newy]:setFillColor(0.6,0.2,0.8,0.4)
+				
+				-- print (newx,newy)
+				if (displayb[newx]) then
+					if (displayb[newx][newy]) then
+						displayb[newx][newy]:setFillColor(0.6,0.2,0.8,0.4)
+					end
 				end
 			end
 		end
@@ -766,27 +768,21 @@ function HandleEnemies:frameChecks()
 end
 
 function HandleEnemies:removeCheck(a)
-	if (spawnedEnemies[a]) then
-		local deltaY=math.abs(spawnedEnemies[a].y-p1.y)
-		local deltaX=math.abs(spawnedEnemies[a].x-p1.x)
-		if deltaY>2400 or deltaX>2400 or spawnedEnemies[a].isAlive==false then
-			-- print ("Removing "..a)
-			-- print ("Deltas: X- "..deltaX.." Y- "..deltaY)
-			HandleEnemies:removeEnemy(a)
-		end
+	if spawnedEnemies[a].isAlive==false then
+		HandleEnemies:removeEnemy(a)
 	end
 end
 
 function HandleEnemies:removeEnemy(target)
 	-- timer.cancel(spawnedEnemies[target].refreshtimer)
 	Runtime:removeEventListener("enterFrame",spawnedEnemies[target].refresh)
-	timer.cancel(spawnedEnemies[target].radartimer)
+	-- timer.cancel(spawnedEnemies[target].radartimer)
 	
-	display.remove(spawnedEnemies[target].shadow)
-	spawnedEnemies[target].shadow=nil
+	-- display.remove(spawnedEnemies[target].shadow)
+	-- spawnedEnemies[target].shadow=nil
 	
-	display.remove(spawnedEnemies[target].radar)
-	spawnedEnemies[target].radar=nil
+	-- display.remove(spawnedEnemies[target].radar)
+	-- spawnedEnemies[target].radar=nil
 	
 	display.remove(spawnedEnemies[target])
 	spawnedEnemies[target]=nil
@@ -857,6 +853,28 @@ function HandleEnemies:coordsCheck(i)
 	local deltaX=spawnedEnemies[i].x-xi
 	deltaX=math.floor(deltaX/270)+1
 	
+	if (deltaY<0) or (deltaX<0) then
+		spawnedEnemies[i].isAlive=false
+		print ("enemy out of bounds: north or west")
+	end
+	
+	if spawnedEnemies[i].isAlive==true then
+		local xf=displayedMaps[1]["Xf"]
+		local yf=displayedMaps[1]["Yf"]
+		for i=1,4 do
+			if (displayedMaps[i]) then
+				if (displayedMaps[i]["Xf"]>=xf) and (displayedMaps[i]["Yf"]>=yf) then
+					xf=displayedMaps[i]["Xf"]
+					yf=displayedMaps[i]["Yf"]
+				end
+			end
+		end
+		if (spawnedEnemies[i].y>yf) or (spawnedEnemies[i].y>xf) then
+			spawnedEnemies[i].isAlive=false
+			print ("enemy out of bounds: south or east")
+		end
+	end
+	
 	--[[
 	local comp1=p1["CURY"]
 	
@@ -892,59 +910,61 @@ function HandleEnemies:coordsCheck(i)
 	end
 	--]]
 	
-	if spawnedEnemies[i]["CURX"]~=deltaX then
-		spawnedEnemies[i]["CURX"]=deltaX
-		spawnedEnemies[i]["DMAP"]=map
-		spawnedEnemies[i]["MAPX"]=displayedMaps[map]["MAPX"]
-		spawnedEnemies[i]["MAPY"]=displayedMaps[map]["MAPY"]
-	end
-	if spawnedEnemies[i]["CURY"]~=deltaY then
-		spawnedEnemies[i]["CURY"]=deltaY
-		spawnedEnemies[i]["DMAP"]=map
-		spawnedEnemies[i]["MAPX"]=displayedMaps[map]["MAPX"]
-		spawnedEnemies[i]["MAPY"]=displayedMaps[map]["MAPY"]
-		
-		-- if deltaY>comp1 then
-			-- local layertomodify=view:layer(34)
+	if spawnedEnemies[i].isAlive==true then
+		if spawnedEnemies[i]["CURX"]~=deltaX then
+			spawnedEnemies[i]["CURX"]=deltaX
+			spawnedEnemies[i]["DMAP"]=map
+			spawnedEnemies[i]["MAPX"]=displayedMaps[map]["MAPX"]
+			spawnedEnemies[i]["MAPY"]=displayedMaps[map]["MAPY"]
+		end
+		if spawnedEnemies[i]["CURY"]~=deltaY then
+			spawnedEnemies[i]["CURY"]=deltaY
+			spawnedEnemies[i]["DMAP"]=map
+			spawnedEnemies[i]["MAPX"]=displayedMaps[map]["MAPX"]
+			spawnedEnemies[i]["MAPY"]=displayedMaps[map]["MAPY"]
 			
-			-- HandleEnemies:doPostRowPosition( spawnedEnemies[i] )
-			
-			-- local front=math.abs(deltaY-comp1)*2
-			-- local i=layertomodify.numChildren
-			-- local done=false
-			-- local cyclecap=1
-			-- while (i>=cyclecap and done==false) do
-				-- layertomodify[i]:toBack()
-				-- if (layertomodify[i].row) then
-					-- front=front-1
-				-- end
+			-- if deltaY>comp1 then
+				-- local layertomodify=view:layer(34)
 				
-				-- i=i-1
-				-- if front==0 then
-					-- done=true
+				-- HandleEnemies:doPostRowPosition( spawnedEnemies[i] )
+				
+				-- local front=math.abs(deltaY-comp1)*2
+				-- local i=layertomodify.numChildren
+				-- local done=false
+				-- local cyclecap=1
+				-- while (i>=cyclecap and done==false) do
+					-- layertomodify[i]:toBack()
+					-- if (layertomodify[i].row) then
+						-- front=front-1
+					-- end
+					
+					-- i=i-1
+					-- if front==0 then
+						-- done=true
+					-- end
+				-- end
+			-- else
+				-- local layertomodify=view:layer(36)
+				
+				-- HandleEnemies:doPreRowPosition( spawnedEnemies[i] )
+				
+				-- local front=math.abs(deltaY-comp1)*2
+				-- local done=false
+				-- local cyclecap=layertomodify.numChildren
+				-- local i=cyclecap-(front+2)
+				-- while (i<=cyclecap and done==false) do
+					-- layertomodify[i]:toFront()
+					-- if (layertomodify[i].row) then
+						-- front=front-1
+					-- end
+					
+					-- i=i+1
+					-- if front==0 then
+						-- done=true
+					-- end
 				-- end
 			-- end
-		-- else
-			-- local layertomodify=view:layer(36)
-			
-			-- HandleEnemies:doPreRowPosition( spawnedEnemies[i] )
-			
-			-- local front=math.abs(deltaY-comp1)*2
-			-- local done=false
-			-- local cyclecap=layertomodify.numChildren
-			-- local i=cyclecap-(front+2)
-			-- while (i<=cyclecap and done==false) do
-				-- layertomodify[i]:toFront()
-				-- if (layertomodify[i].row) then
-					-- front=front-1
-				-- end
-				
-				-- i=i+1
-				-- if front==0 then
-					-- done=true
-				-- end
-			-- end
-		-- end
+		end
 	end
 	
 end
@@ -964,17 +984,17 @@ function HandleEnemies:getPath(i)
 		local mapsize=table.maxn(displayedMaps[1]["PLAIN"])
 		if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
 			px=px+mapsize
-			if em==1 or em==3 then
+			-- if em==1 or em==3 then
 				-- print ("adding "..mapsize.." to enemy X coord because of offset. (currentx: "..ex..")")
-				ex=ex+mapsize
-			end
+				-- ex=ex+mapsize
+			-- end
 		end
 		if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
 			py=py+mapsize
-			if em==1 or em==2 then
+			-- if em==1 or em==2 then
 				-- print ("adding "..mapsize.." to enemy Y coord because of offset. (currentx: "..ey..")")
-				ey=ey+mapsize
-			end
+				-- ey=ey+mapsize
+			-- end
 		end
 		
 		-- print (ex,ey,"to",px,py)
@@ -998,7 +1018,7 @@ function HandleEnemies:getPath(i)
 
 		if path then
 			for node, count in path:nodes() do
-				-- print (count, node:getX(), node:getY())
+				print (count, node:getX(), node:getY())
 			end
 			-- print "REMOVING LISTENER"
 			-- Runtime:removeEventListener("enterFrame",HandleEnemies.frameChecks)

@@ -811,7 +811,7 @@ function Spawn(ax,ay)
 	enemy["STATS"]["MaxHealth"]=(10*enemy["STATS"]["Level"])+(enemy["STATS"]["Constitution"]["NATURAL"]*20)
 	enemy["STATS"]["Health"]=enemy["STATS"]["MaxHealth"]
 	
-	enemy:refresh()
+	-- enemy:refresh()
 	-- enemy:AI()
 	-- Runtime:addEventListener("tap",enemy.AI)
 	Runtime:addEventListener("enterFrame",enemy.refresh)
