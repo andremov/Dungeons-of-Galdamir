@@ -727,12 +727,16 @@ function HandleEnemies:frameChecks()
 			end
 			-- print (pastx,pasty)
 			-- print (spawnedEnemies[i]["CURY"])
-			displayb[pastx][pasty]:setFillColor(1,1,1,0.4)
-	
+			if (displayb[pastx]) then
+				if (displayb[pastx][pasty]) then
+					displayb[pastx][pasty]:setFillColor(1,1,1,0.4)
+				end
+			end
+			
 			HandleEnemies:coordsCheck(i)
 			HandleEnemies:enemyHits(i)
 			HandleEnemies:removeCheck(i)
-			HandleEnemies:getPath(i)
+			-- HandleEnemies:getPath(i)
 			
 			
 			-- local newx,newy=deltaX*2,deltaY*2
@@ -752,7 +756,11 @@ function HandleEnemies:frameChecks()
 			end
 			
 			-- print (newx,newy)
-			displayb[newx][newy]:setFillColor(0.6,0.2,0.8,0.4)
+			if (displayb[newx]) then
+				if (displayb[newx][newy]) then
+					displayb[newx][newy]:setFillColor(0.6,0.2,0.8,0.4)
+				end
+			end
 		end
 	end
 end
@@ -830,6 +838,16 @@ function HandleEnemies:coordsCheck(i)
 	local xi=displayedMaps[1]["Xi"]
 	local yi=displayedMaps[1]["Yi"]
 	local map=1
+	for i=1,4 do
+		if (displayedMaps[i]) then
+			if (displayedMaps[i]["Xi"]<=xi) and (displayedMaps[i]["Yi"]<=yi) then
+				xi=displayedMaps[i]["Xi"]
+				yi=displayedMaps[i]["Yi"]
+				map=i
+			end
+		end
+	end
+	
 	
 	local deltaY=spawnedEnemies[i].y-yi
 	local tileY=200
@@ -839,6 +857,7 @@ function HandleEnemies:coordsCheck(i)
 	local deltaX=spawnedEnemies[i].x-xi
 	deltaX=math.floor(deltaX/270)+1
 	
+	--[[
 	local comp1=p1["CURY"]
 	
 	if (displayedMaps[4]) then
@@ -854,7 +873,7 @@ function HandleEnemies:coordsCheck(i)
 			-- comp1=comp1+8
 		-- end
 	-- end
-		
+	
 	if deltaY>8 then
 		deltaY=deltaY-8
 		map=map+2
@@ -871,6 +890,7 @@ function HandleEnemies:coordsCheck(i)
 		deltaX=deltaX+8
 		map=map+1
 	end
+	--]]
 	
 	if spawnedEnemies[i]["CURX"]~=deltaX then
 		spawnedEnemies[i]["CURX"]=deltaX
@@ -884,10 +904,10 @@ function HandleEnemies:coordsCheck(i)
 		spawnedEnemies[i]["MAPX"]=displayedMaps[map]["MAPX"]
 		spawnedEnemies[i]["MAPY"]=displayedMaps[map]["MAPY"]
 		
-		if deltaY>comp1 then
+		-- if deltaY>comp1 then
 			-- local layertomodify=view:layer(34)
 			
-			HandleEnemies:doPostRowPosition( spawnedEnemies[i] )
+			-- HandleEnemies:doPostRowPosition( spawnedEnemies[i] )
 			
 			-- local front=math.abs(deltaY-comp1)*2
 			-- local i=layertomodify.numChildren
@@ -904,10 +924,10 @@ function HandleEnemies:coordsCheck(i)
 					-- done=true
 				-- end
 			-- end
-		else
+		-- else
 			-- local layertomodify=view:layer(36)
 			
-			HandleEnemies:doPreRowPosition( spawnedEnemies[i] )
+			-- HandleEnemies:doPreRowPosition( spawnedEnemies[i] )
 			
 			-- local front=math.abs(deltaY-comp1)*2
 			-- local done=false
@@ -924,8 +944,9 @@ function HandleEnemies:coordsCheck(i)
 					-- done=true
 				-- end
 			-- end
-		end
+		-- end
 	end
+	
 end
 
 function HandleEnemies:getPath(i)
@@ -937,23 +958,26 @@ function HandleEnemies:getPath(i)
 		local em=thisEnemy["DMAP"]
 		local px,py=thisEnemy["AIVALS"]["UNIT"]["TILE"]["X"]*2,thisEnemy["AIVALS"]["UNIT"]["TILE"]["Y"]*2
 		local pm=HandleMaps:getMap(thisEnemy["AIVALS"]["UNIT"]["MAP"]["X"],thisEnemy["AIVALS"]["UNIT"]["MAP"]["Y"])
-		-- print ( unpack(thisEnemy["AIVALS"]["UNIT"]["MAP"]) )
-		-- print (ex,ey,"to",px,py)
+		
+		-- print ("RAW: "..ex,ey,"to",px,py)
+		
 		local mapsize=table.maxn(displayedMaps[1]["PLAIN"])
 		if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
 			px=px+mapsize
 			if em==1 or em==3 then
+				-- print ("adding "..mapsize.." to enemy X coord because of offset. (currentx: "..ex..")")
 				ex=ex+mapsize
 			end
 		end
 		if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
 			py=py+mapsize
 			if em==1 or em==2 then
+				-- print ("adding "..mapsize.." to enemy Y coord because of offset. (currentx: "..ey..")")
 				ey=ey+mapsize
 			end
 		end
 		
-		print (ex,ey,"to",px,py)
+		-- print (ex,ey,"to",px,py)
 		
 		
 		-- Runtime:removeEventListener("enterFrame",HandleEnemies.frameChecks)
@@ -974,12 +998,12 @@ function HandleEnemies:getPath(i)
 
 		if path then
 			for node, count in path:nodes() do
-				print (count, node:getX(), node:getY())
+				-- print (count, node:getX(), node:getY())
 			end
-			print "REMOVING LISTENER"
-			Runtime:removeEventListener("enterFrame",HandleEnemies.frameChecks)
+			-- print "REMOVING LISTENER"
+			-- Runtime:removeEventListener("enterFrame",HandleEnemies.frameChecks)
 		else 
-			print "no path found"
+			-- print "no path found"
 		end
 	end
 end
@@ -1024,16 +1048,17 @@ function Controls:Move(px,py)
 end
 
 function Controls:buttonPress()
+	-- Tests:
 	-- g.CallAddCoins(100)
 	-- p1["STATS"]["Experience"]=p1["STATS"]["Experience"]+10
-	
 	-- p1:ModifyHealth(-20,"Sux2BU")
 	-- p1:ModifyMana(-10)
 	-- p1:ModifyEnergy(-10)
+	print (spawnedEnemies[1]["CURX"],spawnedEnemies[1]["CURY"])
 	
-	p1:setSequence("SWING")
-	-- player["WEAPON"].damages=true
-	Runtime:addEventListener("enterFrame",Controls.playerHits)
+	
+	-- p1:setSequence("SWING")
+	-- Runtime:addEventListener("enterFrame",Controls.playerHits)
 end
 
 function Controls:playerHits()
