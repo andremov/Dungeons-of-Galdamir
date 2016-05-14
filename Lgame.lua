@@ -735,8 +735,11 @@ function HandleEnemies:frameChecks()
 			
 			HandleEnemies:coordsCheck(i)
 			HandleEnemies:enemyHits(i)
-			-- HandleEnemies:getPath(i)
-			HandleEnemies:removeCheck(i)
+			HandleEnemies:getPath(i)
+			if spawnedEnemies[i].isAlive==false then
+				HandleEnemies:removeEnemy(i)
+			end
+			-- HandleEnemies:removeCheck(i)
 			
 			
 			if (spawnedEnemies[i]) then
@@ -764,12 +767,6 @@ function HandleEnemies:frameChecks()
 				end
 			end
 		end
-	end
-end
-
-function HandleEnemies:removeCheck(a)
-	if spawnedEnemies[a].isAlive==false then
-		HandleEnemies:removeEnemy(a)
 	end
 end
 
@@ -972,58 +969,75 @@ end
 function HandleEnemies:getPath(i)
 	local thisEnemy=spawnedEnemies[i]
 	if thisEnemy["MODE"]=="PURSUIT" then
-		-- print "FOUND IN PURSUIT"
+		local shortX=thisEnemy["AIVALS"]["TARGET"]["TILE"]["X"]
+		local shortY=thisEnemy["AIVALS"]["TARGET"]["TILE"]["Y"]
+		if shortX or shortY then
+			print ("!!",shortX,shortY)
+		elseif not(shortX) and not(shortY) then
+			print "FOUND IN PURSUIT"
 
-		local ex,ey=thisEnemy["CURX"]*2,thisEnemy["CURY"]*2
-		local em=thisEnemy["DMAP"]
-		local px,py=thisEnemy["AIVALS"]["UNIT"]["TILE"]["X"]*2,thisEnemy["AIVALS"]["UNIT"]["TILE"]["Y"]*2
-		local pm=HandleMaps:getMap(thisEnemy["AIVALS"]["UNIT"]["MAP"]["X"],thisEnemy["AIVALS"]["UNIT"]["MAP"]["Y"])
-		
-		-- print ("RAW: "..ex,ey,"to",px,py)
-		
-		local mapsize=table.maxn(displayedMaps[1]["PLAIN"])
-		if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
-			px=px+mapsize
-			-- if em==1 or em==3 then
-				-- print ("adding "..mapsize.." to enemy X coord because of offset. (currentx: "..ex..")")
-				-- ex=ex+mapsize
-			-- end
-		end
-		if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
-			py=py+mapsize
-			-- if em==1 or em==2 then
-				-- print ("adding "..mapsize.." to enemy Y coord because of offset. (currentx: "..ey..")")
-				-- ey=ey+mapsize
-			-- end
-		end
-		
-		-- print (ex,ey,"to",px,py)
-		
-		
-		-- Runtime:removeEventListener("enterFrame",HandleEnemies.frameChecks)
-		
-		local walkable = 0
-
-		-- Library setup
-		local Grid = require ("jumper.grid") -- The grid class
-		local Pathfinder = require ("jumper.pathfinder") -- The pathfinder class
-		
-		-- Creates a grid object
-		local grid = Grid(displayedMaps["BOUNDS"])
-		-- Creates a pathfinder object using Jump Point Search
-		local pather = Pathfinder(grid, 'DIJKSTRA', walkable) -- I like DIJKSTRA, but others work too. Check the pathfinding module for more info on the types of pathfinding algorithm.
-		pather:setMode('ORTHOGONAL')
-		
-		local path = pather:getPath(ex,ey,px,py)
-
-		if path then
-			for node, count in path:nodes() do
-				print (count, node:getX(), node:getY())
+			local ex,ey=thisEnemy["CURX"]*2,thisEnemy["CURY"]*2
+			local em=thisEnemy["DMAP"]
+			local px,py=thisEnemy["AIVALS"]["UNIT"]["TILE"]["X"]*2,thisEnemy["AIVALS"]["UNIT"]["TILE"]["Y"]*2
+			local pm=HandleMaps:getMap(thisEnemy["AIVALS"]["UNIT"]["MAP"]["X"],thisEnemy["AIVALS"]["UNIT"]["MAP"]["Y"])
+			
+			-- print ("RAW: "..ex,ey,"to",px,py)
+			
+			local mapsize=table.maxn(displayedMaps[1]["PLAIN"])
+			if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+				px=px+mapsize
+				-- if em==1 or em==3 then
+					-- print ("adding "..mapsize.." to enemy X coord because of offset. (currentx: "..ex..")")
+					-- ex=ex+mapsize
+				-- end
 			end
-			-- print "REMOVING LISTENER"
+			if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+				py=py+mapsize
+				-- if em==1 or em==2 then
+					-- print ("adding "..mapsize.." to enemy Y coord because of offset. (currentx: "..ey..")")
+					-- ey=ey+mapsize
+				-- end
+			end
+			
+			-- print (ex,ey,"to",px,py)
+			
+			
 			-- Runtime:removeEventListener("enterFrame",HandleEnemies.frameChecks)
-		else 
-			-- print "no path found"
+			
+			local walkable = 0
+
+			-- Library setup
+			local Grid = require ("jumper.grid") -- The grid class
+			local Pathfinder = require ("jumper.pathfinder") -- The pathfinder class
+			
+			-- Creates a grid object
+			local grid = Grid(displayedMaps["BOUNDS"])
+			-- Creates a pathfinder object using Jump Point Search
+			local pather = Pathfinder(grid, 'DIJKSTRA', walkable) -- I like DIJKSTRA, but others work too. Check the pathfinding module for more info on the types of pathfinding algorithm.
+			pather:setMode('ORTHOGONAL')
+			
+			local path = pather:getPath(ex,ey,px,py)
+
+			if path then
+				-- print "REMOVING LISTENER"
+				-- Runtime:removeEventListener("enterFrame",HandleEnemies.frameChecks)
+				
+				-- asd=path:nodes()
+				-- print (asd)
+
+				for node, count in path:nodes() do
+					if (count==3) then
+						firstX=node:getX()
+						firstY=node:getY()
+					end
+					-- print (count, node:getX(), node:getY())
+				end
+				thisEnemy["AIVALS"]["TARGET"]["TILE"]["X"]=firstX
+				thisEnemy["AIVALS"]["TARGET"]["TILE"]["Y"]=firstY
+				print ("enemy now trying to go to",firstX,firstY,"from",ex,ey)
+			else 
+				-- print "no path found"
+			end
 		end
 	end
 end
@@ -1074,7 +1088,8 @@ function Controls:buttonPress()
 	-- p1:ModifyHealth(-20,"Sux2BU")
 	-- p1:ModifyMana(-10)
 	-- p1:ModifyEnergy(-10)
-	print (spawnedEnemies[1]["CURX"],spawnedEnemies[1]["CURY"])
+	
+	-- print (spawnedEnemies[1]["CURX"],spawnedEnemies[1]["CURY"])
 	
 	
 	-- p1:setSequence("SWING")
