@@ -972,10 +972,16 @@ function HandleEnemies:getPath(i)
 		local shortX=thisEnemy["AIVALS"]["TARGET"]["TILE"]["X"]
 		local shortY=thisEnemy["AIVALS"]["TARGET"]["TILE"]["Y"]
 		if shortX or shortY then
-			print ("!!",shortX,shortY)
+			-- print ("!!",shortX,shortY)
+			thisEnemy["AIVALS"]["REPATH"]=thisEnemy["AIVALS"]["REPATH"]-1
+			if thisEnemy["AIVALS"]["REPATH"]<0 then
+				thisEnemy["AIVALS"]["TARGET"]["TILE"]["Y"]=nil
+				thisEnemy["AIVALS"]["TARGET"]["TILE"]["X"]=nil
+				thisEnemy["AIVALS"]["REPATH"]=1000
+			end
 		elseif not(shortX) and not(shortY) then
-			print "FOUND IN PURSUIT"
-
+			-- print "FOUND IN PURSUIT"
+			
 			local ex,ey=thisEnemy["CURX"]*2,thisEnemy["CURY"]*2
 			local em=thisEnemy["DMAP"]
 			local px,py=thisEnemy["AIVALS"]["UNIT"]["TILE"]["X"]*2,thisEnemy["AIVALS"]["UNIT"]["TILE"]["Y"]*2
@@ -1010,8 +1016,21 @@ function HandleEnemies:getPath(i)
 			local Grid = require ("jumper.grid") -- The grid class
 			local Pathfinder = require ("jumper.pathfinder") -- The pathfinder class
 			
+			function flip(original)
+				local result={}
+				for i=1,table.maxn(original) do
+					result[i]={}
+					for j=1,table.maxn(original) do
+						result[i][j]=original[j][i]
+					end
+				end
+				return result
+			end
+			
+			flip(displayedMaps["BOUNDS"])
 			-- Creates a grid object
-			local grid = Grid(displayedMaps["BOUNDS"])
+			-- local grid = Grid(displayedMaps["BOUNDS"])
+			local grid = Grid(flip(displayedMaps["BOUNDS"]))
 			-- Creates a pathfinder object using Jump Point Search
 			local pather = Pathfinder(grid, 'DIJKSTRA', walkable) -- I like DIJKSTRA, but others work too. Check the pathfinding module for more info on the types of pathfinding algorithm.
 			pather:setMode('ORTHOGONAL')
@@ -1024,17 +1043,37 @@ function HandleEnemies:getPath(i)
 				
 				-- asd=path:nodes()
 				-- print (asd)
+				if (pathsteps) then
+					for i=1,table.maxn(pathsteps) do
+						display.remove(pathsteps[i])
+					end
+				end
+				
+				pathsteps={}
 
+				print ("enemy now trying to go to",firstX,firstY,"from",ex,ey)
 				for node, count in path:nodes() do
 					if (count==3) then
 						firstX=node:getX()
 						firstY=node:getY()
 					end
-					-- print (count, node:getX(), node:getY())
+					print ("STEP "..count..":", "("..node:getX()..",", node:getY()..")")
+					
+					pathsteps[count]=display.newRect(0,0,8,8)
+					pathsteps[count].x=displayb[node:getX()][node:getY()].x
+					pathsteps[count].y=displayb[node:getX()][node:getY()].y
+					pathsteps[count]:setFillColor(1,0.64,0)
+					-- if (displayb[pastx]) then
+						-- if (displayb[pastx][pasty]) then
+							-- displayb[pastx][pasty]:setFillColor(1,1,1,0.4)
+						-- end
+					-- end
 				end
 				thisEnemy["AIVALS"]["TARGET"]["TILE"]["X"]=firstX
 				thisEnemy["AIVALS"]["TARGET"]["TILE"]["Y"]=firstY
-				print ("enemy now trying to go to",firstX,firstY,"from",ex,ey)
+				thisEnemy["AIVALS"]["UNIT"]["!TILE"]["X"]=px
+				thisEnemy["AIVALS"]["UNIT"]["!TILE"]["Y"]=py
+				thisEnemy["AIVALS"]["REPATH"]=1000
 			else 
 				-- print "no path found"
 			end
@@ -1089,6 +1128,9 @@ function Controls:buttonPress()
 	-- p1:ModifyMana(-10)
 	-- p1:ModifyEnergy(-10)
 	
+		spawnedEnemies[1]["AIVALS"]["TARGET"]["TILE"]["X"]=nil
+		spawnedEnemies[1]["AIVALS"]["TARGET"]["TILE"]["Y"]=nil
+		
 	-- print (spawnedEnemies[1]["CURX"],spawnedEnemies[1]["CURY"])
 	
 	

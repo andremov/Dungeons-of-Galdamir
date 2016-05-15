@@ -114,6 +114,9 @@ function Spawn(ax,ay)
 	
 	enemy["AIVALS"]={}
 	enemy["AIVALS"]["CONTACTCD"]=500
+	enemy["AIVALS"]["LASTMOVE"]=nil
+	enemy["AIVALS"]["CURMOVE"]=nil
+	enemy["AIVALS"]["REPATH"]=1000
 	
 	enemy["AIVALS"]["UNIT"]={}
 	enemy["AIVALS"]["UNIT"]["CATEGORY"]=nil
@@ -128,6 +131,9 @@ function Spawn(ax,ay)
 	enemy["AIVALS"]["UNIT"]["TILE"]={}
 	enemy["AIVALS"]["UNIT"]["TILE"]["X"]=nil
 	enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=nil
+	enemy["AIVALS"]["UNIT"]["!TILE"]={}
+	enemy["AIVALS"]["UNIT"]["!TILE"]["X"]=nil
+	enemy["AIVALS"]["UNIT"]["!TILE"]["Y"]=nil
 	
 	enemy["AIVALS"]["TARGET"]={}
 	enemy["AIVALS"]["TARGET"]["TILE"]={}
@@ -201,6 +207,7 @@ function Spawn(ax,ay)
 		
 		enemy:AI()
 		enemy:updateRadar()
+		-- timer.performWithDelay(200,enemy.refresh)
 	end
 	enemy.turn=function()
 		if enemy.xScale==1 then
@@ -240,79 +247,112 @@ function Spawn(ax,ay)
 			local deltaxenemy=0
 			local deltayenemy=0
 			
+			print "MOVE:"
 			
 			local yTileCheck=(enemy["CURY"]*2==enemy["AIVALS"]["TARGET"]["TILE"]["Y"])
 			local xTileCheck=(enemy["CURX"]*2==enemy["AIVALS"]["TARGET"]["TILE"]["X"])
 			
 			if yTileCheck and xTileCheck then
 				print "cleaned targets"
+				-- print "SWITCHING TO SEARCH"
+				-- enemy["AIVALS"]["LASTMOVE"]=nil
+				-- enemy["AIVALS"]["CURMOVE"]=nil
+				-- enemy["MODE"]="SEARCH"
 				enemy["AIVALS"]["TARGET"]["TILE"]["X"]=nil
 				enemy["AIVALS"]["TARGET"]["TILE"]["Y"]=nil
 			else
 				-- print (xTileCheck,yTileCheck)
+				print (enemy["CURX"]*2,enemy["CURY"]*2,"->",enemy["AIVALS"]["TARGET"]["TILE"]["X"],enemy["AIVALS"]["TARGET"]["TILE"]["Y"])
 				-- print (enemy["CURX"],enemy["CURY"])
 				-- print (enemy["AIVALS"]["TARGET"]["TILE"]["X"],enemy["AIVALS"]["TARGET"]["TILE"]["Y"])
 			end
 			
-			yTileCheck=(enemy["AIVALS"]["UNIT"]["TILE"]["Y"]==enemy["AIVALS"]["TARGET"]["TILE"]["Y"])
-			xTileCheck=(enemy["AIVALS"]["UNIT"]["TILE"]["X"]==enemy["AIVALS"]["TARGET"]["TILE"]["X"])
+			yTileCheck=(enemy["AIVALS"]["UNIT"]["!TILE"]["Y"]) and (enemy["AIVALS"]["UNIT"]["!TILE"]["Y"]==enemy["AIVALS"]["TARGET"]["TILE"]["Y"])
+			xTileCheck=(enemy["AIVALS"]["UNIT"]["!TILE"]["X"]) and (enemy["AIVALS"]["UNIT"]["!TILE"]["X"]==enemy["AIVALS"]["TARGET"]["TILE"]["X"])
+			
+			if yTileCheck and xTileCheck then
+				print "SWITCHING TO SEARCH"
+				enemy["AIVALS"]["LASTMOVE"]=nil
+				enemy["AIVALS"]["CURMOVE"]=nil
+				enemy["MODE"]="SEARCH"
+			end
+			
+			yTileCheck=(enemy["AIVALS"]["UNIT"]["!TILE"]["Y"]==enemy["CURY"]*2)
+			xTileCheck=(enemy["AIVALS"]["UNIT"]["!TILE"]["X"]==enemy["CURX"]*2)
+			
+			if yTileCheck and xTileCheck then
+				print "SWITCHING TO SEARCH"
+				enemy["AIVALS"]["LASTMOVE"]=nil
+				enemy["AIVALS"]["CURMOVE"]=nil
+				enemy["MODE"]="SEARCH"
+			end
+			
 			-- print (enemy["AIVALS"]["UNIT"]["TILE"]["X"],enemy["AIVALS"]["TARGET"]["TILE"]["X"])
 			-- print (enemy["AIVALS"]["UNIT"]["TILE"]["Y"],enemy["AIVALS"]["TARGET"]["TILE"]["Y"])
-			if yTileCheck and xTileCheck then
-				print "holy shit he found me"
-				local deltax=enemy["AIVALS"]["UNIT"]["POS"]["X"]-enemy.x
-				local deltay=enemy["AIVALS"]["UNIT"]["POS"]["Y"]-enemy.y
-				local deltah=math.sqrt( deltax^2 + deltay^2 )
-				deltaxenemy=(deltax/deltah)*speedvalue
-				deltayenemy=(deltay/deltah)*speedvalue
-				
-				ySuccess=(math.abs(deltay)<10)
-				xSuccess=(math.abs(deltax)<25)
-			else
+			
+			-- print (enemy["AIVALS"]["UNIT"]["!TILE"]["Y"],enemy["AIVALS"]["TARGET"]["TILE"]["Y"])
+			-- print (enemy["AIVALS"]["UNIT"]["!TILE"]["X"],enemy["AIVALS"]["TARGET"]["TILE"]["X"])
+			
+			-- if not(enemy["AIVALS"]["TARGET"]["TILE"]["X"]) and not(enemy["AIVALS"]["TARGET"]["TILE"]["Y"]) then
+			if enemy["MODE"]=="PURSUIT" then
+				-- enemy["MODE"]="SEARCH"
+			-- else
 				-- local ex,ey=thisEnemy["CURX"]*2,thisEnemy["CURY"]*2
 				if (enemy["AIVALS"]["TARGET"]["TILE"]["X"]) and enemy["AIVALS"]["TARGET"]["TILE"]["Y"] then
 					xTileCheck=(enemy["AIVALS"]["TARGET"]["TILE"]["X"]-(enemy["CURX"]*2))
 					yTileCheck=(enemy["AIVALS"]["TARGET"]["TILE"]["Y"]-(enemy["CURY"]*2))
 					
-					print "--"
-					
+					-- print "--"
+					local value
 					if xTileCheck<0 then
-						print "LEFT"
+						print "WEST"
+						value="WEST"
 					elseif xTileCheck>0 then
-						print "RIGHT"
+						print "EAST"
+						value="EAST"
 					end
 					
 					if yTileCheck<0 then
 						print "NORTH"
+						value="NORTH"
 					elseif yTileCheck>0 then
 						print "SOUTH"
+						value="SOUTH"
 					end
 					
+					if (enemy["AIVALS"]["CURMOVE"]~=value) then
+						enemy["AIVALS"]["LASTMOVE"]=enemy["AIVALS"]["CURMOVE"]
+						enemy["AIVALS"]["CURMOVE"]=value
+					end
+					
+					
 					if xTileCheck==0 then
-						-- deltaxenemy=(1/16)*speedvalue
+						if (enemy["AIVALS"]["LASTMOVE"]=="WEST") then
+							deltaxenemy=(2/64)*speedvalue*-1
+						elseif(enemy["AIVALS"]["LASTMOVE"]=="EAST") then
+							deltaxenemy=(2/64)*speedvalue
+						end
 					else
 						local inverter1=(math.abs(xTileCheck)/xTileCheck)
 						local inverter2=(math.abs(xTileCheck)/xTileCheck)*-1
-						deltaxenemy=(15/16)*speedvalue*inverter1
+						deltaxenemy=(62/64)*speedvalue--*inverter1
 					end
 					if yTileCheck==0 then
-						-- deltayenemy=(1/16)*speedvalue
+						if (enemy["AIVALS"]["LASTMOVE"]=="NORTH") then
+							deltayenemy=(2/64)*speedvalue*-1
+						elseif (enemy["AIVALS"]["LASTMOVE"]=="SOUTH") then
+							deltayenemy=(2/64)*speedvalue
+						end
 					else
 						local inverter1=(math.abs(yTileCheck)/yTileCheck)
 						local inverter2=(math.abs(yTileCheck)/yTileCheck)*-1
-						deltayenemy=(15/16)*speedvalue*inverter1
+						deltayenemy=(62/64)*speedvalue--*inverter1
 					end
+					enemy:move(deltaxenemy,deltayenemy)
 				end
+				-- enemy["MODE"]="PURSUIT"
 			end
 			
-			
-			if xSuccess and ySuccess then
-				-- print "GOT TO TARGET"
-				enemy["MODE"]="IDLE"
-				enemy["CATEGORY"]=nil
-			else
-				enemy:move(deltaxenemy,deltayenemy)
-			end
 		--[[
 			local speedvalue=160
 			
@@ -616,6 +656,40 @@ function Spawn(ax,ay)
 				enemy["AIVALS"]["POS"][2]=enemy.y
 			end
 			]]
+		
+		elseif enemy["MODE"]=="SEARCH" then
+			local ySuccess=false
+			local xSuccess=false
+			local speedvalue=160
+			local deltaxenemy=0
+			local deltayenemy=0
+			
+			local deltax
+			if (enemy.x<enemy["AIVALS"]["UNIT"]["POS"]["X"]) then
+				deltax=enemy["AIVALS"]["UNIT"]["POS"][1]-enemy.x
+			else
+				deltax=enemy["AIVALS"]["UNIT"]["POS"][2]-enemy.x
+			end
+			-- local deltax=enemy["AIVALS"]["UNIT"]["POS"][1]-enemy.x
+			-- if (deltax>enemy["AIVALS"]["UNIT"]["POS"][2]-enemy.x) then
+				-- deltax=enemy["AIVALS"]["UNIT"]["POS"][2]-enemy.x
+			-- end
+			local deltay=enemy["AIVALS"]["UNIT"]["POS"]["Y"]-enemy.y
+			local deltah=math.sqrt( deltax^2 + deltay^2 )
+			deltaxenemy=(deltax/deltah)*speedvalue
+			deltayenemy=(deltay/deltah)*speedvalue
+			
+			ySuccess=(math.abs(deltay)<10)
+			xSuccess=(math.abs(deltax)<25)
+			if xSuccess and ySuccess then
+				-- print "GOT TO TARGET"
+				enemy["AIVALS"]["LASTMOVE"]=nil
+				enemy["AIVALS"]["CURMOVE"]=nil
+				enemy["MODE"]="IDLE"
+				enemy["CATEGORY"]=nil
+			else
+				enemy:move(deltaxenemy,deltayenemy)
+			end
 		elseif enemy["MODE"]=="ATTACK" then
 			if enemy["AIVALS"]["UNIT"]["POS"]["X"]>enemy.x then
 				if enemy.xScale==-1 then
@@ -658,7 +732,7 @@ function Spawn(ax,ay)
 	end
 	enemy.updateRadar=function()
 		enemy["AIVALS"]["CONTACTCD"]=enemy["AIVALS"]["CONTACTCD"]-1
-		enemy.radar:rotate(1)
+		enemy.radar:rotate(2)
 	end
 	
 	-- Modify Health Function
@@ -811,6 +885,8 @@ function Spawn(ax,ay)
 			enemy["AIVALS"]["TARGET"]["TILE"]["X"]=nil
 			enemy["AIVALS"]["UNIT"]["POS"][1]=nil
 			enemy["AIVALS"]["UNIT"]["POS"][2]=nil
+			enemy["AIVALS"]["LASTMOVE"]=nil
+			enemy["AIVALS"]["CURMOVE"]=nil
 			enemy["AIVALS"]["CONTACTCD"]=500
 		end
 	end
