@@ -131,7 +131,7 @@ HandleMaps={}
 function HandleMaps:findSpot()
 	local spot=1
 	local found=false
-	while spot<=4 and found==false do
+	while spot<=1 and found==false do
 		if displayedMaps[spot]==nil then
 			found=true
 		else
@@ -242,24 +242,27 @@ end
 
 function HandleMaps:buildBoundary()
 	local order={}
-	if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
-		if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
-			-- map4 is northwest
-			order={4,3,2,1}
+	if displayedMaps[4] then
+		if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+			if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+				-- map4 is northwest
+				order={4,3,2,1}
+			else
+				-- map4 is northeast
+				order={3,4,1,2}
+			end
 		else
-			-- map4 is northeast
-			order={3,4,1,2}
+			if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+				-- map4 is southwest
+				order={2,1,4,3}
+			else
+				-- map4 is southeast
+				order={1,2,3,4}
+			end
 		end
 	else
-		if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
-			-- map4 is southwest
-			order={2,1,4,3}
-		else
-			-- map4 is southeast
-			order={1,2,3,4}
-		end
+		order={1}
 	end
-	
 	local mapsize=table.maxn(displayedMaps[1]["PLAIN"])
 	if (displayb) then
 		for x=1,mapsize*2 do
@@ -297,11 +300,17 @@ function HandleMaps:buildBoundary()
 			
 			displayb[x][y]=display.newRect(x*10,y*10,10,10)
 			
-			boundary[x][y]=displayedMaps[order[orderpos]]["PLAIN"][ay][ax]
+			if order[orderpos] then
+				boundary[x][y]=displayedMaps[order[orderpos]]["PLAIN"][ay][ax]
+			else
+				boundary[x][y]=2
+			end
 			if boundary[x][y]==1 then
 				displayb[x][y]:setFillColor(0.5,0,0,0.8)
-			else
+			elseif boundary[x][y]==0 then
 				displayb[x][y]:setFillColor(1,1,1,0.4)
+			else
+				display.remove(displayb[x][y])
 			end
 		end
 	end
@@ -554,12 +563,14 @@ end
 
 function HandleRows:InitialLayering()
 	local order={3,1}
-	if displayedMaps[1]["MAPY"]<displayedMaps[4]["MAPY"] then
+	if not (displayedMaps[4]) then
+		order={1,1}
+	elseif displayedMaps[1]["MAPY"]<displayedMaps[4]["MAPY"] then
 		order={1,3}
 	end
 	for i=1,2 do
 		local mapitem1=displayedMaps[order[i]]
-		local mapitem2=displayedMaps[order[i]+1]
+		local mapitem2=displayedMaps[order[i]+1] or displayedMaps[order[i]]
 		-- for j=table.maxn(mapitem.MapRows)-1,1,-2 do
 		-- for j=table.maxn(mapitem.MapRows),1,-1 do
 		for j=2,table.maxn(mapitem1.MapRows),2 do
@@ -568,7 +579,12 @@ function HandleRows:InitialLayering()
 			local item2=mapitem1.MapRows[j-1]
 			local item3=mapitem2.MapRows[j]
 			local item4=mapitem2.MapRows[j-1]
-			if (item2[1].y<p1.y) then
+			-- print (item2.askedY .. " - " .. p1.y)
+			local requestY=item2.askedY
+			if not(requestY) then
+				requestY=mapitem1.Level.contentBounds.yMax
+			end
+			if (requestY<p1.y) then
 				-- HandleRows:doPreRowPosition(item1)
 				-- HandleRows:doPreRowPosition(item2)
 				HandleRows:doPreRowPosition(item1)

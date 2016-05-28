@@ -161,8 +161,8 @@ function Create:Walls()
 				Map["MAP"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
 				Map["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
 			else
-				Map["PLAIN"][plainrow][plaincol]=1
-				Map["MAP"][i].open=false
+				-- Map["PLAIN"][plainrow][plaincol]=1
+				-- Map["MAP"][i].open=false
 			end
 		elseif Map["MAP"][i].col%2==0 then
 			Map["MAP"][i].class="WALLX"
@@ -199,7 +199,50 @@ function Create:Walls()
 		end
 		Map["MAP"][i].roomed=false
 	end
-	
+	if not( Create["loadinfo"] ) then
+		for i=1,Map.side^2 do
+			local plaincol=Map["MAP"][i].col+1
+			local plainrow=Map["MAP"][i].row+1
+			if Map["MAP"][i].class=="CORNER" then
+				local surroundings={ i-Map.side, i-1, i+1, i+Map.side }
+				for j=1,4 do
+					surroundings[j]=Map["MAP"][j]
+					if surroundings[j] then
+						-- if surroundings[j]["wall"] then
+							surroundings[j]=surroundings[j]["wall"]
+						-- else
+							-- surroundings[j]=false
+						-- end
+					else
+						surroundings[j]=false
+					end
+				end
+				surroundings=surroundings[1] or surroundings[2] or surroundings[3] or surroundings[4]
+				if surroundings then
+					print "Walls around, corner"
+					Map["MAP"][i].wall=true
+					-- Map["MAP"][i].open=math.random(0,1)
+					Map["PLAIN"][plainrow][plaincol]=1
+					Map["MAP"][i].open=false
+				else
+					print "no walls around, choosing"
+					Map["MAP"][i].open=math.random(0,10)
+					if Map["MAP"][i].open>9 then
+						print "	no corner"
+						Map["MAP"][i].open=0
+					else
+						print "	corner"
+						Map["MAP"][i].open=1
+					end
+					Map["PLAIN"][plainrow][plaincol]=Map["MAP"][i].open
+					Map["MAP"][i].open=(Map["MAP"][i].open==0)
+				end
+				-- surroundings[1]=Map["MAP"][1]
+				-- surroundings[1]=Map["MAP"][1]
+				-- surroundings[1]=Map["MAP"][1]
+			end
+		end
+	end
 	Create:Progress()
 end
 
@@ -353,12 +396,12 @@ function Create:Visualize()
 				
 				Map["TOP"][i].yScale=0.4
 			else
-				Map["TILE"][i]=display.newImageRect("tiles/FloorWall.png",Map.tile,Map.tile/3)
+				Map["TILE"][i]=display.newImageRect("tiles/FloorWall2.png",Map.tile,Map.tile/3)
 				
-				grads[#grads+1]=display.newImageRect("tiles/CornerGrad.png",Map.tile/2,Map.tile/2)
-				grads[#grads]:rotate(270)
-				grads[#grads+1]=display.newImageRect("tiles/CornerGrad.png",Map.tile/2,Map.tile/2)
-				grads[#grads]:rotate(180)
+				-- grads[#grads+1]=display.newImageRect("tiles/CornerGrad.png",Map.tile/2,Map.tile/2)
+				-- grads[#grads]:rotate(270)
+				-- grads[#grads+1]=display.newImageRect("tiles/CornerGrad.png",Map.tile/2,Map.tile/2)
+				-- grads[#grads]:rotate(180)
 			end
 		elseif Map["MAP"][i].class=="WALLX" then
 			if Map["MAP"][i].open==false then
@@ -371,26 +414,31 @@ function Create:Visualize()
 				Map["TOP"][i].yScale=0.95
 				Map["SIDE"][i].yScale=0.8
 			else
-				Map["TILE"][i]=display.newImageRect("tiles/FloorWall.png",Map.tile/1.5,Map.tile/3)
+				Map["TILE"][i]=display.newImageRect("tiles/FloorWall1.png",Map.tile/1.5,Map.tile/3)
 				Map["TILE"][i]:rotate(90)
 				
-				grads[#grads+1]=display.newImageRect("tiles/WallGrad.png",Map.tile/3,Map.tile/2)
+				-- grads[#grads+1]=display.newImageRect("tiles/WallGrad.png",Map.tile/3,Map.tile/2)
 			end
 		elseif Map["MAP"][i].class=="CORNER" then
-			Map["SIDE"][i]=display.newImageRect("tiles/SidePillar.png",Map.tile/3,Map.tile)
-			Map["TOP"][i]=display.newImage("tiles/TopPillar.png",Map.tile/3,Map.tile/3)
-			Map["PHYSICS"][i]=display.newRect(0,0,Map.tile/3,Map.tile/3)
-			
-			Map["TOP"][i].yScale=0.4
-			Map["TOP"][i].xScale=0.95
+			if Map["MAP"][i].open==false then
+				Map["SIDE"][i]=display.newImageRect("tiles/SidePillar.png",Map.tile/3,Map.tile)
+				Map["TOP"][i]=display.newImage("tiles/TopPillar.png",Map.tile/3,Map.tile/3)
+				Map["PHYSICS"][i]=display.newRect(0,0,Map.tile/3,Map.tile/3)
+				
+				Map["TOP"][i].yScale=0.4
+				Map["TOP"][i].xScale=0.95
+			else
+				Map["TILE"][i]=display.newImageRect("tiles/FloorCorner.png",Map.tile/3,Map.tile/3)
+				-- Map["TILE"][i]:rotate(90)
+			end
 		elseif Map["MAP"][i].class=="TILE" then
 			Map["TILE"][i]=display.newImageRect("tiles/FloorTile.png",Map.tile,Map.tile/1.5)
 			if Map["MAP"][i-Map.side].open==false then
-				grads[#grads+1]=display.newImageRect("tiles/WallGrad.png",Map.tile,Map.tile/2)
+				-- grads[#grads+1]=display.newImageRect("tiles/WallGrad.png",Map.tile,Map.tile/2)
 			else
-				grads[#grads+1]=display.newImageRect("tiles/CornerGrad.png",Map.tile/2,Map.tile/2)
-				grads[#grads+1]=display.newImageRect("tiles/CornerGrad.png",Map.tile/2,Map.tile/2)
-				grads[#grads]:rotate(90)
+				-- grads[#grads+1]=display.newImageRect("tiles/CornerGrad.png",Map.tile/2,Map.tile/2)
+				-- grads[#grads+1]=display.newImageRect("tiles/CornerGrad.png",Map.tile/2,Map.tile/2)
+				-- grads[#grads]:rotate(90)
 			end
 		end
 		if (Map["PHYSICS"][i]) then
@@ -456,6 +504,8 @@ function Create:Visualize()
 		
 		if (Map["SIDE"][i]) then
 			Map.MapRows[rowval]:insert(Map["SIDE"][i])
+			Map.MapRows[rowval].askedY=Map["SIDE"][i].contentBounds.yMax
+			-- print (rowval .. ":" .. Map["SIDE"][i].contentBounds.yMax .. " - " .. Map["MAP"][i].class)
 		end
 		if (Map["TOP"][i]) then
 			Map.MapRows[rowval]:insert(Map["TOP"][i])
