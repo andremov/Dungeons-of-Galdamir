@@ -9,15 +9,17 @@ module(..., package.seeall)
 -- GLOBAL
 ---------------------------------------------------------------------------------------
 
-local side=14
-local tile=200
+-- local side=14
+-- local tile=200
 
 local function getColumn(id)
+	local side=14
 	local column=((id-1)%side)
 	return column
 end
 
 local function getRow(id)
+	local side=14
 	local row=math.floor((id-1)/side)
 	return row
 end
@@ -73,18 +75,21 @@ function Create:Start(paramx,paramy,info,posx,posy)
 	Create["MAPY"]=paramy
 	Create["loadinfo"]=info
 	
+	local side=14
+	local tile=200
 	
-	local deltaX=side/2
-	local deltaY=(deltaX*(tile/1.5))+(deltaX*(tile/3))
-	deltaX=(deltaX*tile)+(deltaX*(tile/3))
+	local delta=side/2
+	local deltaX=(delta*tile)+(delta*(tile/3))
+	local deltaY=(delta*(tile/1.5))+(delta*(tile/3))
+	
 	Create["Xi"]=posx
 	Create["Yi"]=posy
 	
-	Create["X"]=Create["Xi"]+(deltaX/2)
-	Create["Y"]=Create["Yi"]+(deltaY/2)
+	-- Create["X"]=Create["Xi"]+(deltaX/2)
+	-- Create["Y"]=Create["Yi"]+(deltaY/2)
 	
-	Create["Xf"]=Create["X"]+(deltaX/2)
-	Create["Yf"]=Create["Y"]+(deltaY/2)
+	-- Create["Xf"]=Create["Xi"]+(deltaX)
+	-- Create["Yf"]=Create["Yi"]+(deltaY)
 	
 	Create:Progress()
 end
@@ -102,6 +107,8 @@ end
 function Create:Template()
 	-- Create={}
 	-- Create.CreateRows={}
+	local side=14
+	local tile=200
 	Map={}
 	Map.side=side
 	Map.tile=tile
@@ -109,14 +116,14 @@ function Create:Template()
 	Map["MAPX"]=Create["MAPX"]
 	Map["MAPY"]=Create["MAPY"]
 	
-	Map["X"]=Create["X"]
-	Map["Y"]=Create["Y"]
+	-- Map["X"]=Create["X"]
+	-- Map["Y"]=Create["Y"]
 	
 	Map["Xi"]=Create["Xi"]
 	Map["Yi"]=Create["Yi"]
 	
-	Map["Xf"]=Create["Xf"]
-	Map["Yf"]=Create["Yf"]
+	-- Map["Xf"]=Create["Xf"]
+	-- Map["Yf"]=Create["Yf"]
 	
 	Map.MapRows={}
 	-- for i=1,8 do
@@ -387,8 +394,8 @@ function Create:Visualize()
 			end
 		end
 		if (Map["PHYSICS"][i]) then
-			Map["PHYSICS"][i].x=Map["Xi"]+((Map.tile/1.5)*(Map["MAP"][i].col))
-			Map["PHYSICS"][i].y=Map["Yi"]+((Map.tile/2)*(Map["MAP"][i].row))
+			Map["PHYSICS"][i].x=Create["Xi"]+((Map.tile/1.5)*(Map["MAP"][i].col))
+			Map["PHYSICS"][i].y=Create["Yi"]+((Map.tile/2)*(Map["MAP"][i].row))
 			Map["PHYSICS"][i]:setFillColor(0.8,0.4,0.4)
 			physics.addBody(Map["PHYSICS"][i],"static",{friction=0.5,filter={categoryBits=1,maskBits=2}})
 		end
@@ -404,8 +411,8 @@ function Create:Visualize()
 			end
 		end
 		if (Map["TILE"][i]) then
-			Map["TILE"][i].x=Map["Xi"]+((Map.tile/1.5)*(Map["MAP"][i].col))
-			Map["TILE"][i].y=Map["Yi"]+((Map.tile/2)*(Map["MAP"][i].row))
+			Map["TILE"][i].x=Create["Xi"]+((Map.tile/1.5)*(Map["MAP"][i].col))
+			Map["TILE"][i].y=Create["Yi"]+((Map.tile/2)*(Map["MAP"][i].row))
 			if Map["TILE"][i].col==1 or Map["TILE"][i].col==13 or Map["TILE"][i].row==1 or Map["TILE"][i].row==13 then
 				Map["TILE"][i]:setFillColor(0,0,1)
 			end

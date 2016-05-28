@@ -86,12 +86,22 @@ function Spawn(ax,ay)
 	-- Essentials
 	local enemy=display.newGroup()
 	enemy.x, enemy.y = ax,ay
-	local shade={ -51,-4, 51,-4, 51,12, -51,12}
+	local shade={ -40,-4, 40,-4, 40,12, -40,12}
 	physics.addBody(enemy,"dynamic",{shape=shade,filter={categoryBits=2,maskBits=7}})
 	enemy.isFixedRotation=true
 	enemy["CATEGORY"]="ENEMY"
 	
-	enemy.textd=display.newText((enemy.x..", "..enemy.y),0,50,native.systemFont,30)
+	local asd=
+	{
+		text = "",     
+		x = 0,
+		y = 50,
+		width = 200,     --required for multi-line and alignment
+		font = native.systemFont,   
+		fontSize = 30,
+		align = "center"  --new alignment parameter
+	}
+	enemy.textd=display.newText(asd)
 	enemy:insert(enemy.textd)
 	
 	-- Map Essentials
@@ -110,13 +120,14 @@ function Spawn(ax,ay)
 	enemy["LASTTIME"]=0
 	enemy["SCALE"]=1
 	enemy["MODE"]="IDLE"
+	enemy["!MODE"]=""
 	enemy["ANIMATIONS"]=readAnims('Barry/BarryAnim.json')
 	
 	enemy["AIVALS"]={}
 	enemy["AIVALS"]["CONTACTCD"]=500
 	enemy["AIVALS"]["LASTMOVE"]=nil
 	enemy["AIVALS"]["CURMOVE"]=nil
-	enemy["AIVALS"]["REPATH"]=1000
+	enemy["AIVALS"]["REPATH"]=200
 	
 	enemy["AIVALS"]["UNIT"]={}
 	enemy["AIVALS"]["UNIT"]["CATEGORY"]=nil
@@ -202,7 +213,12 @@ function Spawn(ax,ay)
 		end
 		enemy.shadow:toBack()
 		
-		enemy.textd.text=(math.floor(enemy.x)..", "..math.floor(enemy.y))
+		
+		-- enemy.textd.text=(math.floor(enemy.x)..", "..math.floor(enemy.y).."\n"..enemy.MAPX..", "..enemy.MAPY)
+		-- enemy.textd.text=(enemy.CURX..", "..enemy.CURY.."\n"..enemy.MAPX..", "..enemy.MAPY)
+		enemy.textd.text=(enemy["MODE"].."\n"..enemy.CURX..", "..enemy.CURY.." : "..enemy.MAPX..", "..enemy.MAPY)
+		
+		
 		enemy["WEAPON"]["basedamage"]=enemy["STATS"]["Damage"]
 		
 		enemy:AI()
@@ -229,6 +245,10 @@ function Spawn(ax,ay)
 	
 	-- AI Functions
 	enemy.AI=function()
+		if (enemy["MODE"]~=enemy["!MODE"]) then
+			enemy["!MODE"]=enemy["MODE"]
+			-- print ("MODE SWITCH:",enemy["MODE"])
+		end
 		enemy["STATS"]["COOLDOWN"]=enemy["STATS"]["COOLDOWN"]-1
 		if enemy["MODE"]=="IDLE" then
 			enemy:setSequence("IDLE")
@@ -247,22 +267,22 @@ function Spawn(ax,ay)
 			local deltaxenemy=0
 			local deltayenemy=0
 			
-			print "MOVE:"
+			-- print "MOVE:"
 			
 			local yTileCheck=(enemy["CURY"]*2==enemy["AIVALS"]["TARGET"]["TILE"]["Y"])
 			local xTileCheck=(enemy["CURX"]*2==enemy["AIVALS"]["TARGET"]["TILE"]["X"])
 			
 			if yTileCheck and xTileCheck then
-				print "cleaned targets"
+				-- print "cleaned targets"
 				-- print "SWITCHING TO SEARCH"
 				-- enemy["AIVALS"]["LASTMOVE"]=nil
 				-- enemy["AIVALS"]["CURMOVE"]=nil
 				-- enemy["MODE"]="SEARCH"
 				enemy["AIVALS"]["TARGET"]["TILE"]["X"]=nil
 				enemy["AIVALS"]["TARGET"]["TILE"]["Y"]=nil
-			else
+			-- else
 				-- print (xTileCheck,yTileCheck)
-				print (enemy["CURX"]*2,enemy["CURY"]*2,"->",enemy["AIVALS"]["TARGET"]["TILE"]["X"],enemy["AIVALS"]["TARGET"]["TILE"]["Y"])
+				-- print (enemy["CURX"]*2,enemy["CURY"]*2,"->",enemy["AIVALS"]["TARGET"]["TILE"]["X"],enemy["AIVALS"]["TARGET"]["TILE"]["Y"])
 				-- print (enemy["CURX"],enemy["CURY"])
 				-- print (enemy["AIVALS"]["TARGET"]["TILE"]["X"],enemy["AIVALS"]["TARGET"]["TILE"]["Y"])
 			end
@@ -271,7 +291,7 @@ function Spawn(ax,ay)
 			xTileCheck=(enemy["AIVALS"]["UNIT"]["!TILE"]["X"]) and (enemy["AIVALS"]["UNIT"]["!TILE"]["X"]==enemy["AIVALS"]["TARGET"]["TILE"]["X"])
 			
 			if yTileCheck and xTileCheck then
-				print "SWITCHING TO SEARCH"
+				-- print "SWITCHING TO SEARCH BECAUSE NEXT STEP IS WHERE PLAYER IS AT"
 				enemy["AIVALS"]["LASTMOVE"]=nil
 				enemy["AIVALS"]["CURMOVE"]=nil
 				enemy["MODE"]="SEARCH"
@@ -281,7 +301,7 @@ function Spawn(ax,ay)
 			xTileCheck=(enemy["AIVALS"]["UNIT"]["!TILE"]["X"]==enemy["CURX"]*2)
 			
 			if yTileCheck and xTileCheck then
-				print "SWITCHING TO SEARCH"
+				-- print "SWITCHING TO SEARCH BECAUSE ENEMY IS ALREADY AT NEXT STEP"
 				enemy["AIVALS"]["LASTMOVE"]=nil
 				enemy["AIVALS"]["CURMOVE"]=nil
 				enemy["MODE"]="SEARCH"
@@ -305,18 +325,18 @@ function Spawn(ax,ay)
 					-- print "--"
 					local value
 					if xTileCheck<0 then
-						print "WEST"
+						-- print "WEST"
 						value="WEST"
 					elseif xTileCheck>0 then
-						print "EAST"
+						-- print "EAST"
 						value="EAST"
 					end
 					
 					if yTileCheck<0 then
-						print "NORTH"
+						-- print "NORTH"
 						value="NORTH"
 					elseif yTileCheck>0 then
-						print "SOUTH"
+						-- print "SOUTH"
 						value="SOUTH"
 					end
 					
@@ -325,28 +345,45 @@ function Spawn(ax,ay)
 						enemy["AIVALS"]["CURMOVE"]=value
 					end
 					
+					if not(enemy["AIVALS"]["LASTMOVE"]) then
+						local choose=math.random(0,1)
+						if (value=="WEST" or value=="EAST") then
+							choose=choose+2
+						end
+						if (choose==0) then
+							enemy["AIVALS"]["LASTMOVE"]="WEST"
+						elseif (choose==1) then
+							enemy["AIVALS"]["LASTMOVE"]="EAST"
+						elseif (choose==2) then
+							enemy["AIVALS"]["LASTMOVE"]="NORTH"
+						elseif (choose==3) then
+							enemy["AIVALS"]["LASTMOVE"]="SOUTH"
+						end
+					end
 					
+					local pastmovefraction=20
+					local curmovefraction=60
 					if xTileCheck==0 then
 						if (enemy["AIVALS"]["LASTMOVE"]=="WEST") then
-							deltaxenemy=(2/64)*speedvalue*-1
+							deltaxenemy=(pastmovefraction/64)*speedvalue*-1
 						elseif(enemy["AIVALS"]["LASTMOVE"]=="EAST") then
-							deltaxenemy=(2/64)*speedvalue
+							deltaxenemy=(pastmovefraction/64)*speedvalue
 						end
 					else
 						local inverter1=(math.abs(xTileCheck)/xTileCheck)
 						local inverter2=(math.abs(xTileCheck)/xTileCheck)*-1
-						deltaxenemy=(62/64)*speedvalue--*inverter1
+						deltaxenemy=(curmovefraction/64)*speedvalue*inverter1
 					end
 					if yTileCheck==0 then
 						if (enemy["AIVALS"]["LASTMOVE"]=="NORTH") then
-							deltayenemy=(2/64)*speedvalue*-1
+							deltayenemy=(pastmovefraction/64)*speedvalue*-1
 						elseif (enemy["AIVALS"]["LASTMOVE"]=="SOUTH") then
-							deltayenemy=(2/64)*speedvalue
+							deltayenemy=(pastmovefraction/64)*speedvalue
 						end
 					else
 						local inverter1=(math.abs(yTileCheck)/yTileCheck)
 						local inverter2=(math.abs(yTileCheck)/yTileCheck)*-1
-						deltayenemy=(62/64)*speedvalue--*inverter1
+						deltayenemy=(curmovefraction/64)*speedvalue*inverter1
 					end
 					enemy:move(deltaxenemy,deltayenemy)
 				end
@@ -660,21 +697,24 @@ function Spawn(ax,ay)
 		elseif enemy["MODE"]=="SEARCH" then
 			local ySuccess=false
 			local xSuccess=false
-			local speedvalue=160
+			local speedvalue=120
 			local deltaxenemy=0
 			local deltayenemy=0
-			
-			local deltax
-			if (enemy.x<enemy["AIVALS"]["UNIT"]["POS"]["X"]) then
-				deltax=enemy["AIVALS"]["UNIT"]["POS"][1]-enemy.x
-			else
-				deltax=enemy["AIVALS"]["UNIT"]["POS"][2]-enemy.x
-			end
 			-- local deltax=enemy["AIVALS"]["UNIT"]["POS"][1]-enemy.x
 			-- if (deltax>enemy["AIVALS"]["UNIT"]["POS"][2]-enemy.x) then
 				-- deltax=enemy["AIVALS"]["UNIT"]["POS"][2]-enemy.x
 			-- end
 			local deltay=enemy["AIVALS"]["UNIT"]["POS"]["Y"]-enemy.y
+			local deltax=enemy["AIVALS"]["UNIT"]["POS"]["X"]-enemy.x
+			if (math.abs(deltay)<30) then
+				if (enemy.x<enemy["AIVALS"]["UNIT"]["POS"]["X"]) then
+					deltax=enemy["AIVALS"]["UNIT"]["POS"][1]-enemy.x
+				else
+					deltax=enemy["AIVALS"]["UNIT"]["POS"][2]-enemy.x
+				end
+			end
+			-- deltax=deltax
+			
 			local deltah=math.sqrt( deltax^2 + deltay^2 )
 			deltaxenemy=(deltax/deltah)*speedvalue
 			deltayenemy=(deltay/deltah)*speedvalue
@@ -732,7 +772,26 @@ function Spawn(ax,ay)
 	end
 	enemy.updateRadar=function()
 		enemy["AIVALS"]["CONTACTCD"]=enemy["AIVALS"]["CONTACTCD"]-1
-		enemy.radar:rotate(2)
+		if enemy["AIVALS"]["CONTACTCD"]<=0 then
+			print "LOST PLAYER"
+			enemy["AIVALS"]["CONTACTCD"]=500
+			enemy:cleanTarget()
+		end
+		enemy.radar:rotate(5)
+	end
+	enemy.cleanTarget=function()
+		enemy["MODE"]="IDLE"
+		enemy["AIVALS"]["UNIT"]["POS"]["X"]=nil
+		enemy["AIVALS"]["UNIT"]["POS"]["Y"]=nil
+		enemy["AIVALS"]["UNIT"]["TILE"]["X"]=nil
+		enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=nil
+		enemy["AIVALS"]["UNIT"]["CATEGORY"]=nil
+		enemy["AIVALS"]["TARGET"]["TILE"]["Y"]=nil
+		enemy["AIVALS"]["TARGET"]["TILE"]["X"]=nil
+		enemy["AIVALS"]["UNIT"]["POS"][1]=nil
+		enemy["AIVALS"]["UNIT"]["POS"][2]=nil
+		enemy["AIVALS"]["LASTMOVE"]=nil
+		enemy["AIVALS"]["CURMOVE"]=nil
 	end
 	
 	-- Modify Health Function
@@ -816,12 +875,16 @@ function Spawn(ax,ay)
 	enemy:insert(enemy["shadow"])
 
 	-- Radar Essentials
-	enemy.radar=display.newRect(0,0,600,1)
-	enemy.radar:setFillColor(0,0,0,0)
+	enemy.radar=display.newRect(0,0,2000,1)
+	enemy.radar:setFillColor(1,0,0,0)
 	enemy.radar.x,enemy.radar.y=enemy.x,enemy.y
+	enemy:insert(enemy["radar"])
 	enemy["radar"].collision = function( self, event )
 		local other=event.other
 		if other.CATEGORY=="PLAYER" then
+			-- if (enemy["AIVALS"]["UNIT"]["CATEGORY"]~=other.CATEGORY) then
+				-- print "found player"
+			-- end
 			enemy["AIVALS"]["UNIT"]["TILE"]["X"]=other["CURX"]
 			enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=other["CURY"]
 			enemy["AIVALS"]["UNIT"]["MAP"]["X"]=other["MAPX"]
@@ -831,6 +894,12 @@ function Spawn(ax,ay)
 			enemy["AIVALS"]["UNIT"]["POS"][1]=other.x-140
 			enemy["AIVALS"]["UNIT"]["POS"][2]=other.x+140
 			enemy["AIVALS"]["UNIT"]["CATEGORY"]=other.CATEGORY
+			
+			print ("CONTACT!")
+			print (enemy["AIVALS"]["UNIT"]["TILE"]["X"]..", "..enemy["AIVALS"]["UNIT"]["TILE"]["Y"])
+			-- print (", ")
+			-- print ("CONTACT!")
+			
 			
 			local shortx=other.x
 			local shorty=other.y
@@ -873,26 +942,14 @@ function Spawn(ax,ay)
 			end
 			enemy["AIVALS"]["CONTACTCD"]=500
 		end
-		if enemy["AIVALS"]["CONTACTCD"]<=0 then
-			print "LOST PLAYER"
-			enemy["MODE"]="IDLE"
-			enemy["AIVALS"]["UNIT"]["POS"]["X"]=nil
-			enemy["AIVALS"]["UNIT"]["POS"]["Y"]=nil
-			enemy["AIVALS"]["UNIT"]["TILE"]["X"]=nil
-			enemy["AIVALS"]["UNIT"]["TILE"]["Y"]=nil
-			enemy["AIVALS"]["UNIT"]["CATEGORY"]=nil
-			enemy["AIVALS"]["TARGET"]["TILE"]["Y"]=nil
-			enemy["AIVALS"]["TARGET"]["TILE"]["X"]=nil
-			enemy["AIVALS"]["UNIT"]["POS"][1]=nil
-			enemy["AIVALS"]["UNIT"]["POS"][2]=nil
-			enemy["AIVALS"]["LASTMOVE"]=nil
-			enemy["AIVALS"]["CURMOVE"]=nil
-			enemy["AIVALS"]["CONTACTCD"]=500
-		end
+		-- if enemy["AIVALS"]["CONTACTCD"]<=0 then
+			-- print "LOST PLAYER"
+			-- enemy["AIVALS"]["CONTACTCD"]=500
+			-- enemy:cleanTarget()
+		-- end
 	end
 	physics.addBody(enemy.radar,"dynamic",{isSensor=true,friction=0.5,filter={categoryBits=4,maskBits=2}})
 	enemy.radar:addEventListener( "collision", enemy["radar"])
-	enemy:insert(enemy["radar"])
 
 	enemy["HitBox"]=display.newRect(0,-75,90,150)
 	enemy["HitBox"]:setFillColor(1,1,1,0)

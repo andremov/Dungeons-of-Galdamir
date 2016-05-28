@@ -90,7 +90,7 @@ function CreatePlayer(name)
 		
 		-- Essentials
 		player=display.newGroup()
-		local shade={ -51,-4, 51,-4, 51,12, -51,12}
+		local shade={ -40,-4, 40,-4, 40,12, -40,12}
 		physics.addBody(player,"dynamic",{shape=shade,filter={categoryBits=2,maskBits=7}})
 		player.isFixedRotation=true
 		player.x, player.y = display.contentWidth/2, display.contentHeight/2
@@ -115,8 +115,8 @@ function CreatePlayer(name)
 		player["MAPX"]=0
 		player["MAPY"]=0
 		player["QUAD"]=1
-		player["CURY"]=2
-		player["CURX"]=0
+		player["CURY"]=1
+		player["CURX"]=1
 		
 		-- Animation Essentials
 		player["SEQUENCE"]="IDLE"
@@ -188,9 +188,12 @@ function CreatePlayer(name)
 			if player["TIME"] ~= player["LASTTIME"] then
 				player:saturation()
 			end
+			player.shadow:toBack()
+			
 			
 			player:regeneration()
-			player.textd.text=(math.floor(player.x)..", "..math.floor(player.y).."\n"..player.MAPX..", "..player.MAPY)
+			-- player.textd.text=(math.floor(player.x)..", "..math.floor(player.y).."\n"..player.MAPX..", "..player.MAPY)
+			player.textd.text=(player.CURX..", "..player.CURY.."\n"..player.MAPX..", "..player.MAPY)
 			
 			player["WEAPON"]["basedamage"]=player["STATS"]["Damage"]
 		

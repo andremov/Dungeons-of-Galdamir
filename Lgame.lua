@@ -102,7 +102,7 @@ function Initial:Continue()
 	view:add(p1,35,true)
 	view:setBounds(false)
 	view:track()
-	HandleEnemies:start()
+	-- HandleEnemies:start()
 	-- Initial:firstSave()
 	Runtime:addEventListener("enterFrame",HandleEnemies.frameChecks)
 	Controls:Move(0,0)
@@ -216,7 +216,7 @@ function HandleMaps:mapDisplay()
 			HandleMaps:cleanMap(m)
 		end
 	end
-		
+	
 	local result=HandleMaps:findSpot()
 	if  (result) then
 		local nx=mapstodisplay[result][1]
@@ -225,7 +225,7 @@ function HandleMaps:mapDisplay()
 		local npy=mapstodisplay[result][4]
 		
 		local mapinfo=save.Load:getMap(nx,ny)
-		print ("SEQUENCING: "..nx,ny,mapinfo)
+		-- print ("SEQUENCING: "..nx,ny,mapinfo)
 		builder.Create:Start(nx,ny,mapinfo,npx,npy)
 	else
 		for m in ipairs(displayedMaps) do
@@ -336,7 +336,6 @@ function HandleMaps:getMap(mapx,mapy)
 	return nil,nil
 end
 
-
 function HandleMaps:cleanMap(victim)
 	if (displayedMaps[victim]["PHYSICS"]) then
 		for a in ipairs(displayedMaps[victim]["PHYSICS"]) do
@@ -391,31 +390,33 @@ end
 function HandleMaps:movementEvents()
 	
 	local pastx,pasty=p1["CURX"]*2,p1["CURY"]*2
-	if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
-		pastx=pastx+table.maxn(displayedMaps[1]["PLAIN"])
-	end
-	if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
-		pasty=pasty+table.maxn(displayedMaps[1]["PLAIN"])
-	end
-	
-	displayb[pastx][pasty]:setFillColor(1,1,1,0.4)
+	-- if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+		-- pastx=pastx+table.maxn(displayedMaps[1]["PLAIN"])
+	-- end
+	-- if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+		-- pasty=pasty+table.maxn(displayedMaps[1]["PLAIN"])
+	-- end
+	-- if (pastx) and (pasty) then
+		displayb[pastx][pasty]:setFillColor(1,1,1,0.4)
+	-- end
 	
 	HandleMaps:mapSwitch()
 	HandleRows:coordsCheck()
 	
 	-- local newx,newy=deltaX*2,deltaY*2
 	local newx,newy=p1["CURX"]*2,p1["CURY"]*2
-	if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
-		newx=newx+table.maxn(displayedMaps[1]["PLAIN"])
-	end
-	if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
-		newy=newy+table.maxn(displayedMaps[1]["PLAIN"])
-	end
+	-- if displayedMaps[4]["MAPX"]<displayedMaps[1]["MAPX"] then
+		-- newx=newx+table.maxn(displayedMaps[1]["PLAIN"])
+	-- end
+	-- if displayedMaps[4]["MAPY"]<displayedMaps[1]["MAPY"] then
+		-- newy=newy+table.maxn(displayedMaps[1]["PLAIN"])
+	-- end
 	
 	displayb[newx][newy]:setFillColor(0,0,1,0.8)
 end
 
 function HandleMaps:mapSwitch()
+	--[[
 	local xi=displayedMaps[1]["Xi"]
 	local yi=displayedMaps[1]["Yi"]
 	
@@ -481,7 +482,7 @@ function HandleMaps:mapSwitch()
 			end
 		end
 		p1["QUAD"]=HandleMaps:QuadCheck()
-		print ("MAP CHANGE: "..p1["MAPX"],p1["MAPY"],p1["QUAD"])
+		-- print ("MAP CHANGE: "..p1["MAPX"],p1["MAPY"],p1["QUAD"])
 		HandleRows:InitialLayering()
 	elseif (quadchange) then
 	
@@ -507,9 +508,10 @@ function HandleMaps:mapSwitch()
 			end
 		end
 		
-		print ("QUAD CHANGE: "..p1["MAPX"],p1["MAPY"],p1["QUAD"])
+		-- print ("QUAD CHANGE: "..p1["MAPX"],p1["MAPY"],p1["QUAD"])
 		HandleMaps:mapDisplay()
 	end
+	--]]
 end
 
 function HandleMaps:QuadCheck()
@@ -541,7 +543,8 @@ HandleRows={}
 
 function HandleRows:doPostRowPosition( value )
 	value:toLayer(34)
-	value:toBack()
+	-- value:toBack()
+	value:toFront()
 end
 
 function HandleRows:doPreRowPosition( value )
@@ -550,21 +553,40 @@ function HandleRows:doPreRowPosition( value )
 end
 
 function HandleRows:InitialLayering()
-	for i in ipairs(displayedMaps) do
-		local mapitem=displayedMaps[i]
-		for j=table.maxn(mapitem.MapRows)-1,1,-2 do
-			local item1=mapitem.MapRows[j]
-			local item2=mapitem.MapRows[j+1]
-			if (item1[1].y<p1.y) then
+	local order={3,1}
+	if displayedMaps[1]["MAPY"]<displayedMaps[4]["MAPY"] then
+		order={1,3}
+	end
+	for i=1,2 do
+		local mapitem1=displayedMaps[order[i]]
+		local mapitem2=displayedMaps[order[i]+1]
+		-- for j=table.maxn(mapitem.MapRows)-1,1,-2 do
+		-- for j=table.maxn(mapitem.MapRows),1,-1 do
+		for j=2,table.maxn(mapitem1.MapRows),2 do
+			-- print (j)
+			local item1=mapitem1.MapRows[j]
+			local item2=mapitem1.MapRows[j-1]
+			local item3=mapitem2.MapRows[j]
+			local item4=mapitem2.MapRows[j-1]
+			if (item2[1].y<p1.y) then
+				-- HandleRows:doPreRowPosition(item1)
+				-- HandleRows:doPreRowPosition(item2)
 				HandleRows:doPreRowPosition(item1)
+				HandleRows:doPreRowPosition(item3)
 				HandleRows:doPreRowPosition(item2)
+				HandleRows:doPreRowPosition(item4)
+				-- HandleRows:doPreRowPosition(item2)
 			else
-				HandleRows:doPostRowPosition(item2)
+				-- HandleRows:doPostRowPosition(item2)
 				HandleRows:doPostRowPosition(item1)
+				HandleRows:doPostRowPosition(item3)
+				HandleRows:doPostRowPosition(item2)
+				HandleRows:doPostRowPosition(item4)
 			end
 		end
 	end
-	HandleRows:FurtherLayering()
+	-- print "!!"
+	-- HandleRows:FurtherLayering()
 end
 
 function HandleRows:FurtherLayering()
@@ -575,10 +597,11 @@ function HandleRows:FurtherLayering()
 			local thislayer=(p1["CURY"]*2)+(layer-2)
 			local thismap=map
 			local thislayerobj
-			if thislayer<1 then
-				thislayer=thislayer+14
-				thismap=thismap+2
-			elseif thislayer>14 then
+			-- if thislayer<1 then
+				-- thislayer=thislayer+14
+				-- thismap=thismap+2
+			-- elseif thislayer>14 then
+			if thislayer>14 then
 				thislayer=thislayer-14
 				thismap=thismap+2
 			end
@@ -612,10 +635,11 @@ function HandleRows:FurtherLayering()
 			local thislayer=(p1["CURY"]*2)+(layer-2)
 			local thismap=map
 			local thislayerobj
-			if thislayer<1 then
-				thislayer=thislayer+14
-				thismap=thismap+2
-			elseif thislayer>14 then
+			-- if thislayer<1 then
+				-- thislayer=thislayer+14
+				-- thismap=thismap+2
+			-- elseif thislayer>14 then
+			if thislayer>14 then
 				thislayer=thislayer-14
 				thismap=thismap+2
 			end
@@ -636,6 +660,26 @@ end
 function HandleRows:coordsCheck()
 	local xi=displayedMaps[1]["Xi"]
 	local yi=displayedMaps[1]["Yi"]
+	-- local xi=displayedMaps[1].Level.contentBounds.xMin
+	-- local yi=displayedMaps[1].Level.contentBounds.yMin
+	-- print (tostring(displayedMaps[1].Level.contentBounds.xMin==xi))
+	-- print (xi)
+	-- print (displayedMaps[1].Level.contentBounds.xMin)
+	-- local left = obj1.contentBounds.xMin <= obj2.contentBounds.xMin and obj1.contentBounds.xMax >= obj2.contentBounds.xMin
+	local map=1
+	for i=1,4 do
+		if (displayedMaps[i]) then
+			-- local compx=displayedMaps[i].Level.contentBounds.xMin
+			-- local compy=displayedMaps[i].Level.contentBounds.yMin
+			local compx=displayedMaps[i]["Xi"]
+			local compy=displayedMaps[i]["Yi"]
+			if (compx<=xi) and (compy<=yi) then
+				xi=compx
+				yi=compy
+				-- map=i
+			end
+		end
+	end
 	
 	local deltaY=p1.y-yi
 	local tileY=200
@@ -643,7 +687,9 @@ function HandleRows:coordsCheck()
 	deltaY=math.floor(deltaY/tileY)+1
 	
 	local deltaX=p1.x-xi
-	deltaX=math.floor(deltaX/270)+1
+	local tileX=200
+	tileX=(tileX)+(tileX/3)
+	deltaX=math.floor(deltaX/tileX)+1
 	
 	if p1["CURX"]~=deltaX then
 		p1["CURX"]=deltaX
@@ -651,8 +697,28 @@ function HandleRows:coordsCheck()
 	if p1["CURY"]~=deltaY then
 		-- print ("PLAYER Y: "..deltaY)
 		p1["CURY"]=deltaY
-		HandleRows:FurtherLayering()
+		-- HandleRows:FurtherLayering()
 	end
+	
+	-- local xi=displayedMaps[1]["Xi"]
+	-- local yi=displayedMaps[1]["Yi"]
+	
+	-- local deltaY=p1.y-yi
+	-- local tileY=200
+	-- tileY=(tileY/1.5)+(tileY/3)
+	-- deltaY=math.floor(deltaY/tileY)+1
+	
+	-- local deltaX=p1.x-xi
+	-- deltaX=math.floor(deltaX/270)+1
+	
+	-- if p1["CURX"]~=deltaX then
+		-- p1["CURX"]=deltaX
+	-- end
+	-- if p1["CURY"]~=deltaY then
+		-- print ("PLAYER Y: "..deltaY)
+		-- p1["CURY"]=deltaY
+		-- HandleRows:FurtherLayering()
+	-- end
 end
 
 
@@ -787,30 +853,36 @@ end
 
 function HandleEnemies:enemyHits(i)
 	local obj1=p1["HitBox"]
-	if (obj1) then
-		local thisEnemy=spawnedEnemies[i]
-		local obj2=thisEnemy["WEAPON"]
-		if (obj2) then
-			local framecheck=thisEnemy["CURFRAME"]>10 and thisEnemy["CURFRAME"]<20
-			if thisEnemy["SEQUENCE"]=="SWING" and (framecheck) then
-				if (obj2.canDamage==true) then
-					local left = obj1.contentBounds.xMin <= obj2.contentBounds.xMin and obj1.contentBounds.xMax >= obj2.contentBounds.xMin
-					local right = obj1.contentBounds.xMin >= obj2.contentBounds.xMin and obj1.contentBounds.xMin <= obj2.contentBounds.xMax
-					local up = obj1.contentBounds.yMin <= obj2.contentBounds.yMin and obj1.contentBounds.yMax >= obj2.contentBounds.yMin
-					local down = obj1.contentBounds.yMin >= obj2.contentBounds.yMin and obj1.contentBounds.yMin <= obj2.contentBounds.yMax
-					
-					local thisCycle=(left or right) and (up or down)
-					if thisCycle==true then
-						obj2.canDamage=false
-						-- print "WHAM!"
-						local damageDealt=obj2.basedamage
-						if damageDealt>0 then
-							damageDealt=damageDealt*-1
-						end
-						p1:ModifyHealth(damageDealt)
+	local thisEnemy=spawnedEnemies[i]
+	local obj2=thisEnemy["WEAPON"]
+	if (obj1) and (obj2) and thisEnemy["SEQUENCE"]=="SWING" then
+		local over10=thisEnemy["CURFRAME"]>10
+		local under20=thisEnemy["CURFRAME"]<20
+		if (over10) and (under20) then
+			if (obj2.canDamage==true) then
+				local left = obj1.contentBounds.xMin <= obj2.contentBounds.xMin and obj1.contentBounds.xMax >= obj2.contentBounds.xMin
+				local right = obj1.contentBounds.xMin >= obj2.contentBounds.xMin and obj1.contentBounds.xMin <= obj2.contentBounds.xMax
+				local up = obj1.contentBounds.yMin <= obj2.contentBounds.yMin and obj1.contentBounds.yMax >= obj2.contentBounds.yMin
+				local down = obj1.contentBounds.yMin >= obj2.contentBounds.yMin and obj1.contentBounds.yMin <= obj2.contentBounds.yMax
+				
+				local thisCycle=(left or right) and (up or down)
+				if thisCycle==true then
+					obj2.canDamage=false
+					print "WHAM!"
+					local damageDealt=obj2.basedamage
+					if damageDealt>0 then
+						damageDealt=damageDealt*-1
 					end
+					p1:ModifyHealth(damageDealt)
+				else
+					print "SWISH!"
 				end
-			elseif (obj2) then
+			end
+		elseif (over10) then
+			if (obj2.canDamage==true) then
+				thisEnemy["MODE"]="IDLE"
+				print "enemy air swinging!!"
+			else
 				obj2.canDamage=true
 			end
 		end
@@ -841,21 +913,13 @@ function HandleEnemies:coordsCheck(i)
 		end
 	end
 	
+	-- if (deltaY<0) or (deltaX<0) then
+	-- if (spawnedEnemies[i].y<yi) or (spawnedEnemies[i].y<xi) then
+		-- spawnedEnemies[i].isAlive=false
+		-- print ("enemy out of bounds: north or west")
+	-- end
 	
-	local deltaY=spawnedEnemies[i].y-yi
-	local tileY=200
-	tileY=(tileY/1.5)+(tileY/3)
-	deltaY=math.floor(deltaY/tileY)+1
-	
-	local deltaX=spawnedEnemies[i].x-xi
-	deltaX=math.floor(deltaX/270)+1
-	
-	if (deltaY<0) or (deltaX<0) then
-		spawnedEnemies[i].isAlive=false
-		print ("enemy out of bounds: north or west")
-	end
-	
-	if spawnedEnemies[i].isAlive==true then
+	-- if spawnedEnemies[i].isAlive==true then
 		local xf=displayedMaps[1]["Xf"]
 		local yf=displayedMaps[1]["Yf"]
 		for i=1,4 do
@@ -866,11 +930,36 @@ function HandleEnemies:coordsCheck(i)
 				end
 			end
 		end
-		if (spawnedEnemies[i].y>yf) or (spawnedEnemies[i].y>xf) then
-			spawnedEnemies[i].isAlive=false
-			print ("enemy out of bounds: south or east")
+		-- if (spawnedEnemies[i].y>yf) or (spawnedEnemies[i].y>xf) then
+			-- spawnedEnemies[i].isAlive=false
+			-- print ("enemy out of bounds: south or east")
+		-- end
+	-- end
+	
+	
+	local deltaY=spawnedEnemies[i].y-yi
+	local tileY=200
+	tileY=(tileY/1.5)+(tileY/3)
+	deltaY=math.floor(deltaY/tileY)+1
+	
+	local deltaX=spawnedEnemies[i].x-xi
+	deltaX=math.floor(deltaX/270)+1
+	
+	if (deltaX<0) or (deltaY<0) then
+		spawnedEnemies[i].isAlive=false
+		-- print ("enemy out of bounds: north or west")
+	elseif (deltaX>14) or (deltaY>14) then
+		spawnedEnemies[i].isAlive=false
+		-- print ("enemy out of bounds: south or east")
+	else
+		if (deltaX>7) then
+			map=map+1
+		end
+		if (deltaY>7) then
+			map=map+2
 		end
 	end
+	
 	
 	--[[
 	local comp1=p1["CURY"]
@@ -908,60 +997,61 @@ function HandleEnemies:coordsCheck(i)
 	--]]
 	
 	if spawnedEnemies[i].isAlive==true then
-		if spawnedEnemies[i]["CURX"]~=deltaX then
+		-- if spawnedEnemies[i]["CURX"]~=deltaX then
 			spawnedEnemies[i]["CURX"]=deltaX
-			spawnedEnemies[i]["DMAP"]=map
-			spawnedEnemies[i]["MAPX"]=displayedMaps[map]["MAPX"]
-			spawnedEnemies[i]["MAPY"]=displayedMaps[map]["MAPY"]
-		end
-		if spawnedEnemies[i]["CURY"]~=deltaY then
+			-- spawnedEnemies[i]["DMAP"]=map
+			-- spawnedEnemies[i]["MAPX"]=displayedMaps[map]["MAPX"]
+			-- spawnedEnemies[i]["MAPY"]=displayedMaps[map]["MAPY"]
+		-- end
+		-- if spawnedEnemies[i]["CURY"]~=deltaY then
 			spawnedEnemies[i]["CURY"]=deltaY
 			spawnedEnemies[i]["DMAP"]=map
 			spawnedEnemies[i]["MAPX"]=displayedMaps[map]["MAPX"]
 			spawnedEnemies[i]["MAPY"]=displayedMaps[map]["MAPY"]
-			
-			-- if deltaY>comp1 then
-				-- local layertomodify=view:layer(34)
+			--[[
+			if deltaY>comp1 then
+				local layertomodify=view:layer(34)
 				
-				-- HandleEnemies:doPostRowPosition( spawnedEnemies[i] )
+				HandleEnemies:doPostRowPosition( spawnedEnemies[i] )
 				
-				-- local front=math.abs(deltaY-comp1)*2
-				-- local i=layertomodify.numChildren
-				-- local done=false
-				-- local cyclecap=1
-				-- while (i>=cyclecap and done==false) do
-					-- layertomodify[i]:toBack()
-					-- if (layertomodify[i].row) then
-						-- front=front-1
-					-- end
+				local front=math.abs(deltaY-comp1)*2
+				local i=layertomodify.numChildren
+				local done=false
+				local cyclecap=1
+				while (i>=cyclecap and done==false) do
+					layertomodify[i]:toBack()
+					if (layertomodify[i].row) then
+						front=front-1
+					end
 					
-					-- i=i-1
-					-- if front==0 then
-						-- done=true
-					-- end
-				-- end
-			-- else
-				-- local layertomodify=view:layer(36)
+					i=i-1
+					if front==0 then
+						done=true
+					end
+				end
+			else
+				local layertomodify=view:layer(36)
 				
-				-- HandleEnemies:doPreRowPosition( spawnedEnemies[i] )
+				HandleEnemies:doPreRowPosition( spawnedEnemies[i] )
 				
-				-- local front=math.abs(deltaY-comp1)*2
-				-- local done=false
-				-- local cyclecap=layertomodify.numChildren
-				-- local i=cyclecap-(front+2)
-				-- while (i<=cyclecap and done==false) do
-					-- layertomodify[i]:toFront()
-					-- if (layertomodify[i].row) then
-						-- front=front-1
-					-- end
+				local front=math.abs(deltaY-comp1)*2
+				local done=false
+				local cyclecap=layertomodify.numChildren
+				local i=cyclecap-(front+2)
+				while (i<=cyclecap and done==false) do
+					layertomodify[i]:toFront()
+					if (layertomodify[i].row) then
+						front=front-1
+					end
 					
-					-- i=i+1
-					-- if front==0 then
-						-- done=true
-					-- end
-				-- end
-			-- end
-		end
+					i=i+1
+					if front==0 then
+						done=true
+					end
+				end
+			end
+			]]
+		-- end
 	end
 	
 end
@@ -975,8 +1065,12 @@ function HandleEnemies:getPath(i)
 			-- print ("!!",shortX,shortY)
 			thisEnemy["AIVALS"]["REPATH"]=thisEnemy["AIVALS"]["REPATH"]-1
 			if thisEnemy["AIVALS"]["REPATH"]<0 then
-				thisEnemy["AIVALS"]["TARGET"]["TILE"]["Y"]=nil
-				thisEnemy["AIVALS"]["TARGET"]["TILE"]["X"]=nil
+				-- thisEnemy["AIVALS"]["TARGET"]["TILE"]["Y"]=nil
+				-- thisEnemy["AIVALS"]["TARGET"]["TILE"]["X"]=nil
+				-- thisEnemy["AIVALS"][""]=
+				-- thisEnemy["MODE"]="IDLE"
+				-- thisEnemy["AIVALS"]["UNIT"]["CATEGORY"]=nil
+				thisEnemy:cleanTarget()
 				thisEnemy["AIVALS"]["REPATH"]=1000
 			end
 		elseif not(shortX) and not(shortY) then
@@ -1051,7 +1145,8 @@ function HandleEnemies:getPath(i)
 				
 				pathsteps={}
 
-				print ("enemy now trying to go to",firstX,firstY,"from",ex,ey)
+				-- print ("enemy now trying to go to",firstX,firstY,"from",ex,ey)
+				print ("ENEMY NEW PATH:")
 				for node, count in path:nodes() do
 					if (count==3) then
 						firstX=node:getX()
@@ -1075,7 +1170,7 @@ function HandleEnemies:getPath(i)
 				thisEnemy["AIVALS"]["UNIT"]["!TILE"]["Y"]=py
 				thisEnemy["AIVALS"]["REPATH"]=1000
 			else 
-				-- print "no path found"
+				print "no path found"
 			end
 		end
 	end

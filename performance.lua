@@ -8,12 +8,12 @@ local prevTime = 0
 _M.added = true
 
 local function createText()
-	local memory = display.newText('00 00.00 000',10,0, native.systemFont, 40);
+	local memory = display.newText('00 00.00 000',10,0, "Consolas", 40);
 	memory:setFillColor(0,0,0)
 	memory.anchorY = 0
 	memory.x, memory.y = display.contentCenterX, display.actualContentHeight-50
 	
-	background=display.newRect(memory.x, memory.y+20,245,45)
+	background=display.newRect(memory.x, memory.y+20,300,45)
 	
 	function background:tap()
 		collectgarbage('collect')
@@ -38,6 +38,7 @@ function _M.labelUpdater(event)
 	_M.text.text = tostring(mFloor( 1000 / (curTime - prevTime))) .. ' ' ..
 			tostring(mFloor(sGetInfo('textureMemoryUsed') * 0.0001) * 0.01) .. ' ' ..
 			tostring(mFloor(collectgarbage('count')))
+	-- _M.bkg.width=#_M.text.text*23
 	_M.bkg:toFront()
 	_M.text:toFront()
 	prevTime = curTime
