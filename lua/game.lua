@@ -5,7 +5,7 @@
 ---------------------------------------------------------------------------------------
 module(..., package.seeall)
 
--- FORWARD CALL
+-- FORWARD CALLS
 local mapsDone=false
 local maxmap=1000
 local displayedMaps={}

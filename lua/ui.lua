@@ -13,8 +13,8 @@ local coinsheet = graphics.newImageSheet("coinsprite.png", { width=32, height=32
 local widget = require "widget"
 -- local b=require("Lbuilder")
 -- local p=require("Lplayer")
-local JSON=require("JSON")
-local game=require("Lgame")
+-- local JSON=require("JSON")
+-- local game=require("Lgame")
 local isOpn		--window open
 local isPaused	--paused
 local isUse		--using an item
@@ -141,6 +141,7 @@ local function readAnims(animname)
 end
 
 local function readAsset(assname)
+	local JSON=require("lua.json")
 	-- call JSON read function to receive lua table with JSON info
 	
 	filename = system.pathForFile( assname )

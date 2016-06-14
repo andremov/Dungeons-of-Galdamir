@@ -3,19 +3,25 @@
 -- menu.lua
 --
 ---------------------------------------------------------------------------------------
+module(..., package.seeall)
+
+-- FORWARD CALLS
+local shSuffix="RLSE"
+local loSuffix="RELEASE"
+local verNum="1.3.0"
+-- local runes={}
+-- local runegroup=display.newGroup()
+-- local words={"love", "hate", "dragon", "mystery", "quest", "penis", "skill", "adventure", "death", "betrayal", "vengeance", "fuck"}
+-- local numofwords=30
 
 
 ---------------------------------------------------------------------------------------
 -- GLOBAL
 ---------------------------------------------------------------------------------------
 
-module(..., package.seeall)
-local widget = require "widget"
-local score=require("Lscore")
-local save=require("Lsave")
-local shSuffix="RLSE"
-local loSuffix="RELEASE"
-local verNum="1.3.0"
+-- local widget = require "widget"
+-- local score=require("Lscore")
+-- local save=require("Lsave")
 
 function getWord()
 	if (runes[numofwords]) then
@@ -89,23 +95,15 @@ end
 -- MAIN MENU
 ---------------------------------------------------------------------------------------
 
-local splash=require("Lsplashes")
-local ui=require("Lui")
+-- local splash=require("Lsplashes")
+-- local ui=require("Lui")
 
 local mmg
 MainMenu={}
--- local PlayBtn
--- local OptnBtn
--- local RSplash
--- local text={}
--- local Sounds
--- local Splash
--- local runes={}
--- local runegroup=display.newGroup()
--- local words={"love", "hate", "dragon", "mystery", "quest", "penis", "skill", "adventure", "death", "betrayal", "vengeance", "fuck"}
--- local numofwords=30
 
 function MainMenu:show()
+	local ui=require("lua.ui")
+	local widget = require "widget"
 	
 	mmg=display.newGroup()
 	
@@ -209,8 +207,8 @@ end
 -- SAVE GAME
 ---------------------------------------------------------------------------------------
 
-local game=require("Lgame")
-local save=require("Lsave")
+-- local game=require("Lgame")
+-- local save=require("Lsave")
 local sgg
 local slotg
 SaveGame={}

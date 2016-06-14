@@ -3,13 +3,7 @@
 -- main.lua
 --
 ---------------------------------------------------------------------------------------
-display.setStatusBar( display.HiddenStatusBar )
-system.setIdleTimer( false )
-local menu = require("Lmenu")
-local physics = require "physics"
 
-local performance = require('performance')
-performance:newPerformanceMeter()
 
 --[[
 	local AdBuddiz = require "plugin.adbuddiz"
@@ -35,17 +29,25 @@ performance:newPerformanceMeter()
 	6c7e651b-851d-4ab9-923d-a557d77d4a6a
 --]]
 
-current=0
+function mainFunction()
+	display.setStatusBar( display.HiddenStatusBar )
+	system.setIdleTimer( false )
+
+	local performance = require("lua.performance")
+	performance:newPerformanceMeter()
 
 --	print "C U B 3 D :  DUNGEONS OF GAL'DARAH"
 	print "C U B 3 D :  DUNGEONS OF GALDAMIR"
+	
+	local physics = require "physics"
 	physics.start()
 	physics.setGravity(0,0)
 	
 	-- physics.setDrawMode("hybrid")
 	
 	-- menu.FirstMenu()
+	local menu = require("lua.menu")
 	menu.MainMenu:show()
-	
-	
-	
+end
+
+mainFunction()
