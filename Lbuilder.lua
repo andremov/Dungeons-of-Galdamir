@@ -70,7 +70,7 @@ end
 local Map
 Create={}
 
-function Create:Start(paramx,paramy,info,posx,posy)
+function Create:Start(paramx,paramy,info,posx,posy,maxmap)
 	Create["MAPX"]=paramx
 	Create["MAPY"]=paramy
 	Create["loadinfo"]=info
@@ -79,17 +79,23 @@ function Create:Start(paramx,paramy,info,posx,posy)
 	local tile=200
 	
 	local delta=side/2
-	local deltaX=(delta*tile)+(delta*(tile/3))
-	local deltaY=(delta*(tile/1.5))+(delta*(tile/3))
+	local mapSizeX=(delta*tile)+(delta*(tile/3))
+	local mapSizeY=(delta*(tile/1.5))+(delta*(tile/3))
 	
 	Create["Xi"]=posx
 	Create["Yi"]=posy
 	
+	-- Create["Xf"]=posx
+	-- Create["Yf"]=posy
+	
 	-- Create["X"]=Create["Xi"]+(deltaX/2)
 	-- Create["Y"]=Create["Yi"]+(deltaY/2)
 	
-	-- Create["Xf"]=Create["Xi"]+(deltaX)
-	-- Create["Yf"]=Create["Yi"]+(deltaY)
+	Create["Xf"]=Create["Xi"]+(mapSizeX)
+	Create["Yf"]=Create["Yi"]+(mapSizeY)
+	
+	Create["TILEX"]=(maxmap+paramx)*(side/2)
+	Create["TILEY"]=(maxmap+paramy)*(side/2)
 	
 	Create:Progress()
 end
@@ -122,8 +128,11 @@ function Create:Template()
 	Map["Xi"]=Create["Xi"]
 	Map["Yi"]=Create["Yi"]
 	
-	-- Map["Xf"]=Create["Xf"]
-	-- Map["Yf"]=Create["Yf"]
+	Map["Xf"]=Create["Xf"]
+	Map["Yf"]=Create["Yf"]
+	
+	Map["TILEX"]=Create["TILEX"]
+	Map["TILEY"]=Create["TILEY"]
 	
 	Map.MapRows={}
 	-- for i=1,8 do
@@ -206,36 +215,64 @@ function Create:Walls()
 			if Map["MAP"][i].class=="CORNER" then
 				local surroundings={ i-Map.side, i-1, i+1, i+Map.side }
 				for j=1,4 do
-					surroundings[j]=Map["MAP"][j]
+					surroundings[j]=Map["MAP"][surroundings[j]]
+					if plaincol==1 and j==2 then
+						-- print ("ID: " .. i .. " is in column 1.")
+						surroundings[j]=nil
+					-- elseif plaincol==7 and j==3 then
+						-- surroundings[j]=nil
+					end
+					if plainrow==1 and j==1 then
+						-- print ("ID: " .. i .. " is in row 1.")
+						surroundings[j]=nil
+					-- elseif plaincol==7 and j==3 then
+						-- surroundings[j]=nil
+					end
 					if surroundings[j] then
 						-- if surroundings[j]["wall"] then
-							surroundings[j]=surroundings[j]["wall"]
+							surroundings[j]=not surroundings[j].open
 						-- else
 							-- surroundings[j]=false
 						-- end
 					else
-						surroundings[j]=false
+						surroundings[j]=true
 					end
 				end
+				-- print (unpack (surroundings) )
+					-- print ("ID: " .. i)
+					-- print ("Position 1: " .. i-Map.side .. " - " .. tostring(surroundings[1]))
+					-- print ("Position 2: " .. i-1 .. " - " .. tostring(surroundings[2]))
+					-- print ("Position 3: " .. i+1 .. " - " .. tostring(surroundings[3]))
+					-- print ("Position 4: " .. i+Map.side .. " - " .. tostring(surroundings[4]))
+					-- print "-...-"
+					
+				-- if (surroundings[1] or surroundings[2] or surroundings[3] or surroundings[4]) then
+				-- else
+					-- print (unpack (surroundings) )
+				-- end
 				surroundings=surroundings[1] or surroundings[2] or surroundings[3] or surroundings[4]
+				-- if plaincol==1 or plainrow==1 then
+					-- surroundings=true
+				-- end
 				if surroundings then
-					print "Walls around, corner"
-					Map["MAP"][i].wall=true
+					-- print "Walls around, corner"
+					-- Map["MAP"][i].wall=true
 					-- Map["MAP"][i].open=math.random(0,1)
 					Map["PLAIN"][plainrow][plaincol]=1
 					Map["MAP"][i].open=false
 				else
-					print "no walls around, choosing"
+					-- print "no walls around, choosing"
 					Map["MAP"][i].open=math.random(0,10)
-					if Map["MAP"][i].open>9 then
-						print "	no corner"
+					if Map["MAP"][i].open>5 then
+						-- print "	no corner"
 						Map["MAP"][i].open=0
 					else
-						print "	corner"
+						-- print "	corner"
 						Map["MAP"][i].open=1
 					end
 					Map["PLAIN"][plainrow][plaincol]=Map["MAP"][i].open
 					Map["MAP"][i].open=(Map["MAP"][i].open==0)
+					-- print (tostring(Map["MAP"][i].open)  )
 				end
 				-- surroundings[1]=Map["MAP"][1]
 				-- surroundings[1]=Map["MAP"][1]
@@ -429,6 +466,7 @@ function Create:Visualize()
 				Map["TOP"][i].xScale=0.95
 			else
 				Map["TILE"][i]=display.newImageRect("tiles/FloorCorner.png",Map.tile/3,Map.tile/3)
+				-- print "!!!"
 				-- Map["TILE"][i]:rotate(90)
 			end
 		elseif Map["MAP"][i].class=="TILE" then

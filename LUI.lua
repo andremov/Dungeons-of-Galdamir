@@ -1052,7 +1052,7 @@ function Controls:joystickHandler( event )
 end
 
 function Controls:toGame()
-	game.Controls:Check(Controls.x,Controls.y)
+	game.Controls:joystickMovementCheck(Controls.x,Controls.y)
 end
 
 

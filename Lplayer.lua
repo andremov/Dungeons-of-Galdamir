@@ -112,11 +112,12 @@ function CreatePlayer(name)
 		-- player.textd.align="center"
 		
 		-- Map Essentials
-		player["MAPX"]=0
-		player["MAPY"]=0
+		player["CHUNK"]={x=0, y=0}
+		player["TILE"]={x=1, y=1}
+		-- player["MAPY"]=0
 		player["QUAD"]=1
-		player["CURY"]=1
-		player["CURX"]=1
+		-- player["CURY"]=1
+		-- player["CURX"]=1
 		
 		-- Animation Essentials
 		player["SEQUENCE"]="IDLE"
@@ -193,7 +194,7 @@ function CreatePlayer(name)
 			
 			player:regeneration()
 			-- player.textd.text=(math.floor(player.x)..", "..math.floor(player.y).."\n"..player.MAPX..", "..player.MAPY)
-			player.textd.text=(player.CURX..", "..player.CURY.."\n"..player.MAPX..", "..player.MAPY)
+			player.textd.text=(player.TILE.x..", "..player.TILE.y.."\n"..player.CHUNK.x..", "..player.CHUNK.y)
 			
 			player["WEAPON"]["basedamage"]=player["STATS"]["Damage"]
 		
