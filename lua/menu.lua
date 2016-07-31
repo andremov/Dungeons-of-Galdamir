@@ -532,6 +532,7 @@ function Keyboard:show()
 	-- # OPENING
 	-- DEPENDENCIES
 	local ui=require("lua.ui")
+	local game=require("lua.game")
 	local widget = require "widget"
 	-- FORWARD CALLS
 	kg=display.newGroup()

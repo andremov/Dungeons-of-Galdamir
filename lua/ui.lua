@@ -963,6 +963,7 @@ local pcg
 Controls={}
 
 function Controls:show()
+local game=require("lua.game")
 	pcg=display.newGroup()
 	
 	Controls.joybkg=display.newImageRect("ui/joybkg.png",270,270)
@@ -1053,6 +1054,7 @@ function Controls:joystickHandler( event )
 end
 
 function Controls:toGame()
+local game=require("lua.game")
 	game.Controls:joystickMovementCheck(Controls.x,Controls.y)
 end
 

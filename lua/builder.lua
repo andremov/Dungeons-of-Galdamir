@@ -5,48 +5,70 @@
 ---------------------------------------------------------------------------------------
 module(..., package.seeall)
 
+	-- # OPENING
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	
+	-- # CLOSING
+	
 ---------------------------------------------------------------------------------------
 -- GLOBAL
 ---------------------------------------------------------------------------------------
 
--- local side=14
--- local tile=200
 
 local function getColumn(id)
-	local side=14
-	local column=((id-1)%side)
+	-- # OPENING
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	local side
+	local column
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	side=14
+	column=((id-1)%side)
+	
+	-- # CLOSING
 	return column
 end
 
 local function getRow(id)
-	local side=14
-	local row=math.floor((id-1)/side)
+	-- # OPENING
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	local side
+	local row
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	side=14
+	row=math.floor((id-1)/side)
+	
+	-- # CLOSING
 	return row
 end
 
 local function readAsset(assname)
-	local JSON = require("JSON")
-	-- call JSON read func to receive lua table with JSON info
+	-- # OPENING
+	-- DEPENDENCIES
+	local JSON = require("lua.json")
+	-- FORWARD CALLS
+	local filename
+	local file
+	local output
+	local step
+	local parsed
+	-- LOCAL FUNCTIONS
 	
+	-- # BODY
 	filename = system.pathForFile( assname )
 	file = assert(io.open(filename, "r"))
 	
-	-- use JSON library to decode it to a LUA table
-	-- then return table
-	
-	-- local output = J:decode(file:read("*all"))
-	local output = JSON:decode(file:read("*all"))
+	output = JSON:decode(file:read("*all"))
 	output=output["frames"]
-	
-	-- arrange JSON info to a better array
-	-- i used for id of animation
-	-- first name is animation name
-	-- animation subdivision -> parts
-	-- part name is asset name
-	-- for every frame of animation, save asset info
-	-- x, y, xScale, yScale, rotation, depth
-	-- depth is layering, who is in front of who
-	-- then arrange color matrix to regular RGBA channels
 	
 	step={}
 	for i=1,table.maxn(output) do
@@ -59,6 +81,8 @@ local function readAsset(assname)
 	end
 	parsed={}
 	parsed["frames"]=step
+	
+	-- # CLOSING
 	return parsed
 end
 
@@ -67,239 +91,226 @@ end
 -- CREATE
 ---------------------------------------------------------------------------------------
 
-local Map
+local Region
 Create={}
 
-function Create:Start(paramx,paramy,info,posx,posy,maxmap)
-	Create["MAPX"]=paramx
-	Create["MAPY"]=paramy
+function Create:Start(paramx,paramy,info,posx,posy,regcap)
+	-- # OPENING
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	local side
+	local tile
+	local delta
+	local regSizeX
+	local regSizeY
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	side=14
+	tile=200
+	
+	delta=side/2
+	regSizeX=(delta*tile)+(delta*(tile/3))
+	regSizeY=(delta*(tile/1.5))+(delta*(tile/3))
+	
+	Create["POSITION"]={}
+	Create["POSITION"]["REGION"]={x=paramx,y=paramy}
+	Create["POSITION"]["TILE"]={x=(regcap+paramx)*(side/2),y=(regcap+paramy)*(side/2)}
+	Create["POSITION"]["BEGIN"]={x=posx,y=posy}
+	Create["POSITION"]["MID"]={x=posx+(regSizeX/2),y=posy+(regSizeY/2)}
+	Create["POSITION"]["END"]={x=posx+regSizeX,y=posy+regSizeY}
 	Create["loadinfo"]=info
 	
-	local side=14
-	local tile=200
-	
-	local delta=side/2
-	local mapSizeX=(delta*tile)+(delta*(tile/3))
-	local mapSizeY=(delta*(tile/1.5))+(delta*(tile/3))
-	
-	Create["Xi"]=posx
-	Create["Yi"]=posy
-	
-	-- Create["Xf"]=posx
-	-- Create["Yf"]=posy
-	
-	-- Create["X"]=Create["Xi"]+(deltaX/2)
-	-- Create["Y"]=Create["Yi"]+(deltaY/2)
-	
-	Create["Xf"]=Create["Xi"]+(mapSizeX)
-	Create["Yf"]=Create["Yi"]+(mapSizeY)
-	
-	Create["TILEX"]=(maxmap+paramx)*(side/2)
-	Create["TILEY"]=(maxmap+paramy)*(side/2)
-	
+	-- # CLOSING
 	Create:Progress()
 end
 
 function Create:sheet()
+	-- # OPENING
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
 	-- local options=readAsset('tiles/Tiles.json')
 	-- Create.TSheet=graphics.newImageSheet( "/Tiles/Tiles.png", options )
 	-- Create.TilesRef={}
 	-- for i=1,table.maxn(options["frames"]) do
 		-- Create.TilesRef[options["frames"][i]["filename"]]=i
 	-- end
+	
+	-- # CLOSING
 	Create:Progress()
 end
 
 function Create:Template()
-	-- Create={}
-	-- Create.CreateRows={}
-	local side=14
-	local tile=200
-	Map={}
-	Map.side=side
-	Map.tile=tile
+	-- # OPENING
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	local side
+	local tile
+	-- LOCAL FUNCTIONS
 	
-	Map["MAPX"]=Create["MAPX"]
-	Map["MAPY"]=Create["MAPY"]
+	-- # BODY
+	side=14
+	tile=200
+	Region={}
+	Region.side=side
+	Region.tile=tile
 	
-	-- Map["X"]=Create["X"]
-	-- Map["Y"]=Create["Y"]
+	Region["POSITION"]=Create["POSITION"]
 	
-	Map["Xi"]=Create["Xi"]
-	Map["Yi"]=Create["Yi"]
+	Region.regRows={}
+	Region.Gradients=display.newGroup()
+	Region.Gradients.isVisible=false
+	Region.Level=display.newGroup()
+	Region.Level.isVisible=false
 	
-	Map["Xf"]=Create["Xf"]
-	Map["Yf"]=Create["Yf"]
-	
-	Map["TILEX"]=Create["TILEX"]
-	Map["TILEY"]=Create["TILEY"]
-	
-	Map.MapRows={}
-	-- for i=1,8 do
-		-- Map.MapRows[i]=display.newGroup()
-		-- Map.MapRows[i].toLayer=function() end
-		-- Map.MapRows[i].row=i
-		-- Map.MapRows[i].isVisible=false
-	-- end
-	Map.Gradients=display.newGroup()
-	Map.Gradients.isVisible=false
-	Map.Level=display.newGroup()
-	Map.Level.isVisible=false
-	
-	Map["MAP"]={}
-	for i=1,Map.side^2 do
-		Map["MAP"][i]={}
-		Map["MAP"][i].col=getColumn(i)
-		Map["MAP"][i].row=getRow(i)
+	Region["REGION"]={}
+	for i=1,Region.side^2 do
+		Region["REGION"][i]={}
+		Region["REGION"][i].col=getColumn(i)
+		Region["REGION"][i].row=getRow(i)
 	end
-	Map["PLAIN"]={}
-	for i=1,Map.side do
-		Map["PLAIN"][i]={}
+	Region["PLAIN"]={}
+	for i=1,Region.side do
+		Region["PLAIN"][i]={}
 	end
+	
+	-- # CLOSING
 	Create:Progress()
 end
 
 function Create:Walls()
-	for i=1,Map.side^2 do
-		local plaincol=Map["MAP"][i].col+1
-		local plainrow=Map["MAP"][i].row+1
-		if Map["MAP"][i].row%2==0 and Map["MAP"][i].col%2==0 then
-			Map["MAP"][i].class="CORNER"
-			Map["MAP"][i].wall=true
+	-- # OPENING
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	local plainrow
+	local plaincol
+	local surroundings
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	for i=1,Region.side^2 do
+		plaincol=Region["REGION"][i].col+1
+		plainrow=Region["REGION"][i].row+1
+		if Region["REGION"][i].row%2==0 and Region["REGION"][i].col%2==0 then
+			Region["REGION"][i].class="CORNER"
+			Region["REGION"][i].wall=true
 			if ( Create["loadinfo"] ) then
-				Map["MAP"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
-				Map["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
-			else
-				-- Map["PLAIN"][plainrow][plaincol]=1
-				-- Map["MAP"][i].open=false
+				Region["REGION"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
+				Region["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
 			end
-		elseif Map["MAP"][i].col%2==0 then
-			Map["MAP"][i].class="WALLX"
-			Map["MAP"][i].wall=true
+		elseif Region["REGION"][i].col%2==0 then
+			Region["REGION"][i].class="WALLX"
+			Region["REGION"][i].wall=true
 			if ( Create["loadinfo"] ) then
-				Map["MAP"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
-				Map["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
+				Region["REGION"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
+				Region["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
 			else
-				Map["MAP"][i].open=math.random(0,1)
-				Map["PLAIN"][plainrow][plaincol]=Map["MAP"][i].open
-				Map["MAP"][i].open=(Map["MAP"][i].open==0)
+				Region["REGION"][i].open=math.random(0,1)
+				Region["PLAIN"][plainrow][plaincol]=Region["REGION"][i].open
+				Region["REGION"][i].open=(Region["REGION"][i].open==0)
 			end
-		elseif Map["MAP"][i].row%2==0 then
-			Map["MAP"][i].class="WALLY"
-			Map["MAP"][i].wall=true
+		elseif Region["REGION"][i].row%2==0 then
+			Region["REGION"][i].class="WALLY"
+			Region["REGION"][i].wall=true
 			if ( Create["loadinfo"] ) then
-				Map["MAP"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
-				Map["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
+				Region["REGION"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
+				Region["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
 			else
-				Map["MAP"][i].open=math.random(0,1)
-				Map["PLAIN"][plainrow][plaincol]=Map["MAP"][i].open
-				Map["MAP"][i].open=(Map["MAP"][i].open==0)
+				Region["REGION"][i].open=math.random(0,1)
+				Region["PLAIN"][plainrow][plaincol]=Region["REGION"][i].open
+				Region["REGION"][i].open=(Region["REGION"][i].open==0)
 			end
 		else
-			Map["MAP"][i].class="TILE"
-			Map["MAP"][i].wall=false
+			Region["REGION"][i].class="TILE"
+			Region["REGION"][i].wall=false
 			if ( Create["loadinfo"] ) then
-				Map["MAP"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
-				Map["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
+				Region["REGION"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
+				Region["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
 			else
-				Map["MAP"][i].open=true
-				Map["PLAIN"][plainrow][plaincol]=0
+				Region["REGION"][i].open=true
+				Region["PLAIN"][plainrow][plaincol]=0
 			end
 		end
-		Map["MAP"][i].roomed=false
+		Region["REGION"][i].roomed=false
 	end
 	if not( Create["loadinfo"] ) then
-		for i=1,Map.side^2 do
-			local plaincol=Map["MAP"][i].col+1
-			local plainrow=Map["MAP"][i].row+1
-			if Map["MAP"][i].class=="CORNER" then
-				local surroundings={ i-Map.side, i-1, i+1, i+Map.side }
+		for i=1,Region.side^2 do
+			plaincol=Region["REGION"][i].col+1
+			plainrow=Region["REGION"][i].row+1
+			if Region["REGION"][i].class=="CORNER" then
+				surroundings={ i-Region.side, i-1, i+1, i+Region.side }
 				for j=1,4 do
-					surroundings[j]=Map["MAP"][surroundings[j]]
+					surroundings[j]=Region["REGION"][surroundings[j]]
 					if plaincol==1 and j==2 then
-						-- print ("ID: " .. i .. " is in column 1.")
 						surroundings[j]=nil
-					-- elseif plaincol==7 and j==3 then
-						-- surroundings[j]=nil
 					end
 					if plainrow==1 and j==1 then
-						-- print ("ID: " .. i .. " is in row 1.")
 						surroundings[j]=nil
-					-- elseif plaincol==7 and j==3 then
-						-- surroundings[j]=nil
 					end
 					if surroundings[j] then
-						-- if surroundings[j]["wall"] then
-							surroundings[j]=not surroundings[j].open
-						-- else
-							-- surroundings[j]=false
-						-- end
+						surroundings[j]=not surroundings[j].open
 					else
 						surroundings[j]=true
 					end
 				end
-				-- print (unpack (surroundings) )
-					-- print ("ID: " .. i)
-					-- print ("Position 1: " .. i-Map.side .. " - " .. tostring(surroundings[1]))
-					-- print ("Position 2: " .. i-1 .. " - " .. tostring(surroundings[2]))
-					-- print ("Position 3: " .. i+1 .. " - " .. tostring(surroundings[3]))
-					-- print ("Position 4: " .. i+Map.side .. " - " .. tostring(surroundings[4]))
-					-- print "-...-"
-					
-				-- if (surroundings[1] or surroundings[2] or surroundings[3] or surroundings[4]) then
-				-- else
-					-- print (unpack (surroundings) )
-				-- end
 				surroundings=surroundings[1] or surroundings[2] or surroundings[3] or surroundings[4]
-				-- if plaincol==1 or plainrow==1 then
-					-- surroundings=true
-				-- end
 				if surroundings then
-					-- print "Walls around, corner"
-					-- Map["MAP"][i].wall=true
-					-- Map["MAP"][i].open=math.random(0,1)
-					Map["PLAIN"][plainrow][plaincol]=1
-					Map["MAP"][i].open=false
+					Region["PLAIN"][plainrow][plaincol]=1
+					Region["REGION"][i].open=false
 				else
-					-- print "no walls around, choosing"
-					Map["MAP"][i].open=math.random(0,10)
-					if Map["MAP"][i].open>5 then
-						-- print "	no corner"
-						Map["MAP"][i].open=0
+					Region["REGION"][i].open=math.random(0,10)
+					if Region["REGION"][i].open>5 then
+						Region["REGION"][i].open=0
 					else
-						-- print "	corner"
-						Map["MAP"][i].open=1
+						Region["REGION"][i].open=1
 					end
-					Map["PLAIN"][plainrow][plaincol]=Map["MAP"][i].open
-					Map["MAP"][i].open=(Map["MAP"][i].open==0)
-					-- print (tostring(Map["MAP"][i].open)  )
+					Region["PLAIN"][plainrow][plaincol]=Region["REGION"][i].open
+					Region["REGION"][i].open=(Region["REGION"][i].open==0)
 				end
-				-- surroundings[1]=Map["MAP"][1]
-				-- surroundings[1]=Map["MAP"][1]
-				-- surroundings[1]=Map["MAP"][1]
 			end
 		end
 	end
+	
+	-- # CLOSING
 	Create:Progress()
 end
 
 function Create:Pathfinding()
-	local tiles2={}
-	local numTiles=0
-	local done=false
-	for i=1,table.maxn(Map["MAP"]) do
+	-- # OPENING
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	local tiles2
+	local numTiles
+	local done
+	local obj
+	local cont
+	local walls
+	local curdir
+	local plainrow
+	local plaincol
+	local curtile
+	local curwall
+	local pick
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	tiles2={}
+	numTiles=0
+	done=false
+	for i=1,table.maxn(Region["REGION"]) do
 		tiles2[i]={}
 		tiles2[i].open=false
 		tiles2[i].done=false
 		tiles2[i].walls={}
 	end
-	tiles2[Map.side+2].open=true
-	local obj
-	local cont
-	while done==false and numTiles<(Map.side^2)/4 do
+	tiles2[Region.side+2].open=true
+	while done==false and numTiles<(Region.side^2)/4 do
 		obj=nil
 		cont=1
-		while not(obj) and cont<=table.maxn(Map["MAP"]) do
+		while not(obj) and cont<=table.maxn(Region["REGION"]) do
 			if tiles2[cont].open==true and tiles2[cont].done==false then
 				obj=cont
 			end
@@ -307,38 +318,36 @@ function Create:Pathfinding()
 		end
 		if not (obj) then
 			cont=1
-			while not(obj) and cont<=table.maxn(Map["MAP"]) do
-				if tiles2[cont].open==false and Map["MAP"][cont].class=="TILE" then
+			while not(obj) and cont<=table.maxn(Region["REGION"]) do
+				if tiles2[cont].open==false and Region["REGION"][cont].class=="TILE" then
 					obj=cont
 					-- print ("BREAKING: "..obj)
-					local walls={obj-Map.side,obj-1,obj+1,obj+Map.side}
+					walls={obj-Region.side,obj-1,obj+1,obj+Region.side}
 					for v=1,table.maxn(walls) do
-						local curdir=walls[v]
-						if (Map["MAP"][curdir]) then
-							Map["MAP"][curdir].roomed=true
-							Map["MAP"][curdir].open=true
-							local plainrow=Map["MAP"][curdir].row+1
-							local plaincol=Map["MAP"][curdir].col+1
-							Map["PLAIN"][plainrow][plaincol]=0
+						curdir=walls[v]
+						if (Region["REGION"][curdir]) then
+							Region["REGION"][curdir].roomed=true
+							Region["REGION"][curdir].open=true
+							plainrow=Region["REGION"][curdir].row+1
+							plaincol=Region["REGION"][curdir].col+1
+							Region["PLAIN"][plainrow][plaincol]=0
 						end
 					end
 				end
 				cont=cont+1
 			end
 		end
-		if not (obj) and numTiles==(Map.side^2)/4 then
+		if not (obj) and numTiles==(Region.side^2)/4 then
 			done=true
 		end
 		if (obj) then
 			-- print ("OBJ>"..obj)
-			local walls={"U","L","R","D"}
+			walls={"U","L","R","D"}
 			for i=1,table.maxn(walls) do
-				local curdir=walls[i]
-				local curtile
-				local curwall
+				curdir=walls[i]
 				if curdir=="U" then
-					curtile=obj-(Map.side*2)
-					curwall=obj-Map.side
+					curtile=obj-(Region.side*2)
+					curwall=obj-Region.side
 				elseif curdir=="L" then
 					curtile=obj-2
 					curwall=obj-1
@@ -346,167 +355,154 @@ function Create:Pathfinding()
 					curtile=obj+2
 					curwall=obj+1
 				elseif curdir=="D" then
-					curtile=obj+(Map.side*2)
-					curwall=obj+Map.side
+					curtile=obj+(Region.side*2)
+					curwall=obj+Region.side
 				end
-				-- print ("   >WALL>"..curwall)
-				-- print ("        >TILE>"..curtile)
 				if (getRow(curwall)==0 and curdir=="U") or 
 				   (getColumn(curwall)==0 and curdir=="L") then
 					curtile=nil
 				end
-				if (getRow(obj)==Map.side-1 and curdir=="D") or 
-				   (getColumn(obj)==Map.side-1 and curdir=="R") then
+				if (getRow(obj)==Region.side-1 and curdir=="D") or 
+				   (getColumn(obj)==Region.side-1 and curdir=="R") then
 					curwall=nil
 				end
 
-				if (curwall) and (Map["MAP"][curwall].open==true) then
-					Map["MAP"][curwall].roomed=true
+				if (curwall) and (Region["REGION"][curwall].open==true) then
+					Region["REGION"][curwall].roomed=true
 					if (curtile) then
 						tiles2[curtile].open=true
-						-- print ("             >isOpen")
 					end
 				else
-					-- print ("             >isNot")
 					if (curwall) and (curtile) and (tiles2[curtile].open==false) then
 						tiles2[curtile].walls[#tiles2[curtile].walls+1]=curwall
 						if table.maxn(tiles2[curtile].walls)>=2 then
 							for w=1,table.maxn(tiles2[curtile].walls) do
-								local v=tiles2[curtile].walls[w]
-								Map["MAP"][v].roomed=true
-								Map["MAP"][v].open=true
-								local plainrow=Map["MAP"][v].row+1
-								local plaincol=Map["MAP"][v].col+1
-								Map["PLAIN"][plainrow][plaincol]=0
+								pick=tiles2[curtile].walls[w]
+								Region["REGION"][pick].roomed=true
+								Region["REGION"][pick].open=true
+								plainrow=Region["REGION"][pick].row+1
+								plaincol=Region["REGION"][pick].col+1
+								Region["PLAIN"][plainrow][plaincol]=0
 							end
 							tiles2[curtile].open=true
-							-- print ("             >nowOpen")
 						end
 					end
 				end
 			end
 			tiles2[obj].done=true
-			Map["MAP"][obj].roomed=true
+			Region["REGION"][obj].roomed=true
 			numTiles=numTiles+1
 		end
 	end
-	-- print ("NumTiles: "..numTiles)
+	
+	-- # CLOSING
 	Create:Progress()
 end
 
 function Create:Visualize()
+	-- # OPENING
+	-- DEPENDENCIES
 	local physics = require "physics"
-	if (Map["PHYSICS"]) then
-		for i=1,table.maxn(Map["MAP"]) do
-			display.remove(Map["PHYSICS"][i])
-			Map["PHYSICS"][i]=nil
-			display.remove(Map["TOP"][i])
-			Map["TOP"][i]=nil
-			display.remove(Map["SIDE"][i])
-			Map["SIDE"][i]=nil
-			display.remove(Map["TILE"][i])
-			Map["TILE"][i]=nil
+	-- FORWARD CALLS
+	local rowval
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	if (Region["PHYSICS"]) then
+		for i=1,table.maxn(Region["REGION"]) do
+			display.remove(Region["PHYSICS"][i])
+			Region["PHYSICS"][i]=nil
+			display.remove(Region["TOP"][i])
+			Region["TOP"][i]=nil
+			display.remove(Region["SIDE"][i])
+			Region["SIDE"][i]=nil
+			display.remove(Region["TILE"][i])
+			Region["TILE"][i]=nil
 		end
-		for i=1,Map["Gradients"].numChildren do
-			display.remove(Map["Gradients"][i])
-			Map["Gradients"][i]=nil
+		for i=1,Region["Gradients"].numChildren do
+			display.remove(Region["Gradients"][i])
+			Region["Gradients"][i]=nil
 		end
 	end
-	Map["PHYSICS"]=nil
-	Map["PHYSICS"]={}
-	Map["TOP"]=nil
-	Map["TOP"]={}
-	Map["SIDE"]=nil
-	Map["SIDE"]={}
-	Map["TILE"]=nil
-	Map["TILE"]={}
-	Map["Gradients"]=nil
-	Map["Gradients"]={}
-	for i=1,table.maxn(Map["MAP"]) do
+	Region["PHYSICS"]=nil
+	Region["PHYSICS"]={}
+	Region["TOP"]=nil
+	Region["TOP"]={}
+	Region["SIDE"]=nil
+	Region["SIDE"]={}
+	Region["TILE"]=nil
+	Region["TILE"]={}
+	Region["Gradients"]=nil
+	Region["Gradients"]={}
+	for i=1,table.maxn(Region["REGION"]) do
 		grads={}
-		if Map["MAP"][i].class=="WALLY" then
-			if Map["MAP"][i].open==false then
-				Map["SIDE"][i]=display.newImageRect("tiles/SideWall.png",Map.tile,Map.tile)
-				Map["TOP"][i]=display.newImage("tiles/TopWall.png",Map.tile,Map.tile/3)
-				Map["PHYSICS"][i]=display.newRect(0,0,Map.tile,Map.tile/3)
+		if Region["REGION"][i].class=="WALLY" then
+			if Region["REGION"][i].open==false then
+				Region["SIDE"][i]=display.newImageRect("tiles/SideWall.png",Region.tile,Region.tile)
+				Region["TOP"][i]=display.newImage("tiles/TopWall.png",Region.tile,Region.tile/3)
+				Region["PHYSICS"][i]=display.newRect(0,0,Region.tile,Region.tile/3)
 				
 				
-				Map["TOP"][i].yScale=0.4
+				Region["TOP"][i].yScale=0.4
 			else
-				Map["TILE"][i]=display.newImageRect("tiles/FloorWall2.png",Map.tile,Map.tile/3)
-				
-				-- grads[#grads+1]=display.newImageRect("tiles/CornerGrad.png",Map.tile/2,Map.tile/2)
-				-- grads[#grads]:rotate(270)
-				-- grads[#grads+1]=display.newImageRect("tiles/CornerGrad.png",Map.tile/2,Map.tile/2)
-				-- grads[#grads]:rotate(180)
+				Region["TILE"][i]=display.newImageRect("tiles/FloorWall2.png",Region.tile,Region.tile/3)
 			end
-		elseif Map["MAP"][i].class=="WALLX" then
-			if Map["MAP"][i].open==false then
-				Map["TOP"][i]=display.newImage("tiles/TopWall.png",Map.tile/1.5,Map.tile/3)
-				Map["SIDE"][i]=display.newImageRect("tiles/SidePillar.png",Map.tile/3,Map.tile)
-				Map["PHYSICS"][i]=display.newRect(0,0,Map.tile/3,Map.tile/1.5)
+		elseif Region["REGION"][i].class=="WALLX" then
+			if Region["REGION"][i].open==false then
+				Region["TOP"][i]=display.newImage("tiles/TopWall.png",Region.tile/1.5,Region.tile/3)
+				Region["SIDE"][i]=display.newImageRect("tiles/SidePillar.png",Region.tile/3,Region.tile)
+				Region["PHYSICS"][i]=display.newRect(0,0,Region.tile/3,Region.tile/1.5)
 				
-				Map["TOP"][i]:rotate(90)
-				Map["TOP"][i].xScale=0.85
-				Map["TOP"][i].yScale=0.95
-				Map["SIDE"][i].yScale=0.8
+				Region["TOP"][i]:rotate(90)
+				Region["TOP"][i].xScale=0.85
+				Region["TOP"][i].yScale=0.95
+				Region["SIDE"][i].yScale=0.8
 			else
-				Map["TILE"][i]=display.newImageRect("tiles/FloorWall1.png",Map.tile/1.5,Map.tile/3)
-				Map["TILE"][i]:rotate(90)
-				
-				-- grads[#grads+1]=display.newImageRect("tiles/WallGrad.png",Map.tile/3,Map.tile/2)
+				Region["TILE"][i]=display.newImageRect("tiles/FloorWall1.png",Region.tile/1.5,Region.tile/3)
+				Region["TILE"][i]:rotate(90)
 			end
-		elseif Map["MAP"][i].class=="CORNER" then
-			if Map["MAP"][i].open==false then
-				Map["SIDE"][i]=display.newImageRect("tiles/SidePillar.png",Map.tile/3,Map.tile)
-				Map["TOP"][i]=display.newImage("tiles/TopPillar.png",Map.tile/3,Map.tile/3)
-				Map["PHYSICS"][i]=display.newRect(0,0,Map.tile/3,Map.tile/3)
+		elseif Region["REGION"][i].class=="CORNER" then
+			if Region["REGION"][i].open==false then
+				Region["SIDE"][i]=display.newImageRect("tiles/SidePillar.png",Region.tile/3,Region.tile)
+				Region["TOP"][i]=display.newImage("tiles/TopPillar.png",Region.tile/3,Region.tile/3)
+				Region["PHYSICS"][i]=display.newRect(0,0,Region.tile/3,Region.tile/3)
 				
-				Map["TOP"][i].yScale=0.4
-				Map["TOP"][i].xScale=0.95
+				Region["TOP"][i].yScale=0.4
+				Region["TOP"][i].xScale=0.95
 			else
-				Map["TILE"][i]=display.newImageRect("tiles/FloorCorner.png",Map.tile/3,Map.tile/3)
-				-- print "!!!"
-				-- Map["TILE"][i]:rotate(90)
+				Region["TILE"][i]=display.newImageRect("tiles/FloorCorner.png",Region.tile/3,Region.tile/3)
 			end
-		elseif Map["MAP"][i].class=="TILE" then
-			Map["TILE"][i]=display.newImageRect("tiles/FloorTile.png",Map.tile,Map.tile/1.5)
-			if Map["MAP"][i-Map.side].open==false then
-				-- grads[#grads+1]=display.newImageRect("tiles/WallGrad.png",Map.tile,Map.tile/2)
-			else
-				-- grads[#grads+1]=display.newImageRect("tiles/CornerGrad.png",Map.tile/2,Map.tile/2)
-				-- grads[#grads+1]=display.newImageRect("tiles/CornerGrad.png",Map.tile/2,Map.tile/2)
-				-- grads[#grads]:rotate(90)
+		elseif Region["REGION"][i].class=="TILE" then
+			Region["TILE"][i]=display.newImageRect("tiles/FloorTile.png",Region.tile,Region.tile/1.5)
+		end
+		if (Region["PHYSICS"][i]) then
+			Region["PHYSICS"][i].x=Create.POSITION.BEGIN.x+((Region.tile/1.5)*(Region["REGION"][i].col))
+			Region["PHYSICS"][i].y=Create.POSITION.BEGIN.y+((Region.tile/2)*(Region["REGION"][i].row))
+			Region["PHYSICS"][i]:setFillColor(0.8,0.4,0.4)
+			physics.addBody(Region["PHYSICS"][i],"static",{friction=0.5,filter={categoryBits=1,maskBits=2}})
+		end
+		if (Region["TOP"][i]) then
+			Region["TOP"][i].x=Region["PHYSICS"][i].x
+			Region["TOP"][i].y=Region["PHYSICS"][i].y-(Region.tile*0.9)
+		end
+		if (Region["SIDE"][i]) then
+			Region["SIDE"][i].x=Region["PHYSICS"][i].x
+			Region["SIDE"][i].y=Region["PHYSICS"][i].y-(Region.tile/3)
+			if Region["REGION"][i].class=="WALLX" then
+				Region["SIDE"][i].y=Region["PHYSICS"][i].y-13
 			end
 		end
-		if (Map["PHYSICS"][i]) then
-			Map["PHYSICS"][i].x=Create["Xi"]+((Map.tile/1.5)*(Map["MAP"][i].col))
-			Map["PHYSICS"][i].y=Create["Yi"]+((Map.tile/2)*(Map["MAP"][i].row))
-			Map["PHYSICS"][i]:setFillColor(0.8,0.4,0.4)
-			physics.addBody(Map["PHYSICS"][i],"static",{friction=0.5,filter={categoryBits=1,maskBits=2}})
-		end
-		if (Map["TOP"][i]) then
-			Map["TOP"][i].x=Map["PHYSICS"][i].x
-			Map["TOP"][i].y=Map["PHYSICS"][i].y-(Map.tile*0.9)
-		end
-		if (Map["SIDE"][i]) then
-			Map["SIDE"][i].x=Map["PHYSICS"][i].x
-			Map["SIDE"][i].y=Map["PHYSICS"][i].y-(Map.tile/3)
-			if Map["MAP"][i].class=="WALLX" then
-				Map["SIDE"][i].y=Map["PHYSICS"][i].y-13
-			end
-		end
-		if (Map["TILE"][i]) then
-			Map["TILE"][i].x=Create["Xi"]+((Map.tile/1.5)*(Map["MAP"][i].col))
-			Map["TILE"][i].y=Create["Yi"]+((Map.tile/2)*(Map["MAP"][i].row))
-			if Map["TILE"][i].col==1 or Map["TILE"][i].col==13 or Map["TILE"][i].row==1 or Map["TILE"][i].row==13 then
-				Map["TILE"][i]:setFillColor(0,0,1)
+		if (Region["TILE"][i]) then
+			Region["TILE"][i].x=Create.POSITION.BEGIN.x+((Region.tile/1.5)*(Region["REGION"][i].col))
+			Region["TILE"][i].y=Create.POSITION.BEGIN.y+((Region.tile/2)*(Region["REGION"][i].row))
+			if Region["TILE"][i].col==1 or Region["TILE"][i].col==13 or Region["TILE"][i].row==1 or Region["TILE"][i].row==13 then
+				Region["TILE"][i]:setFillColor(0,0,1)
 			end
 		end
 		if (grads) then
-			local basetile=Map["TILE"][i] or Map["PHYSICS"][i]
+			local basetile=Region["TILE"][i] or Region["PHYSICS"][i]
 			for a in ipairs(grads) do
-				if Map["MAP"][i].class=="TILE" or Map["MAP"][i].class=="WALLX" then
+				if Region["REGION"][i].class=="TILE" or Region["REGION"][i].class=="WALLX" then
 					if (grads[2]) then
 						if a==1 then
 							grads[a].x=basetile.x-50
@@ -517,7 +513,7 @@ function Create:Visualize()
 						grads[a].x=basetile.x
 					end
 					grads[a].y=basetile.y-17
-				elseif Map["MAP"][i].class=="WALLY" then
+				elseif Region["REGION"][i].class=="WALLY" then
 					if a==1 then
 						grads[a].x=basetile.x-50
 					elseif a==2 then
@@ -527,62 +523,62 @@ function Create:Visualize()
 				end
 			end
 		end
-		Map["Gradients"][i]=grads
+		Region["Gradients"][i]=grads
 	end
 	
 	
-	for i=1,Map.side^2 do
-		local rowval=Map["MAP"][i].row+1
-		if not (Map.MapRows[rowval]) then
-			Map.MapRows[rowval]=display.newGroup()
-			Map.MapRows[rowval].toLayer=function() end
-			Map.MapRows[rowval].row=rowval
-			Map.MapRows[rowval].isVisible=false
+	for i=1,Region.side^2 do
+		rowval=Region["REGION"][i].row+1
+		if not (Region.regRows[rowval]) then
+			Region.regRows[rowval]=display.newGroup()
+			Region.regRows[rowval].toLayer=function() end
+			Region.regRows[rowval].row=rowval
+			Region.regRows[rowval].isVisible=false
 		end
 		
-		if (Map["SIDE"][i]) then
-			Map.MapRows[rowval]:insert(Map["SIDE"][i])
-			Map.MapRows[rowval].askedY=Map["SIDE"][i].contentBounds.yMax
-			-- print (rowval .. ":" .. Map["SIDE"][i].contentBounds.yMax .. " - " .. Map["MAP"][i].class)
+		if (Region["SIDE"][i]) then
+			Region.regRows[rowval]:insert(Region["SIDE"][i])
+			Region.regRows[rowval].askedY=Region["SIDE"][i].contentBounds.yMax
 		end
-		if (Map["TOP"][i]) then
-			Map.MapRows[rowval]:insert(Map["TOP"][i])
+		if (Region["TOP"][i]) then
+			Region.regRows[rowval]:insert(Region["TOP"][i])
 		end
 	end
 	
-	-- for i=1,Map.side^2 do
-		-- local rowval=Map["MAP"][i].row+1
-		-- if (Map["Gradients"][i]) then
-			-- for a in ipairs(Map["Gradients"][i]) do
-				-- Map.MapRows[rowval]:insert(Map["Gradients"][i][a])
-			-- end
-		-- end
-	-- end
-	
-	for i=1,Map.side^2 do
-		if (Map["TILE"][i]) then
-			Map.Level:insert(Map["TILE"][i])
+	for i=1,Region.side^2 do
+		if (Region["TILE"][i]) then
+			Region.Level:insert(Region["TILE"][i])
 		end
-		if (Map["PHYSICS"][i]) then
-			Map.Level:insert(Map["PHYSICS"][i])
+		if (Region["PHYSICS"][i]) then
+			Region.Level:insert(Region["PHYSICS"][i])
 		end
 	end
-	for i=1,Map.side^2 do
-		if (Map["Gradients"][i]) then
-			for a in ipairs(Map["Gradients"][i]) do
-				Map.Level:insert(Map["Gradients"][i][a])
+	for i=1,Region.side^2 do
+		if (Region["Gradients"][i]) then
+			for a in ipairs(Region["Gradients"][i]) do
+				Region.Level:insert(Region["Gradients"][i][a])
 			end
 		end
 	end
+	
+	-- # CLOSING
 	Create:Progress()
 end
 
 function Create:Progress()
-	local game=require("Lgame")
-	local funcs={
+	-- # OPENING
+	-- DEPENDENCIES
+	local game=require("lua.game")
+	-- FORWARD CALLS
+	local funcs
+	local funcnames
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	funcs={
 		Create.sheet,Create.Template,Create.Walls,Create.Pathfinding,Create.Visualize
 	}
-	local funcnames={
+	funcnames={
 		"Sheet","Template","Walls","Pathfinding","Visualize"
 	}
 	if not (Create.progress) then
@@ -593,15 +589,14 @@ function Create:Progress()
 		Create.progress=Create.progress+1
 	end
 	if Create.progress>table.maxn(funcs) then
-		-- print "Done."
-		
 		Create.progress=0
-		game.HandleMaps:setMap(Map)
+		game.HandleRegions:setRegion(Region)
 	else
-		-- print (funcnames[Create.progress])
-		-- timer.performWithDelay(1,funcs[Create.progress])
+		print (funcnames[Create.progress])
 		funcs[Create.progress]()
 	end
+	
+	-- # CLOSING
 end
 
 

@@ -6,7 +6,20 @@
 module(..., package.seeall)
 
 local function readAnims(animname)
-	local JSON = require("JSON")
+	-- # OPENING
+	-- DEPENDENCIES
+	local JSON = require("lua.json")
+	-- FORWARD CALLS
+	local output
+	local nameofsequence
+	local nameofasset
+	local b
+	local a
+	local cont
+	local colorArray
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
 	-- call JSON read func to receive lua table with JSON info
 	-- adapt JSON info for ease of access
 	
@@ -18,12 +31,12 @@ local function readAnims(animname)
 	-- then return table
 	
 	-- local output = J:decode(file:read("*all"))
-	local output = JSON:decode(file:read("*all"))
+	output = JSON:decode(file:read("*all"))
 	
 	output=output["Animations"]["Animation"]
 	
 	-- arrange JSON info to a better array
-	-- i used for id of animation
+	-- i used for id of anima	tion
 	-- first name is animation name
 	-- animation subdivision -> parts
 	-- part name is asset name
@@ -33,11 +46,11 @@ local function readAnims(animname)
 	-- then arrange color matrix to regular RGBA channels
 	parsed={}
 	for i=1,table.maxn(output) do
-		local nameofsequence=output[i]["-name"]
+		nameofsequence=output[i]["-name"]
 		parsed[nameofsequence] = {}
 		parsed[nameofsequence]["maxframes"]=tonumber(output[i]["-frameCount"])
 		for j=1,table.maxn(output[i]["Part"]) do
-			local nameofasset=output[i]["Part"][j]["-name"]
+			nameofasset=output[i]["Part"][j]["-name"]
 			parsed[nameofsequence][nameofasset]={}
 			for k=1,table.maxn(output[i]["Part"][j]["Frame"]) do
 				parsed[nameofsequence][nameofasset][k]={}
@@ -49,15 +62,15 @@ local function readAnims(animname)
 				parsed[nameofsequence][nameofasset][k]["depth"]=tonumber(output[i]["Part"][j]["Frame"][k]["-depth"])
 				
 				
-				local b=output[i]["Part"][j]["Frame"][k]["-colorMatrix"]
-				local a={}
-				local cont=0
+				b=output[i]["Part"][j]["Frame"][k]["-colorMatrix"]
+				a={}
+				cont=0
 				for word in string.gmatch(b,"%d+") do
 					a[cont]=word
 					cont=cont+1
 				end
 				
-				local colorArray={}
+				colorArray={}
 				colorArray[1] = a[00] + a[01] + a[02] + a[03] + a[04]
 				colorArray[2] = a[05] + a[06] + a[07] + a[08] + a[09]
 				colorArray[3] = a[10] + a[11] + a[12] + a[13] + a[14]
@@ -69,7 +82,7 @@ local function readAnims(animname)
 		-- for cycling purposes:
 		parsed[i]=parsed[nameofsequence]
 	end
-		
+	
 	parsed["IDLE"]["loop"]=true
 	parsed["WALK"]["loop"]=true
 	parsed["SWING"]["loop"]=false
@@ -78,20 +91,36 @@ local function readAnims(animname)
 		parsed[i]["TIME"]=0.8
 	end
 	
+	-- # CLOSING
 	return parsed
 end
 
 function Spawn(ax,ay)
+	-- # OPENING
+	-- DEPENDENCIES
 	local physics = require "physics"
+	-- FORWARD CALLS
+	local enemy
+	local shade
+	local asd
+	local limbnames
+	local thislimb
+	local mask
+	local acceptableparams
+	local statnames
+	local thisstat
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
 	-- Essentials
-	local enemy=display.newGroup()
+	enemy=display.newGroup()
 	enemy.x, enemy.y = ax,ay
-	local shade={ -40,-4, 40,-4, 40,12, -40,12}
+	shade={ -40,-4, 40,-4, 40,12, -40,12}
 	physics.addBody(enemy,"dynamic",{shape=shade,filter={categoryBits=2,maskBits=7}})
 	enemy.isFixedRotation=true
 	enemy["CATEGORY"]="ENEMY"
 	
-	local asd=
+	asd=
 	{
 		text = "",     
 		x = 0,
@@ -816,7 +845,7 @@ function Spawn(ax,ay)
 
 	-- Assets Essentials
 	enemy["ASSETS"]={}
-	local limbnames={
+	limbnames={
 		"RightArm","Sword","Groin", "RightLeg","LeftLeg", "Body",  "LeftArm", "Face", "Hair", "Shield",
 	}
 	enemy["COPIES"]={
@@ -826,21 +855,20 @@ function Spawn(ax,ay)
 	for t=1,table.maxn(enemy["COPIES"]) do
 		enemy["ASSETS"][enemy["COPIES"][t]]=display.newGroup()
 		enemy["ASSETS"][enemy["COPIES"][t]].setFillColor=function (self,r,g,b,a)
-			local acceptableparams=( (r) and (r>=0) and (r<=1) )
+			acceptableparams=( (r) and (r>=0) and (r<=1) )
 			acceptableparams=acceptableparams and ( (g) and (g>=0) and (g<=1) )
 			acceptableparams=acceptableparams and ( (b) and (b>=0) and (b<=1) )
 			if (acceptableparams) then
 				a=a or 1
 				for i=self.numChildren,1,-1 do
-					local child = self[i]
-					child:setFillColor(r,g,b,a)
+					self[i]:setFillColor(r,g,b,a)
 				end
 			else
 				assert(false, "Invalid color parameters.")
 			end
 		end
 		for i=1,table.maxn(limbnames) do
-			local thislimb=display.newImage("Barry/red/"..limbnames[i]..".png")
+			thislimb=display.newImage("Barry/red/"..limbnames[i]..".png")
 			thislimb.name=limbnames[i]
 			if enemy["COPIES"][t]=="B&W" and limbnames[i]=="Sword" then
 				enemy["WEAPON"]=thislimb
@@ -851,16 +879,16 @@ function Spawn(ax,ay)
 		enemy:insert(enemy["ASSETS"][enemy["COPIES"][t]])
 		if enemy["COPIES"][t]=="B&W" then
 			for i=1,enemy["ASSETS"][enemy["COPIES"][t]].numChildren do
-				local thislimb=enemy["ASSETS"][enemy["COPIES"][t]][i]
+				thislimb=enemy["ASSETS"][enemy["COPIES"][t]][i]
 				thislimb.fill.effect = "filter.grayscale"
 			end
 		elseif enemy["COPIES"][t]=="COLOR" then
-			local mask = graphics.newMask( "ui/circlemask.png" )
+			mask = graphics.newMask( "ui/circlemask.png" )
 			enemy["ASSETS"][enemy["COPIES"][t]]:setMask(mask)
 			enemy["ASSETS"][enemy["COPIES"][t]].maskScaleX=1.5
 			enemy["ASSETS"][enemy["COPIES"][t]].maskScaleY=1.5
 			for i=1,enemy["ASSETS"][enemy["COPIES"][t]].numChildren do
-				local thislimb=enemy["ASSETS"][enemy["COPIES"][t]][i]
+				thislimb=enemy["ASSETS"][enemy["COPIES"][t]][i]
 				thislimb.fill.effect = "filter.desaturate"
 				thislimb.fill.effect.intensity = 0
 			end
@@ -972,9 +1000,9 @@ function Spawn(ax,ay)
 	
 	-- Stats
 	enemy["STATS"]={}
-	local statnames={"Constitution","Dexterity","Strength","Talent","Stamina","Intellect"	}
+	statnames={"Constitution","Dexterity","Strength","Talent","Stamina","Intellect"	}
 	for s=1,table.maxn(statnames) do
-		local thisstat=statnames[s]
+		thisstat=statnames[s]
 		enemy["STATS"][thisstat]={}
 		enemy["STATS"][thisstat]["NAME"]=thisstat
 		enemy["STATS"][thisstat]["ID"]=s
@@ -1001,29 +1029,46 @@ function Spawn(ax,ay)
 	-- Runtime:addEventListener("tap",enemy.AI)
 	Runtime:addEventListener("enterFrame",enemy.refresh)
 	
+	-- # CLOSING
 	return enemy
 end
 
 function CreatePlayer(name)
+	-- # OPENING
+	-- DEPENDENCIES
+	local physics = require "physics"
+	-- FORWARD CALLS
+	local names
+	local shade
+	local asd
+	local limbnames
+	local acceptableparams
+	local thislimb
+	local mask
+	local statnames
+	local statdescrip
+	local thisstat
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
 	if not(player) then
-		local physics = require "physics"
-		local names={
+		names={
 			"Barry"
 		}
 		
 		-- Essentials
 		player=display.newGroup()
-		local shade={ -40,-4, 40,-4, 40,12, -40,12}
+		shade={ -40,-4, 40,-4, 40,12, -40,12}
 		physics.addBody(player,"dynamic",{shape=shade,filter={categoryBits=2,maskBits=7}})
 		player.isFixedRotation=true
 		player.x, player.y = display.contentWidth/2, display.contentHeight/2
 		player["CATEGORY"]="PLAYER"
 		
-		local asd=
+		asd=
 		{
 			text = "",     
 			x = 0,
-			y = 50,
+			y = 80,
 			width = 200,     --required for multi-line and alignment
 			font = native.systemFont,   
 			fontSize = 30,
@@ -1035,10 +1080,14 @@ function CreatePlayer(name)
 		-- player.textd.align="center"
 		
 		-- Map Essentials
-		player["CHUNK"]={x=0, y=0}
-		player["TILE"]={x=1, y=1}
+		player["POSITION"]={}
+		player["POSITION"]["REGION"]={x=0,y=0,q=1}
+		player["POSITION"]["GLOBAL"]={x=5,y=5}
+		player["POSITION"]["REGIONAL"]={x=5,y=5}
+		-- player["CHUNK"]={x=0, y=0}
+		-- player["TILE"]={x=1, y=1}
 		-- player["MAPY"]=0
-		player["QUAD"]=1
+		-- player["QUAD"]=1
 		-- player["CURY"]=1
 		-- player["CURX"]=1
 		
@@ -1117,7 +1166,15 @@ function CreatePlayer(name)
 			
 			player:regeneration()
 			-- player.textd.text=(math.floor(player.x)..", "..math.floor(player.y).."\n"..player.MAPX..", "..player.MAPY)
-			player.textd.text=(player.TILE.x..", "..player.TILE.y.."\n"..player.CHUNK.x..", "..player.CHUNK.y)
+			player.textd.text=(
+				player.POSITION.GLOBAL.x..", "..
+				player.POSITION.GLOBAL.y.."\n"..
+				player.POSITION.REGION.x..", "..
+				player.POSITION.REGION.y..", "..
+				player.POSITION.REGION.q.."\n"..
+				player.POSITION.REGIONAL.x..", "..
+				player.POSITION.REGIONAL.y
+			)
 			
 			player["WEAPON"]["basedamage"]=player["STATS"]["Damage"]
 		
@@ -1265,7 +1322,7 @@ function CreatePlayer(name)
 		
 		-- Assets Essentials
 		player["ASSETS"]={}
-		local limbnames={
+		limbnames={
 			"RightArm","Sword","Groin", "RightLeg","LeftLeg", "Body",  "LeftArm", "Face", "Hair", "Shield",
 		}
 		player["COPIES"]={
@@ -1277,21 +1334,20 @@ function CreatePlayer(name)
 			-- print ("STARTING WITH "..player["COPIES"][t])
 			player["ASSETS"][player["COPIES"][t]]=display.newGroup()
 			player["ASSETS"][player["COPIES"][t]].setFillColor=function (self,r,g,b,a)
-				local acceptableparams=( (r) and (r>=0) and (r<=1) )
+				acceptableparams=( (r) and (r>=0) and (r<=1) )
 				acceptableparams=acceptableparams and ( (g) and (g>=0) and (g<=1) )
 				acceptableparams=acceptableparams and ( (b) and (b>=0) and (b<=1) )
 				if (acceptableparams) then
 					a=a or 1
 					for i=self.numChildren,1,-1 do
-						local child = self[i]
-						child:setFillColor(r,g,b,a)
+						self[i]:setFillColor(r,g,b,a)
 					end
 				else
 					assert(false, "Invalid color parameters.")
 				end
 			end
 			for i=1,table.maxn(limbnames) do
-				local thislimb=display.newImage("Barry/blue/"..limbnames[i]..".png")
+				thislimb=display.newImage("Barry/reg/"..limbnames[i]..".png")
 				thislimb.name=limbnames[i]
 				if player["COPIES"][t]=="B&W" and limbnames[i]=="Sword" then
 					player["WEAPON"]=thislimb
@@ -1304,22 +1360,22 @@ function CreatePlayer(name)
 				player["ASSETS"][player["COPIES"][t]].xScale=1.5
 				player["ASSETS"][player["COPIES"][t]].yScale=1.5
 				for i=1,player["ASSETS"][player["COPIES"][t]].numChildren do
-					local thislimb=player["ASSETS"][player["COPIES"][t]][i]
+					thislimb=player["ASSETS"][player["COPIES"][t]][i]
 					thislimb.fill.effect = "filter.scatter"
 					thislimb.fill.effect.intensity = 0.25
 				end
 			elseif player["COPIES"][t]=="B&W" then
 				for i=1,player["ASSETS"][player["COPIES"][t]].numChildren do
-					local thislimb=player["ASSETS"][player["COPIES"][t]][i]
+					thislimb=player["ASSETS"][player["COPIES"][t]][i]
 					thislimb.fill.effect = "filter.grayscale"
 				end
 			elseif player["COPIES"][t]=="COLOR" then
-				local mask = graphics.newMask( "ui/circlemask.png" )
+				mask = graphics.newMask( "ui/circlemask.png" )
 				player["ASSETS"][player["COPIES"][t]]:setMask(mask)
 				player["ASSETS"][player["COPIES"][t]].maskScaleX=1.5
 				player["ASSETS"][player["COPIES"][t]].maskScaleY=1.5
 				for i=1,player["ASSETS"][player["COPIES"][t]].numChildren do
-					local thislimb=player["ASSETS"][player["COPIES"][t]][i]
+					thislimb=player["ASSETS"][player["COPIES"][t]][i]
 					thislimb.fill.effect = "filter.desaturate"
 					thislimb.fill.effect.intensity = 0
 				end
@@ -1365,10 +1421,10 @@ function CreatePlayer(name)
 		-- Stats
 		player["STATS"]={}
 		player["STATS"]["Free"]=7
-		local statnames={"Constitution","Dexterity","Strength","Talent","Stamina","Intellect"	}
-		local statdescrip={"Physical state of the body as to health.","Skill using hands or body, mental skill and cleverness.","Muscular or bodily power.","Magical or mental power.","Power to endure fatigue.","Capacity for thought or knowledge."}
+		statnames={"Constitution","Dexterity","Strength","Talent","Stamina","Intellect"	}
+		statdescrip={"Physical state of the body as to health.","Skill using hands or body, mental skill and cleverness.","Muscular or bodily power.","Magical or mental power.","Power to endure fatigue.","Capacity for thought or knowledge."}
 		for s=1,table.maxn(statnames) do
-			local thisstat=statnames[s]
+			thisstat=statnames[s]
 			player["STATS"][thisstat]={}
 			player["STATS"][thisstat]["NAME"]=thisstat
 			player["STATS"][thisstat]["ID"]=s
@@ -1409,6 +1465,8 @@ function CreatePlayer(name)
 		-- player:refresh()
 		Runtime:addEventListener("enterFrame",player.refresh)
 	end
+	
+	-- # CLOSING
 	return player
 end
 

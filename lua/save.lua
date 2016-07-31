@@ -15,15 +15,6 @@ local key={ --MAX:62
 		"k","l","m","n","o","p","q","r","s","t",
 		"u","v","w","x","y","z",
 	}
-
-	-- # OPENING
-	-- DEPENDENCIES
-	-- FORWARD CALLS
-	-- LOCAL FUNCTIONS
-	
-	-- # BODY
-	
-	-- # CLOSING
 	
 ---------------------------------------------------------------------------------------
 -- GLOBAL
@@ -91,7 +82,7 @@ local function sumLarge(factor1, factor2)
 end
 ]]
 
---[[ DEVUSE
+--[[ DEV USE
 local function printtable(param,space)
 	space=space or ">"
 	for k, v in pairs( param ) do
@@ -223,12 +214,12 @@ end
 
 Save={}
 
-function Save:keepMapData(map)
+function Save:keepMapData(region)
 	-- # OPENING
 	-- DEPENDENCIES
 	-- FORWARD CALLS
-	local mapx
-	local mapy
+	local regx
+	local regy
 	local str
 	local fila
 	local found
@@ -239,43 +230,43 @@ function Save:keepMapData(map)
 	if not (Save["DATA"]) then
 		Save["DATA"]={}
 	end
-	if not (Save["DATA"].maps) then
-		Save["DATA"].maps={}
+	if not (Save["DATA"].regions) then
+		Save["DATA"].regions={}
 	end
 	
-	mapx=map["MAPX"]
-	mapy=map["MAPY"]
-	map=map["PLAIN"]
+	regx=region.POSITION.REGION.x
+	regy=region.POSITION.REGION.y
+	region=region["PLAIN"]
 	
 	str=""
-	if mapx<0 then
+	if regx<0 then
 		str=str.."-"
 	else
 		str=str.."+"
 	end
-	mapx=math.abs(mapx)
-	mapx=DecimalToBase(62,mapx)
-	for i=#mapx,1 do
-		mapx="0"..mapx
+	regx=math.abs(regx)
+	regx=DecimalToBase(62,regx)
+	for i=#regx,1 do
+		regx="0"..regx
 	end
-	str=str..mapx
+	str=str..regx
 	
-	if mapy<0 then
+	if regy<0 then
 		str=str.."-"
 	else
 		str=str.."+"
 	end
-	mapy=math.abs(mapy)
-	mapy=DecimalToBase(62,mapy)
-	for i=#mapy,1 do
-		mapy="0"..mapy
+	regy=math.abs(regy)
+	regy=DecimalToBase(62,regy)
+	for i=#regy,1 do
+		regy="0"..regy
 	end
-	str=str..mapy
+	str=str..regy
 	
-	for i=1,table.maxn(map) do
+	for i=1,table.maxn(region) do
 		fila=""
-		for j=1,table.maxn(map[i]) do
-			fila=fila..map[j][i]
+		for j=1,table.maxn(region[i]) do
+			fila=fila..region[j][i]
 		end
 		fila=BaseToDecimal(5,fila)
 		fila=DecimalToBase(62,fila)
@@ -289,15 +280,15 @@ function Save:keepMapData(map)
 	
 	found=false
 	it=1
-	while (it<=table.maxn(Save["DATA"].maps) and (found==false)  ) do
-		if Save["DATA"].maps[it]==str then
+	while (it<=table.maxn(Save["DATA"].regions) and (found==false)  ) do
+		if Save["DATA"].regions[it]==str then
 			found=true
 		end
 		it=it+1
 	end
 
 	if found==false then
-		Save["DATA"].maps[table.maxn(Save["DATA"].maps)+1]=str
+		Save["DATA"].regions[table.maxn(Save["DATA"].regions)+1]=str
 	end
 	
 	-- # CLOSING
@@ -414,7 +405,7 @@ function Save:recordData()
 	os.rename( system.pathForFile( "TEMPSave"..Save["SLOT"]..".png", system.DocumentsDirectory ), system.pathForFile( "Save"..Save["SLOT"]..".png", system.DocumentsDirectory )	)
 	
 	fh:write( Save["DATA"].p1, "\n" )
-	fh:write( JSON:encode_pretty(Save["DATA"].maps), "\n" )
+	fh:write( JSON:encode_pretty(Save["DATA"].regions), "\n" )
 	io.close( fh )
 	
 	-- # CLOSING
