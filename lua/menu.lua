@@ -225,7 +225,7 @@ SaveGame={}
 function SaveGame:show()
 	-- # OPENING
 	-- DEPENDENCIES
-	local save=require("lua.save")
+	local slot=require("lua.slot")
 	local widget = require "widget"
 	-- FORWARD CALLS
 	sgg=display.newGroup()
@@ -274,7 +274,7 @@ function SaveGame:show()
 	SlotBtn={}
 	
 	for btn=1,3 do
-		local name=save.Load:getName(btn) or "No Data"
+		local name=slot.Load:getName(btn) or "No Data"
 		SlotBtn[btn] =  widget.newButton{
 			label=name,
 			labelColor = { default={255,255,255}, over={0,0,0} },
@@ -315,7 +315,7 @@ end
 function SaveGame:slotInfo()
 	-- # OPENING
 	-- DEPENDENCIES
-	local save=require("lua.save")
+	local slot=require("lua.slot")
 	local ui=require("lua.ui")
 	local widget = require "widget"
 	-- FORWARD CALLS
@@ -367,7 +367,7 @@ function SaveGame:slotInfo()
 	else
 		playlabel="Load Game"
 		
-		gold, level=save.Load:getExtraInfo(SaveGame["SLOT"])
+		gold, level=slot.Load:getExtraInfo(SaveGame["SLOT"])
 		gold=gold or 0
 		level=level or 0
 	
@@ -447,7 +447,10 @@ function SaveGame:loadSlot()
 	-- # BODY
 	SaveGame:clear()
 	if ( SaveGame["NAME"]=="No Data" ) then
-		Keyboard:show()
+		-- Keyboard:show()
+		print "KEYBOARD BYPASSED"
+		local game=require("lua.game")
+		game.Initial:create(SaveGame["SLOT"])
 	else
 		game.Initial:create(SaveGame["SLOT"])
 	end
@@ -458,11 +461,12 @@ end
 function SaveGame:deleteSlot()
 	-- # OPENING
 	-- DEPENDENCIES
+	local slot=require("lua.slot")
 	-- FORWARD CALLS
 	-- LOCAL FUNCTIONS
 	
 	-- # BODY
-	save.Erase:clearSave(SaveGame["SLOT"])
+	slot.Erase:clearSave(SaveGame["SLOT"])
 	
 	-- # CLOSING
 end

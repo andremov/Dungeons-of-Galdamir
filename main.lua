@@ -46,8 +46,12 @@ function mainFunction()
 	-- physics.setDrawMode("hybrid")
 	
 	-- menu.FirstMenu()
-	local menu = require("lua.menu")
-	menu.MainMenu:show()
+	-- local menu = require("lua.menu")
+	-- menu.MainMenu:show()
+	
+	print "RUSHED START UP"
+	local game = require("lua.game")
+	game.Initial:create( )
 end
 
 mainFunction()

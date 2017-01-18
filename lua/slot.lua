@@ -6,7 +6,7 @@
 module(..., package.seeall)
 
 -- FORWARD CALLS
-local key={ --MAX:62
+local key = { --MAX:62
 		"0","1","2","3","4","5","6","7","8","9",
 		"A","B","C","D","E","F","G","H","I","J",
 		"K","L","M","N","O","P","Q","R","S","T",
@@ -212,18 +212,100 @@ end
 -- SAVE
 ---------------------------------------------------------------------------------------
 
-Save={}
+Save = { }
 
-function Save:keepMapData(region)
+function Save:keepRegionData( region, x, y )
 	-- # OPENING
 	-- DEPENDENCIES
 	-- FORWARD CALLS
-	local regx
-	local regy
-	local str
-	local fila
-	local found
-	local it
+	local stringRegion
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	if ( not Save ["DATA"] ) then
+		Save["DATA"] = { }
+	end
+	if ( not Save ["DATA"] .regions ) then
+		Save["DATA"].regions = { }
+	end
+	
+	-- REGION X POSITION
+	
+	stringRegion = ""
+	if (x < 0) then
+		stringRegion = stringRegion .. "-"
+	else
+		stringRegion = stringRegion .. "+"
+	end
+	
+	x = math.abs ( x )
+	x = DecimalToBase ( 62, x )
+	for i = #x, 1 do
+		x = "0" .. x
+	end
+	stringRegion = stringRegion .. x
+	
+	-- REGION Y POSITION
+	
+	if (y < 0) then
+		stringRegion =stringRegion .. "-"
+	else
+		stringRegion = stringRegion .. "+"
+	end
+	
+	y = math.abs ( y )
+	y = DecimalToBase ( 62, y )
+	for i = #y, 1 do
+		y = "0" .. y
+	end
+	stringRegion = stringRegion .. y
+	
+	-- SERIALIZE REGION
+	
+	for i = 1, table.maxn (region) do
+		fila = ""
+		for j = 1, table.maxn (region [i]) do
+			local value = 0
+			if (region [j] [i] .solid) then
+				value = 1
+			end
+			fila = fila .. value
+		end
+		
+		fila = BaseToDecimal( 5, fila )
+		fila = DecimalToBase( 62, fila )
+		
+		for i = #fila, 5 do
+			fila = "0" .. fila
+		end
+		
+		stringRegion = stringRegion .. fila
+	end
+	
+	
+	-- THIS CODE PREVENTED CONSTANT OVERWRITING OF REGION DATA WHEN REGIONS WERE SAVED ON LOAD AND UNLOAD
+	-- SEEING AS NOW REGIONS ARE SAVED WHEN CREATED, THIS CODE IS UNNECESSARY, BUT IS KEPT FOR ARCHIVE PURPOSES
+	
+	-- found = false
+	-- it = 1
+	-- while (it <= table.maxn ( Save ["DATA"] .regions ) and found == false) do
+		-- if (Save ["DATA"] .regions [it] == stringRegion) then
+			-- found = true
+		-- end
+		-- it = it + 1
+	-- end
+
+	-- if (found == false) then
+		Save ["DATA"] .regions [table.maxn (Save["DATA"].regions) + 1] = stringRegion
+	-- end
+	
+	-- # CLOSING
+end
+
+function Save:keepRegionSeed(seed)
+	-- # OPENING
+	-- DEPENDENCIES
+	-- FORWARD CALLS
 	-- LOCAL FUNCTIONS
 	
 	-- # BODY
@@ -233,64 +315,7 @@ function Save:keepMapData(region)
 	if not (Save["DATA"].regions) then
 		Save["DATA"].regions={}
 	end
-	
-	regx=region.POSITION.REGION.x
-	regy=region.POSITION.REGION.y
-	region=region["PLAIN"]
-	
-	str=""
-	if regx<0 then
-		str=str.."-"
-	else
-		str=str.."+"
-	end
-	regx=math.abs(regx)
-	regx=DecimalToBase(62,regx)
-	for i=#regx,1 do
-		regx="0"..regx
-	end
-	str=str..regx
-	
-	if regy<0 then
-		str=str.."-"
-	else
-		str=str.."+"
-	end
-	regy=math.abs(regy)
-	regy=DecimalToBase(62,regy)
-	for i=#regy,1 do
-		regy="0"..regy
-	end
-	str=str..regy
-	
-	for i=1,table.maxn(region) do
-		fila=""
-		for j=1,table.maxn(region[i]) do
-			fila=fila..region[j][i]
-		end
-		fila=BaseToDecimal(5,fila)
-		fila=DecimalToBase(62,fila)
-		
-		for i=#fila,5 do
-			fila="0"..fila
-		end
-		
-		str=str..fila
-	end
-	
-	found=false
-	it=1
-	while (it<=table.maxn(Save["DATA"].regions) and (found==false)  ) do
-		if Save["DATA"].regions[it]==str then
-			found=true
-		end
-		it=it+1
-	end
-
-	if found==false then
-		Save["DATA"].regions[table.maxn(Save["DATA"].regions)+1]=str
-	end
-	
+	Save["DATA"].regions.seed = seed
 	-- # CLOSING
 end
 
@@ -417,7 +442,7 @@ end
 -- LOAD
 ---------------------------------------------------------------------------------------
 
-Load={}
+Load = { }
 
 function Load:retrieveData()
 	-- # OPENING
@@ -600,7 +625,7 @@ function Load:getExtraInfo(slot)
 	return gold,level
 end
 
-function Load:getMap(mapx,mapy)
+function Load:getRegion(mapx,mapy)
 	-- # OPENING
 	-- DEPENDENCIES
 	-- FORWARD CALLS
@@ -609,8 +634,8 @@ function Load:getMap(mapx,mapy)
 	local thismapx
 	local xneg
 	local thismapy
-	local yneg
-	local parsed
+	local yneg 	
+	local parsed = nil
 	local mapinfo
 	local stringpos
 	local estacol
@@ -620,10 +645,10 @@ function Load:getMap(mapx,mapy)
 	-- # BODY
 	found=false
 	counter=1
-	if (Save["DATA"]) and (Save["DATA"].maps) then
-		while found==false and counter<=table.maxn(Save["DATA"].maps) do
+	if (Save["DATA"]) and (Save["DATA"].regions) then
+		while found==false and counter<=table.maxn(Save["DATA"].regions) do
 			
-			thismapx=string.sub(Save["DATA"].maps[counter],1,3)
+			thismapx=string.sub(Save["DATA"].regions[counter],1,3)
 			
 			xneg=string.sub(thismapx,1,1)
 			thismapx=string.sub(thismapx,2)
@@ -632,7 +657,7 @@ function Load:getMap(mapx,mapy)
 				thismapx=thismapx*-1
 			end
 			
-			thismapy=string.sub(Save["DATA"].maps[counter],4,6)
+			thismapy=string.sub(Save["DATA"].regions[counter],4,6)
 			
 			yneg=string.sub(thismapy,1,1)
 			thismapy=string.sub(thismapy,2)
@@ -648,9 +673,9 @@ function Load:getMap(mapx,mapy)
 			end
 		end
 		
-		if found==true then
+		if (found==true) then
 			parsed={}
-			mapinfo=string.sub(Save["DATA"].maps[counter],7)
+			mapinfo=string.sub(Save["DATA"].regions[counter],7)
 			for i=1,#mapinfo/6 do
 				stringpos=(i*6)
 				parsed[i]=string.sub(mapinfo,stringpos-5, stringpos)
@@ -683,13 +708,62 @@ function Load:getMap(mapx,mapy)
 	return parsed
 end
 
+function Load:regionExists(mapx,mapy)
+	-- # OPENING
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	local found
+	local counter
+	local thismapx
+	local xneg
+	local thismapy
+	local yneg
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	found=false
+	counter=1
+	if (Save["DATA"]) and (Save["DATA"].regions) then
+		while found==false and counter<=table.maxn(Save["DATA"].regions) do
+			
+			thismapx=string.sub(Save["DATA"].regions[counter],1,3)
+			
+			xneg=string.sub(thismapx,1,1)
+			thismapx=string.sub(thismapx,2)
+			thismapx=BaseToDecimal(62,thismapx)
+			if xneg=="-" then
+				thismapx=thismapx*-1
+			end
+			
+			thismapy=string.sub(Save["DATA"].regions[counter],4,6)
+			
+			yneg=string.sub(thismapy,1,1)
+			thismapy=string.sub(thismapy,2)
+			thismapy=BaseToDecimal(62,thismapy)
+			if yneg=="-" then
+				thismapy=thismapy*-1
+			end
+			
+			if thismapx==mapx and thismapy==mapy then
+				found=true
+			else
+				counter=counter+1
+			end
+		end
+		
+	end
+	
+	-- # CLOSING
+	return found
+end
+
 
 
 ---------------------------------------------------------------------------------------
 -- ERASE
 ---------------------------------------------------------------------------------------
 
-Erase={}
+Erase = { }
 
 function Erase:clearSave(slot)
 	-- # OPENING

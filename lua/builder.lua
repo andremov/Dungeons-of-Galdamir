@@ -87,46 +87,52 @@ local function readAsset(assname)
 end
 
 
+
 ---------------------------------------------------------------------------------------
 -- CREATE
 ---------------------------------------------------------------------------------------
 
 local Region
 Create={}
+Create.verbose = false
+Create.obstaclePercentage = 0.45
 
-function Create:Start(paramx,paramy,info,posx,posy,regcap)
+function Create:start( parameters )
 	-- # OPENING
+	if (Create.verbose) then
+		print "START REGION ROW CREATION"
+	end
 	-- DEPENDENCIES
+	local slot=require("lua.slot")
 	-- FORWARD CALLS
-	local side
-	local tile
-	local delta
-	local regSizeX
-	local regSizeY
+	
 	-- LOCAL FUNCTIONS
 	
 	-- # BODY
-	side=14
-	tile=200
 	
-	delta=side/2
-	regSizeX=(delta*tile)+(delta*(tile/3))
-	regSizeY=(delta*(tile/1.5))+(delta*(tile/3))
+	-- Create["POSITION"] = { }
+	-- Create["POSITION"]["REGION"] = parameters.region
+	-- Create["POSITION"]["CREATE"] = parameters.position
+	-- Create["ROW"] = parameters.row
+	-- Create["HALLS"] = parameters.halls
+	-- Create["TILESIZE"] = parameters.tileSize
+	-- Create["WALLFIRST"] = parameters.wallFirst
 	
-	Create["POSITION"]={}
-	Create["POSITION"]["REGION"]={x=paramx,y=paramy}
-	Create["POSITION"]["TILE"]={x=(regcap+paramx)*(side/2),y=(regcap+paramy)*(side/2)}
-	Create["POSITION"]["BEGIN"]={x=posx,y=posy}
-	Create["POSITION"]["MID"]={x=posx+(regSizeX/2),y=posy+(regSizeY/2)}
-	Create["POSITION"]["END"]={x=posx+regSizeX,y=posy+regSizeY}
-	Create["loadinfo"]=info
+	-- local region = slot.Load:getMap(mapx,mapy)
 	
 	-- # CLOSING
-	Create:Progress()
+	if (slot.Load:regionExists(parameters.region.x,parameters.region.y)) then
+		Create:sheet( parameters, slot.Load:getRegion(parameters.region.x,parameters.region.y) )
+	else
+		Create:buildTemplate( parameters )
+	end
 end
 
-function Create:sheet()
+function Create:sheet( parameters, regionSave )
 	-- # OPENING
+	if (Create.verbose) then
+		print "LOADING TILE SET"
+	end
 	-- DEPENDENCIES
 	-- FORWARD CALLS
 	-- LOCAL FUNCTIONS
@@ -140,463 +146,339 @@ function Create:sheet()
 	-- end
 	
 	-- # CLOSING
-	Create:Progress()
+	Create:visualize( parameters, regionSave )
 end
 
-function Create:Template()
+function Create:visualize( parameters, regionSave )
 	-- # OPENING
-	-- DEPENDENCIES
-	-- FORWARD CALLS
-	local side
-	local tile
-	-- LOCAL FUNCTIONS
-	
-	-- # BODY
-	side=14
-	tile=200
-	Region={}
-	Region.side=side
-	Region.tile=tile
-	
-	Region["POSITION"]=Create["POSITION"]
-	
-	Region.regRows={}
-	Region.Gradients=display.newGroup()
-	Region.Gradients.isVisible=false
-	Region.Level=display.newGroup()
-	Region.Level.isVisible=false
-	
-	Region["REGION"]={}
-	for i=1,Region.side^2 do
-		Region["REGION"][i]={}
-		Region["REGION"][i].col=getColumn(i)
-		Region["REGION"][i].row=getRow(i)
+	if (Create.verbose) then
+		print "CREATE VISUALIZATION OF REGION"
 	end
-	Region["PLAIN"]={}
-	for i=1,Region.side do
-		Region["PLAIN"][i]={}
-	end
-	
-	-- # CLOSING
-	Create:Progress()
-end
-
-function Create:Walls()
-	-- # OPENING
-	-- DEPENDENCIES
-	-- FORWARD CALLS
-	local plainrow
-	local plaincol
-	local surroundings
-	-- LOCAL FUNCTIONS
-	
-	-- # BODY
-	for i=1,Region.side^2 do
-		plaincol=Region["REGION"][i].col+1
-		plainrow=Region["REGION"][i].row+1
-		if Region["REGION"][i].row%2==0 and Region["REGION"][i].col%2==0 then
-			Region["REGION"][i].class="CORNER"
-			Region["REGION"][i].wall=true
-			if ( Create["loadinfo"] ) then
-				Region["REGION"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
-				Region["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
-			end
-		elseif Region["REGION"][i].col%2==0 then
-			Region["REGION"][i].class="WALLX"
-			Region["REGION"][i].wall=true
-			if ( Create["loadinfo"] ) then
-				Region["REGION"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
-				Region["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
-			else
-				Region["REGION"][i].open=math.random(0,1)
-				Region["PLAIN"][plainrow][plaincol]=Region["REGION"][i].open
-				Region["REGION"][i].open=(Region["REGION"][i].open==0)
-			end
-		elseif Region["REGION"][i].row%2==0 then
-			Region["REGION"][i].class="WALLY"
-			Region["REGION"][i].wall=true
-			if ( Create["loadinfo"] ) then
-				Region["REGION"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
-				Region["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
-			else
-				Region["REGION"][i].open=math.random(0,1)
-				Region["PLAIN"][plainrow][plaincol]=Region["REGION"][i].open
-				Region["REGION"][i].open=(Region["REGION"][i].open==0)
-			end
-		else
-			Region["REGION"][i].class="TILE"
-			Region["REGION"][i].wall=false
-			if ( Create["loadinfo"] ) then
-				Region["REGION"][i].open=( Create["loadinfo"][plainrow][plaincol]==0 )
-				Region["PLAIN"][plainrow][plaincol]=Create["loadinfo"][plainrow][plaincol]
-			else
-				Region["REGION"][i].open=true
-				Region["PLAIN"][plainrow][plaincol]=0
-			end
-		end
-		Region["REGION"][i].roomed=false
-	end
-	if not( Create["loadinfo"] ) then
-		for i=1,Region.side^2 do
-			plaincol=Region["REGION"][i].col+1
-			plainrow=Region["REGION"][i].row+1
-			if Region["REGION"][i].class=="CORNER" then
-				surroundings={ i-Region.side, i-1, i+1, i+Region.side }
-				for j=1,4 do
-					surroundings[j]=Region["REGION"][surroundings[j]]
-					if plaincol==1 and j==2 then
-						surroundings[j]=nil
-					end
-					if plainrow==1 and j==1 then
-						surroundings[j]=nil
-					end
-					if surroundings[j] then
-						surroundings[j]=not surroundings[j].open
-					else
-						surroundings[j]=true
-					end
-				end
-				surroundings=surroundings[1] or surroundings[2] or surroundings[3] or surroundings[4]
-				if surroundings then
-					Region["PLAIN"][plainrow][plaincol]=1
-					Region["REGION"][i].open=false
-				else
-					Region["REGION"][i].open=math.random(0,10)
-					if Region["REGION"][i].open>5 then
-						Region["REGION"][i].open=0
-					else
-						Region["REGION"][i].open=1
-					end
-					Region["PLAIN"][plainrow][plaincol]=Region["REGION"][i].open
-					Region["REGION"][i].open=(Region["REGION"][i].open==0)
-				end
-			end
-		end
-	end
-	
-	-- # CLOSING
-	Create:Progress()
-end
-
-function Create:Pathfinding()
-	-- # OPENING
-	-- DEPENDENCIES
-	-- FORWARD CALLS
-	local tiles2
-	local numTiles
-	local done
-	local obj
-	local cont
-	local walls
-	local curdir
-	local plainrow
-	local plaincol
-	local curtile
-	local curwall
-	local pick
-	-- LOCAL FUNCTIONS
-	
-	-- # BODY
-	tiles2={}
-	numTiles=0
-	done=false
-	for i=1,table.maxn(Region["REGION"]) do
-		tiles2[i]={}
-		tiles2[i].open=false
-		tiles2[i].done=false
-		tiles2[i].walls={}
-	end
-	tiles2[Region.side+2].open=true
-	while done==false and numTiles<(Region.side^2)/4 do
-		obj=nil
-		cont=1
-		while not(obj) and cont<=table.maxn(Region["REGION"]) do
-			if tiles2[cont].open==true and tiles2[cont].done==false then
-				obj=cont
-			end
-			cont=cont+1
-		end
-		if not (obj) then
-			cont=1
-			while not(obj) and cont<=table.maxn(Region["REGION"]) do
-				if tiles2[cont].open==false and Region["REGION"][cont].class=="TILE" then
-					obj=cont
-					-- print ("BREAKING: "..obj)
-					walls={obj-Region.side,obj-1,obj+1,obj+Region.side}
-					for v=1,table.maxn(walls) do
-						curdir=walls[v]
-						if (Region["REGION"][curdir]) then
-							Region["REGION"][curdir].roomed=true
-							Region["REGION"][curdir].open=true
-							plainrow=Region["REGION"][curdir].row+1
-							plaincol=Region["REGION"][curdir].col+1
-							Region["PLAIN"][plainrow][plaincol]=0
-						end
-					end
-				end
-				cont=cont+1
-			end
-		end
-		if not (obj) and numTiles==(Region.side^2)/4 then
-			done=true
-		end
-		if (obj) then
-			-- print ("OBJ>"..obj)
-			walls={"U","L","R","D"}
-			for i=1,table.maxn(walls) do
-				curdir=walls[i]
-				if curdir=="U" then
-					curtile=obj-(Region.side*2)
-					curwall=obj-Region.side
-				elseif curdir=="L" then
-					curtile=obj-2
-					curwall=obj-1
-				elseif curdir=="R" then
-					curtile=obj+2
-					curwall=obj+1
-				elseif curdir=="D" then
-					curtile=obj+(Region.side*2)
-					curwall=obj+Region.side
-				end
-				if (getRow(curwall)==0 and curdir=="U") or 
-				   (getColumn(curwall)==0 and curdir=="L") then
-					curtile=nil
-				end
-				if (getRow(obj)==Region.side-1 and curdir=="D") or 
-				   (getColumn(obj)==Region.side-1 and curdir=="R") then
-					curwall=nil
-				end
-
-				if (curwall) and (Region["REGION"][curwall].open==true) then
-					Region["REGION"][curwall].roomed=true
-					if (curtile) then
-						tiles2[curtile].open=true
-					end
-				else
-					if (curwall) and (curtile) and (tiles2[curtile].open==false) then
-						tiles2[curtile].walls[#tiles2[curtile].walls+1]=curwall
-						if table.maxn(tiles2[curtile].walls)>=2 then
-							for w=1,table.maxn(tiles2[curtile].walls) do
-								pick=tiles2[curtile].walls[w]
-								Region["REGION"][pick].roomed=true
-								Region["REGION"][pick].open=true
-								plainrow=Region["REGION"][pick].row+1
-								plaincol=Region["REGION"][pick].col+1
-								Region["PLAIN"][plainrow][plaincol]=0
-							end
-							tiles2[curtile].open=true
-						end
-					end
-				end
-			end
-			tiles2[obj].done=true
-			Region["REGION"][obj].roomed=true
-			numTiles=numTiles+1
-		end
-	end
-	
-	-- # CLOSING
-	Create:Progress()
-end
-
-function Create:Visualize()
-	-- # OPENING
 	-- DEPENDENCIES
 	local physics = require "physics"
 	-- FORWARD CALLS
-	local rowval
+	-- local rowval
+	local regionRow = { }
+	local regionRowSave
+	local localRow
+	local sevenTileSize
+	local thirdTileSize
+	local fullTileSize
 	-- LOCAL FUNCTIONS
 	
 	-- # BODY
-	if (Region["PHYSICS"]) then
-		for i=1,table.maxn(Region["REGION"]) do
-			display.remove(Region["PHYSICS"][i])
-			Region["PHYSICS"][i]=nil
-			display.remove(Region["TOP"][i])
-			Region["TOP"][i]=nil
-			display.remove(Region["SIDE"][i])
-			Region["SIDE"][i]=nil
-			display.remove(Region["TILE"][i])
-			Region["TILE"][i]=nil
-		end
-		for i=1,Region["Gradients"].numChildren do
-			display.remove(Region["Gradients"][i])
-			Region["Gradients"][i]=nil
+	
+	thirdTileSize = parameters.tileSize/3
+	sevenTileSize = parameters.tileSize - thirdTileSize
+	fullTileSize = parameters.tileSize
+	
+	-- regionRow ["SIDE"] = { }
+	-- regionRow ["TOP"] = { }
+	-- regionRow ["PHYSICS"] = { }
+	-- regionRow ["TILE"] = { }
+	regionRow ["GROUP"] = display.newGroup()
+	
+	-- regionRow ["GROUP"].y = parameters.position.y
+	
+	localRow = ((parameters.row*2) % (parameters.halls*2)) + 1
+	
+	for y = localRow, localRow + 1 do
+		regionRowSave = regionSave [y]
+		regionRow [y] = { }
+		regionRow [y] ["SIDE"] = { }
+		regionRow [y] ["TOP"] = { }
+		regionRow [y] ["PHYSICS"] = { }
+		regionRow [y] ["TILE"] = { }
+		-- regionRow ["GROUP"] = display.newGroup()
+		
+		for x = 1, table.maxn(regionRowSave) do
+			print (x)
+			local wallTile = 0
+			if ( parameters.wallFirst ) then
+				wallTile = 1
+			end
+			
+			if (y % 2 == wallTile  and x % 2 == wallTile) then -- CORNER
+				if (regionRowSave[x] == 0) then
+					regionRow[y]["SIDE"][x]=display.newImageRect("tiles/SidePillar.png",thirdTileSize,fullTileSize)
+					regionRow[y]["TOP"][x]=display.newImageRect("tiles/TopPillar.png",thirdTileSize,thirdTileSize)
+					regionRow[y]["PHYSICS"][x]=display.newRect(0,0,thirdTileSize,thirdTileSize)
+					
+					regionRow[y]["TOP"][x].yScale=0.4
+				else
+					regionRow[y]["TILE"][x]=display.newImageRect("tiles/FloorCorner.png",thirdTileSize,thirdTileSize)
+				end
+			elseif (y % 2 == wallTile) then -- HORIZONTAL WALL
+				if (regionRowSave[x] == 0) then
+					regionRow[y]["SIDE"][x]=display.newImageRect("tiles/SideWall.png",fullTileSize,fullTileSize)
+					regionRow[y]["TOP"][x]=display.newImageRect("tiles/TopWall.png",fullTileSize,thirdTileSize)
+
+					regionRow[y]["PHYSICS"][x]=display.newRect(0,0,fullTileSize,thirdTileSize)
+					
+					
+					regionRow[y]["TOP"][x].yScale=0.4
+				else
+					regionRow[y]["TILE"][x]=display.newImageRect("tiles/FatFloor.png",fullTileSize,thirdTileSize)
+				end
+			elseif (x % 2 == wallTile) then -- VERTICAL WALL
+				if (regionRowSave[x] == 0) then
+					regionRow[y]["SIDE"][x]=display.newImageRect("tiles/SidePillar.png",thirdTileSize,fullTileSize)
+					regionRow[y]["TOP"][x]=display.newImageRect("tiles/TopWall.png",fullTileSize,thirdTileSize)
+					regionRow[y]["PHYSICS"][x]=display.newRect(0,0,thirdTileSize,sevenTileSize)
+					
+					regionRow[y]["TOP"][x]:rotate(90)
+					regionRow[y]["TOP"][x].xScale=0.85
+					regionRow[y]["SIDE"][x].yScale=0.8
+				else
+					regionRow[y]["TILE"][x]=display.newImageRect("tiles/SlimFloor.png",thirdTileSize,sevenTileSize)
+				end
+			else
+				regionRow[y]["TILE"][x]=display.newImageRect("tiles/FloorTile.png",fullTileSize,sevenTileSize)
+			end
+			
+			
+			
+			if (regionRow[y]["PHYSICS"][x]) then
+				regionRow[y]["PHYSICS"][x].x=sevenTileSize*x
+				regionRow[y]["PHYSICS"][x].y=(fullTileSize/2)*(y-localRow)
+				regionRow[y]["PHYSICS"][x]:setFillColor(0.8,0.4,0.4)
+				-- physics.addBody(regionRow[y]["PHYSICS"][x],"static",{friction=0.5,filter={categoryBits=1,maskBits=2}})
+				
+				regionRow ["GROUP"] :insert ( regionRow [y] ["PHYSICS"] [x] )
+			end
+			
+			if (regionRow[y]["TOP"][x]) then
+				regionRow[y]["TOP"][x].x=regionRow[y]["PHYSICS"][x].x
+				regionRow[y]["TOP"][x].y=regionRow[y]["PHYSICS"][x].y-(fullTileSize*0.9)
+				
+				regionRow ["GROUP"] :insert ( regionRow [y] ["TOP"] [x] )
+			end
+			
+			if (regionRow[y]["SIDE"][x]) then
+				regionRow[y]["SIDE"][x].x=regionRow[y]["PHYSICS"][x].x
+				regionRow[y]["SIDE"][x].y=regionRow[y]["PHYSICS"][x].y-14
+				
+				if (y % 2 == wallTile) then
+					regionRow[y]["SIDE"][x].y=regionRow[y]["SIDE"][x].y-thirdTileSize+14
+				end
+				
+				regionRow ["GROUP"] :insert ( regionRow [y] ["SIDE"] [x] )
+			end
+			
+			if (regionRow[y]["TILE"][x]) then
+				regionRow[y]["TILE"][x].x=sevenTileSize*x
+				regionRow[y]["TILE"][x].y=(fullTileSize/2)*(y-localRow)
+				
+				regionRow ["GROUP"] :insert ( regionRow [y] ["TILE"] [x] )
+			end
 		end
 	end
-	Region["PHYSICS"]=nil
-	Region["PHYSICS"]={}
-	Region["TOP"]=nil
-	Region["TOP"]={}
-	Region["SIDE"]=nil
-	Region["SIDE"]={}
-	Region["TILE"]=nil
-	Region["TILE"]={}
-	Region["Gradients"]=nil
-	Region["Gradients"]={}
-	for i=1,table.maxn(Region["REGION"]) do
-		grads={}
-		if Region["REGION"][i].class=="WALLY" then
-			if Region["REGION"][i].open==false then
-				Region["SIDE"][i]=display.newImageRect("tiles/SideWall.png",Region.tile,Region.tile)
-				Region["TOP"][i]=display.newImage("tiles/TopWall.png",Region.tile,Region.tile/3)
-				Region["PHYSICS"][i]=display.newRect(0,0,Region.tile,Region.tile/3)
-				
-				
-				Region["TOP"][i].yScale=0.4
+	
+	-- # CLOSING
+	Create:sendRegion( regionRow, parameters.row, parameters.region.x )
+end
+
+function Create:buildTemplate( parameters )
+	-- # OPENING
+	if (Create.verbose) then
+		print "BUILDING TEMPLATE"
+	end
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	buildingRegion = { }
+	
+	for y = 1, parameters.halls * 2 do
+		buildingRegion [y] = { }
+		for x = 1, parameters.halls * 2 do
+			buildingRegion [y] [x] = { }
+			local wallTile = 0
+			if ( parameters.wallFirst ) then
+				wallTile = 1
+			end
+			if (y % 2 == wallTile and x % 2 == wallTile) then
+				buildingRegion [y] [x] .class = "CORNER"
+				buildingRegion [y] [x] .solid = true
+			elseif (y % 2 == wallTile) then
+				buildingRegion [y] [x] .class = "WALL"
+				buildingRegion [y] [x] .solid = false
+			elseif (x % 2 == wallTile) then
+				buildingRegion [y] [x] .class = "WALL"
+				buildingRegion [y] [x] .solid = false
 			else
-				Region["TILE"][i]=display.newImageRect("tiles/FloorWall2.png",Region.tile,Region.tile/3)
+				buildingRegion [y] [x] .class = "TILE"
+				buildingRegion [y] [x] .solid = false
 			end
-		elseif Region["REGION"][i].class=="WALLX" then
-			if Region["REGION"][i].open==false then
-				Region["TOP"][i]=display.newImage("tiles/TopWall.png",Region.tile/1.5,Region.tile/3)
-				Region["SIDE"][i]=display.newImageRect("tiles/SidePillar.png",Region.tile/3,Region.tile)
-				Region["PHYSICS"][i]=display.newRect(0,0,Region.tile/3,Region.tile/1.5)
+		end
+	end
+	
+	-- # CLOSING
+	Create:buildWalls( parameters, buildingRegion )
+end
+
+function Create:buildWalls( parameters, buildingRegion )
+	-- # OPENING
+	if (Create.verbose) then
+		print "RISING WALLS"
+	end
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	local walls = { }
+	local cap
+	-- LOCAL FUNCTIONS
+	
+	local function shuffle ( array )
+
+		for i = 1, table.maxn (array) - 1 do
+
+			local randomIndex = math.random ( i, table.maxn(array) )
+			local tempItem = array [randomIndex]
+			array [randomIndex] = array [i]
+			array [i] = tempItem
+			
+		end
+
+		return array
+	end
+	
+	-- # BODY
+	
+	for y = 1, parameters .halls * 2 do
+		for x = 1, parameters .halls * 2 do
+			if ( buildingRegion [y] [x] .class == "WALL" ) then
+				walls [table.maxn(walls) + 1] = { x = x, y = y }
+			end
+		end
+	end
+	
+	walls = shuffle( walls )
+	
+	cap = math.floor( table.maxn( walls ) * Create .obstaclePercentage )
+	
+	for i = 1, cap do
+		local x = walls[i].x
+		local y = walls[i].y
+		buildingRegion [y] [x] .solid = true
+		
+		if ( not Create:checkOpen( parameters, buildingRegion ) ) then
+			buildingRegion [y] [x] .solid = false
+		end
+	end
+	
+	-- # CLOSING
+	Create:saveRegion( parameters, buildingRegion )
+	Create:start( parameters )
+end
+
+function Create:saveRegion( parameters, buildingRegion )
+	if (Create.verbose) then
+		print "SAVING REGION"
+	end
+	
+	local slot = require( "lua.slot" )
+	
+	slot.Save:keepRegionData( buildingRegion, parameters.region.x, parameters.region.y )
+end
+
+function Create:checkOpen( parameters, buildingRegion )
+	-- # OPENING
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	local xCenter
+	local yCenter
+	local nonSolids = 0
+	local openCount = 0
+	local floodCheck = { }
+	local floodDone
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	
+	xCenter = parameters .halls
+	yCenter = parameters .halls
+	
+	if (buildingRegion [yCenter] [xCenter] .class == "CORNER") then
+		xCenter = xCenter + 1
+		yCenter = yCenter + 1
+	end
+	
+	-- 
+	-- FLOOD CHECK MEANING
+	-- 
+	-- 0 : SOLID
+	-- 1 : NOT SOLID
+	-- 2 : SPREAD MISSING
+	-- 3 : SPREAD DONE
+	-- 
+	
+	for y = 1, parameters .halls * 2 do
+		floodCheck [y] = { }
+		for x = 1, parameters .halls * 2 do
+			floodCheck [y] [x] = 1
+			if ( not buildingRegion [y] [x] .solid ) then
+				nonSolids = nonSolids + 1
+				floodCheck [y] [x] = 0
+			end
+		end
+	end
+	
+	floodCheck[yCenter][xCenter] = 2
+	floodDone = false
+	while (not floodDone) do
+		floodDone = true
+		
+		for y = 1, parameters .halls * 2 do
+			for x = 1, parameters .halls * 2 do
 				
-				Region["TOP"][i]:rotate(90)
-				Region["TOP"][i].xScale=0.85
-				Region["TOP"][i].yScale=0.95
-				Region["SIDE"][i].yScale=0.8
-			else
-				Region["TILE"][i]=display.newImageRect("tiles/FloorWall1.png",Region.tile/1.5,Region.tile/3)
-				Region["TILE"][i]:rotate(90)
-			end
-		elseif Region["REGION"][i].class=="CORNER" then
-			if Region["REGION"][i].open==false then
-				Region["SIDE"][i]=display.newImageRect("tiles/SidePillar.png",Region.tile/3,Region.tile)
-				Region["TOP"][i]=display.newImage("tiles/TopPillar.png",Region.tile/3,Region.tile/3)
-				Region["PHYSICS"][i]=display.newRect(0,0,Region.tile/3,Region.tile/3)
-				
-				Region["TOP"][i].yScale=0.4
-				Region["TOP"][i].xScale=0.95
-			else
-				Region["TILE"][i]=display.newImageRect("tiles/FloorCorner.png",Region.tile/3,Region.tile/3)
-			end
-		elseif Region["REGION"][i].class=="TILE" then
-			Region["TILE"][i]=display.newImageRect("tiles/FloorTile.png",Region.tile,Region.tile/1.5)
-		end
-		if (Region["PHYSICS"][i]) then
-			Region["PHYSICS"][i].x=Create.POSITION.BEGIN.x+((Region.tile/1.5)*(Region["REGION"][i].col))
-			Region["PHYSICS"][i].y=Create.POSITION.BEGIN.y+((Region.tile/2)*(Region["REGION"][i].row))
-			Region["PHYSICS"][i]:setFillColor(0.8,0.4,0.4)
-			physics.addBody(Region["PHYSICS"][i],"static",{friction=0.5,filter={categoryBits=1,maskBits=2}})
-		end
-		if (Region["TOP"][i]) then
-			Region["TOP"][i].x=Region["PHYSICS"][i].x
-			Region["TOP"][i].y=Region["PHYSICS"][i].y-(Region.tile*0.9)
-		end
-		if (Region["SIDE"][i]) then
-			Region["SIDE"][i].x=Region["PHYSICS"][i].x
-			Region["SIDE"][i].y=Region["PHYSICS"][i].y-(Region.tile/3)
-			if Region["REGION"][i].class=="WALLX" then
-				Region["SIDE"][i].y=Region["PHYSICS"][i].y-13
-			end
-		end
-		if (Region["TILE"][i]) then
-			Region["TILE"][i].x=Create.POSITION.BEGIN.x+((Region.tile/1.5)*(Region["REGION"][i].col))
-			Region["TILE"][i].y=Create.POSITION.BEGIN.y+((Region.tile/2)*(Region["REGION"][i].row))
-			if Region["TILE"][i].col==1 or Region["TILE"][i].col==13 or Region["TILE"][i].row==1 or Region["TILE"][i].row==13 then
-				Region["TILE"][i]:setFillColor(0,0,1)
-			end
-		end
-		if (grads) then
-			local basetile=Region["TILE"][i] or Region["PHYSICS"][i]
-			for a in ipairs(grads) do
-				if Region["REGION"][i].class=="TILE" or Region["REGION"][i].class=="WALLX" then
-					if (grads[2]) then
-						if a==1 then
-							grads[a].x=basetile.x-50
-						elseif a==2 then
-							grads[a].x=basetile.x+50
+				if (floodCheck [y] [x] == 2) then
+					floodDone = false
+					openCount = openCount + 1
+					
+					if (x > 1) then
+						if (floodCheck [y] [x - 1] == 1) then
+							floodCheck [y] [x - 1] = 2
 						end
-					else
-						grads[a].x=basetile.x
 					end
-					grads[a].y=basetile.y-17
-				elseif Region["REGION"][i].class=="WALLY" then
-					if a==1 then
-						grads[a].x=basetile.x-50
-					elseif a==2 then
-						grads[a].x=basetile.x+50
+					
+					if (y > 1) then
+						if (floodCheck [y - 1] [x] == 1) then
+							floodCheck [y - 1] [x] = 2
+						end
 					end
-					grads[a].y=basetile.y-16
+					
+					if (x < parameters.halls * 2) then
+						if (floodCheck [y] [x + 1] == 1) then
+							floodCheck [y] [x + 1] = 2
+						end
+					end
+					
+					if (y < parameters.halls * 2) then
+						if (floodCheck [y + 1] [x] == 1) then
+							floodCheck [y + 1] [x] = 2
+						end
+					end
+					floodCheck [y] [x] = 3
 				end
 			end
 		end
-		Region["Gradients"][i]=grads
-	end
 	
-	
-	for i=1,Region.side^2 do
-		rowval=Region["REGION"][i].row+1
-		if not (Region.regRows[rowval]) then
-			Region.regRows[rowval]=display.newGroup()
-			Region.regRows[rowval].toLayer=function() end
-			Region.regRows[rowval].row=rowval
-			Region.regRows[rowval].isVisible=false
-		end
-		
-		if (Region["SIDE"][i]) then
-			Region.regRows[rowval]:insert(Region["SIDE"][i])
-			Region.regRows[rowval].askedY=Region["SIDE"][i].contentBounds.yMax
-		end
-		if (Region["TOP"][i]) then
-			Region.regRows[rowval]:insert(Region["TOP"][i])
-		end
-	end
-	
-	for i=1,Region.side^2 do
-		if (Region["TILE"][i]) then
-			Region.Level:insert(Region["TILE"][i])
-		end
-		if (Region["PHYSICS"][i]) then
-			Region.Level:insert(Region["PHYSICS"][i])
-		end
-	end
-	for i=1,Region.side^2 do
-		if (Region["Gradients"][i]) then
-			for a in ipairs(Region["Gradients"][i]) do
-				Region.Level:insert(Region["Gradients"][i][a])
-			end
-		end
 	end
 	
 	-- # CLOSING
-	Create:Progress()
+	return (openCount == nonSolids)
 end
 
-function Create:Progress()
-	-- # OPENING
-	-- DEPENDENCIES
+function Create:sendRegion( region, row, regionIndex )
+	if (Create.verbose) then
+		print "SENDING REGION"
+	end
+	
 	local game=require("lua.game")
-	-- FORWARD CALLS
-	local funcs
-	local funcnames
-	-- LOCAL FUNCTIONS
 	
-	-- # BODY
-	funcs={
-		Create.sheet,Create.Template,Create.Walls,Create.Pathfinding,Create.Visualize
-	}
-	funcnames={
-		"Sheet","Template","Walls","Pathfinding","Visualize"
-	}
-	if not (Create.progress) then
-		Create.progress=0
-	end
-	Create.progress=Create.progress+1
-	if (Create["loadinfo"] and funcnames[Create.progress]=="Pathfinding") then
-		Create.progress=Create.progress+1
-	end
-	if Create.progress>table.maxn(funcs) then
-		Create.progress=0
-		game.HandleRegions:setRegion(Region)
-	else
-		print (funcnames[Create.progress])
-		funcs[Create.progress]()
-	end
-	
-	-- # CLOSING
+	game.HandleRows:addRegion( region["GROUP"], row, regionIndex )
 end
+
 
 

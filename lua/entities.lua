@@ -120,19 +120,6 @@ function Spawn(ax,ay)
 	enemy.isFixedRotation=true
 	enemy["CATEGORY"]="ENEMY"
 	
-	asd=
-	{
-		text = "",     
-		x = 0,
-		y = 50,
-		width = 200,     --required for multi-line and alignment
-		font = native.systemFont,   
-		fontSize = 30,
-		align = "center"  --new alignment parameter
-	}
-	enemy.textd=display.newText(asd)
-	enemy:insert(enemy.textd)
-	
 	-- Map Essentials
 	enemy["CURX"]=1
 	enemy["CURY"]=1
@@ -241,12 +228,6 @@ function Spawn(ax,ay)
 			enemy.saturation()
 		end
 		enemy.shadow:toBack()
-		
-		
-		-- enemy.textd.text=(math.floor(enemy.x)..", "..math.floor(enemy.y).."\n"..enemy.MAPX..", "..enemy.MAPY)
-		-- enemy.textd.text=(enemy.CURX..", "..enemy.CURY.."\n"..enemy.MAPX..", "..enemy.MAPY)
-		enemy.textd.text=(enemy["MODE"].."\n"..enemy.CURX..", "..enemy.CURY.." : "..enemy.MAPX..", "..enemy.MAPY)
-		
 		
 		enemy["WEAPON"]["basedamage"]=enemy["STATS"]["Damage"]
 		
@@ -1064,26 +1045,11 @@ function CreatePlayer(name)
 		player.x, player.y = display.contentWidth/2, display.contentHeight/2
 		player["CATEGORY"]="PLAYER"
 		
-		asd=
-		{
-			text = "",     
-			x = 0,
-			y = 80,
-			width = 200,     --required for multi-line and alignment
-			font = native.systemFont,   
-			fontSize = 30,
-			align = "center"  --new alignment parameter
-		}
-		player.textd=display.newText(asd)
-		player:insert(player.textd)
-		-- player.textd.width=200
-		-- player.textd.align="center"
-		
 		-- Map Essentials
-		player["POSITION"]={}
-		player["POSITION"]["REGION"]={x=0,y=0,q=1}
-		player["POSITION"]["GLOBAL"]={x=5,y=5}
-		player["POSITION"]["REGIONAL"]={x=5,y=5}
+		-- player["POSITION"]={}
+		-- player["POSITION"]["REGION"]={x=0,y=0,q=1}
+		-- player["POSITION"]["GLOBAL"]={x=5,y=5}
+		-- player["POSITION"]["REGIONAL"]={x=5,y=5}
 		-- player["CHUNK"]={x=0, y=0}
 		-- player["TILE"]={x=1, y=1}
 		-- player["MAPY"]=0
@@ -1165,16 +1131,6 @@ function CreatePlayer(name)
 			
 			
 			player:regeneration()
-			-- player.textd.text=(math.floor(player.x)..", "..math.floor(player.y).."\n"..player.MAPX..", "..player.MAPY)
-			player.textd.text=(
-				player.POSITION.GLOBAL.x..", "..
-				player.POSITION.GLOBAL.y.."\n"..
-				player.POSITION.REGION.x..", "..
-				player.POSITION.REGION.y..", "..
-				player.POSITION.REGION.q.."\n"..
-				player.POSITION.REGIONAL.x..", "..
-				player.POSITION.REGIONAL.y
-			)
 			
 			player["WEAPON"]["basedamage"]=player["STATS"]["Damage"]
 		
@@ -1464,6 +1420,9 @@ function CreatePlayer(name)
 	-- player.SPD=(1.00-(player.stats[2]/100))
 		-- player:refresh()
 		Runtime:addEventListener("enterFrame",player.refresh)
+		
+		player.x = 1
+		player.y = 1
 	end
 	
 	-- # CLOSING

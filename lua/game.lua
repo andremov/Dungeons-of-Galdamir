@@ -7,91 +7,27 @@ module(..., package.seeall)
 
 -- FORWARD CALLS
 local mapsDone=false
-local maxmap=1000
 local displayedRegions={}
 local spawnedEnemies={}
+
+local regionSettings = {
+		halls = 5,
+		tileSize = 200,
+		wallFirst = true,
+		requestDimensions = 5,
+		fixDimensions = 5,
+		maxRegions = 10,
+	}
+local fullTileMultiplier = 1.0
+local wallTileMultiplier = 0.3
+local centerMap = {  x = 0, y = 0 }
+local displayedRows = { }
+
+local debugPos
 
 ---------------------------------------------------------------------------------------
 -- LOCAL FUNCTIONS
 ---------------------------------------------------------------------------------------
-
-local function getLowestMap()
-	-- # OPENING
-	-- DEPENDENCIES
-	-- FORWARD CALLS
-	local xi
-	local yi
-	local map
-	local compx
-	local compy
-	-- LOCAL FUNCTIONS
-	
-	-- # BODY
-	xi=displayedRegions[1].POSITION.BEGIN.x
-	yi=displayedRegions[1].POSITION.BEGIN.y
-	
-	map=1
-	for i=1,4 do
-		if (displayedRegions[i]) then
-			compx=displayedRegions[i].POSITION.BEGIN.x
-			compy=displayedRegions[i].POSITION.BEGIN.y
-			if (compx<=xi) and (compy<=yi) then
-				map=i
-			end
-		end
-	end
-	
-	-- # CLOSING
-	return map
-end
-
-local function getLowestMapPosition()
-	-- # OPENING
-	-- DEPENDENCIES
-	-- FORWARD CALLS
-	local xi
-	local yi
-	-- LOCAL FUNCTIONS
-	
-	-- # BODY
-	xi=displayedRegions[getLowestMap()].POSITION.BEGIN.x
-	yi=displayedRegions[getLowestMap()].POSITION.BEGIN.y
-	
-	-- # CLOSING
-	return xi,yi
-end
-
-local function getLowestMapCoordinates()
-	-- # OPENING
-	-- DEPENDENCIES
-	-- FORWARD CALLS
-	local xi
-	local yi
-	-- LOCAL FUNCTIONS
-	
-	-- # BODY
-	xi=displayedRegions[getLowestMap()]["MAPX"]
-	yi=displayedRegions[getLowestMap()]["MAPY"]
-	
-	-- # CLOSING
-	return xi,yi
-end
-
-local function getLowestMapTileCoordinates()
-	-- # OPENING
-	-- DEPENDENCIES
-	-- FORWARD CALLS
-	local xi
-	local yi
-	-- LOCAL FUNCTIONS
-	
-	-- # BODY
-	xi=displayedRegions[getLowestMap()].POSITION.TILE.x
-	yi=displayedRegions[getLowestMap()].POSITION.TILE.y
-	
-	-- # CLOSING
-	return xi,yi
-end
 
 local function checkPlayerAttackContact()
 	-- # OPENING
@@ -150,131 +86,130 @@ local function checkPlayerAttackContact()
 	end
 end
 
-local function quadCheck()
+local function getPlayerCurrents()
 	-- # OPENING
 	-- DEPENDENCIES
 	-- FORWARD CALLS
-	local xm
-	local ym
-	local newquad
+	local current = { }
+	local regionSize = regionSettings.halls * regionSettings.tileSize
+	local mapSize = regionSize * regionSettings.maxRegions * 2
 	-- LOCAL FUNCTIONS
 	
 	-- # BODY
-	xm=displayedRegions[1].POSITION.MID.x
-	ym=displayedRegions[1].POSITION.MID.y
+
+	local fixedPlayerCoords = {
+		x = p1.x,
+		y = p1.y
+	}
 	
-	if (xm) and (ym) then
-		newquad=1
-		
-		if p1.x>xm then
-			newquad=newquad+1
-		end
-		
-		if p1.y>ym then
-			newquad=newquad+2
-		end
+	while (fixedPlayerCoords.x < 0) do
+		fixedPlayerCoords.x = fixedPlayerCoords.x + mapSize
 	end
 	
+	while (fixedPlayerCoords.y < 0) do
+		fixedPlayerCoords.y = fixedPlayerCoords.y + mapSize
+	end
+	
+	
+	fixedPlayerCoords.x = fixedPlayerCoords.x % mapSize
+	
+	fixedPlayerCoords.y = fixedPlayerCoords.y % mapSize
+	
+	current.regionSize = regionSize
+	
+	current.mapSize = mapSize
+	
+	current.inMapPixels = { x = math.floor(fixedPlayerCoords.x), y = math.floor(fixedPlayerCoords.y) }
+	
+	current.realPixels = { x = math.floor(p1.x), y = math.floor(p1.y) }
+	
+	current.globalTile = {
+		x = math.ceil(current.inMapPixels.x / regionSettings.tileSize),
+		y = math.ceil(current.inMapPixels.y / regionSettings.tileSize)
+	}
+	
+	current.region = {
+		x = math.ceil(current.globalTile.x / regionSettings.halls),
+		y = math.ceil(current.globalTile.y / regionSettings.halls)
+	}
+	
+	current.regionPixels = {
+		x = current.inMapPixels.x - ((current.region.x - 1) * regionSize),
+		y = current.inMapPixels.y - ((current.region.y - 1) * regionSize)
+	}
+	
+	current.regionalTile = {
+		x = current.globalTile.x - ((current.region.x - 1) * regionSettings.halls),
+		y = current.globalTile.y - ((current.region.y - 1) * regionSettings.halls)
+	}
+
 	-- # CLOSING
-	if p1.POSITION.REGION.q~=newquad then
-		return newquad
-	end
-	return nil
+	return current
 end
 
-local function checkPlayerCoordinates()
-	-- # OPENING
-	-- DEPENDENCIES
-	-- FORWARD CALLS
-	local lowestX
-	local lowestY
-	local lowestTileX
-	local lowestTileY
-	local deltaY
-	local tileSizeY
-	local tileY
-	local deltaX
-	local tileSizeX
-	local tileX
-	local xi
-	local yi
-	local xf
-	local yf
-	local newmapx
-	local newmapy
-	local quadchange
-	-- LOCAL FUNCTIONS
+local function playerCheckRefresh()
+	local current = getPlayerCurrents()
 	
-	-- # BODY
-	lowestX,lowestY=getLowestMapPosition()
-	lowestTileX,lowestTileY=getLowestMapTileCoordinates()
-	
-	deltaY=p1.y-lowestY
-	tileSizeY=200
-	tileSizeY=(tileSizeY/1.5)+(tileSizeY/3)
-	tileY=math.floor(deltaY/tileSizeY)+1
-	-- tileY=tileY+lowestTileY
-	
-	deltaX=p1.x-lowestX
-	tileSizeX=200
-	tileSizeX=(tileSizeX)+(tileSizeX/3)
-	tileX=math.floor(deltaX/tileSizeX)+1
-	-- tileX=tileX+lowestTileX
-	
-	if p1.POSITION.REGIONAL.x~=tileX or p1.POSITION.REGIONAL.y~=tileY then
-	
-		p1.POSITION.REGIONAL.x=tileX
-		p1.POSITION.REGIONAL.y=tileY
+	if (not debugPos) then
+		debugPos = display.newGroup()
+		debugPos.y = 10
+		debugPos.x = -60
+		-- debugPos.anchorY = 
 		
-		p1.POSITION.GLOBAL.x=tileX+lowestTileX
-		p1.POSITION.GLOBAL.y=tileY+lowestTileY
+		local square = display.newRect(0,0,360,210)
+		square.anchorX = 0
+		square.anchorY = 0
+		debugPos:insert(square)
 		
-		if p1.POSITION.REGIONAL.y~=tileY then
-			print ("PLAYER Y: "..tileY)
+		debugPos .texts = { }
+		
+		local i = 1
+		for k,v in pairs(current) do
+		
+			local fullString
+			
+			if (type(v) == "table") then
+				fullString = k .. ":  " .. v.x .. ", " .. v.y
+			else
+				fullString = k .. ":  " .. v
+			end
+			
+			debugPos .texts [i] = display.newText(fullString, 0, 0, native.systemFont, 25)
+			debugPos .texts [i] .anchorX = 0
+			debugPos .texts [i] .anchorY = 0
+			debugPos .texts [i] .y = (i - 1) * 25
+			debugPos .texts [i] .x = 5
+			debugPos .texts [i]:setTextColor(0,0,0)
+			debugPos:insert(debugPos .texts [i])
+			i = i + 1
 		end
 		
-		xi=displayedRegions[1].POSITION.BEGIN.x
-		yi=displayedRegions[1].POSITION.BEGIN.y
+		-- debugPos.x = 100
+		-- debugPos.y = 60
+	else
+		local i = 1
+		for k,v in pairs(current) do
 		
-		xf=displayedRegions[1].POSITION.END.x
-		yf=displayedRegions[1].POSITION.END.y
-		
-		newmapx=0
-		newmapy=0
-		
-		if p1.x>xf then
-			-- print "OVER X"
-			newmapx=newmapx+1
-		elseif p1.x<xi then
-			-- print "UNDER X"
-			newmapx=newmapx-1
-		end
-		
-		if p1.y>yf then
-			-- print "OVER Y"
-			newmapy=newmapy+1
-		elseif p1.y<yi then
-			-- print "UNDER Y"
-			newmapy=newmapy-1
-		end
-		
-		quadchange=quadCheck()
-		
-		if newmapx~=0 or newmapy~=0 or (quadchange) then
-			HandleRegions:regionSwitch(newmapx,newmapy,quadchange)
+			local fullString
+			
+			if (type(v) == "table") then
+				fullString = k .. ":  " .. v.x .. ", " .. v.y
+			else
+				fullString = k .. ":  " .. v
+			end
+			
+			debugPos .texts [i] .text = fullString
+			i = i + 1
 		end
 	end
-	
-	-- # CLOSING
 end
-
 
 
 ---------------------------------------------------------------------------------------
 -- STARTUP
 ---------------------------------------------------------------------------------------
 
-Initial={}
+Initial = { }
 
 
 function Initial:loadScreen()
@@ -344,24 +279,34 @@ function Initial:create(slot,value)
 	-- DEPENDENCIES
 	local entity=require("lua.entities")
 	local per=require("lua.perspective")
-	local save=require("lua.save")
+	local slot=require("lua.slot")
 	-- FORWARD CALLS
 	local data
 	-- LOCAL FUNCTIONS
 	
 	-- # BODY
-	Initial:loadScreen()
-	save.setSlot(slot)
+	print "LOAD SCREEN SKIPPED"
+	-- Initial:loadScreen()
+	print "SET SAVE SLOT SKIPPED"
+	-- save.setSlot(slot)
+	-- print "VIEW CREATION SKIPPED"
 	view=per.createView()
-	data=save.Load:retrieveData()
-	p1=entity.CreatePlayer( value )
-	if (data) then
-		LoadData:setPlayerValues(data)
-	end
+	print "LOAD SAVE SLOT SKIPPED"
+	-- data=save.Load:retrieveData()
+	-- print "CREATE PLAYER SKIPPED"
+	p1=entity.CreatePlayer( value or "Player" )
+	print (p1.x,p1.y)
+	print "SET PLAYER VALUES SKIPPED"
+	-- if (data) then
+		-- LoadData:setPlayerValues(data)
+	-- end
 	
 	-- # CLOSING
-	Initial:wait()
-	HandleRegions:regionDisplay()
+	-- print "CONTINUE ACTIONS SKIPPED"
+	-- Initial:wait()
+	Initial:Continue()	
+	-- print "REGION DISPLAY SKIPPED"
+	HandleRows:requestRows()
 end
 
 function Initial:wait()
@@ -388,26 +333,35 @@ function Initial:Continue()
 	-- LOCAL FUNCTIONS
 	
 	-- # BODY
-	for i=LoadingScreen.numChildren,1,-1 do
-		if (LoadingScreen[i]) then
-			display.remove(LoadingScreen[i])
-			LoadingScreen[i]=nil
-		end
-	end
-	LoadingScreen=nil
+	-- for i=LoadingScreen.numChildren,1,-1 do
+		-- if (LoadingScreen[i]) then
+			-- display.remove(LoadingScreen[i])
+			-- LoadingScreen[i]=nil
+		-- end
+	-- end
+	-- LoadingScreen=nil
 	
 	ui.Essentials()
 	ui.Controls:show()
-	view:add(p1,35,true)
+	view:add(p1,2,true)
 	view:setBounds(false)
 	view:track()
 	-- HandleEnemies:start()
 	-- Initial:firstSave()
-	Runtime:addEventListener("enterFrame",HandleEnemies.frameChecks)
-	Runtime:addEventListener("enterFrame",checkPlayerCoordinates)
+	Runtime:addEventListener("enterFrame",HandleRows.movementEvents)
+	-- Runtime:addEventListener("enterFrame",HandleEnemies.frameChecks)
+	-- Runtime:addEventListener("enterFrame",checkPlayerCoordinates)
+	
+	displayedRows = { }
+	
+	for region = 1, regionSettings.maxRegions * 2 do
+		displayedRows [region] = { }
+		for row = 1, regionSettings.halls * regionSettings.maxRegions do
+			displayedRows [region] [row] = { }
+		end
+	end
 	
 	-- # CLOSING
-	Controls:Move(0,0)
 end
 
 function Initial:firstSave()
@@ -434,358 +388,290 @@ end
 -- HANDLE MAPS
 ---------------------------------------------------------------------------------------
 
-HandleRegions={}
 
+HandleRows = { }
 
-function HandleRegions:getEmptyRegion()
-	-- # OPENING
-	-- DEPENDENCIES
-	-- FORWARD CALLS
-	local spot
-	local found
-	-- LOCAL FUNCTIONS
-	
-	-- # BODY
-	spot=1
-	found=false
-	while spot<=1 and found==false do
-		if displayedRegions[spot]==nil then
-			found=true
-		else
-			spot=spot+1
-		end
-	end
-	if found==false then
-		spot=nil
-	end
-	
-	-- # CLOSING
-	return spot
-end
-
-function HandleRegions:regionDisplay()
+function HandleRows:requestRows()
 	-- # OPENING
 	-- DEPENDENCIES
 	local builder=require("lua.builder")
-	local save=require("lua.save")
+	-- local save=require("lua.save")
 	-- FORWARD CALLS
-	local mapstodisplay
-	local side
-	local tile
-	local deltaX
-	local deltaY
-	local result
-	local nx
-	local ny
-	local npx
-	local npy
-	local mapinfo
+	local mapSize = regionSettings.halls * regionSettings.tileSize
+	local scale = 0.2
+	local current = getPlayerCurrents()
+	local centerX = current.globalTile.x
+	local centerY = current.globalTile.y
 	-- LOCAL FUNCTIONS
 	
 	-- # BODY
 	mapsDone=false
-	mapstodisplay={
-		{ p1.POSITION.REGION.x,p1.POSITION.REGION.y},
-		{},
-		{},
-		{}
-	}
 	
-	side=14
-	tile=200
-	deltaX=side/2
-	deltaX=(deltaX*tile)+(deltaX*(tile/3))
-	deltaY=side/2
-	deltaY=(deltaY*(tile/1.5))+(deltaY*(tile/3))
+	local pendingRows = { }
 	
-	if (displayedRegions[1]) then
-		mapstodisplay[1][3]=displayedRegions[1].Xi or display.contentCenterX-(tile/2)
-		mapstodisplay[1][4]=displayedRegions[1].Yi or display.contentCenterY-(tile/2)
-	else
-		mapstodisplay[1][3]=display.contentCenterX-(tile/2)
-		mapstodisplay[1][4]=display.contentCenterY-(tile/2)
-	end
-	
-	if p1.POSITION.REGION.q%2==0 then
-		mapstodisplay[2]={
-			mapstodisplay[1][1]+1,
-			mapstodisplay[1][2],
-		}
-		mapstodisplay[2][3]=mapstodisplay[1][3]+deltaX
-	else
-		mapstodisplay[2]={
-			mapstodisplay[1][1]-1,
-			mapstodisplay[1][2],
-		}
-		mapstodisplay[2][3]=mapstodisplay[1][3]-deltaX
-	end
-	mapstodisplay[2][4]=mapstodisplay[1][4]
-	
-	if p1.POSITION.REGION.q<3 then
-		mapstodisplay[3]={
-			mapstodisplay[1][1],
-			mapstodisplay[1][2]-1,
-		}
-		mapstodisplay[3][4]=mapstodisplay[1][4]-deltaY
-	else
-		mapstodisplay[3]={
-			mapstodisplay[1][1],
-			mapstodisplay[1][2]+1,
-		}
-		mapstodisplay[3][4]=mapstodisplay[1][4]+deltaY
-	end
-	mapstodisplay[3][3]=mapstodisplay[1][3]
-	
-	for m=2,3 do
-		for v=1,2 do
-			if mapstodisplay[m][v]>maxmap then
-				mapstodisplay[m][v]=-maxmap
-			elseif  mapstodisplay[m][v]<-maxmap then
-				mapstodisplay[m][v]=maxmap
-			end
-		end
-	end
-	
-	mapstodisplay[4]={mapstodisplay[2][1],mapstodisplay[3][2],mapstodisplay[2][3],mapstodisplay[3][4]}
-	
-	for m in ipairs(displayedRegions) do
-		if (displayedRegions[m].POSITION.REGION.x~=mapstodisplay[m][1]) or (displayedRegions[m].POSITION.REGION.y~=mapstodisplay[m][2]) then
-			HandleRegions:cleanRegion(m)
-		end
-	end
-	
-	result=HandleRegions:getEmptyRegion()
-	if (result) then
-		nx=mapstodisplay[result][1]
-		ny=mapstodisplay[result][2]
-		npx=mapstodisplay[result][3]
-		npy=mapstodisplay[result][4]
+	for rowX = centerX - regionSettings.requestDimensions, centerX + regionSettings.requestDimensions do
+		for rowY = centerY - regionSettings.requestDimensions, centerY + regionSettings.requestDimensions do
 		
-		mapinfo=save.Load:getMap(nx,ny)
-		-- print ("SEQUENCING: "..nx,ny,mapinfo)
-		builder.Create:Start(nx,ny,mapinfo,npx,npy,maxmap)
-	else
-		for m in ipairs(displayedRegions) do
-			displayedRegions[m].Level.isVisible=true
-			for r in ipairs(displayedRegions[m].regRows) do
-				displayedRegions[m].regRows[r].isVisible=true
+			local fixedRowX = rowX
+			fixedRowX = (fixedRowX % (regionSettings.maxRegions * regionSettings.halls))
+			while (fixedRowX < 1) do
+				fixedRowX = fixedRowX + (regionSettings.maxRegions * regionSettings.halls)
 			end
-		end
-		HandleRegions:buildBoundary()
-		-- HandleRows:InitialLayering()
-		mapsDone=true
-	end
-	
-	-- # CLOSING
-end
-
-function HandleRegions:buildBoundary()
-	-- # OPENING
-	-- DEPENDENCIES
-	-- FORWARD CALLS
-	-- LOCAL FUNCTIONS
-	
-	-- # BODY
-	--[[
-	local order={}
-	if displayedRegions[4] then
-		if displayedRegions[4]["MAPY"]<displayedRegions[1]["MAPY"] then
-			if displayedRegions[4]["MAPX"]<displayedRegions[1]["MAPX"] then
-				-- map4 is northwest
-				order={4,3,2,1}
-			else
-				-- map4 is northeast
-				order={3,4,1,2}
-			end
-		else
-			if displayedRegions[4]["MAPX"]<displayedRegions[1]["MAPX"] then
-				-- map4 is southwest
-				order={2,1,4,3}
-			else
-				-- map4 is southeast
-				order={1,2,3,4}
-			end
-		end
-	else
-		order={1}
-	end
-	local mapsize=table.maxn(displayedRegions[1]["PLAIN"])
-	if (displayb) then
-		for x=1,mapsize*2 do
-			for y=1,mapsize*2 do
-				display.remove(displayb[x][y])
-			end
-		end
-	end
-	
-	if (displayb) then
-		if (displayb["MAP"]) then
-			for i=1,4 do
-			display.remove(displayb["MAP"][i])
-			end
-		end
-	end
-	
-	displayb={}
-	local boundary={}
-	for x=1,mapsize*2 do
-		boundary[x]={}
-		displayb[x]={}
-		for y=1,mapsize*2 do
-			local orderpos=1
-			ax=x
-			if ax>mapsize then
-				ax=ax-mapsize
-				orderpos=orderpos+1
-			end
-			local ay=y
-			if ay>mapsize then
-				ay=ay-mapsize
-				orderpos=orderpos+2
-			end
+			local fixedMapX = math.ceil(fixedRowX / regionSettings.halls)
 			
-			displayb[x][y]=display.newRect(x*10,y*10,10,10)
 			
-			if order[orderpos] then
-				boundary[x][y]=displayedRegions[order[orderpos] ]["PLAIN"][ay][ax]
-			else
-				boundary[x][y]=2
+			local fixedRowY = rowY
+			fixedRowY = (fixedRowY % (regionSettings.maxRegions * regionSettings.halls))
+			while (fixedRowY < 1) do
+				fixedRowY = fixedRowY + (regionSettings.maxRegions * regionSettings.halls)
 			end
-			if boundary[x][y]==1 then
-				displayb[x][y]:setFillColor(0.5,0,0,0.8)
-			elseif boundary[x][y]==0 then
-				displayb[x][y]:setFillColor(1,1,1,0.4)
-			else
-				display.remove(displayb[x][y])
-			end
+			local fixedMapY = math.ceil(fixedRowY / regionSettings.halls)
+			
+			
+			
+			parameters = { }
+			parameters.region = { x = fixedMapX, y = fixedMapY }
+			parameters.row = fixedRowY - ((fixedMapY - 1) * regionSettings.halls)
+			parameters.globalRow = fixedRowY
+			parameters.halls = regionSettings.halls
+			parameters.tileSize = regionSettings.tileSize
+			parameters.wallFirst = regionSettings.wallFirst
+			parameters.create = true
+			pendingRows[table.maxn(pendingRows) + 1] = parameters
+			-- builder.Create:Start( parameters )
 		end
 	end
 	
-	displayedRegions["BOUNDS"]=boundary
-	]]
+	for region in ipairs(displayedRows) do
+		for row in ipairs(displayedRows[region]) do
+			displayedRows[region][row].passed = false
+		end
+	end
 	
-	-- # CLOSING
-end
-
-function HandleRegions:setRegion(regionParam)
-	-- # OPENING
-	-- DEPENDENCIES
-	-- FORWARD CALLS
-	local result
-	local row
-	-- LOCAL FUNCTIONS
-	
-	-- # BODY
-	result=HandleRegions:getEmptyRegion()
-	if (result) then
-		displayedRegions[result]=regionParam
+	local create = true
+	for i = 1, table.maxn (pendingRows) do
+		local row = pendingRows[i].globalRow
+		local region = pendingRows[i].region.x
 		
-		for i=1,table.maxn(regionParam["regRows"]) do
-			row=regionParam["regRows"][i]
-			view:add(row,69,false)
-		end
-		view:add(regionParam.Level,70,false)
+		-- print ("CHECK ",region,row)
 		
-		HandleRegions:regionDisplay()
+		if (displayedRows [region] [row] .created) then
+			displayedRows [region] [row] .passed = true
+		elseif ( create ) then
+			create = false
+			-- builder.Create:start (pendingRows [i])
+			
+			print ("REQUESTING", region, row, displayedRows [region] [row] .created, displayedRows [region] [row] .passed)
+			
+			amaga(pendingRows[i])
+		end
 	end
 	
-	-- # CLOSING
-end
-
-function HandleRegions:getRegion(mapx,mapy)
-	-- # OPENING
-	-- DEPENDENCIES
-	-- FORWARD CALLS
-	local id
-	local map
-	-- LOCAL FUNCTIONS
+	mapsDone = create
 	
-	-- # BODY
-	for i=1,table.maxn(displayedRegions) do
-		if (displayedRegions[i]) then
-			if displayedRegions[i]["MAPX"]==mapx and displayedRegions[i]["MAPY"]==mapy then
-				id=i
-				map=displayedRegions[i]
+	for region in ipairs(displayedRows) do
+		for row in ipairs(displayedRows[region]) do
+			if (displayedRows[region][row].passed == false and displayedRows[region][row].created) then
+				HandleRows:cleanRow(region, row)
 			end
 		end
 	end
 	
+	-- if (not mapsDone) then
+	
+		-- HandleRows:requestRows()
+	
+	-- end
+	
 	-- # CLOSING
-	return id,map
 end
 
-function HandleRegions:cleanRegion(victim)
+function HandleRows:fixRegionPosition()
 	-- # OPENING
+	-- print "FIXING POSITIONS"
 	-- DEPENDENCIES
 	-- FORWARD CALLS
+	local current = getPlayerCurrents()
+	local centerX
+	local centerY
+	local centerRegionX
+	local centerRegionY
 	-- LOCAL FUNCTIONS
 	
 	-- # BODY
-	if (displayedRegions[victim]["PHYSICS"]) then
-		for a in ipairs(displayedRegions[victim]["PHYSICS"]) do
-			display.remove(displayedRegions[victim]["PHYSICS"][a])
-			displayedRegions[victim]["PHYSICS"][a]=nil
-		end
-	else
-		print ("MAP "..victim.." doesnt exist?")
-	end
 	
-	if (displayedRegions[victim]["TOP"]) then
-		for a in ipairs(displayedRegions[victim]["TOP"]) do
-			display.remove(displayedRegions[victim]["TOP"][a])
-			displayedRegions[victim]["TOP"][a]=nil
-		end
-	else
-		print ("MAP "..victim.." doesnt exist?")
-	end
+	centerX = current.region.x
+	centerY = current.region.y
 	
-	if (displayedRegions[victim]["SIDE"]) then
-		for a in ipairs(displayedRegions[victim]["SIDE"]) do
-			display.remove(displayedRegions[victim]["SIDE"][a])
-			displayedRegions[victim]["SIDE"][a]=nil
-		end
-	else
-		print ("MAP "..victim.." doesnt exist?")
-	end
+	-- print ("CENTER ",centerX, centerY)
 	
-	if (displayedRegions[victim]["TILE"]) then
-		for a in ipairs(displayedRegions[victim]["TILE"]) do
-			display.remove(displayedRegions[victim]["TILE"][a])
-			displayedRegions[victim]["TILE"][a]=nil
-		end
-	else
-		print ("MAP "..victim.." doesnt exist?")
-	end
+	centerRegionX = current.realPixels.x - current.regionPixels.x
+	centerRegionY = current.realPixels.y - current.regionPixels.y
 	
-	if (displayedRegions[victim]["Gradients"]) then
-		for a in ipairs(displayedRegions[victim]["Gradients"]) do
-			for b in ipairs(displayedRegions[victim]["Gradients"][a]) do
-				display.remove(displayedRegions[victim]["Gradients"][a][b])
-				displayedRegions[victim]["Gradients"][a][b]=nil
+	-- print (centerRegionX, centerRegionY)
+	
+	for regionX = centerX - regionSettings.fixDimensions, centerX + regionSettings.fixDimensions do
+	
+		local fixedRegionX = regionX % regionSettings.maxRegions
+		while (fixedRegionX < 1) do
+			fixedRegionX = fixedRegionX + regionSettings.maxRegions
+		end
+		
+		-- print ("REGIONX",fixedRegionX)
+		
+		for regionY = centerY - regionSettings.fixDimensions, centerY + regionSettings.fixDimensions do
+			local fixedRegionY = regionY % regionSettings.maxRegions
+			while (fixedRegionY < 1) do
+				fixedRegionY = fixedRegionY + regionSettings.maxRegions
+			end
+		
+			-- print ("REGIONY",fixedRegionY)
+		
+			local distanceX = centerX - regionX
+			distanceX = distanceX * regionSettings.halls * regionSettings.tileSize
+			distanceX = centerRegionX - distanceX
+			
+			local distanceY = centerY - regionY
+			distanceY = distanceY * regionSettings.halls * regionSettings.tileSize
+			distanceY = centerRegionY - distanceY
+			
+			
+			for row = 1, regionSettings.halls do
+				local thisDistanceY = distanceY + ((row - 1) * regionSettings.tileSize)
+				
+				
+				local globalRow = ((fixedRegionY - 1) * regionSettings.halls) + row
+				
+				
+				-- print ("ROW",row,"or",globalRow)
+				
+				displayedRows[fixedRegionX][globalRow].x = distanceX
+				displayedRows[fixedRegionX][globalRow].y = thisDistanceY
+				
+				-- print (distanceX, thisDistanceY)
 			end
 		end
-	else
-		print ("MAP "..victim.." doesnt exist?")
 	end
 	
-	displayedRegions[victim]=nil
-	
-	-- # CLOSING
 end
 
---[[
-function HandleRegions:movementEvents()
+function HandleRows:addRegion( regionParam, regionIndex, globalRow )
 	-- # OPENING
 	-- DEPENDENCIES
 	-- FORWARD CALLS
-	local pastx
-	local pasty
-	local newx
-	local newy
 	-- LOCAL FUNCTIONS
 	
 	-- # BODY
 	
+	
+	-- regionParam.xScale = regionParam.xScale * 0.2
+	-- regionParam.yScale = regionParam.yScale * 0.2
+	
+	HandleRows:fixRegionPosition()
+	
+	-- print ("RECEIVING",regionIndex,globalRow)
+	
+	regionParam .x = displayedRows [regionIndex] [globalRow] .x
+	regionParam .y = displayedRows [regionIndex] [globalRow] .y
+	
+	-- print ("IN POSITION",regionParam .x, regionParam .y)
+	
+	regionParam.created = true
+	
+	displayedRows [regionIndex] [globalRow] = regionParam
+	
+	if (regionParam.y < p1.y) then
+		view:add(displayedRows [regionIndex] [globalRow], 3, false)
+	else
+		view:add(displayedRows [regionIndex] [globalRow], 1, false)
+	end
+	
+	-- # CLOSING
+end
+
+function HandleRows:cleanRow( victimRegion, victimRow )
+	-- # OPENING
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	if (displayedRows[victimRegion][victimRow]["PHYSICS"]) then
+		for a in ipairs(displayedRows[victimRegion][victimRow]["PHYSICS"]) do
+			display.remove(displayedRows[victimRegion][victimRow]["PHYSICS"][a])
+			displayedRows[victimRegion][victimRow]["PHYSICS"][a]=nil
+		end
+	-- else
+		-- print ("PHYSICS "..victimRow.." + "..victimRegion.." doesnt exist?")
+	end
+	
+	if (displayedRows[victimRegion][victimRow]["TOP"]) then
+		for a in ipairs(displayedRows[victimRegion][victimRow]["TOP"]) do
+			display.remove(displayedRows[victimRegion][victimRow]["TOP"][a])
+			displayedRows[victimRegion][victimRow]["TOP"][a]=nil
+		end
+	-- else
+		-- print ("TOP "..victimRow.." + "..victimRegion.." doesnt exist?")
+	end
+	
+	if (displayedRows[victimRegion][victimRow]["SIDE"]) then
+		for a in ipairs(displayedRows[victimRegion][victimRow]["SIDE"]) do
+			display.remove(displayedRows[victimRegion][victimRow]["SIDE"][a])
+			displayedRows[victimRegion][victimRow]["SIDE"][a]=nil
+		end
+	-- else
+		-- print ("SIDE "..victimRow.." + "..victimRegion.." doesnt exist?")
+	end
+	
+	if (displayedRows[victimRegion][victimRow]["TILE"]) then
+		for a in ipairs(displayedRows[victimRegion][victimRow]["TILE"]) do
+			display.remove(displayedRows[victimRegion][victimRow]["TILE"][a])
+			displayedRows[victimRegion][victimRow]["TILE"][a]=nil
+		end
+	-- else
+		-- print ("TILE "..victimRow.." + "..victimRegion.." doesnt exist?")
+	end
+	
+	if (displayedRows[victimRegion][victimRow]["Gradients"]) then
+		for a in ipairs(displayedRows[victimRegion][victimRow]["Gradients"]) do
+			for b in ipairs(displayedRows[victimRegion][victimRow]["Gradients"][a]) do
+				display.remove(displayedRows[victimRegion][victimRow]["Gradients"][a][b])
+				displayedRows[victimRegion][victimRow]["Gradients"][a][b]=nil
+			end
+		end
+	-- else
+		-- print ("GRADS "..victimRow.." + "..victimRegion.." doesnt exist?")
+	end
+	
+	
+	for i = displayedRows[victimRegion][victimRow].numChildren, 1, -1 do
+		local child = displayedRows[victimRegion][victimRow][i]
+		displayedRows[victimRegion][victimRow].parent:remove( child )
+		display.remove( child )
+	end
+	
+	-- print ("CLEANING",victimRegion,victimRow)
+	
+	displayedRows[victimRegion][victimRow]={}
+	
+	-- # CLOSING
+end
+
+function HandleRows:movementEvents()
+	-- # OPENING
+	-- DEPENDENCIES
+	-- FORWARD CALLS
+	-- local pastx
+	-- local pasty
+	-- local newx
+	-- local newy
+	-- LOCAL FUNCTIONS
+	
+	-- # BODY
+	
+	HandleRows:requestRows()
+	
+	playerCheckRefresh()
 	-- pastx,pasty=p1.POSITION.GLOBAL.x*2,p1.POSITION.GLOBAL.y*2
 	-- if displayedRegions[4]["MAPX"]<displayedRegions[1]["MAPX"] then
 		-- pastx=pastx+table.maxn(displayedRegions[1]["PLAIN"])
@@ -797,7 +683,7 @@ function HandleRegions:movementEvents()
 		-- displayb[pastx][pasty]:setFillColor(1,1,1,0.4)
 	-- end
 	
-	-- HandleRegions:mapSwitch()
+	-- HandleRows:mapSwitch()
 	
 	-- local newx,newy=deltaX*2,deltaY*2
 	-- newx,newy=p1.POSITION.GLOBAL.x*2,p1.POSITION.GLOBAL.y*2
@@ -812,96 +698,36 @@ function HandleRegions:movementEvents()
 	
 	-- # CLOSING
 end
---]]
 
-function HandleRegions:regionSwitch(mapxparam,mapyparam,quadparam)
-	-- # OPENING
-	-- DEPENDENCIES
-	local save=require("lua.save")
-	-- FORWARD CALLS
-	local temp
-	local constant
-	-- LOCAL FUNCTIONS
+function amaga( params )
 	
-	-- # BODY
-	if mapxparam~=0 or mapyparam~=0 then
-		p1.POSITION.REGION.x=p1.POSITION.REGION.x+mapxparam
-		p1.POSITION.REGION.y=p1.POSITION.REGION.y+mapyparam
-		
-		if math.abs(p1.POSITION.REGION.x)>maxmap then
-			p1.POSITION.REGION.x=(p1.POSITION.REGION.x/math.abs(p1["MAPX"]))
-			p1.POSITION.REGION.x=p1.POSITION.REGION.x*-1
-			p1.POSITION.REGION.x=maxmap*p1.POSITION.REGION.x
-		end
-		if math.abs(p1.POSITION.REGION.y)>maxmap then
-			p1.POSITION.REGION.y=(p1.POSITION.REGION.y/math.abs(p1["MAPY"]))
-			p1.POSITION.REGION.y=p1.POSITION.REGION.y*-1
-			p1.POSITION.REGION.y=maxmap*p1.POSITION.REGION.y
-		end
-		
-		for i in ipairs(displayedRegions) do
-			if displayedRegions[i].POSITION.REGION.x==p1.POSITION.REGION.x and 
-			displayedRegions[i].POSITION.REGION.y==p1.POSITION.REGION.y then
-				temp=displayedRegions[i]
-				displayedRegions[i]=displayedRegions[1]
-				displayedRegions[1]=temp
-			end
-		end
-		
-		for i in ipairs(displayedRegions) do
-			if displayedRegions[i].POSITION.REGION.x~=p1.POSITION.REGION.x and 
-			displayedRegions[i].POSITION.REGION.y==p1.POSITION.REGION.y then
-				temp=displayedRegions[i]
-				displayedRegions[i]=displayedRegions[2]
-				displayedRegions[2]=temp
-			end
-		end
-		if (displayedRegions[4]) then
-			if displayedRegions[4].POSITION.REGION.x==p1.POSITION.REGION.x and 
-			displayedRegions[4].POSITION.REGION.y~=p1.POSITION.REGION.y then
-				temp=displayedRegions[4]
-				displayedRegions[4]=displayedRegions[3]
-				displayedRegions[3]=temp
-			end
-		end
-		p1.POSITION.REGION.q=quadCheck()
-		if not(p1.POSITION.REGION.q) then
-			p1.POSITION.REGION.q=-1
-		end
-		-- print ("MAP CHANGE: "..p1["MAPX"],p1["MAPY"],p1["QUAD"])
-		-- HandleRows:InitialLayering()
-	elseif (quadparam) then
+	local group = display.newGroup()
 	
-		for i in ipairs(displayedRegions) do
-			save.Save:keepMapData(displayedRegions[i])
-		end
-		
-		constant="X"
-		if quadparam%2==0 and p1.POSITION.REGION.q%2==0 then
-			constant="Y"
-		elseif quadparam%2==1 and p1.POSITION.REGION.q%2==1 then
-			constant="Y"
-		end
-		
-		p1.POSITION.REGION.q=quadparam
-		
-		for i in ipairs(displayedRegions) do
-			if displayedRegions[i].POSITION.REGION.x~=p1.POSITION.REGION.x and constant=="X" then
-				HandleRegions:cleanRegion(i)
-			elseif displayedRegions[i].POSITION.REGION.y~=p1.POSITION.REGION.y and constant=="Y" then
-				HandleRegions:cleanRegion(i)
-			end
-		end
-		
-		-- print ("QUAD CHANGE: "..p1["MAPX"],p1["MAPY"],p1["QUAD"])
-		HandleRegions:regionDisplay()
-	end
+	local square = display.newRect(0, 0, regionSettings.tileSize * regionSettings.halls, regionSettings.tileSize)
+	square:setFillColor( math.random(1,9)/10, math.random(1,9)/10, math.random(1,9)/10, 0.3)
+	square.anchorX = 0
+	square.anchorY = 0
+	-- square.xScale = 0.95
+	-- square.yScale = 0.95
+	group:insert(square)
+	
+	local string1 = "Region:  " .. params.region.x .. ", " .. params.region.y
+	
+	local string2 = "Row:  " .. params.row .. "/" .. params.halls .. " or " .. params.globalRow
+	
+	local text1 = display.newText(string1,0,0,native.systemFont,30)
+	text1.y = 0.3 * regionSettings.tileSize
+	text1.x = 0.5 * regionSettings.tileSize * regionSettings.halls
+	group:insert(text1)
+	
+	local text2 = display.newText(string2,0,0,native.systemFont,30)
+	text2.y = 0.6 * regionSettings.tileSize
+	text2.x = 0.5 * regionSettings.tileSize * regionSettings.halls
+	group:insert(text2)
+	
+	HandleRows:addRegion( group, params.region.x, params.globalRow	 )
 
-	-- # CLOSING
 end
-
-
-
 
 ---------------------------------------------------------------------------------------
 -- ENEMIES
@@ -1457,6 +1283,7 @@ function HandleEnemies:getPath(i)
 end
 
 
+
 ---------------------------------------------------------------------------------------
 -- MOVEMENT
 ---------------------------------------------------------------------------------------
@@ -1502,7 +1329,7 @@ function Controls:Move(px,py)
 	p1.x=p1.x+(px*p1["STATS"]["Speed"]/cruisecontrol)
 	p1.y=p1.y+(py*p1["STATS"]["Speed"]/cruisecontrol)
 	
-	-- HandleRegions:movementEvents()
+	HandleRows:movementEvents()
 	
 	-- # CLOSING
 end
@@ -1514,9 +1341,10 @@ function Controls:buttonPress()
 	-- FORWARD CALLS
 	-- LOCAL FUNCTIONS
 	
+		HandleRows:requestRows()
 	-- # BODY
-	p1:setSequence("SWING")
-	Runtime:addEventListener("enterFrame",checkPlayerAttackContact)
+	-- p1:setSequence("SWING")
+	-- Runtime:addEventListener("enterFrame",checkPlayerAttackContact)
 	
 	-- Tests:
 	-- g.CallAddCoins(100)
