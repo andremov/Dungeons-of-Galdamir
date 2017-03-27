@@ -77,7 +77,8 @@ function Perspective.createView(numLayers)
 		local l=l or 4
 		
 		layer[l]:insert(obj)
-		obj.layer=l
+		obj._perspectiveLayer=l
+		obj.layer=obj._perspectiveLayer
 
 		if isFocus==true then
 			view._PERSPECTIVE_PRIVATE_VALUES.focus=obj
@@ -100,7 +101,7 @@ function Perspective.createView(numLayers)
 				obj.layer=obj._perspectiveLayer
 			end
 		end
-			
+		
 		--Moves an object forwards a layer
 		function obj:forward()
 			if layer[obj._perspectiveLayer-1] then

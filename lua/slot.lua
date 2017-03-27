@@ -6,7 +6,7 @@
 module(..., package.seeall)
 
 -- FORWARD CALLS
-local key = { --MAX:62
+local key = { -- MAX: 62
 		"0","1","2","3","4","5","6","7","8","9",
 		"A","B","C","D","E","F","G","H","I","J",
 		"K","L","M","N","O","P","Q","R","S","T",
@@ -214,7 +214,7 @@ end
 
 Save = { }
 
-function Save:keepRegionData( region, x, y )
+function Save:keepMapData( mapSettings, generatedMap )
 	-- # OPENING
 	-- DEPENDENCIES
 	-- FORWARD CALLS
@@ -229,6 +229,65 @@ function Save:keepRegionData( region, x, y )
 		Save["DATA"].regions = { }
 	end
 	
+	for regionY = 1, mapSettings .maxRegions do
+		for regionX = 1, mapSettings .maxRegions do
+			local stringRegion = ""
+	
+			-- ADD REGION ADDRESS IN X
+			local stringX = DecimalToBase ( 62, regionX )
+			for i = #stringX, 1 do
+				stringX = "0" .. stringX
+			end
+			stringRegion = stringRegion .. stringX
+			
+			-- ADD REGION ADDRESS IN Y
+			local stringY = DecimalToBase ( 62, regionY )
+			for i = #stringY, 1 do
+				stringY = "0" .. stringY
+			end
+			stringRegion = stringRegion .. stringY
+			
+			-- SERIALIZE REGION
+			-- A WALL IS REPRESENTED BY A 1
+	
+	
+			-- FUTURE TILE CODES:
+			-- 0: VOID
+			-- 1: FLOOR
+			-- 2: WALL
+			-- 3: WEAK_WALL
+			
+			local startX = ((regionX - 1) * mapSettings .regionHalls) + 1
+			local startY = ((regionY - 1) * mapSettings .regionHalls) + 1
+			
+			local endX = regionX * mapSettings .regionHalls
+			local endY = regionY * mapSettings .regionHalls
+			
+			for y = startY, endY do
+				local stringRow = ""
+				for x = startX, endX do
+					local value = 0
+					if (generatedMap [y] [x] .isSolid) then
+						value = 1
+					end
+					stringRow = stringRow .. value
+				end
+				
+				stringRow = BaseToDecimal( 5, stringRow )
+				stringRow = DecimalToBase( 62, stringRow )
+				
+				for i = #stringRow, 3 do
+					stringRow = "0" .. stringRow
+				end
+				stringRegion = stringRegion .. stringRow
+			end
+			
+			Save ["DATA"] .regions [table.maxn (Save["DATA"].regions) + 1] = stringRegion
+			
+		end
+	end
+	
+	--[[
 	-- REGION X POSITION
 	
 	stringRegion = ""
@@ -262,6 +321,8 @@ function Save:keepRegionData( region, x, y )
 	
 	-- SERIALIZE REGION
 	
+	-- A WALL IS REPRESENTED BY A 1
+	
 	for i = 1, table.maxn (region) do
 		fila = ""
 		for j = 1, table.maxn (region [i]) do
@@ -275,13 +336,11 @@ function Save:keepRegionData( region, x, y )
 		fila = BaseToDecimal( 5, fila )
 		fila = DecimalToBase( 62, fila )
 		
-		for i = #fila, 5 do
+		for i = #fila, 3 do
 			fila = "0" .. fila
 		end
-		
 		stringRegion = stringRegion .. fila
 	end
-	
 	
 	-- THIS CODE PREVENTED CONSTANT OVERWRITING OF REGION DATA WHEN REGIONS WERE SAVED ON LOAD AND UNLOAD
 	-- SEEING AS NOW REGIONS ARE SAVED WHEN CREATED, THIS CODE IS UNNECESSARY, BUT IS KEPT FOR ARCHIVE PURPOSES
@@ -298,10 +357,11 @@ function Save:keepRegionData( region, x, y )
 	-- if (found == false) then
 		Save ["DATA"] .regions [table.maxn (Save["DATA"].regions) + 1] = stringRegion
 	-- end
-	
+	]]
 	-- # CLOSING
 end
 
+--[[
 function Save:keepRegionSeed(seed)
 	-- # OPENING
 	-- DEPENDENCIES
@@ -318,6 +378,7 @@ function Save:keepRegionSeed(seed)
 	Save["DATA"].regions.seed = seed
 	-- # CLOSING
 end
+]]
 
 function Save:keepPlayerData(player)
 	-- # OPENING
@@ -645,26 +706,15 @@ function Load:getRegion(mapx,mapy)
 	-- # BODY
 	found=false
 	counter=1
+	
 	if (Save["DATA"]) and (Save["DATA"].regions) then
 		while found==false and counter<=table.maxn(Save["DATA"].regions) do
 			
-			thismapx=string.sub(Save["DATA"].regions[counter],1,3)
-			
-			xneg=string.sub(thismapx,1,1)
-			thismapx=string.sub(thismapx,2)
+			thismapx=string.sub(Save["DATA"].regions[counter],1,2)
 			thismapx=BaseToDecimal(62,thismapx)
-			if xneg=="-" then
-				thismapx=thismapx*-1
-			end
 			
-			thismapy=string.sub(Save["DATA"].regions[counter],4,6)
-			
-			yneg=string.sub(thismapy,1,1)
-			thismapy=string.sub(thismapy,2)
+			thismapy=string.sub(Save["DATA"].regions[counter],3,4)
 			thismapy=BaseToDecimal(62,thismapy)
-			if yneg=="-" then
-				thismapy=thismapy*-1
-			end
 			
 			if thismapx==mapx and thismapy==mapy then
 				found=true
@@ -675,16 +725,18 @@ function Load:getRegion(mapx,mapy)
 		
 		if (found==true) then
 			parsed={}
+			
 			mapinfo=string.sub(Save["DATA"].regions[counter],7)
-			for i=1,#mapinfo/6 do
-				stringpos=(i*6)
-				parsed[i]=string.sub(mapinfo,stringpos-5, stringpos)
+			for i=1,#mapinfo/4 do
+				stringpos=(i*4)
+				parsed[i]=string.sub(mapinfo,stringpos-3, stringpos)
 			end
 			mapinfo=nil
+			
 			for i=1,table.maxn(parsed) do
 				parsed[i]=BaseToDecimal(62,parsed[i])
 				parsed[i]=DecimalToBase(5,parsed[i])
-				for j=#parsed[i],13 do
+				for j=#parsed[i],9 do
 					parsed[i]="0"..parsed[i]
 				end
 				estacol={}
@@ -723,26 +775,16 @@ function Load:regionExists(mapx,mapy)
 	-- # BODY
 	found=false
 	counter=1
+	
 	if (Save["DATA"]) and (Save["DATA"].regions) then
 		while found==false and counter<=table.maxn(Save["DATA"].regions) do
 			
-			thismapx=string.sub(Save["DATA"].regions[counter],1,3)
-			
-			xneg=string.sub(thismapx,1,1)
-			thismapx=string.sub(thismapx,2)
+			thismapx=string.sub(Save["DATA"].regions[counter],1,2)
 			thismapx=BaseToDecimal(62,thismapx)
-			if xneg=="-" then
-				thismapx=thismapx*-1
-			end
 			
-			thismapy=string.sub(Save["DATA"].regions[counter],4,6)
 			
-			yneg=string.sub(thismapy,1,1)
-			thismapy=string.sub(thismapy,2)
+			thismapy=string.sub(Save["DATA"].regions[counter],3,4)
 			thismapy=BaseToDecimal(62,thismapy)
-			if yneg=="-" then
-				thismapy=thismapy*-1
-			end
 			
 			if thismapx==mapx and thismapy==mapy then
 				found=true

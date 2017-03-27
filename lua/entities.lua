@@ -1014,7 +1014,7 @@ function Spawn(ax,ay)
 	return enemy
 end
 
-function CreatePlayer(name)
+function CreatePlayer(name, scale)
 	-- # OPENING
 	-- DEPENDENCIES
 	local physics = require "physics"
@@ -1029,6 +1029,7 @@ function CreatePlayer(name)
 	local statnames
 	local statdescrip
 	local thisstat
+	local scale = scale or 1
 	-- LOCAL FUNCTIONS
 	
 	-- # BODY
@@ -1046,6 +1047,7 @@ function CreatePlayer(name)
 		player["CATEGORY"]="PLAYER"
 		
 		-- Map Essentials
+		player["REVISION"] = { regionX = -1, rowY = -1 }
 		-- player["POSITION"]={}
 		-- player["POSITION"]["REGION"]={x=0,y=0,q=1}
 		-- player["POSITION"]["GLOBAL"]={x=5,y=5}
@@ -1062,7 +1064,7 @@ function CreatePlayer(name)
 		player["CURFRAME"]=1
 		player["TIME"]=1
 		player["LASTTIME"]=0
-		player["SCALE"]=1
+		player["SCALE"]=scale
 		player["COMBAT"]=false
 		player["ANIMATIONS"]=readAnims('Barry/BarryAnim.json')
 		
@@ -1304,6 +1306,8 @@ function CreatePlayer(name)
 			end
 			for i=1,table.maxn(limbnames) do
 				thislimb=display.newImage("Barry/reg/"..limbnames[i]..".png")
+				thislimb.xScale = scale
+				thislimb.yScale = scale
 				thislimb.name=limbnames[i]
 				if player["COPIES"][t]=="B&W" and limbnames[i]=="Sword" then
 					player["WEAPON"]=thislimb
@@ -1342,6 +1346,8 @@ function CreatePlayer(name)
 		
 		-- Shadow Essentials
 		player["shadow"]=display.newImageRect("Barry/Shadow.png",103,17)
+		player["shadow"].xScale = scale
+		player["shadow"].yScale = scale
 		player["shadow"].anchorY=0.2
 		player:insert(player["shadow"])
 		
@@ -1421,8 +1427,8 @@ function CreatePlayer(name)
 		-- player:refresh()
 		Runtime:addEventListener("enterFrame",player.refresh)
 		
-		player.x = 1
-		player.y = 1
+		player.x = 150
+		player.y = 100
 	end
 	
 	-- # CLOSING
